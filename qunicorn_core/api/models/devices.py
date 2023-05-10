@@ -26,15 +26,25 @@ class DevicesSchema(MaBaseSchema):
         cls_or_instance=ma.fields.Str(),
         required=True,
         allow_none=False,
-        metadata={"description": "List of available services which can be used with a device."},
+        metadata={
+            "description": "List of available services which can be used with a device."
+        },
     )
-    device_id = ma.fields.Integer(required=True, allow_none=False, metadata={"description": "The unique deviceID."})
-    name = ma.fields.String(required=True, allow_none=False, metadata={"description": "The name of a device."})
-    address_url = ma.fields.String(required=True, allow_none=False, metadata={"description": "URL of a device."})
+    device_id = ma.fields.Integer(
+        required=True, allow_none=False, metadata={"description": "The unique deviceID."}
+    )
+    name = ma.fields.String(
+        required=True, allow_none=False, metadata={"description": "The name of a device."}
+    )
+    address_url = ma.fields.String(
+        required=True, allow_none=False, metadata={"description": "URL of a device."}
+    )
     status = ma.fields.String(
         required=True,
         allow_none=False,
-        metadata={"description": "Availability of a device. [Available], [Not_Available]"},
+        metadata={
+            "description": "Availability of a device. [Available], [Not_Available]"
+        },
     )
     description = ma.fields.String(
         required=True,

@@ -128,7 +128,9 @@ class JWTMixin:
                     continue  # encountered empty schema for optional security
                 schema_name = next(iter(scheme.keys()))
                 if schema_name not in available_schemas:
-                    warn(f"The schema '{scheme}' is not specified in the available securitySchemes.")
+                    warn(
+                        f"The schema '{scheme}' is not specified in the available securitySchemes."
+                    )
             doc = deepupdate(doc, {"security": operation})
         return doc
 
