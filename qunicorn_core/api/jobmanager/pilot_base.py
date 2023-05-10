@@ -15,6 +15,7 @@
 
 class Pilot:
     """Base class for Pilots"""
+
     def __init__(self, name):
         self.name = name
 

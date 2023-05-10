@@ -4,13 +4,11 @@ from flask import render_template, current_app
 from .root import DEBUG_BLP
 
 
-
 @DEBUG_BLP.route("/routes")
 def routes():
     """Render all registered routes."""
     output = []
     for rule in current_app.url_map.iter_rules():
-
         line = {
             "endpoint": rule.endpoint,
             "methods": ", ".join(rule.methods),

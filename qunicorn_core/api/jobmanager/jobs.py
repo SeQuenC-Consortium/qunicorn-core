@@ -46,15 +46,17 @@ class JobRegister:
     shots: int
     circuit_format: str
 
+
 qiskitpilot = QiskitPilot
 awspilot = AWSPilot
+
 
 @CELERY.task()
 def createJob(request):
     """Create a job and assign to the target pilot"""
-    if(request == 'IBMQ'):
+    if request == "IBMQ":
         pilot = qiskitpilot("QP")
-        pilot.execute('123456')
+        pilot.execute("123456")
         print(f"Job Registered at {request}")
         time.sleep(5)
         print("Job complete")
@@ -84,10 +86,10 @@ class JobIDView(MethodView):
         """Create/Register new job."""
 
         request_data = request.get_json()
-        target = request_data['target']
+        target = request_data["target"]
         print(target)
         createJob.delay(target)
-        return jsonify({'taskmode': f'Job type {target}'}), 200
+        return jsonify({"taskmode": f"Job type {target}"}), 200
 
 
 @JOBMANAGER_API.route("/<string:job_id>/")
@@ -97,31 +99,26 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def get(self, job_id: str):
         """Get the urls for the jobmanager api for job control."""
-        
+
         pass
 
     @JOBMANAGER_API.arguments(JobRegisterSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def post(self, job_id: str):
         """Cancel a job execution via id."""
-  
+
         pass
 
-    
     @JOBMANAGER_API.arguments(JobRegisterSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def delete(self, job_id: str):
         """Delete job data via id."""
-       
+
         pass
 
-        
     @JOBMANAGER_API.arguments(JobRegisterSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def put(self, job_id: str):
         """Pause a job via id."""
-       
+
         pass
-
-
-  

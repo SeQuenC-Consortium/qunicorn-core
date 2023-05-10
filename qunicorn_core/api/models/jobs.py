@@ -37,11 +37,15 @@ class JobRegisterSchema(MaBaseSchema):
     credentials = ma.fields.Dict(
         keys=ma.fields.Str(), values=ma.fields.Str(), required=True
     )
-    shots = ma.fields.Int(required=False, allow_none = True, metada={
-        "label" : "Shots",
-        "description" : "Number of shots",
-        "input_type" : "number"
-    })
+    shots = ma.fields.Int(
+        required=False,
+        allow_none=True,
+        metada={
+            "label": "Shots",
+            "description": "Number of shots",
+            "input_type": "number",
+        },
+    )
     noise_model = ma.fields.String(required=False)
     only_measurement_errors = ma.fields.Boolean(required=False)
     circuit_format = ma.fields.String(required=False)
@@ -52,6 +56,7 @@ class JobIDSchema(MaBaseSchema):
     uid = ma.fields.Integer(required=True, allow_none=False, dump_only=True, example=123)
     description = ma.fields.String(required=False, allow_none=False, dump_only=True)
     taskmode = ma.fields.Integer(required=False, allow_none=False, dump_only=True)
+
 
 class JobResponseSchema(MaBaseSchema):
     pass

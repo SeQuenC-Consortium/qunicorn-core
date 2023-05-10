@@ -36,7 +36,6 @@ class DEVICES:
     simulator: bool
 
 
-
 @DEVICES_API.route("/<string:device_id>/")
 class DevicesView(MethodView):
     """Devices Endpoint to get properties of a specific device."""
@@ -45,7 +44,7 @@ class DevicesView(MethodView):
     @DEVICES_API.response(HTTPStatus.OK, DevicesSchema())
     def get(self):
         """Get information about a specific device."""
-        
+
         pass
 
 
@@ -57,7 +56,7 @@ class DevicesView(MethodView):
     @DEVICES_API.response(HTTPStatus.OK, DevicesSchema())
     def get(self):
         """Get the status of a specific device."""
-    
+
         pass
 
 
@@ -80,6 +79,5 @@ class DevicesView(MethodView):
     @DEVICES_API.response(HTTPStatus.OK, DevicesSchema())
     def get(self):
         """Get the active jobs of a device."""
-        
-        pass
 
+        pass

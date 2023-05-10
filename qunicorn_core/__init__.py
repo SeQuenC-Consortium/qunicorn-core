@@ -84,7 +84,6 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
             celery_conf["broker_url"] = environ["BROKER_URL"]
             config["CELERY"] = celery_conf
 
-
     else:
         # load the test config if passed in
         config.from_mapping(test_config)

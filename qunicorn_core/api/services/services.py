@@ -44,6 +44,5 @@ class ServicesView(MethodView):
     @SERVICES_API.response(HTTPStatus.OK, ServicesSchema())
     def get(self):
         """Get information about a sinlge service."""
-        
-        pass
 
+        pass

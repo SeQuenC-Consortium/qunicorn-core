@@ -6,6 +6,7 @@ from .sqlalchemy_config import SQLAchemyProductionConfig, SQLAchemyDebugConfig
 from .smorest_config import SmorestProductionConfig, SmorestDebugConfig
 from .celery_config import CELERY_DEBUG_CONFIG
 
+
 class ProductionConfig(SQLAchemyProductionConfig, SmorestProductionConfig):
     ENV = "production"
     SECRET_KEY = urandom(32)
@@ -26,6 +27,7 @@ class ProductionConfig(SQLAchemyProductionConfig, SmorestProductionConfig):
     DEFAULT_LOG_DATE_FORMAT = None
 
     CELERY = CELERY_DEBUG_CONFIG
+
 
 class DebugConfig(ProductionConfig, SQLAchemyDebugConfig, SmorestDebugConfig):
     ENV = "development"

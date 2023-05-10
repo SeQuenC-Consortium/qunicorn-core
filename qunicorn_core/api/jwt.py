@@ -75,7 +75,6 @@ class JWTMixin:
             security_scheme = {security_scheme: []}
 
         def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
-
             # map to names that are less likely to have collisions with user defined arguments!
             _jwt_optional = optional
             _jwt_fresh = fresh
@@ -131,7 +130,9 @@ class JWTMixin:
                     continue  # encountered empty schema for optional security
                 schema_name = next(iter(scheme.keys()))
                 if schema_name not in available_schemas:
-                    warn(f"The schema '{scheme}' is not specified in the available securitySchemes.")
+                    warn(
+                        f"The schema '{scheme}' is not specified in the available securitySchemes."
+                    )
             doc = deepupdate(doc, {"security": operation})
         return doc
 
@@ -167,11 +168,7 @@ def loadUserObject(jwt_header: dict, jwt_payload: dict):
 @JWT.user_lookup_error_loader
 def on_user_load_error(jwt_header: dict, jwt_payload: dict):
     identity: Optional[str] = jwt_payload.get("sub")
-    abort(
-        401,
-        message=f"The user with the id '{identity}' could not be loaded."
-        
-    )
+    abort(401, message=f"The user with the id '{identity}' could not be loaded.")
 
 
 @JWT.expired_token_loader

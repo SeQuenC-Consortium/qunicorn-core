@@ -15,7 +15,7 @@
 
 """Module containing the routes of the Taskmanager API."""
 
-from ..models.users import UserIDSchema, UsersSchema 
+from ..models.users import UserIDSchema, UsersSchema
 from typing import Dict, List
 from flask.helpers import url_for
 from flask.views import MethodView
@@ -40,6 +40,5 @@ class UsersView(MethodView):
     @USERS_API.response(HTTPStatus.OK, UsersSchema())
     def get(self):
         """Get information about a sinlge user."""
-        
-        pass
 
+        pass
