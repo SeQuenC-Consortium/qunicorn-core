@@ -3,6 +3,8 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Python: >= 3.8](https://img.shields.io/badge/python-^3.8-blue)
+[![Formatting and linting](https://github.com/SeQuenC-Consortium/qunicorn-core/actions/workflows/formatting-linting.yml/badge.svg)](https://github.com/SeQuenC-Consortium/qunicorn-core/actions/workflows/formatting-linting.yml)
+[![Runs python tests](https://github.com/SeQuenC-Consortium/qunicorn-core/actions/workflows/run-pytests.yml/badge.svg)](https://github.com/SeQuenC-Consortium/qunicorn-core/actions/workflows/run-pytests.yml)
 
 This package uses Poetry ([documentation](https://python-poetry.org/docs/)).
 
