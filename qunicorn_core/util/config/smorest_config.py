@@ -5,9 +5,7 @@ class SmorestProductionConfig:
 
     # OpenAPI Documentation renderers:
     OPENAPI_REDOC_PATH = "/redoc/"
-    OPENAPI_REDOC_URL = (
-        "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"
-    )
+    OPENAPI_REDOC_URL = "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"
 
     OPENAPI_RAPIDOC_PATH = "/rapidoc/"
     OPENAPI_RAPIDOC_URL = "https://cdn.jsdelivr.net/npm/rapidoc/dist/rapidoc-min.js"

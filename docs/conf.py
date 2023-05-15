@@ -88,9 +88,7 @@ extensions = [
 autosectionlabel_prefix_document = False
 autosectionlabel_maxdepth = None
 
-intersphinx_mapping: Optional[
-    Dict[str, Tuple[str, Union[Optional[str], Tuple[str]]]]
-] = None
+intersphinx_mapping: Optional[Dict[str, Tuple[str, Union[Optional[str], Tuple[str]]]]] = None
 intersphinx_timeout = 30
 
 source_suffix = {
@@ -121,10 +119,7 @@ if sphinx_config.get("enable-autosectionlabel", False):
 if sphinx_config.get("intersphinx-mapping", None):
     extensions.append("sphinx.ext.intersphinx")
     mapping = sphinx_config.get("intersphinx-mapping", None)
-    intersphinx_mapping = {
-        key: (val[0], val[1] if len(val) > 1 and val[1] else None)
-        for key, val in mapping.items()
-    }
+    intersphinx_mapping = {key: (val[0], val[1] if len(val) > 1 and val[1] else None) for key, val in mapping.items()}
 
 
 myst_enable_extensions: List[str] = []
@@ -137,9 +132,7 @@ if sphinx_config.get("enable-markdown", False):
     elif _md_plugin.lower() == "recommonmark":
         extensions.append("recommonmark")
     else:
-        print(
-            "Unknown markdown plugin specified (allowed: 'myst', 'recommonmark'), using 'myst'."
-        )
+        print("Unknown markdown plugin specified (allowed: 'myst', 'recommonmark'), using 'myst'.")
         extensions.append("myst_parser")
     print("MARKDOWN ENABLED")
 

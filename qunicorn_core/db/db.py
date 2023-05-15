@@ -41,9 +41,7 @@ DB: SQLAlchemy = SQLAlchemy(
 # Model constant to be importable directly
 MODEL = cast(Type[DeclarativeBase], DB.Model)
 if not issubclass(MODEL, Model):
-    raise Warning(
-        f"Please update the type cast of db.MODEL to reflect the current type {type(MODEL)}."
-    )
+    raise Warning(f"Please update the type cast of db.MODEL to reflect the current type {type(MODEL)}.")
 
 REGISTRY: registry = MODEL.registry
 

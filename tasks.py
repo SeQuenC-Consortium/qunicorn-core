@@ -250,9 +250,7 @@ def start_containers(c):
 
 
 @task
-def worker(
-    c, pool="solo", concurrency=1, dev=False, log_level="INFO", periodic_scheduler=False
-):
+def worker(c, pool="solo", concurrency=1, dev=False, log_level="INFO", periodic_scheduler=False):
     """Run the celery worker, optionally starting the redis broker.
 
     Args:
@@ -396,9 +394,7 @@ def purge_task_queues(c):
     Args:
         c (Context): task context
     """
-    answer = input(
-        "This action cannot be undone. Type in 'purge' to purge all task queues:"
-    )
+    answer = input("This action cannot be undone. Type in 'purge' to purge all task queues:")
     if answer != "purge":
         print("Not purging task queues.")
         return
@@ -584,9 +580,7 @@ def start_docker(c):
             periodic_scheduler=periodic_scheduler,
         )
     else:
-        raise ValueError(
-            "Environment variable 'CONTAINER_MODE' must be set to either 'server' or 'worker'!"
-        )
+        raise ValueError("Environment variable 'CONTAINER_MODE' must be set to either 'server' or 'worker'!")
 
 
 @task
@@ -681,18 +675,12 @@ def doc_index(c, filter_=""):
             hide="stdout",
         )
         print(
-            "".join(
-                l
-                for l in output.stdout.splitlines(True)
-                if (l and not l[0].isspace()) or (not filter_) or (filter_ in l.lower())
-            ),
+            "".join(l for l in output.stdout.splitlines(True) if (l and not l[0].isspace()) or (not filter_) or (filter_ in l.lower())),
         )
 
 
 @task
-def list_licenses(
-    c, format_="json", include_installed=False, summary=False, short=False, echo=False
-):
+def list_licenses(c, format_="json", include_installed=False, summary=False, short=False, echo=False):
     """List licenses of dependencies.
 
     By default only the direct (and transitive) dependencies of the plugin runner are included.
