@@ -34,9 +34,7 @@ class JobRegisterSchema(MaBaseSchema):
     circuit = CircuitField(required=True)
     target = ma.fields.String(required=True, example="IBMQ")
     qpu = ma.fields.String(required=True)
-    credentials = ma.fields.Dict(
-        keys=ma.fields.Str(), values=ma.fields.Str(), required=True
-    )
+    credentials = ma.fields.Dict(keys=ma.fields.Str(), values=ma.fields.Str(), required=True)
     shots = ma.fields.Int(
         required=False,
         allow_none=True,
