@@ -21,6 +21,6 @@ jobs:
       - name: Install requirements with poetry
         run: python -m poetry export --without-hashes --format=requirements.txt -o requirements.txt && python -m pip install -r requirements.txt
       - name: Run unit tests
-        run: python -m pytest qunicorn_core/tests
+        run: python -m pytest tests
 
 
