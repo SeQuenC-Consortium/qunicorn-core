@@ -6,13 +6,13 @@ To get an overview of qunicorn, read our **[README](README.md)** or check our **
 
 
 # Git Workflow 
-wip 
+This section contains our git workflow.
 
 # Conventions
 ## Branch Naming convention
 Convention is based on: <https://gist.github.com/digitaljhelms/4287848>
-* Feature Branch: feature-{IssueNumber}-{ShortIssueDescription}
-* Bug Branch: bug-{bugNumber}-{ShortBugDescription}
+* Feature Branch: feature/{IssueNumber}-{ShortIssueDescription}
+* Bug Branch: bug/{bugNumber}-{ShortBugDescription}
 * Descriptions should not be much longer than 4,5 words
 
 ## Commit message convention
