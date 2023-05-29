@@ -17,6 +17,10 @@
 
 """Module containing all SQLalchemy Models."""
 
-from . import example  # noqa
-# from . import deployments
-# from . import jobs
+from . import cloud_device
+from . import deployment
+from . import job
+from . import pilot
+from . import provider
+from . import quantum_program
+from . import user
