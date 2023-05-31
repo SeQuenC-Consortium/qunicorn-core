@@ -33,7 +33,8 @@ class UserDataclass:
     """Dataclass for storing Users
     
     Attributes:
-        TODO
+        id (int): automatically generated database id. Use the id to fetch this information from the database.
+        name (str): name of the user.
     """
 
     __tablename__ = "User"

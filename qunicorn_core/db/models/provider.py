@@ -35,7 +35,10 @@ class ProviderDataclass:
     """Dataclass for storing Providers
     
     Attributes:
-        TODO
+        id (int): automatically generated database id. Use the id to fetch this information from the database.
+        with_token (bool): if authentication is needed and can be done by passing a token this attribute true.
+        supported_language (ProgrammingLanguage): the programming language that this provider supports.
+        cloud_service (CloudService): name of the cloud service.
     """
 
     __tablename__ = "Provider"

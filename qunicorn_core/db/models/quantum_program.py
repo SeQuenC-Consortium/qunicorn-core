@@ -34,8 +34,8 @@ class QuantumProgramDataclass:
     """Dataclass for storing QuantumPrograms
     
     Attributes:
-        We will later extend this class and maybe create subclasses for different types
-        TODO
+        id (int): automatically generated database id. Use the id to fetch this information from the database.
+        quantum_circuit (str): quantum code that needs to be executed.
     """
 
     __tablename__ = "QuantumProgram"
