@@ -44,7 +44,6 @@ class PilotDataclass:
     __tablename__ = "Pilot"
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
-    programming_language: Mapped[ProgrammingLanguage] = mapped_column(sql.String(50), default=None)
     job: Mapped[int] = mapped_column(ForeignKey("JobDataclass.id"))
+    programming_language: Mapped[ProgrammingLanguage] = mapped_column(sql.String(50), default=None)
     state: Mapped[PilotState] = mapped_column(sql.String(50), default=None)
-

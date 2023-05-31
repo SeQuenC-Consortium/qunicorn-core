@@ -41,4 +41,4 @@ class QuantumProgramDataclass:
     __tablename__ = "QuantumProgram"
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
-    quantum_circuit: mapped_column(sql.BLOB, default=None)
+    quantum_circuit: Mapped[str] = mapped_column(sql.BLOB, default=None)

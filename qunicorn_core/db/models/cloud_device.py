@@ -42,6 +42,5 @@ class CloudDeviceDataclass:
     __tablename__ = "CloudDevice"
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
-    rest_endpoint: Mapped[str] = mapped_column(sql.String(50), default=None)
     provider: Mapped[int] = mapped_column(ForeignKey("ProviderDataclass.id"))
-
+    rest_endpoint: Mapped[str] = mapped_column(sql.String(50), default=None)

@@ -35,7 +35,8 @@ class DeploymentDataclass:
     __tablename__ = "Deployment"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     deployed_by: Mapped[int] = mapped_column(ForeignKey("UserDataclass.id"))
     quantum_program_id: Mapped[int] = mapped_column(ForeignKey("QuantumProgramDataclass.id"))
     deployed_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
+    name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
+

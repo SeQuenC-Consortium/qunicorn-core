@@ -49,7 +49,6 @@ class JobDataclass:
     __tablename__ = "Job"
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
-    name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     executed_by: Mapped[int] = mapped_column(ForeignKey("UserDataclass.id"))
     executed_on: Mapped[int] = mapped_column(ForeignKey("CloudDeviceDataclass.id"))
     deployment_id: Mapped[int] = mapped_column(ForeignKey("DeploymentDataclass.id"))
@@ -57,6 +56,7 @@ class JobDataclass:
     state: Mapped[JobState] = mapped_column(sql.String(50), default=None) #TODO: How do we store Enums in the DB
     started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
+    name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     token: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     data: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     results: Mapped[Optional[Union[dict, list, str, float, int, bool, None]]] = mapped_column(sql.BLOB, default=None)
