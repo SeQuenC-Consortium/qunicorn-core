@@ -12,21 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence, List, Union
-
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import sqltypes as sql
-from sqlalchemy.sql import sqltypes as sql
-from sqlalchemy.sql.expression import select
-from sqlalchemy.sql.schema import ForeignKey
-from .deployment import DeploymentDataclass
 
-from ..db import MODEL, REGISTRY
-
-from datetime import datetime
-
-from ..enums.job_state import JobState
-from ..enums.programming_language import ProgrammingLanguage
+from ..db import REGISTRY
 
 
 @REGISTRY.mapped_as_dataclass
@@ -34,8 +23,8 @@ class QuantumProgramDataclass:
     """Dataclass for storing QuantumPrograms
     
     Attributes:
-        id (int): automatically generated database id. Use the id to fetch this information from the database.
-        quantum_circuit (str): quantum code that needs to be executed.
+        id (int): Automatically generated database id. Use the id to fetch this information from the database.
+        quantum_circuit (str): Quantum code that needs to be executed.
     """
 
     __tablename__ = "QuantumProgram"

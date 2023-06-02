@@ -12,21 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence, List, Union
-
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import sqltypes as sql
-from sqlalchemy.sql import sqltypes as sql
-from sqlalchemy.sql.expression import select
 from sqlalchemy.sql.schema import ForeignKey
-from .deployment import DeploymentDataclass
 
-from ..db import MODEL, REGISTRY
-
-from datetime import datetime
-
-from ..enums.job_state import JobState
-from ..enums.programming_language import ProgrammingLanguage
+from ..db import REGISTRY
 
 
 @REGISTRY.mapped_as_dataclass
@@ -34,9 +24,9 @@ class CloudDeviceDataclass:
     """Dataclass for storing CloudDevices of a provider
     
     Attributes:
-        id (int): automatically generated database id. Use the id to fetch this information from the database.
-        rest_endpoint (str): rest_endpoint how to connect to the Cloud device
-        provider: the provider of the cloud_service with the needed configurations
+        id (int): Automatically generated database id. Use the id to fetch this information from the database.
+        rest_endpoint (str): Rest-endpoint how to connect to the Cloud device
+        provider: The provider of the cloud_service with the needed configurations
     """
 
     __tablename__ = "CloudDevice"

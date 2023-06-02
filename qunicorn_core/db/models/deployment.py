@@ -26,9 +26,9 @@ class DeploymentDataclass:
     """Dataclass for storing deployments
 
     Attributes:
-        id (int): automatically generated database id. Use the id to fetch this information from the database.
-        name (str, optional): optional name for a deployment
-        deployed_by (str): the  user_id that deployed this Deployment
+        id (int): Automatically generated database id. Use the id to fetch this information from the database.
+        name (str, optional): Optional name for a deployment
+        deployed_by (str): The  user_id that deployed this Deployment
         deployed_at (Date): Date of the creation of a deployment
     """
 

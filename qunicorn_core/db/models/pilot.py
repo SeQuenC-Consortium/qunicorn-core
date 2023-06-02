@@ -12,22 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence, List, Union
-
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import sqltypes as sql
-from sqlalchemy.sql import sqltypes as sql
-from sqlalchemy.sql.expression import select
 from sqlalchemy.sql.schema import ForeignKey
-from .deployment import DeploymentDataclass
 
-from ..db import MODEL, REGISTRY
+from ..db import REGISTRY
 
-from datetime import datetime
-
-from ..enums.job_state import JobState
-from ..enums.pilot_state import PilotState
-from ..enums.programming_language import ProgrammingLanguage
+from ...static.enums.pilot_state import PilotState
+from ...static.enums.programming_language import ProgrammingLanguage
 
 
 @REGISTRY.mapped_as_dataclass
@@ -35,10 +27,10 @@ class PilotDataclass:
     """Dataclass for storing Pilots
     
     Attributes:
-        id (int): automatically generated database id. Use the id to fetch this information from the database.
-        programming_language (ProgrammingLanguage): programming language that the code should have after translation
+        id (int): Automatically generated database id. Use the id to fetch this information from the database.
+        programming_language (ProgrammingLanguage): Programming language that the code should have after translation
         job (int): ID of the job that is executed by the pilot.
-        state (PilotState): represents progress and current state of pilot.
+        state (PilotState): Represents progress and current state of pilot.
     """
 
     __tablename__ = "Pilot"

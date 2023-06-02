@@ -12,20 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Sequence, List, Union
+from typing import Optional, Union
 
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import sqltypes as sql
-from sqlalchemy.sql import sqltypes as sql
-from sqlalchemy.sql.expression import select
 from sqlalchemy.sql.schema import ForeignKey
-from .deployment import DeploymentDataclass
 
-from ..db import MODEL, REGISTRY
+from ..db import REGISTRY
 
 from datetime import datetime
 
-from ..enums.job_state import JobState
+from ...static.enums.job_state import JobState
 
 
 @REGISTRY.mapped_as_dataclass
@@ -33,17 +30,17 @@ class JobDataclass:
     """Dataclass for storing Jobs
     
     Attributes:
-        id (int): automatically generated database id. Use the id to fetch this information from the database.
+        id (int): Automatically generated database id. Use the id to fetch this information from the database.
         name (str, optional): Optional name for a job
         executed_by (str): A user_id associated to the job, user that wants to execute the job
         deployment_id (int): A deployment_id associated with the job
-        state (Optional[str], optional): the state of a job, enum JobState
-        started_at (datetime, optional): the moment the job was scheduled. (default :py:func:`~datetime.datetime.utcnow`)
-        finished_at (Optional[datetime], optional): the moment the job finished successfully or with an error.
+        state (Optional[str], optional): The state of a job, enum JobState
+        started_at (datetime, optional): The moment the job was scheduled. (default :py:func:`~datetime.datetime.utcnow`)
+        finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
         token (str, optional): The token that is needed to authenticate for a cloud_device
-        data (Union[dict, list, str, float, int, bool, None], optional): mutable JSON-like store for additional lightweight task data. Default value is empty dict.
-        results (str, optional): the output data (files) of the job
-        parameters (str, optional): the parameters for the Job. Job parameters should already be prepared and error checked before starting the task.
+        data (Union[dict, list, str, float, int, bool, None], optional): Mutable JSON-like store for additional lightweight task data. Default value is empty dict.
+        results (str, optional): The output data (files) of the job
+        parameters (str, optional): The parameters for the Job. Job parameters should already be prepared and error checked before starting the task.
     """
 
     __tablename__ = "Job"

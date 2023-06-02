@@ -12,24 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
-
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.sql import sqltypes as sql
-
-from ..db import REGISTRY
+from enum import Enum
 
 
-@REGISTRY.mapped_as_dataclass
-class UserDataclass:
-    """Dataclass for storing Users
-    
-    Attributes:
-        id (int): Automatically generated database id. Use the id to fetch this information from the database.
-        name (str): Name of the user.
+class PilotState(Enum):
+    """Enum to save the different states of the pilots
+
+    Values:
+        READY: Pilot is ready to use
+        BLOCKED: Pilot currently executes a job and cannot used otherwise
     """
 
-    __tablename__ = "User"
-
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
-    name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
+    READY = 1
+    BLOCKED = 2
