@@ -12,15 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# originally from <https://github.com/buehlefs/flask-template/>
+from enum import Enum
 
 
-"""Module containing all SQLalchemy Models."""
+class ProviderName(Enum):
+    """Enum to save the different provider names
 
-from . import cloud_device
-from . import deployment
-from . import job
-from . import pilot
-from . import provider
-from . import quantum_program
-from . import user
+    Values:
+        IBM: International Business Machines Corporation
+        AWS: Amazon Web Services
+    """
+
+    IBM = 1
+    AWS = 2

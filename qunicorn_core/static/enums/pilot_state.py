@@ -12,15 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# originally from <https://github.com/buehlefs/flask-template/>
+from enum import Enum
 
 
-"""Module containing all SQLalchemy Models."""
+class PilotState(Enum):
+    """Enum to save the different states of the pilots
 
-from . import cloud_device
-from . import deployment
-from . import job
-from . import pilot
-from . import provider
-from . import quantum_program
-from . import user
+    Values:
+        READY: Pilot is ready to use
+        BLOCKED: Pilot currently executes a job and cannot used otherwise
+    """
+
+    READY = 1
+    BLOCKED = 2

@@ -12,15 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# originally from <https://github.com/buehlefs/flask-template/>
+from enum import Enum
 
 
-"""Module containing all SQLalchemy Models."""
+class JobState(Enum):
+    """Enum to save the different states of the jobs
 
-from . import cloud_device
-from . import deployment
-from . import job
-from . import pilot
-from . import provider
-from . import quantum_program
-from . import user
+    Values:
+        READY: Job is ready to use
+        RUNNING: Job is currently executing a quantum circuit
+        FINISHED: Job finished the executing
+        BLOCKED: Job is blocked, and cannot be used for other purposes
+        ERROR: When an error occurred while executing a quantum circuit
+    """
+
+    READY = 1
+    RUNNING = 2
+    FINISHED = 3
+    BLOCKED = 4
+    ERROR = 5

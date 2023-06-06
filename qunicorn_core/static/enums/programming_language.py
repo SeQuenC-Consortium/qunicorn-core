@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# originally from <https://github.com/buehlefs/flask-template/>
+from enum import Enum
 
 
-"""Module containing all SQLalchemy Models."""
+class ProgrammingLanguage(Enum):
+    """Enum to save the different programming languages for quantum circuits
 
-from . import cloud_device
-from . import deployment
-from . import job
-from . import pilot
-from . import provider
-from . import quantum_program
-from . import user
+    Values:
+        QISKIT: The programming language is QISKIT
+        PYQUIL: The programming language is PYQUIL
+        QMWARE: The programming language is QMWARE
+    """
+
+    QISKIT = 1
+    PYQUIL = 2
+    QMWARE = 3
