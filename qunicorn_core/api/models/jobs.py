@@ -17,6 +17,8 @@
 
 import marshmallow as ma
 from marshmallow import fields, ValidationError
+from qiskit import QuantumCircuit
+
 from ..util import MaBaseSchema
 
 __all__ = ["JobIDSchema", "JobRegisterSchema"]
@@ -30,23 +32,30 @@ class CircuitField(fields.Field):
             raise ValidationError("Field should be str or list")
 
 
+def get_quasm_string() -> str:
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    qc.measure_all()
+    return qc.qasm()
+
+
 class JobRegisterSchema(MaBaseSchema):
-    circuit = CircuitField(required=True)
-    target = ma.fields.String(required=True, example="IBMQ")
+    circuit = CircuitField(required=True, example=get_quasm_string())
+    provider = ma.fields.String(required=True, example="IBMQ")
+    token = ma.fields.String(required=True, example="")
     qpu = ma.fields.String(required=True)
-    credentials = ma.fields.Dict(keys=ma.fields.Str(), values=ma.fields.Str(), required=True)
-    shots = ma.fields.Int(
-        required=False,
-        allow_none=True,
-        metada={
-            "label": "Shots",
-            "description": "Number of shots",
-            "input_type": "number",
-        },
+    credentials = ma.fields.Dict(
+        keys=ma.fields.Str(), values=ma.fields.Str(), required=True
     )
+    shots = ma.fields.Int(required=False, allow_none = True, metada={
+        "label" : "Shots",
+        "description" : "Number of shots",
+        "input_type" : "number"
+    })
+    circuit_format = ma.fields.String(required=False)
     noise_model = ma.fields.String(required=False)
     only_measurement_errors = ma.fields.Boolean(required=False)
-    circuit_format = ma.fields.String(required=False)
     parameters = ma.fields.List(ma.fields.Float(), required=False)
 
 
@@ -54,7 +63,6 @@ class JobIDSchema(MaBaseSchema):
     uid = ma.fields.Integer(required=True, allow_none=False, dump_only=True, example=123)
     description = ma.fields.String(required=False, allow_none=False, dump_only=True)
     taskmode = ma.fields.Integer(required=False, allow_none=False, dump_only=True)
-
 
 class JobResponseSchema(MaBaseSchema):
     pass

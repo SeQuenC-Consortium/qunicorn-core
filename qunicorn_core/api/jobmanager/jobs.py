@@ -14,19 +14,17 @@
 
 
 """Module containing the routes of the Taskmanager API."""
+from collections import namedtuple
 
-from qunicorn_core.api.jobmanager.jobmanager import jobmanager
 from qunicorn_core.celery import CELERY
 from ..models.jobs import JobIDSchema
 from ..models.jobs import JobRegisterSchema
-from typing import Dict
 from flask.helpers import url_for
 from flask.views import MethodView
-from flask import request, jsonify
+from flask import jsonify
 from dataclasses import dataclass
 from http import HTTPStatus
 from .job_pilots import QiskitPilot, AWSPilot
-import time
 
 from .root import JOBMANAGER_API
 
@@ -42,25 +40,29 @@ class JobID:
 class JobRegister:
     circuit: str
     provider: str
+    token: str
     qpu: str
     credentials: dict
     shots: int
     circuit_format: str
-
+    noise_model: str
+    only_measurement_errors: bool
+    parameters: float
 
 qiskitpilot = QiskitPilot
 awspilot = AWSPilot
 
-
 @CELERY.task()
-def createJob(request):
+def createJob(job):
     """Create a job and assign to the target pilot"""
-    if request == "IBMQ":
+    if job.provider == 'IBMQ':
         pilot = qiskitpilot("QP")
-        pilot.execute("123456")
-        print(f"Job Registered at {request}")
-        time.sleep(5)
+        provider = pilot.get_ibm_provider(job.token)
+        backend, transpiled = pilot.transpile(provider, job.circuit)
+        result = pilot.execute(backend, transpiled)
+        print(f"Job Registered at {provider}")
         print("Job complete")
+        return result
     else:
         print("No valid target specified")
     return 0
@@ -83,15 +85,11 @@ class JobIDView(MethodView):
 
     @JOBMANAGER_API.arguments(JobRegisterSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
-    def post(self, new_job_data: dict):
+    def post(self, new_job_data):
         """Create/Register new job."""
-
-        request_data = request.get_json()
-        target = request_data["target"]
-        print(target)
-        createJob.delay(target)
-        jobmanager.create_job()
-        return jsonify({"taskmode": f"Job type {target}"}), 200
+        job: JobRegister = namedtuple("JobRegister", new_job_data.keys())(*new_job_data.values())
+        result = createJob(job)
+        return jsonify({'result': result}), 200
 
 
 @JOBMANAGER_API.route("/<string:job_id>/")
@@ -101,26 +99,30 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def get(self, job_id: str):
         """Get the urls for the jobmanager api for job control."""
-
+        
         pass
 
     @JOBMANAGER_API.arguments(JobRegisterSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def post(self, job_id: str):
-        """Run a job execution via id."""
-        jobmanager.run_job()
+        """Cancel a job execution via id."""
+  
         pass
 
+    
     @JOBMANAGER_API.arguments(JobRegisterSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def delete(self, job_id: str):
         """Delete job data via id."""
-
+       
         pass
 
+        
     @JOBMANAGER_API.arguments(JobRegisterSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def put(self, job_id: str):
         """Pause a job via id."""
-
+       
         pass
+
+
