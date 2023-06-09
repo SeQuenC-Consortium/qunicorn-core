@@ -75,7 +75,6 @@ class JWTMixin:
             security_scheme = {security_scheme: []}
 
         def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
-
             # map to names that are less likely to have collisions with user defined arguments!
             _jwt_optional = optional
             _jwt_fresh = fresh
@@ -123,9 +122,7 @@ class JWTMixin:
         """Actually prepare the documentation."""
         operation: Optional[List[Dict[str, List[Any]]]] = doc_info.get("security")
         if operation:
-            available_schemas: Dict[str, Any] = (
-                spec.to_dict().get("components").get("securitySchemes")
-            )
+            available_schemas: Dict[str, Any] = spec.to_dict().get("components").get("securitySchemes")
             for scheme in operation:
                 if not scheme:
                     continue  # encountered empty schema for optional security
@@ -167,11 +164,7 @@ def loadUserObject(jwt_header: dict, jwt_payload: dict):
 @JWT.user_lookup_error_loader
 def on_user_load_error(jwt_header: dict, jwt_payload: dict):
     identity: Optional[str] = jwt_payload.get("sub")
-    abort(
-        401,
-        message=f"The user with the id '{identity}' could not be loaded."
-        
-    )
+    abort(401, message=f"The user with the id '{identity}' could not be loaded.")
 
 
 @JWT.expired_token_loader

@@ -23,9 +23,7 @@ logger = logging.getLogger("alembic.env")
 # target_metadata = mymodel.Base.metadata
 from flask import current_app
 
-current_app.config[
-    "SQLITE_FOREIGN_KEYS"
-] = False  # do NOT use foreign key checking when updating DB
+current_app.config["SQLITE_FOREIGN_KEYS"] = False  # do NOT use foreign key checking when updating DB
 config.set_main_option(
     "sqlalchemy.url",
     str(current_app.extensions["migrate"].db.engine.url).replace("%", "%%"),
@@ -51,9 +49,7 @@ def run_migrations_offline():
 
     """
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(
-        url=url, target_metadata=target_metadata, literal_binds=True, render_as_batch=True
-    )
+    context.configure(url=url, target_metadata=target_metadata, literal_binds=True, render_as_batch=True)
 
     with context.begin_transaction():
         context.run_migrations()
@@ -90,7 +86,7 @@ def run_migrations_online():
             process_revision_directives=process_revision_directives,
             render_as_batch=True,
             compare_type=True,
-            **current_app.extensions["migrate"].configure_args
+            **current_app.extensions["migrate"].configure_args,
         )
 
         with context.begin_transaction():

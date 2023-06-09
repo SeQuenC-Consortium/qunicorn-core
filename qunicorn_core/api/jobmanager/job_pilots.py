@@ -27,9 +27,10 @@ class QiskitPilot(Pilot):
         print(f"Executing job {job} with the Qiskit Pilot")
 
     def transpile(self, job):
-        """Transpile job on an IBM backend, needs a device_id"""    
+        """Transpile job on an IBM backend, needs a device_id"""
 
         print(f"Transpile a quantum circuit for a specific IBM backend")
+
 
 class AWSPilot(Pilot):
     """The AWS Pilot"""
@@ -38,11 +39,6 @@ class AWSPilot(Pilot):
         print(f"Executing job {job} with AWS Pilot")
 
     def transpile(self, job):
-        """Transpile job on an IBM backend, needs a device_id"""    
+        """Transpile job on an IBM backend, needs a device_id"""
 
         print(f"Transpile a quantum circuit for a specific AWS backend")
-
-
-
-
-

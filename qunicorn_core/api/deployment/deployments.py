@@ -46,13 +46,11 @@ class DeploymentRegister:
 class DeploymentIDView(MethodView):
     """Deployments endpoint for collection of all deployed jobs."""
 
-
     @DEPLOYMENT_API.response(HTTPStatus.OK, PreDeploymentSchema())
     def get(self):
         """Get pre-deployed job definition list."""
 
         pass
-
 
     @DEPLOYMENT_API.arguments(PreDeploymentSchema(), location="json")
     @DEPLOYMENT_API.response(HTTPStatus.OK, PreDeploymentSchema())
@@ -66,40 +64,37 @@ class DeploymentIDView(MethodView):
 class DeploymentDetailView(MethodView):
     """API endpoint for single pre-deployments."""
 
-
     @DEPLOYMENT_API.response(HTTPStatus.OK, PreDeploymentSchema)
     def get(self, deployment_id: str):
         """Get detailed information for single pre-deployed job-definitions."""
-        
+
         pass
 
-    
     @DEPLOYMENT_API.response(HTTPStatus.OK, PreDeploymentSchema)
     def delete(self, deployment_id: str):
         """Delete single pre-deployment."""
-        
-        pass
 
+        pass
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, PreDeploymentSchema)
     def put(self):
         """Update single pre-deployment."""
-        
+
         pass
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, PreDeploymentSchema)
     def patch(self):
         """Update parts of a single pre-deployment."""
-        
+
         pass
+
 
 @DEPLOYMENT_API.route("/<string:deployment_id>/jobs")
 class DeploymentDetailView(MethodView):
     """API endpoint for running jobs of a single pre-deployment."""
 
-
     @DEPLOYMENT_API.response(HTTPStatus.OK, PreDeploymentSchema)
     def get(self, deployment_id: str):
         """Get job definitions of a single pre-deployment."""
-        
+
         pass

@@ -3,9 +3,7 @@ Contains the blueprint to avoid circular dependencies."""
 
 from flask import Blueprint, render_template
 
-DEBUG_BLP = Blueprint(
-    "debug-routes", __name__, template_folder="templates", url_prefix="/debug"
-)
+DEBUG_BLP = Blueprint("debug-routes", __name__, template_folder="templates", url_prefix="/debug")
 
 
 @DEBUG_BLP.route("/")

@@ -43,7 +43,7 @@ class VersionsRootSchema(MaBaseSchema):
 ROOT_ENDPOINT = SmorestBlueprint(
     "api-root",
     "root",
-    #url_prefix="/api",
+    # url_prefix="/api",
     description="The API endpoint pointing towards all api versions.",
 )
 
@@ -56,7 +56,7 @@ class RootView(MethodView):
         return {
             "title": API.spec.title,
             "v1": url_for("jobmanager-api.JobIDView", _external=True),
-            #"v1": url_for("devices-api.DeviceView", _external=True),
+            # "v1": url_for("devices-api.DeviceView", _external=True),
         }
 
 
@@ -75,4 +75,3 @@ def register_root_api(app: Flask):
     API.register_blueprint(DEPLOYMENT_API)
     API.register_blueprint(SERVICES_API)
     API.register_blueprint(USERS_API)
-    

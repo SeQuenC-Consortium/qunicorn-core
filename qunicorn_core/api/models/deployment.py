@@ -19,49 +19,52 @@ import marshmallow as ma
 from marshmallow import fields, ValidationError
 from ..util import MaBaseSchema
 
-__all__ = ["PreDeploymentSchema",]
+__all__ = [
+    "PreDeploymentSchema",
+]
 
 
 class PreDeploymentSchema(MaBaseSchema):
-    uid = ma.fields.Integer(required=False, metadata={
-        "descrption" : "UID for the deployment"
-    })
-    name = ma.fields.String(required=True, metadata={
-        "description": "An optional Name for the deployment."
-    })
-    mode = ma.fields.String(required=True, metadata={
-        "description": "Describes whether a Job should be pre-deployed or executed ad-hoc."
-    })
-    description = ma.fields.String(required=False, metadata={
-        "description" :  "Description for the Pre-deployment."
-    })
+    uid = ma.fields.Integer(required=False, metadata={"descrption": "UID for the deployment"})
+    name = ma.fields.String(required=True, metadata={"description": "An optional Name for the deployment."})
+    mode = ma.fields.String(
+        required=True,
+        metadata={"description": "Describes whether a Job should be pre-deployed or executed ad-hoc."},
+    )
+    description = ma.fields.String(required=False, metadata={"description": "Description for the Pre-deployment."})
     credentials = ma.fields.Dict(
-       keys=ma.fields.Str(), values=ma.fields.Str(), required=False, 
+        keys=ma.fields.Str(),
+        values=ma.fields.Str(),
+        required=False,
     )
     parameters = ma.fields.List(
-        ma.fields.Integer(),requried=False ,metadata={
-        "description" :  "List of Parameters for Quantum Circuits."
-    })
-    shots = ma.fields.Integer(required=False, metadata={
-        "description" :  "Specifying shots for ad-hoc execution."
-    })
-    deploymentType = ma.fields.String(required=True, metadata={
-        "description": "Decide between [Circuit], [CodeFile] ,[Container]."
-    })
-    resourceURI = ma.fields.String(required=True, metadata={
-        "description" : "URL String to the container image, file or body for in-request quantum circuit"
-    })
-    tags = ma.fields.List(fields.String(), required=False, metadata={
-      "description": "A list of Tags, for grouping and searching deployments"        
-    })
-    source = ma.fields.String(required=False, metadata={
-        "description": "The source format of a quantum circuit."
-    })
-    target = ma.fields.String(required=False, metadata={
-        "description": "The Target Service, needed for translation between formats. Decides which Pilot needs to be used"
-    })
-    
+        ma.fields.Integer(),
+        requried=False,
+        metadata={"description": "List of Parameters for Quantum Circuits."},
+    )
+    shots = ma.fields.Integer(required=False, metadata={"description": "Specifying shots for ad-hoc execution."})
+    deploymentType = ma.fields.String(
+        required=True,
+        metadata={"description": "Decide between [Circuit], [CodeFile] ,[Container]."},
+    )
+    resourceURI = ma.fields.String(
+        required=True,
+        metadata={"description": "URL String to the container image, file or body for in-request quantum circuit"},
+    )
+    tags = ma.fields.List(
+        fields.String(),
+        required=False,
+        metadata={"description": "A list of Tags, for grouping and searching deployments"},
+    )
+    source = ma.fields.String(
+        required=False,
+        metadata={"description": "The source format of a quantum circuit."},
+    )
+    target = ma.fields.String(
+        required=False,
+        metadata={"description": "The Target Service, needed for translation between formats. Decides which Pilot needs to be used"},
+    )
+
+
 class DeploymentResponseSchema(MaBaseSchema):
-     uid = ma.fields.Integer(required=False, metadata={
-        "descrption" : "Unique Identifier for the deployment"
-    })
+    uid = ma.fields.Integer(required=False, metadata={"descrption": "Unique Identifier for the deployment"})
