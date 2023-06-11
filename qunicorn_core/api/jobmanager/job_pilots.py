@@ -22,9 +22,22 @@ from qiskit_ibm_provider import IBMProvider
 class QiskitPilot(Pilot):
     """The Qiskit Pilot"""
 
-    def get_ibm_provider(self, token:str) -> IBMProvider:
+    def execute(self, job):
+        """Execute a job on an IBM backend using the Qiskit Pilot"""
+
+        provider = self.__get_ibm_provider(job.token)
+        backend, transpiled = self.transpile(provider, job.circuit)
+
+        job = backend.run(transpiled, shots=job.shots)
+        counts = job.result().get_counts()
+
+        print(f"Executing job {job} on {job.provider} with the Qiskit Pilot and get the result {counts}")
+        return counts
+
+    @staticmethod
+    def __get_ibm_provider(token: str) -> IBMProvider:
         """Save account credentials and get provider"""
-        
+
         # Save account credentials.
         # You can get you token in your account settings of the front page
         IBMProvider.save_account(token=token, overwrite=True)
@@ -32,16 +45,8 @@ class QiskitPilot(Pilot):
         # Load previously saved account credentials.
         return IBMProvider()
 
-    def execute(self, backend, transpiled, shots):
-        """Execute a job on an IBM backend using the Qiskit Pilot"""
-
-        job = backend.run(transpiled, shots=shots)
-        counts = job.result().get_counts()
-
-        print(f"Executing job {job} with the Qiskit Pilot and get the result {counts}")
-        return counts
-
-    def transpile(self, provider: IBMProvider, quantum_circuit_string: str):
+    @staticmethod
+    def transpile(provider: IBMProvider, quantum_circuit_string: str):
         """Transpile job on an IBM backend, needs a device_id"""
 
         qasm_circ = QuantumCircuit().from_qasm_str(quantum_circuit_string)
@@ -50,6 +55,7 @@ class QiskitPilot(Pilot):
 
         print(f"Transpile a quantum circuit for a specific IBM backend")
         return backend, transpiled
+
 
 class AWSPilot(Pilot):
     """The AWS Pilot"""

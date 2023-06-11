@@ -16,7 +16,7 @@ import json
 import os
 from collections import namedtuple
 
-from qunicorn_core.api.jobmanager.jobs import createJob, JobRegister
+from qunicorn_core.api.jobmanager.jobs import create_and_run_job, JobDto
 
 """"Test class to test the functionality of the jobmanager"""
 
@@ -30,8 +30,8 @@ def test_create_job():
     with open(ROOT_DIR+'\\jobmanager_test_data.json') as f:
         data = json.load(f)
 
-    job: JobRegister = namedtuple("JobRegister", data.keys())(*data.values())
-    result = createJob(job)
+    job: JobDto = namedtuple("JobRegister", data.keys())(*data.values())
+    result = create_and_run_job(job)
 
     # Check if Counts are within certain range
     # Assumes total count of 4000

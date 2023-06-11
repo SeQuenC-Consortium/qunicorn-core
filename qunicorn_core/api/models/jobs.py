@@ -52,7 +52,7 @@ class JobRegisterSchema(MaBaseSchema):
         "label" : "Shots",
         "description" : "Number of shots",
         "input_type" : "number"
-    })
+    }, example=4000)
     circuit_format = ma.fields.String(required=False)
     noise_model = ma.fields.String(required=False)
     only_measurement_errors = ma.fields.Boolean(required=False)
