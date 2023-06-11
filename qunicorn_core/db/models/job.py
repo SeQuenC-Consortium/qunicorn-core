@@ -35,22 +35,25 @@ class JobDataclass:
         executed_by (str): A user_id associated to the job, user that wants to execute the job
         deployment_id (int): A deployment_id associated with the job
         state (Optional[str], optional): The state of a job, enum JobState
-        started_at (datetime, optional): The moment the job was scheduled. (default :py:func:`~datetime.datetime.utcnow`)
+        started_at (datetime, optional): The moment the job was scheduled.
+            (default :py:func:`~datetime.datetime.utcnow`)
         finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
         token (str, optional): The token that is needed to authenticate for a cloud_device
-        data (Union[dict, list, str, float, int, bool, None], optional): Mutable JSON-like store for additional lightweight task data. Default value is empty dict.
+        data (Union[dict, list, str, float, int, bool, None], optional): Mutable JSON-like store for additional
+            lightweight task data. Default value is empty dict.
         results (str, optional): The output data (files) of the job
-        parameters (str, optional): The parameters for the Job. Job parameters should already be prepared and error checked before starting the task.
+        parameters (str, optional): The parameters for the Job. Job parameters should already be prepared and error
+            checked before starting the task.
     """
 
     __tablename__ = "Job"
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
-    #executed_by: Mapped[int] = mapped_column(ForeignKey("User.id"))
-    #executed_on: Mapped[int] = mapped_column(ForeignKey("CloudDevice.id"))
-    #deployment_id: Mapped[int] = mapped_column(ForeignKey("Deployment.id"), default=None, nullable=True)
+    # executed_by: Mapped[int] = mapped_column(ForeignKey("User.id"))
+    # executed_on: Mapped[int] = mapped_column(ForeignKey("CloudDevice.id"))
+    # deployment_id: Mapped[int] = mapped_column(ForeignKey("Deployment.id"), default=None, nullable=True)
     progress: Mapped[str] = mapped_column(sql.INTEGER(), default=None)
-    state: Mapped[JobState] = mapped_column(sql.String(50), default=None) #TODO: How do we store Enums in the DB
+    state: Mapped[JobState] = mapped_column(sql.String(50), default=None)  # TODO: How do we store Enums in the DB
     started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)

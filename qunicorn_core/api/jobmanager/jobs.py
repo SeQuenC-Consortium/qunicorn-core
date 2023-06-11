@@ -30,7 +30,7 @@ from .job_pilots import QiskitPilot, AWSPilot
 from .root import JOBMANAGER_API
 from ...db.models.deployment import DeploymentDataclass
 from ...db.models.job import JobDataclass
-from ...db.services import job_service, deployment_service
+from ...db.database_services import database_service, job_service
 
 
 @dataclass
@@ -62,14 +62,14 @@ awspilot = AWSPilot
 def create_and_run_job(job):
     """Create a job and assign to the target pilot"""
 
-    id = job_service.add_job(JobDataclass(data=job.circuit, state="1", progress=0, started_at=datetime.now()))
+    database_id = job_service.add_database_job(job)
     if job.provider == 'IBMQ':
         pilot = qiskitpilot("QP")
         result = pilot.execute(job)
-        job = job_service.get_job(JobDataclass, id)
-        print(job)
-        job.progress = 1
-        job_service.add_job(job)
+        print(database_id)
+        database_job = database_service.get_database_object(JobDataclass, database_id)
+        database_job.state = "3"
+        database_service.add_database_object(database_job)
         print("Job complete")
         return result
     else:
