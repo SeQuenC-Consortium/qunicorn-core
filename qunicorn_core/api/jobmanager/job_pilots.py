@@ -28,10 +28,10 @@ class QiskitPilot(Pilot):
         provider = self.__get_ibm_provider(job.token)
         backend, transpiled = self.transpile(provider, job.circuit)
 
-        job = backend.run(transpiled, shots=job.shots)
-        counts = job.result().get_counts()
+        job_from_ibm = backend.run(transpiled, shots=job.shots)
+        counts = job_from_ibm.result().get_counts()
 
-        print(f"Executing job {job} on {job.provider} with the Qiskit Pilot and get the result {counts}")
+        print(f"Executing job {job_from_ibm} on {job.provider} with the Qiskit Pilot and get the result {counts}")
         return counts
 
     @staticmethod
