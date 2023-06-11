@@ -16,7 +16,11 @@ import json
 import os
 from collections import namedtuple
 
-from qunicorn_core.api.jobmanager.jobs import create_and_run_job, JobDto
+import pytest
+from flask import Response
+from qiskit_ibm_provider.accounts import InvalidAccountError
+
+from qunicorn_core.api.jobmanager.jobs import JobDto, create_and_run_job
 
 """"Test class to test the functionality of the jobmanager"""
 
@@ -24,7 +28,6 @@ from qunicorn_core.api.jobmanager.jobs import create_and_run_job, JobDto
 def test_create_and_run_job():
     """" Tests the create job method """
 
-    # Make sure to add correct token to json file
     root_dir = os.path.dirname(os.path.abspath(__file__))
     file_name = 'jobmanager_test_data.json'
     path_dir = "{}{}{}".format(root_dir, os.sep, file_name)
@@ -33,11 +36,17 @@ def test_create_and_run_job():
         data = json.load(f)
 
     job: JobDto = namedtuple(JobDto.__name__, data.keys())(*data.values())
-    result = create_and_run_job(job)
 
-    # Check if Counts are within certain range
-    # Assumes total count of 4000
-    assert result is not None
-    assert 1800 <= int(result["00"]) <= 2200
-    assert 1800 <= int(result["11"]) <= 2200
+    # When no token is added to the json, an error is expected
+    if job.token != "":
+        result = create_and_run_job(job)
+
+        # Check if Counts are within certain range
+        # Assumes total count of 4000
+        assert result is not None
+        assert 1800 <= int(result["00"]) <= 2200
+        assert 1800 <= int(result["11"]) <= 2200
+    else:
+        with pytest.raises(InvalidAccountError):
+            create_and_run_job(job)
 

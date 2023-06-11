@@ -22,6 +22,8 @@ from qiskit_ibm_provider import IBMProvider
 class QiskitPilot(Pilot):
     """The Qiskit Pilot"""
 
+    IMBQ_BACKEND = "ibmq_qasm_simulator"
+
     def execute(self, job):
         """Execute a job on an IBM backend using the Qiskit Pilot"""
 
@@ -45,12 +47,11 @@ class QiskitPilot(Pilot):
         # Load previously saved account credentials.
         return IBMProvider()
 
-    @staticmethod
-    def transpile(provider: IBMProvider, quantum_circuit_string: str):
+    def transpile(self, provider: IBMProvider, quantum_circuit_string: str):
         """Transpile job on an IBM backend, needs a device_id"""
 
         qasm_circ = QuantumCircuit().from_qasm_str(quantum_circuit_string)
-        backend = provider.get_backend("ibmq_qasm_simulator")
+        backend = provider.get_backend(self.IMBQ_BACKEND)
         transpiled = transpile(qasm_circ, backend=backend)
 
         print(f"Transpile a quantum circuit for a specific IBM backend")
