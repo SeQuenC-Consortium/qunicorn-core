@@ -27,7 +27,6 @@ from qunicorn_core.api.jobmanager.jobs import JobDto, create_and_run_job
 
 def test_create_and_run_job():
     """" Tests the create job method """
-
     root_dir = os.path.dirname(os.path.abspath(__file__))
     file_name = 'jobmanager_test_data.json'
     path_dir = "{}{}{}".format(root_dir, os.sep, file_name)
@@ -47,6 +46,6 @@ def test_create_and_run_job():
         assert 1800 <= int(result["00"]) <= 2200
         assert 1800 <= int(result["11"]) <= 2200
     else:
-        with pytest.raises(InvalidAccountError):
+        with pytest.raises(RuntimeError):
             create_and_run_job(job)
 
