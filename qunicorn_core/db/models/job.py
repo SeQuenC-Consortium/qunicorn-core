@@ -46,9 +46,9 @@ class JobDataclass:
     __tablename__ = "Job"
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
-    executed_by: Mapped[int] = mapped_column(ForeignKey("UserDataclass.id"))
-    executed_on: Mapped[int] = mapped_column(ForeignKey("CloudDeviceDataclass.id"))
-    deployment_id: Mapped[int] = mapped_column(ForeignKey("DeploymentDataclass.id"))
+    #executed_by: Mapped[int] = mapped_column(ForeignKey("User.id"))
+    #executed_on: Mapped[int] = mapped_column(ForeignKey("CloudDevice.id"))
+    #deployment_id: Mapped[int] = mapped_column(ForeignKey("Deployment.id"), default=None, nullable=True)
     progress: Mapped[str] = mapped_column(sql.INTEGER(), default=None)
     state: Mapped[JobState] = mapped_column(sql.String(50), default=None) #TODO: How do we store Enums in the DB
     started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())

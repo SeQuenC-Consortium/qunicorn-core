@@ -15,6 +15,7 @@
 
 """Module containing the routes of the Taskmanager API."""
 from collections import namedtuple
+from datetime import datetime
 
 from qunicorn_core.celery import CELERY
 from ..models.jobs import JobIDSchema
@@ -27,6 +28,9 @@ from http import HTTPStatus
 from .job_pilots import QiskitPilot, AWSPilot
 
 from .root import JOBMANAGER_API
+from ...db.models.deployment import DeploymentDataclass
+from ...db.models.job import JobDataclass
+from ...db.services import job_service, deployment_service
 
 
 @dataclass
@@ -57,9 +61,15 @@ awspilot = AWSPilot
 @CELERY.task()
 def create_and_run_job(job):
     """Create a job and assign to the target pilot"""
+
+    id = job_service.add_job(JobDataclass(data=job.circuit, state="1", progress=0, started_at=datetime.now()))
     if job.provider == 'IBMQ':
         pilot = qiskitpilot("QP")
         result = pilot.execute(job)
+        job = job_service.get_job(JobDataclass, id)
+        print(job)
+        job.progress = 1
+        job_service.add_job(job)
         print("Job complete")
         return result
     else:
