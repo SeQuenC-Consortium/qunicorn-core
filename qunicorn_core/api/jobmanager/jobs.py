@@ -59,7 +59,7 @@ def createJob(job):
         pilot = qiskitpilot("QP")
         provider = pilot.get_ibm_provider(job.token)
         backend, transpiled = pilot.transpile(provider, job.circuit)
-        result = pilot.execute(backend, transpiled)
+        result = pilot.execute(backend, transpiled, job.shots)
         print(f"Job Registered at {provider}")
         print("Job complete")
         return result

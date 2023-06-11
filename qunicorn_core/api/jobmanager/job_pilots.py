@@ -32,10 +32,10 @@ class QiskitPilot(Pilot):
         # Load previously saved account credentials.
         return IBMProvider()
 
-    def execute(self, backend, transpiled):
+    def execute(self, backend, transpiled, shots):
         """Execute a job on an IBM backend using the Qiskit Pilot"""
 
-        job = backend.run(transpiled)
+        job = backend.run(transpiled, shots=shots)
         counts = job.result().get_counts()
 
         print(f"Executing job {job} with the Qiskit Pilot and get the result {counts}")

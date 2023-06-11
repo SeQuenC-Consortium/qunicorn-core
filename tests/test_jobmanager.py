@@ -11,13 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import pathlib
 
-import pytest
-from qunicorn_core.api import *
-from qunicorn_core.api.jobmanager.jobs import createJob, JobRegister
-from collections import namedtuple
 import json
+import os
+from collections import namedtuple
+
+from qunicorn_core.api.jobmanager.jobs import createJob, JobRegister
 
 """"Test class to test the functionality of the jobmanager"""
 
@@ -26,9 +25,11 @@ def test_create_job():
     """"
     Tests the create job method.
     """
-    # Make sure to add a valid token to the jobmanager_test_data.json
-    with open('tests/jobmanager_test_data.json') as f:
+    # Make sure to add correct token to json file
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+    with open(ROOT_DIR+'\\jobmanager_test_data.json') as f:
         data = json.load(f)
+
     job: JobRegister = namedtuple("JobRegister", data.keys())(*data.values())
     result = createJob(job)
 
