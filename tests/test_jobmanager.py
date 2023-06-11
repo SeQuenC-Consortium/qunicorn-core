@@ -21,16 +21,18 @@ from qunicorn_core.api.jobmanager.jobs import create_and_run_job, JobDto
 """"Test class to test the functionality of the jobmanager"""
 
 
-def test_create_job():
-    """"
-    Tests the create job method.
-    """
+def test_create_and_run_job():
+    """" Tests the create job method """
+
     # Make sure to add correct token to json file
-    ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-    with open(ROOT_DIR+'\\jobmanager_test_data.json') as f:
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    file_name = 'jobmanager_test_data.json'
+    path_dir = "{}{}{}".format(root_dir, os.sep, file_name)
+
+    with open(path_dir) as f:
         data = json.load(f)
 
-    job: JobDto = namedtuple("JobRegister", data.keys())(*data.values())
+    job: JobDto = namedtuple(JobDto.__name__, data.keys())(*data.values())
     result = create_and_run_job(job)
 
     # Check if Counts are within certain range
