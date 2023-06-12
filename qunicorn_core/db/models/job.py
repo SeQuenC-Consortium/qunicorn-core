@@ -26,7 +26,7 @@ from ...static.enums.job_state import JobState
 
 
 @REGISTRY.mapped_as_dataclass
-class JobDataclass:
+class Job:
     """Dataclass for storing Jobs
     
     Attributes:
@@ -53,7 +53,7 @@ class JobDataclass:
     # executed_on: Mapped[int] = mapped_column(ForeignKey("CloudDevice.id"))
     # deployment_id: Mapped[int] = mapped_column(ForeignKey("Deployment.id"), default=None, nullable=True)
     progress: Mapped[str] = mapped_column(sql.INTEGER(), default=None)
-    state: Mapped[JobState] = mapped_column(sql.String(50), default=None)  # TODO: How do we store Enums in the DB
+    state: Mapped[str] = mapped_column(sql.Enum(JobState), default=None)  # TODO: How do we store Enums in the DB
     started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)

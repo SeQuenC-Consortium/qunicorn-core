@@ -29,8 +29,9 @@ from .job_pilots import QiskitPilot, AWSPilot
 
 from .root import JOBMANAGER_API
 from ...db.models.deployment import DeploymentDataclass
-from ...db.models.job import JobDataclass
+from ...db.models.job import Job
 from ...db.database_services import database_service, job_service
+from ...static.enums.job_state import JobState
 
 
 @dataclass
@@ -59,18 +60,12 @@ awspilot = AWSPilot
 
 
 @CELERY.task()
-def create_and_run_job(job):
+def create_and_run_job(job_dto: JobDto):
     """Create a job and assign to the target pilot"""
 
-    database_id = job_service.add_database_job(job)
-    if job.provider == 'IBMQ':
+    if job_dto.provider == 'IBMQ':
         pilot = qiskitpilot("QP")
-        result = pilot.execute(job)
-        print(database_id)
-        database_job = database_service.get_database_object(JobDataclass, database_id)
-        database_job.state = "3"
-        database_service.add_database_object(database_job)
-        print("Job complete")
+        result = pilot.execute(job_dto)
         return result
     else:
         print("No valid target specified")

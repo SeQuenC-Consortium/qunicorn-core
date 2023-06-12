@@ -18,22 +18,34 @@ from .pilot_base import Pilot
 from qiskit import QuantumCircuit, transpile
 from qiskit_ibm_provider import IBMProvider
 
+from ...db.database_services import database_service, job_service
+from ...db.models.job import Job
+from ...static.enums.job_state import JobState
+
 
 class QiskitPilot(Pilot):
     """The Qiskit Pilot"""
 
     IMBQ_BACKEND = "ibmq_qasm_simulator"
 
-    def execute(self, job):
+    def execute(self, job_dto):
         """Execute a job on an IBM backend using the Qiskit Pilot"""
 
-        provider = self.__get_ibm_provider(job.token)
-        backend, transpiled = self.transpile(provider, job.circuit)
+        job_id = job_service.create_database_job(job_dto)
 
-        job_from_ibm = backend.run(transpiled, shots=job.shots)
+        provider = self.__get_ibm_provider(job_dto.token)
+        backend, transpiled = self.transpile(provider, job_dto.circuit)
+
+        job_from_ibm = backend.run(transpiled, shots=job_dto.shots)
         counts = job_from_ibm.result().get_counts()
 
-        print(f"Executing job {job_from_ibm} on {job.provider} with the Qiskit Pilot and get the result {counts}")
+        #job_dto = database_service.get_database_object(JobDataclass, job_id)
+        #job_dto.state = JobState.FINISHED
+        #database_service.save_database_object(job_dto)
+        job_service.update_job_state(job_id, JobState.FINISHED)
+        print(f"Job with id {job_id} complete")
+
+        print(f"Executing job {job_from_ibm} on {job_dto.provider} with the Qiskit Pilot and get the result {counts}")
         return counts
 
     @staticmethod

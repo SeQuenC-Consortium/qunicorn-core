@@ -16,17 +16,21 @@ from qunicorn_core.db import DB
 session = DB.session
 
 
-def add_database_object(object):
-    session.add(object)
+def save_database_object(db_object) -> object:
+    session.add(db_object)
     session.commit()
-    session.refresh(object)
-    return object.id
+    session.refresh(db_object)
+    return db_object
 
 
-def remove_database_object(object):
-    session.remove(object)
+def remove_database_object(db_object):
+    session.remove(db_object)
     session.commit()
 
 
-def get_database_object(database_object_class, database_id):
-    return session.get(database_object_class, database_id)
+def get_database_object(database_object_class, db_object_id):
+    return session.get(database_object_class, db_object_id)
+
+
+def get_session():
+    return session
