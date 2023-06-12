@@ -20,7 +20,8 @@ import pytest
 from flask import Response
 from qiskit_ibm_provider.accounts import InvalidAccountError
 
-from qunicorn_core.api.jobmanager.jobs import JobDto, create_and_run_job
+from qunicorn_core.api.jobmanager.jobs import JobDto
+from qunicorn_core.core.jobmanager.jobmanager_service import create_and_run_job
 
 """"Test class to test the functionality of the jobmanager"""
 
