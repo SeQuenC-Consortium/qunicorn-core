@@ -53,11 +53,11 @@ class Job:
     # executed_on: Mapped[int] = mapped_column(ForeignKey("CloudDevice.id"))
     # deployment_id: Mapped[int] = mapped_column(ForeignKey("Deployment.id"), default=None, nullable=True)
     progress: Mapped[str] = mapped_column(sql.INTEGER(), default=None)
-    state: Mapped[str] = mapped_column(sql.Enum(JobState), default=None)  # TODO: How do we store Enums in the DB
+    state: Mapped[str] = mapped_column(sql.Enum(JobState), default=None)
     started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     token: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     data: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-    results: Mapped[Optional[Union[dict, list, str, float, int, bool, None]]] = mapped_column(sql.BLOB, default=None)
+    results: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     parameters: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)

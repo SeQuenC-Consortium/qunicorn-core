@@ -21,7 +21,7 @@ from qiskit import QuantumCircuit
 
 from ..util import MaBaseSchema
 
-__all__ = ["JobIDSchema", "JobRegisterSchema"]
+__all__ = ["JobIDSchema", "JobDtoSchema"]
 
 
 class CircuitField(fields.Field):
@@ -40,7 +40,7 @@ def get_quasm_string() -> str:
     return qc.qasm()
 
 
-class JobRegisterSchema(MaBaseSchema):
+class JobDtoSchema(MaBaseSchema):
     circuit = CircuitField(required=True, example=get_quasm_string())
     provider = ma.fields.String(required=True, example="IBMQ")
     token = ma.fields.String(required=True, example="")
@@ -48,7 +48,7 @@ class JobRegisterSchema(MaBaseSchema):
     credentials = ma.fields.Dict(
         keys=ma.fields.Str(), values=ma.fields.Str(), required=True
     )
-    shots = ma.fields.Int(required=False, allow_none = True, metada={
+    shots = ma.fields.Int(required=False, allow_none=True, metada={
         "label" : "Shots",
         "description" : "Number of shots",
         "input_type" : "number"

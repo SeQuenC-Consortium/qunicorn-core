@@ -28,23 +28,19 @@ class QiskitPilot(Pilot):
 
     IMBQ_BACKEND = "ibmq_qasm_simulator"
 
-    def execute(self, job_dto):
+    def execute(self, job_dto, job_id):
         """Execute a job on an IBM backend using the Qiskit Pilot"""
-
-        job_id = job_service.create_database_job(job_dto)
 
         provider = self.__get_ibm_provider(job_dto.token)
         backend, transpiled = self.transpile(provider, job_dto.circuit)
 
+        job_service.update_attribute(job_id, JobState.RUNNING, Job.state)
+
         job_from_ibm = backend.run(transpiled, shots=job_dto.shots)
         counts = job_from_ibm.result().get_counts()
+        job_service.update_result_and_state(job_id, JobState.FINISHED, str(counts))
 
-        #job_dto = database_service.get_database_object(JobDataclass, job_id)
-        #job_dto.state = JobState.FINISHED
-        #database_service.save_database_object(job_dto)
-        job_service.update_job_state(job_id, JobState.FINISHED)
         print(f"Job with id {job_id} complete")
-
         print(f"Executing job {job_from_ibm} on {job_dto.provider} with the Qiskit Pilot and get the result {counts}")
         return counts
 

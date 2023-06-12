@@ -19,7 +19,7 @@ from datetime import datetime
 
 from qunicorn_core.celery import CELERY
 from ..models.jobs import JobIDSchema
-from ..models.jobs import JobRegisterSchema
+from ..models.jobs import JobDtoSchema
 from flask.helpers import url_for
 from flask.views import MethodView
 from flask import jsonify
@@ -28,6 +28,7 @@ from http import HTTPStatus
 from .job_pilots import QiskitPilot, AWSPilot
 
 from .root import JOBMANAGER_API
+from ...core.jobmanager import jobmanager_service
 from ...db.models.deployment import DeploymentDataclass
 from ...db.models.job import Job
 from ...db.database_services import database_service, job_service
@@ -55,23 +56,6 @@ class JobDto:
     parameters: float
 
 
-qiskitpilot = QiskitPilot
-awspilot = AWSPilot
-
-
-@CELERY.task()
-def create_and_run_job(job_dto: JobDto):
-    """Create a job and assign to the target pilot"""
-
-    if job_dto.provider == 'IBMQ':
-        pilot = qiskitpilot("QP")
-        result = pilot.execute(job_dto)
-        return result
-    else:
-        print("No valid target specified")
-    return 0
-
-
 @JOBMANAGER_API.route("/")
 class JobIDView(MethodView):
     """Jobs endpoint for collection of all jobs."""
@@ -87,13 +71,16 @@ class JobIDView(MethodView):
             )
         ]
 
-    @JOBMANAGER_API.arguments(JobRegisterSchema(), location="json")
+    @JOBMANAGER_API.arguments(JobDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def post(self, new_job_data):
-        """Create/Register new job."""
-        job: JobDto = namedtuple(JobDto.__name__, new_job_data.keys())(*new_job_data.values())
-        result = create_and_run_job(job)
-        return jsonify({'result': result}), 200
+        """Create/Register and run new job."""
+        job_dto: JobDto = JobDto(**new_job_data)
+        job = job_service.create_database_job(job_dto)
+        jobmanager_service.create_and_run_job(job_dto, job.id)
+        #Todo: Das asynchron ausführen
+        #Todo: id in job_dto speichern -> der Nutzer sollte aber keine Id mitgeben
+        return jsonify({'job_id': job.id}), 200
 
 
 @JOBMANAGER_API.route("/<string:job_id>/")
@@ -106,21 +93,21 @@ class JobDetailView(MethodView):
 
         pass
 
-    @JOBMANAGER_API.arguments(JobRegisterSchema(), location="json")
+    @JOBMANAGER_API.arguments(JobDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def post(self, job_id: str):
         """Cancel a job execution via id."""
 
         pass
 
-    @JOBMANAGER_API.arguments(JobRegisterSchema(), location="json")
+    @JOBMANAGER_API.arguments(JobDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def delete(self, job_id: str):
         """Delete job data via id."""
 
         pass
 
-    @JOBMANAGER_API.arguments(JobRegisterSchema(), location="json")
+    @JOBMANAGER_API.arguments(JobDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def put(self, job_id: str):
         """Pause a job via id."""
