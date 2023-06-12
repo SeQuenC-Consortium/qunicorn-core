@@ -1,4 +1,9 @@
 # How to run tests
+Run pytest in poetry
+> poetry run pytest tests
+
+OR:
+
 Install pytest
 > pip install -U pytest
 
