@@ -14,7 +14,7 @@ Welcome to Qunicorn_Core's documentation!
    cli
    changelog
    models/dbmodels
-   models/domainmodel
+   models/projectstructuremodels
    apidocumentation
    architecture
   
