@@ -18,6 +18,7 @@ from collections import namedtuple
 from datetime import datetime
 
 from qunicorn_core.celery import CELERY
+from . import jobmanager
 from ..models.jobs import JobIDSchema
 from ..models.jobs import JobDtoSchema
 from flask.helpers import url_for
