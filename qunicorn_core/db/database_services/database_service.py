@@ -28,7 +28,7 @@ def remove_database_object(db_object):
     session.commit()
 
 
-def get_database_object(database_object_class, db_object_id):
+def get_database_object(db_object_id: int, database_object_class):
     return session.get(database_object_class, db_object_id)
 
 

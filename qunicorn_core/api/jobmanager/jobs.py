@@ -54,6 +54,7 @@ class JobDto:
     noise_model: str
     only_measurement_errors: bool
     parameters: float
+    id: int
 
 
 @JOBMANAGER_API.route("/")
@@ -77,9 +78,9 @@ class JobIDView(MethodView):
         """Create/Register and run new job."""
         job_dto: JobDto = JobDto(**new_job_data)
         job = job_service.create_database_job(job_dto)
-        jobmanager_service.create_and_run_job(job_dto, job.id)
-        #Todo: Das asynchron ausführen
-        #Todo: id in job_dto speichern -> der Nutzer sollte aber keine Id mitgeben
+        job_dto.id = job.id
+        # TODO: execute asynchronous (has been that way before)
+        jobmanager_service.create_and_run_job(job_dto)
         return jsonify({'job_id': job.id}), 200
 
 
@@ -87,11 +88,11 @@ class JobIDView(MethodView):
 class JobDetailView(MethodView):
     """Jobs endpoint for a single job."""
 
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
+    @JOBMANAGER_API.response(HTTPStatus.OK, JobDtoSchema())
     def get(self, job_id: str):
         """Get the urls for the jobmanager api for job control."""
-
-        pass
+        results = database_service.get_database_object(int(job_id), Job)
+        return jsonify({'results': results}), 200
 
     @JOBMANAGER_API.arguments(JobDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())

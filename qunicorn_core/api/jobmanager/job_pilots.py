@@ -28,11 +28,12 @@ class QiskitPilot(Pilot):
 
     IMBQ_BACKEND = "ibmq_qasm_simulator"
 
-    def execute(self, job_dto, job_id):
+    def execute(self, job_dto):
         """Execute a job on an IBM backend using the Qiskit Pilot"""
 
         provider = self.__get_ibm_provider(job_dto.token)
         backend, transpiled = self.transpile(provider, job_dto.circuit)
+        job_id = job_dto.id
 
         job_service.update_attribute(job_id, JobState.RUNNING, Job.state)
 

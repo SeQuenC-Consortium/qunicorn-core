@@ -57,6 +57,7 @@ class JobDtoSchema(MaBaseSchema):
     noise_model = ma.fields.String(required=False)
     only_measurement_errors = ma.fields.Boolean(required=False)
     parameters = ma.fields.List(ma.fields.Float(), required=False)
+    id = ma.fields.Integer(required=False, example=0)
 
 
 class JobIDSchema(MaBaseSchema):
