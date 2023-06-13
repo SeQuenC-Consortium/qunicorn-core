@@ -97,6 +97,13 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.arguments(JobDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def post(self, job_id: str):
+        """Run a job execution via id."""
+        jobmanager.run_job()
+        pass
+
+    @JOBMANAGER_API.arguments(JobDtoSchema(), location="json")
+    @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
+    def post(self, job_id: str):
         """Cancel a job execution via id."""
 
         pass
