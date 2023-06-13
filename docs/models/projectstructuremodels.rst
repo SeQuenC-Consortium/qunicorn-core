@@ -11,11 +11,11 @@ Sequence Diagram for in-Request execution
 Component interactions
 -------
 .. image:: ../images/qunicorn_component_interaction.png
-  :width: 400
+  :width: 600
   :alt: Alternative text
 
 Domain model
 -------
 .. image:: ../images/qunicorn_domain_model.png
-  :width: 400
+  :width: 600
   :alt: Alternative text
