@@ -13,19 +13,12 @@
 # limitations under the License.
 
 
-from qunicorn_core.celery import CELERY
-from ..models.jobs import JobIDSchema
-from ..models.jobs import JobRegisterSchema
-from typing import Dict
-from flask.helpers import url_for
-from flask.views import MethodView
-from flask import request, jsonify
-from dataclasses import dataclass
 from http import HTTPStatus
-import time
+
+from flask.views import MethodView
 
 from .root import PILOT_MANAGER_API
-
+from ..models.jobs import JobIDSchema
 
 
 @PILOT_MANAGER_API.route("/")
@@ -37,10 +30,7 @@ class JobIDView(MethodView):
         """Get status of the execution of the pilot."""
         return "OK", 200
 
-    
     @PILOT_MANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def post(self):
         """Set Pilot state <BLOCKED>/<READY>"""
         return "OK", 200
-
-    
