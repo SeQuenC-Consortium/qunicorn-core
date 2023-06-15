@@ -43,7 +43,7 @@ def get_quasm_string() -> str:
 class JobDtoSchema(MaBaseSchema):
     circuit = CircuitField(required=True, example=get_quasm_string())
     provider = ma.fields.String(required=True, example="IBMQ")
-    token = ma.fields.String(required=True, example="62fe069c518b693d31652ac07e1ca4fa6edbc7e866141eef6abf2819e021f88de1b79498d1449620d1a300df1579b3bb92d443e1ac36ef73c408a09b2372e6d5")
+    token = ma.fields.String(required=True, example="")
     qpu = ma.fields.String(required=True)
     credentials = ma.fields.Dict(
         keys=ma.fields.Str(), values=ma.fields.Str(), required=True
