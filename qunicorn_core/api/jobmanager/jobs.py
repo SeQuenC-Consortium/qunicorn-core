@@ -23,6 +23,7 @@ from flask.helpers import url_for
 from flask.views import MethodView
 
 from . import jobmanager
+from .job_dto import JobDto
 from .root import JOBMANAGER_API
 from ..models.jobs import JobDtoSchema
 from ..models.jobs import JobIDSchema
@@ -36,21 +37,6 @@ class JobID:
     id: str
     description: str
     taskmode: int
-
-
-@dataclass
-class JobDto:
-    circuit: str
-    provider: str
-    token: str
-    qpu: str
-    credentials: dict
-    shots: int
-    circuit_format: str
-    noise_model: str
-    only_measurement_errors: bool
-    parameters: float
-    id: int
 
 
 @JOBMANAGER_API.route("/")
@@ -76,7 +62,8 @@ class JobIDView(MethodView):
         job = job_service.create_database_job(job_dto)
         job_dto.id = job.id
         # TODO: execute asynchronous (has been that way before)
-        jobmanager_service.create_and_run_job(job_dto)
+        job_dict = vars(job_dto)
+        jobmanager_service.create_and_run_job.delay(job_dict)
         return jsonify({'job_id': job.id}), 200
 
 
