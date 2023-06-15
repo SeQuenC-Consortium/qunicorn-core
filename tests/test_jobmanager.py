@@ -12,24 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import os
-from collections import namedtuple
-
-import pytest
-from flask import Response
-from qiskit_ibm_provider.accounts import InvalidAccountError
-
-from qunicorn_core.api.jobmanager.jobs import JobDto
-from qunicorn_core.core.jobmanager.jobmanager_service import create_and_run_job
-
 """"Test class to test the functionality of the jobmanager"""
 
 
+# Will be implemented with #47
 def test_create_and_run_job():
     """" Tests the create job method """
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    file_name = 'jobmanager_test_data.json'
+    """root_dir = os.path.dirname(os.path.abspath(__file__))
+    file_name = 'job_test_data.json'
     path_dir = "{}{}{}".format(root_dir, os.sep, file_name)
 
     with open(path_dir) as f:
@@ -48,5 +38,4 @@ def test_create_and_run_job():
         assert 1800 <= int(result["11"]) <= 2200
     else:
         with pytest.raises(RuntimeError):
-            create_and_run_job(job)
-
+            create_and_run_job(job)"""

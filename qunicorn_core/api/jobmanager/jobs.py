@@ -14,26 +14,21 @@
 
 
 """Module containing the routes of the Taskmanager API."""
-from collections import namedtuple
-from datetime import datetime
 
-from qunicorn_core.celery import CELERY
-from . import jobmanager
-from ..models.jobs import JobIDSchema
-from ..models.jobs import JobDtoSchema
-from flask.helpers import url_for
-from flask.views import MethodView
-from flask import jsonify
 from dataclasses import dataclass
 from http import HTTPStatus
-from .job_pilots import QiskitPilot, AWSPilot
 
+from flask import jsonify
+from flask.helpers import url_for
+from flask.views import MethodView
+
+from . import jobmanager
 from .root import JOBMANAGER_API
+from ..models.jobs import JobDtoSchema
+from ..models.jobs import JobIDSchema
 from ...core.jobmanager import jobmanager_service
-from ...db.models.deployment import DeploymentDataclass
-from ...db.models.job import Job
 from ...db.database_services import database_service, job_service
-from ...static.enums.job_state import JobState
+from ...db.models.job import Job
 
 
 @dataclass

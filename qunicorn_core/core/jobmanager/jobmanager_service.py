@@ -7,7 +7,7 @@ awspilot = AWSPilot
 
 @CELERY.task()
 def create_and_run_job(job_dto):
-    """Create a job and assign to the target pilot"""
+    """Create a job and assign to the target pilot which executes the job"""
 
     if job_dto.provider == 'IBMQ':
         pilot = qiskitpilot("QP")

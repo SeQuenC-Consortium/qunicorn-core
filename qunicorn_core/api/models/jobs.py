@@ -43,15 +43,16 @@ def get_quasm_string() -> str:
 class JobDtoSchema(MaBaseSchema):
     circuit = CircuitField(required=True, example=get_quasm_string())
     provider = ma.fields.String(required=True, example="IBMQ")
-    token = ma.fields.String(required=True, example="")
+    token = ma.fields.String(required=True,
+                             example="aad61436bfd5503f7ff16a9313961d5bfebf937f5545bc8352b146f8912461b05948aba5bcce70e93debb86f3f1166f49a06bfb571ee89e615525048810beb88")
     qpu = ma.fields.String(required=True)
     credentials = ma.fields.Dict(
         keys=ma.fields.Str(), values=ma.fields.Str(), required=True
     )
     shots = ma.fields.Int(required=False, allow_none=True, metada={
-        "label" : "Shots",
-        "description" : "Number of shots",
-        "input_type" : "number"
+        "label": "Shots",
+        "description": "Number of shots",
+        "input_type": "number"
     }, example=4000)
     circuit_format = ma.fields.String(required=False)
     noise_model = ma.fields.String(required=False)
@@ -64,6 +65,7 @@ class JobIDSchema(MaBaseSchema):
     uid = ma.fields.Integer(required=True, allow_none=False, dump_only=True, example=123)
     description = ma.fields.String(required=False, allow_none=False, dump_only=True)
     taskmode = ma.fields.Integer(required=False, allow_none=False, dump_only=True)
+
 
 class JobResponseSchema(MaBaseSchema):
     pass

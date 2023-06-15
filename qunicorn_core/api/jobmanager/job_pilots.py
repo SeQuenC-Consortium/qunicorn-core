@@ -13,12 +13,11 @@
 # limitations under the License.
 
 
-from qunicorn_core.celery import CELERY
-from .pilot_base import Pilot
 from qiskit import QuantumCircuit, transpile
 from qiskit_ibm_provider import IBMProvider
 
-from ...db.database_services import database_service, job_service
+from .pilot_base import Pilot
+from ...db.database_services import job_service
 from ...db.models.job import Job
 from ...static.enums.job_state import JobState
 
@@ -74,11 +73,6 @@ class AWSPilot(Pilot):
         print(f"Executing job {job} with AWS Pilot")
 
     def transpile(self, job):
-        """Transpile job on an IBM backend, needs a device_id"""    
+        """Transpile job on an IBM backend, needs a device_id"""
 
         print(f"Transpile a quantum circuit for a specific AWS backend")
-
-
-
-
-

@@ -14,20 +14,17 @@
 
 from os import environ
 from os import execvpe as replace_process
-from os import urandom
+from pathlib import Path
+from platform import system
 from re import match
 from shutil import copytree
 from typing import List, Optional, cast
 
 from dotenv import load_dotenv, set_key, unset_key
-from invoke import UnexpectedExit, call, task
+from invoke import UnexpectedExit
+from invoke import task
 from invoke.context import Context
 from invoke.runners import Result
-
-from pathlib import Path
-from platform import system
-
-from invoke import task
 
 if system() == "Windows":
     from subprocess import list2cmdline as join
@@ -39,7 +36,6 @@ load_dotenv(".env")
 
 MODULE_NAME = "qunicorn_core"
 CELERY_WORKER = f"{MODULE_NAME}.celery_worker:CELERY"
-
 
 # a list of allowed licenses, dependencies with other licenses will trigger an error in the list-licenses command
 ALLOWED_LICENSES = [
@@ -675,7 +671,8 @@ def doc_index(c, filter_=""):
             hide="stdout",
         )
         print(
-            "".join(l for l in output.stdout.splitlines(True) if (l and not l[0].isspace()) or (not filter_) or (filter_ in l.lower())),
+            "".join(l for l in output.stdout.splitlines(True) if
+                    (l and not l[0].isspace()) or (not filter_) or (filter_ in l.lower())),
         )
 
 
