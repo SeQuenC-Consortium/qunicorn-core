@@ -23,12 +23,23 @@ from flask import Flask, Blueprint, current_app
 # make sure all api_models are imported for CLI to work properly
 from . import models  # noqa
 from .db import DB
+from .models.device import DeviceDataclass
+from .models.provider import ProviderDataclass
+from .models.user import UserDataclass
 from ..util.logging import get_logger
 
 DB_CLI_BLP = Blueprint("db_cli", __name__, cli_group=None)
 DB_CLI = DB_CLI_BLP.cli  # expose as attribute for autodoc generation
 
 DB_COMMAND_LOGGER = "db"
+
+
+@DB_CLI.command("create-and-load-db")
+def create_load_db():
+    """Create all db tables."""
+    create_db_function(current_app)
+    load_db_function(current_app)
+    click.echo("Database created and loaded.")
 
 
 @DB_CLI.command("create-db")
@@ -41,6 +52,27 @@ def create_db():
 def create_db_function(app: Flask):
     DB.create_all()
     get_logger(app, DB_COMMAND_LOGGER).info("Database created.")
+
+
+@DB_CLI.command("load-test-data")
+def load_test_data():
+    """Load database test data"""
+    load_db_function(current_app)
+    click.echo("Test Data Loaded.")
+
+
+def load_db_function(app: Flask):
+    provider = ProviderDataclass(with_token=True, supported_language="", name="IBMQ")
+    DB.session.add(provider)
+    DB.session.commit()
+    DB.session.refresh(provider)
+    device = DeviceDataclass(provider=provider.id, rest_endpoint="")
+    DB.session.add(device)
+    DB.session.commit()
+    user = UserDataclass(name="Default User")
+    DB.session.add(user)
+    DB.session.commit()
+    get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
 
 
 @DB_CLI.command("drop-db")
