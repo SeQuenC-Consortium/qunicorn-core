@@ -19,7 +19,10 @@
 
 from copy import deepcopy
 from dataclasses import dataclass
+from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
+from warnings import warn
+
 from apispec.core import APISpec
 from apispec.utils import deepupdate
 from flask.app import Flask
@@ -28,8 +31,6 @@ from flask_jwt_extended import JWTManager
 from flask_jwt_extended.exceptions import JWTExtendedException
 from flask_jwt_extended.view_decorators import verify_jwt_in_request
 from flask_smorest import Api, abort
-from warnings import warn
-from functools import wraps
 
 JWT = JWTManager()
 
@@ -54,7 +55,6 @@ SECURITY_SCHEMES = {
     "jwt": JWT_SCHEME,
     "jwt-refresh-token": JWT_REFRESH_SCHEME,
 }
-
 
 RT = TypeVar("RT")
 
@@ -145,7 +145,7 @@ class DemoUser:
 
 @JWT.user_identity_loader
 def load_user_identity(user: DemoUser):
-    # load the user identity (primary key) fromthe user object here
+    # load the user identity (primary key) from the user object here
     return user.username
 
 

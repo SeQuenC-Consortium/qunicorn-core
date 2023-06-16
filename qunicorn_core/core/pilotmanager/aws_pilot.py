@@ -13,20 +13,16 @@
 # limitations under the License.
 
 
-"""Module containing the root endpoint of the public control API."""
-
-from dataclasses import dataclass
-
-from ..util import SecurityBlueprint as SmorestBlueprint
-
-PUBLIC_CONTROL_API = SmorestBlueprint(
-    "public-control-api",
-    "PUBLIC CONTROL API",
-    description="Control API for the user of qunicorn.",
-    url_prefix="/control/",
-)
+from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 
 
-@dataclass()
-class RootData:
-    root: str
+class AWSPilot(Pilot):
+    """The AWS Pilot"""
+
+    def execute(self, job):
+        print(f"Executing job {job} with AWS Pilot")
+
+    def transpile(self, job):
+        """Transpile job on an IBM backend, needs a device_id"""
+
+        print(f"Transpile a quantum circuit for a specific AWS backend")

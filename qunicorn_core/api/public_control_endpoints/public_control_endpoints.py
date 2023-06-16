@@ -19,8 +19,8 @@ from flask import jsonify
 from flask.views import MethodView
 
 from .root import PUBLIC_CONTROL_API
-from ..models.jobs import JobDtoSchema
-from ..models.jobs import JobIDSchema
+from ..api_models.job_dtos import JobDtoSchema
+from ..api_models.job_dtos import JobIDSchema
 
 
 @PUBLIC_CONTROL_API.route("/jobs/")

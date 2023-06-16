@@ -12,16 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union
+from datetime import datetime
+from typing import Optional
 
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import sqltypes as sql
-from sqlalchemy.sql.schema import ForeignKey
 
 from ..db import REGISTRY
-
-from datetime import datetime
-
 from ...static.enums.job_state import JobState
 
 
@@ -38,7 +36,6 @@ class Job:
         started_at (datetime, optional): The moment the job was scheduled.
             (default :py:func:`~datetime.datetime.utcnow`)
         finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
-        token (str, optional): The token that is needed to authenticate for a cloud_device
         data (Union[dict, list, str, float, int, bool, None], optional): Mutable JSON-like store for additional
             lightweight task data. Default value is empty dict.
         results (str, optional): The output data (files) of the job
@@ -49,15 +46,14 @@ class Job:
     __tablename__ = "Job"
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
-    # executed_by: Mapped[int] = mapped_column(ForeignKey("User.id"))
-    # executed_on: Mapped[int] = mapped_column(ForeignKey("CloudDevice.id"))
-    # deployment_id: Mapped[int] = mapped_column(ForeignKey("Deployment.id"), default=None, nullable=True)
+    executed_by: Mapped[int] = mapped_column(ForeignKey("User.id"), default=None, nullable=True)
+    executed_on: Mapped[int] = mapped_column(ForeignKey("CloudDevice.id"), default=None, nullable=True)
+    deployment_id: Mapped[int] = mapped_column(ForeignKey("Deployment.id"), default=None, nullable=True)
     progress: Mapped[str] = mapped_column(sql.INTEGER(), default=None)
     state: Mapped[str] = mapped_column(sql.Enum(JobState), default=None)
     started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-    token: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     data: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     results: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     parameters: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)

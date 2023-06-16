@@ -15,23 +15,21 @@
 
 """Module containing all API related code of the project."""
 
+from http import HTTPStatus
 from typing import Dict
+
+import marshmallow as ma
 from flask import Flask
 from flask.helpers import url_for
 from flask.views import MethodView
-import marshmallow as ma
 from flask_smorest import Api, Blueprint as SmorestBlueprint
-from http import HTTPStatus
-from .util import MaBaseSchema
-from .jobmanager import JOBMANAGER_API
-from .devices import DEVICES_API
-from .deployment import DEPLOYMENT_API
-from .services import SERVICES_API
-from .usermanager import USERS_API
+
+from .deployment_api import DEPLOYMENT_API
+from .device_api import DEVICES_API
+from .job_api import JOBMANAGER_API
 from .jwt import SECURITY_SCHEMES
 from .public_control_endpoints import PUBLIC_CONTROL_API
-from .pilot_manager import PILOT_MANAGER_API
-
+from .util import MaBaseSchema
 
 """A single API instance. All api versions should be blueprints."""
 API = Api(spec_kwargs={"title": "QUNICORN_API", "version": "v1"})
@@ -57,8 +55,8 @@ class RootView(MethodView):
         """Get the Root API information containing the links to all versions of this api."""
         return {
             "title": API.spec.title,
-            "v1": url_for("jobmanager-api.JobIDView", _external=True),
-            # "v1": url_for("devices-api.DeviceView", _external=True),
+            "v1": url_for("job_api-api.JobIDView", _external=True),
+            # "v1": url_for("device_api-api.DeviceView", _external=True),
         }
 
 

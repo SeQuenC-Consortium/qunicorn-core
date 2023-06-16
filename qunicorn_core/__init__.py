@@ -14,33 +14,31 @@
 
 """Root module containing the flask app factory."""
 
+from json import load as load_json
+from logging import Logger, Formatter, Handler, WARNING, getLogger
+from logging.config import dictConfig
 from os import environ, makedirs
 from pathlib import Path
 from typing import Any, Dict, Optional, cast
-from logging import Logger, Formatter, Handler, WARNING, getLogger
-from logging.config import dictConfig
 
+import click
 from flask.app import Flask
 from flask.cli import FlaskGroup
 from flask.logging import default_handler
 from flask_cors import CORS
-
-from json import load as load_json
 from tomli import load as load_toml
 
-import click
-
-from .util.config import ProductionConfig, DebugConfig
-from . import licenses
-from . import db
 from . import api
+from . import db
+from . import licenses
 from .api import jwt
-
+from .util.config import ProductionConfig, DebugConfig
 
 # change this to change tha flask app name and the config env var prefix
 # must not contain any spaces!
 APP_NAME = __name__
 CONFIG_ENV_VAR_PREFIX = APP_NAME.upper().replace("-", "_").replace(" ", "_")
+app: Flask
 
 
 def create_app(test_config: Optional[Dict[str, Any]] = None):
@@ -52,8 +50,6 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
 
     # create and configure the app
     app = Flask(APP_NAME, instance_relative_config=True, instance_path=instance_path)
-
-    # Start Loading config #################
 
     # load defaults
     config = app.config

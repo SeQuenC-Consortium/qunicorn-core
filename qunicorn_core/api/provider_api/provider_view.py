@@ -13,20 +13,22 @@
 # limitations under the License.
 
 
-"""Module containing the root endpoint of the public control API."""
+"""Module containing the routes of the Taskmanager API."""
+from http import HTTPStatus
 
-from dataclasses import dataclass
+from flask.views import MethodView
 
-from ..util import SecurityBlueprint as SmorestBlueprint
-
-PUBLIC_CONTROL_API = SmorestBlueprint(
-    "public-control-api",
-    "PUBLIC CONTROL API",
-    description="Control API for the user of qunicorn.",
-    url_prefix="/control/",
-)
+from .root import SERVICES_API
+from ..api_models.provider_dtos import ProviderDtoSchema, ProviderIDSchema
 
 
-@dataclass()
-class RootData:
-    root: str
+@SERVICES_API.route("/<string:service_id>/")
+class ServicesView(MethodView):
+    """Services Endpoint to get properties of a specific service."""
+
+    @SERVICES_API.arguments(ProviderIDSchema(), location="path")
+    @SERVICES_API.response(HTTPStatus.OK, ProviderDtoSchema())
+    def get(self):
+        """Get information about a single service."""
+
+        pass

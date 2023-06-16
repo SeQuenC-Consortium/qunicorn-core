@@ -12,21 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-"""Module containing the root endpoint of the public control API."""
-
-from dataclasses import dataclass
-
-from ..util import SecurityBlueprint as SmorestBlueprint
-
-PUBLIC_CONTROL_API = SmorestBlueprint(
-    "public-control-api",
-    "PUBLIC CONTROL API",
-    description="Control API for the user of qunicorn.",
-    url_prefix="/control/",
-)
-
-
-@dataclass()
-class RootData:
-    root: str
+from . import aws_pilot
+from . import base_pilot
+from . import qiskit_pilot

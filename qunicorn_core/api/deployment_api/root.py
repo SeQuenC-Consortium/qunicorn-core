@@ -13,17 +13,17 @@
 # limitations under the License.
 
 
-"""Module containing the root endpoint of the public control API."""
+"""Module containing the root endpoint of the DEPLOYMENT API."""
 
 from dataclasses import dataclass
 
 from ..util import SecurityBlueprint as SmorestBlueprint
 
-PUBLIC_CONTROL_API = SmorestBlueprint(
-    "public-control-api",
-    "PUBLIC CONTROL API",
-    description="Control API for the user of qunicorn.",
-    url_prefix="/control/",
+DEPLOYMENT_API = SmorestBlueprint(
+    "deployment_api-api",
+    "DEPLOYMENT API",
+    description="Deployment API for the control plane.",
+    url_prefix="/deployments/",
 )
 
 

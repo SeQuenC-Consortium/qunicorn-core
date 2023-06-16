@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import datetime
-from typing import Optional, Sequence, List, Union
+from typing import Optional
 
-from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import sqltypes as sql
 
-from ..db import MODEL, REGISTRY
+from ..db import REGISTRY
 
 
 @REGISTRY.mapped_as_dataclass
@@ -27,9 +26,9 @@ class DeploymentDataclass:
 
     Attributes:
         id (int): Automatically generated database id. Use the id to fetch this information from the database.
-        name (str, optional): Optional name for a deployment
+        name (str, optional): Optional name for a deployment_api
         deployed_by (str): The  user_id that deployed this Deployment
-        deployed_at (Date): Date of the creation of a deployment
+        deployed_at (Date): Date of the creation of a deployment_api
     """
 
     __tablename__ = "Deployment"
@@ -39,4 +38,3 @@ class DeploymentDataclass:
     # quantum_program_id: Mapped[int] = mapped_column(ForeignKey("QuantumProgram.id"))
     deployed_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-

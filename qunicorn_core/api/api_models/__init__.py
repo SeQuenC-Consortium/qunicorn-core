@@ -12,21 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-"""Module containing the root endpoint of the public control API."""
-
-from dataclasses import dataclass
-
-from ..util import SecurityBlueprint as SmorestBlueprint
-
-PUBLIC_CONTROL_API = SmorestBlueprint(
-    "public-control-api",
-    "PUBLIC CONTROL API",
-    description="Control API for the user of qunicorn.",
-    url_prefix="/control/",
-)
+# originally from <https://github.com/buehlefs/flask-template/>
 
 
-@dataclass()
-class RootData:
-    root: str
+"""Module containing all schemas of the API."""
+
+from .deployment_dtos import *
+from .device_dtos import *
+from .job_dtos import *
+from .provider_dtos import *
+from .root import *
+from .user_dtos import *

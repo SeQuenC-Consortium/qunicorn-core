@@ -13,20 +13,35 @@
 # limitations under the License.
 
 
-"""Module containing the root endpoint of the public control API."""
+"""Module containing the root endpoint of the DEVICES API."""
 
 from dataclasses import dataclass
+from http import HTTPStatus
 
+from flask.helpers import url_for
+from flask.views import MethodView
+
+from ..api_models import RootSchema
 from ..util import SecurityBlueprint as SmorestBlueprint
 
-PUBLIC_CONTROL_API = SmorestBlueprint(
-    "public-control-api",
-    "PUBLIC CONTROL API",
-    description="Control API for the user of qunicorn.",
-    url_prefix="/control/",
+USERS_API = SmorestBlueprint(
+    "users-api",
+    "USERS API",
+    description="Users API to list available resources.",
+    url_prefix="/users",
 )
 
 
 @dataclass()
 class RootData:
     root: str
+
+
+@USERS_API.route("/")
+class RootView(MethodView):
+    """Root endpoint of the provider_api api, to list all available provider_api."""
+
+    @USERS_API.response(HTTPStatus.OK, RootSchema())
+    def get(self):
+        """Get the urls of the next endpoints of the users api to call."""
+        return RootData(root=url_for("users-api.UsersView", _external=True))

@@ -17,16 +17,13 @@
 
 """CLI functions for the db module."""
 
-from flask import Flask, Blueprint, current_app
 import click
+from flask import Flask, Blueprint, current_app
 
-from ..util.logging import get_logger
-
-from .db import DB
-
-# make sure all models are imported for CLI to work properly
+# make sure all api_models are imported for CLI to work properly
 from . import models  # noqa
-
+from .db import DB
+from ..util.logging import get_logger
 
 DB_CLI_BLP = Blueprint("db_cli", __name__, cli_group=None)
 DB_CLI = DB_CLI_BLP.cli  # expose as attribute for autodoc generation

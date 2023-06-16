@@ -1,16 +1,33 @@
-from qunicorn_core.api.jobmanager.job_pilots import QiskitPilot, AWSPilot
-from qunicorn_core.api.jobmanager.job_dto import JobDto
+# Copyright 2023 University of Stuttgart
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+from qunicorn_core.api.api_models.job_dtos import JobRequestDto
 from qunicorn_core.celery import CELERY
+from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
+from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
+from qunicorn_core.db.database_services import job_db_service
 
 qiskitpilot = QiskitPilot
 awspilot = AWSPilot
 
 
 @CELERY.task()
-def create_and_run_job(job_dto_dict: dict):
+def run_job(job_dto_dict: dict):
     """Create a job and assign to the target pilot which executes the job"""
 
-    job_dto: JobDto = JobDto(**job_dto_dict)
+    job_dto: JobRequestDto = JobRequestDto(**job_dto_dict)
 
     if job_dto.provider == 'IBMQ':
         pilot = qiskitpilot("QP")
@@ -18,3 +35,42 @@ def create_and_run_job(job_dto_dict: dict):
     else:
         print("No valid target specified")
     return 0
+
+
+def create_and_run_job(job_dto: JobRequestDto):
+    job = job_db_service.create_database_job(job_dto)
+    job_dto.id = job.id
+    # TODO: execute asynchronous (has been that way before)
+    job_dict = vars(job_dto)
+    run_job.delay(job_dict)
+    return job_dto.id
+
+
+def get_job(job_id: int) -> JobRequestDto:
+    job_db_service.get_job()
+    return
+
+
+def run_job():
+    """create new Job from request"""
+    None
+
+
+def save_job_to_storage():
+    """store job for later use"""
+    None
+
+
+def check_registered_pilots():
+    """get all registered pilots for computing the schedule"""
+    None
+
+
+def schedule_jobs():
+    """start the scheduling"""
+    None
+
+
+def send_job_to_pilot():
+    """send job to pilot for execution after it is scheduled"""
+    None

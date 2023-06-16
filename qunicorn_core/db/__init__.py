@@ -15,14 +15,14 @@
 # originally from <https://github.com/buehlefs/flask-template/>
 
 
-"""Module containing database cli and models."""
+"""Module containing database cli and api_models."""
 
 from flask import Flask
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
-from .db import DB, MIGRATE
 from .cli import register_cli_blueprint
+from .db import DB, MIGRATE
 
 
 def register_db(app: Flask):
