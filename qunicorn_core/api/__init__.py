@@ -62,7 +62,7 @@ class RootView(MethodView):
         }
 
 
-def register_root_api(app: Flask, USERS_API=None):
+def register_root_api(app: Flask):
     """Register the API with the flask app."""
     API.init_app(app)
 
