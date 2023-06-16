@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from ..util import SecurityBlueprint as SmorestBlueprint
 
 JOBMANAGER_API = SmorestBlueprint(
-    "job_api-api",
+    "job-api",
     "JOBMANAGER API",
     description="Jobmanager API for the control plane.",
     url_prefix="/jobs/",

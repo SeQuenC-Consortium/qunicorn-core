@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-"""Module containing all API schemas for tasks in the Jobmanager API."""
+"""Module containing all Dtos and their Schemas for tasks in the Jobmanager API."""
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -21,9 +21,12 @@ import marshmallow as ma
 from marshmallow import fields, ValidationError
 from qiskit import QuantumCircuit
 
+from .deployment_dtos import DeploymentDto
+from .device_dtos import DeviceDto
+from .user_dtos import UserDto
 from ..util import MaBaseSchema
 
-__all__ = ["JobIDSchema", "JobResponseDtoSchema", "JobRequestDtoSchema"]
+__all__ = ["JobIDSchema", "JobID", "JobResponseDtoSchema", "JobRequestDtoSchema", "JobCoreDto", "JobResponseDto", "JobRequestDto"]
 
 from ...static.enums.job_state import JobState
 
@@ -32,7 +35,7 @@ from ...static.enums.job_state import JobState
 class JobRequestDto:
     name: str
     circuit: str
-    provider: str
+    provider_name: str
     shots: int
     parameters: float
     token: str
@@ -41,10 +44,9 @@ class JobRequestDto:
 @dataclass
 class JobCoreDto:
     id: int
-    executed_by: int
-    executed_on: int
-    deployment_id: int
-    token: str
+    executed_by: UserDto
+    executed_on: DeviceDto
+    deployment: DeploymentDto
     progress: str
     state: str
     started_at: datetime
@@ -53,7 +55,7 @@ class JobCoreDto:
     data: str
     results: str
     parameters: str
-
+    token: str | None = None
 
 @dataclass
 class JobResponseDto:
@@ -73,7 +75,7 @@ class JobResponseDto:
 @dataclass
 class JobID:
     id: str
-    job_name: str
+    name: str
     job_state: str = JobState.RUNNING
 
 
@@ -96,7 +98,7 @@ def get_quasm_string() -> str:
 class JobRequestDtoSchema(MaBaseSchema):
     name = ma.fields.String(required=True, example="Name")
     circuit = CircuitField(required=True, example=get_quasm_string())
-    provider = ma.fields.String(required=True, example="IBMQ")
+    provider_name = ma.fields.String(required=True, example="IBMQ")
     shots = ma.fields.Int(required=False, allow_none=True, metada={
         "label": "Shots",
         "description": "Number of shots",

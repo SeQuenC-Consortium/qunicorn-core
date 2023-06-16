@@ -24,9 +24,9 @@ from flask.views import MethodView
 from ..api_models import RootSchema
 from ..util import SecurityBlueprint as SmorestBlueprint
 
-USERS_API = SmorestBlueprint(
-    "users-api",
-    "USERS API",
+USER_API = SmorestBlueprint(
+    "user-api",
+    "USER API",
     description="Users API to list available resources.",
     url_prefix="/users",
 )
@@ -37,11 +37,11 @@ class RootData:
     root: str
 
 
-@USERS_API.route("/")
+@USER_API.route("/")
 class RootView(MethodView):
     """Root endpoint of the provider_api api, to list all available provider_api."""
 
-    @USERS_API.response(HTTPStatus.OK, RootSchema())
+    @USER_API.response(HTTPStatus.OK, RootSchema())
     def get(self):
         """Get the urls of the next endpoints of the users api to call."""
         return RootData(root=url_for("users-api.UsersView", _external=True))

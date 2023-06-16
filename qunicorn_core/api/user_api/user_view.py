@@ -19,16 +19,16 @@ from http import HTTPStatus
 
 from flask.views import MethodView
 
-from .root import USERS_API
-from ..api_models.user_dtos import UserIDSchema, UsersSchema
+from .root import USER_API
+from ..api_models.user_dtos import UserDtoSchema
 
 
-@USERS_API.route("/<string:users_id>/")
+@USER_API.route("/<string:users_id>/")
 class UsersView(MethodView):
     """Users Endpoint to get properties of a specific user via ID."""
 
-    @USERS_API.arguments(UserIDSchema(), location="path")
-    @USERS_API.response(HTTPStatus.OK, UsersSchema())
+    @USER_API.arguments(UserDtoSchema(), location="path")
+    @USER_API.response(HTTPStatus.OK, UserDtoSchema())
     def get(self):
         """Get information about a sinlge user."""
 

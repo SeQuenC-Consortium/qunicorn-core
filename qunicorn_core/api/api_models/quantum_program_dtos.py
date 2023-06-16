@@ -13,22 +13,13 @@
 # limitations under the License.
 
 
-"""Module containing the routes of the Taskmanager API."""
-from http import HTTPStatus
+"""Module containing all Dtos and their Schemas  for tasks in the QuantumProgram API."""
+from dataclasses import dataclass
 
-from flask.views import MethodView
-
-from .root import PROVIDER_API
-from ..api_models.provider_dtos import ProviderDtoSchema, ProviderIDSchema
+__all__ = ["QuantumProgramDto"]
 
 
-@PROVIDER_API.route("/<string:service_id>/")
-class ServicesView(MethodView):
-    """Services Endpoint to get properties of a specific service."""
-
-    @PROVIDER_API.arguments(ProviderIDSchema(), location="path")
-    @PROVIDER_API.response(HTTPStatus.OK, ProviderDtoSchema())
-    def get(self):
-        """Get information about a single service."""
-
-        pass
+@dataclass
+class QuantumProgramDto:
+    id: int
+    quantum_circuit: str

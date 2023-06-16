@@ -25,7 +25,7 @@ from ..api_models import RootSchema
 from ..util import SecurityBlueprint as SmorestBlueprint
 
 DEVICES_API = SmorestBlueprint(
-    "device_api-api",
+    "device-api",
     "DEVICES API",
     description="Devices API to list available resources.",
     url_prefix="/device_api",
@@ -39,9 +39,9 @@ class RootData:
 
 @DEVICES_API.route("/")
 class RootView(MethodView):
-    """Root endpoint of the device_api api, to list all available device_api."""
+    """Root endpoint of the device api, to list all available device_api."""
 
     @DEVICES_API.response(HTTPStatus.OK, RootSchema())
     def get(self):
         """Get the urls of the next endpoints of the device_api api to call."""
-        return RootData(root=url_for("device_api-api.DevicesView", _external=True))
+        return RootData(root=url_for("device-api.DevicesView", _external=True))

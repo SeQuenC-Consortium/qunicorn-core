@@ -13,34 +13,29 @@
 # limitations under the License.
 
 
-"""Module containing all API schemas for tasks in the Services API."""
+"""Module containing all Dtos and their Schemas  for tasks in the Services API."""
 from dataclasses import dataclass
 
 import marshmallow as ma
 
 from ..util import MaBaseSchema
 
-__all__ = ["ProviderDtoSchema", "ProviderIDSchema"]
+__all__ = ["ProviderDtoSchema", "ProviderIDSchema", "ProviderDto"]
 
 
 @dataclass
 class ProviderDto:
-    service_type: str
-    description: str
-    address: str
-    status: str
+    id: int
+    with_token: bool
+    supported_language: str
     name: str
-    url: str
-    simulator: bool
 
 
 class ProviderDtoSchema(MaBaseSchema):
-    service_id = ma.fields.String(required=True, allow_none=False)
-    service_type = ma.fields.String(required=True, allow_none=False)
-    provider_name = ma.fields.String(required=True, allow_none=False)
-    status = ma.fields.String(required=True, allow_none=False)
-    description = ma.fields.String(required=True, allow_none=False)
-    url = ma.fields.String(required=True, allow_none=False)
+    service_id = ma.fields.Integer(required=True, allow_none=False)
+    with_token = ma.fields.Boolean(required=False, allow_none=True)
+    supported_language = ma.fields.String(required=False, allow_none=True)
+    name = ma.fields.String(required=True, allow_none=False)
 
 
 class ProviderIDSchema(MaBaseSchema):

@@ -17,7 +17,7 @@
 
 """Module containing all SQLalchemy Models."""
 
-from . import cloud_device
+from . import device
 from . import deployment
 from . import job
 from . import pilot

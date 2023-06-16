@@ -13,78 +13,31 @@
 # limitations under the License.
 
 
-"""Module containing all API schemas for tasks in the Deployment API."""
+"""Module containing all Dtos and their Schemas for tasks in the Deployment API."""
 from dataclasses import dataclass
+from datetime import datetime
 
 import marshmallow as ma
-from marshmallow import fields
 
+from .user_dtos import UserDto
+from .quantum_program_dtos import QuantumProgramDto
 from ..util import MaBaseSchema
 
-__all__ = [
-    "DeploymentDto",
-]
+__all__ = ["DeploymentDtoSchema", "DeploymentDto"]
 
 
 @dataclass
-class DeploymentID:
-    id: str
-    description: str
-    taskmode: int
+class DeploymentDto:
+    id: int
+    deployed_by: UserDto | None = None
+    quantum_program: QuantumProgramDto | None = None
+    deployed_at: datetime | None = None
+    name: str | None = None
 
 
-@dataclass
-class DeploymentRegister:
-    circuit: str
-    provider: str
-    qpu: str
-    credentials: dict
-    shots: int
-    circuit_format: str
-
-
-class DeploymentDto(MaBaseSchema):
+class DeploymentDtoSchema(MaBaseSchema):
     uid = ma.fields.Integer(required=False, metadata={"descrption": "UID for the deployment_api"})
+    deployed_by = ma.fields.Integer(required=False, metadata={"descrption": "Id of the User"})
+    quantum_program = ma.fields.Integer(required=False, metadata={"descrption": "Id of the quantum program"})
+    deployed_at = ma.fields.Date(required=False, metadata={"descrption": "Time of Deployment"})
     name = ma.fields.String(required=True, metadata={"description": "An optional Name for the deployment_api."})
-    mode = ma.fields.String(
-        required=True,
-        metadata={"description": "Describes whether a Job should be pre-deployed or executed ad-hoc."},
-    )
-    description = ma.fields.String(required=False, metadata={"description": "Description for the Pre-deployment_api."})
-    credentials = ma.fields.Dict(
-        keys=ma.fields.Str(),
-        values=ma.fields.Str(),
-        required=False,
-    )
-    parameters = ma.fields.List(
-        ma.fields.Integer(),
-        requried=False,
-        metadata={"description": "List of Parameters for Quantum Circuits."},
-    )
-    shots = ma.fields.Integer(required=False, metadata={"description": "Specifying shots for ad-hoc execution."})
-    deploymentType = ma.fields.String(
-        required=True,
-        metadata={"description": "Decide between [Circuit], [CodeFile] ,[Container]."},
-    )
-    resourceURI = ma.fields.String(
-        required=True,
-        metadata={"description": "URL String to the container image, file or body for in-request quantum circuit"},
-    )
-    tags = ma.fields.List(
-        fields.String(),
-        required=False,
-        metadata={"description": "A list of Tags, for grouping and searching deployments"},
-    )
-    source = ma.fields.String(
-        required=False,
-        metadata={"description": "The source format of a quantum circuit."},
-    )
-    target = ma.fields.String(
-        required=False,
-        metadata={
-            "description": "The Target Service, needed for translation between formats. Decides which Pilot needs to be used"},
-    )
-
-
-class DeploymentResponseSchema(MaBaseSchema):
-    uid = ma.fields.Integer(required=False, metadata={"descrption": "Unique Identifier for the deployment_api"})

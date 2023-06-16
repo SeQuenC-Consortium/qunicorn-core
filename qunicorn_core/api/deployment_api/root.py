@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from ..util import SecurityBlueprint as SmorestBlueprint
 
 DEPLOYMENT_API = SmorestBlueprint(
-    "deployment_api-api",
+    "deployment-api",
     "DEPLOYMENT API",
     description="Deployment API for the control plane.",
     url_prefix="/deployments/",

@@ -37,4 +37,4 @@ class ProviderDataclass:
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
     with_token: Mapped[bool] = mapped_column(sql.BOOLEAN, default=None)
     supported_language: Mapped[ProgrammingLanguage] = mapped_column(sql.String(50), default=None) # TODO: Do we need another table to store multiple languages ?
-    cloud_service: Mapped[ProviderName] = mapped_column(sql.String(50), default=None)
+    name: Mapped[ProviderName] = mapped_column(sql.String(50), default=None)

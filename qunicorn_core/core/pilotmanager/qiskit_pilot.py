@@ -17,6 +17,7 @@ from qiskit import QuantumCircuit, transpile
 from qiskit_ibm_provider import IBMProvider
 
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
+from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import Job
 from qunicorn_core.static.enums.job_state import JobState
 
@@ -33,14 +34,14 @@ class QiskitPilot(Pilot):
         backend, transpiled = self.transpile(provider, job_dto.circuit)
         job_id = job_dto.id
 
-        job_service.update_attribute(job_id, JobState.RUNNING, Job.state)
+        job_db_service.update_attribute(job_id, JobState.RUNNING, Job.state)
 
         job_from_ibm = backend.run(transpiled, shots=job_dto.shots)
         counts = job_from_ibm.result().get_counts()
-        job_service.update_result_and_state(job_id, JobState.FINISHED, str(counts))
+        job_db_service.update_result_and_state(job_id, JobState.FINISHED, str(counts))
 
         print(f"Job with id {job_id} complete")
-        print(f"Executing job {job_from_ibm} on {job_dto.provider} with the Qiskit Pilot and get the result {counts}")
+        print(f"Executing job {job_from_ibm} on {job_dto.provider_name} with the Qiskit Pilot and get the result {counts}")
         return counts
 
     @staticmethod

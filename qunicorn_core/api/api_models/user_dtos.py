@@ -13,31 +13,25 @@
 # limitations under the License.
 
 
-"""Module containing all API schemas for tasks in the Users API."""
+"""Module containing all Dtos and their Schemas for tasks in the Users API."""
 from dataclasses import dataclass
 
 import marshmallow as ma
 
 from ..util import MaBaseSchema
 
-__all__ = ["UsersSchema", "UserIDSchema"]
-
-
-class UsersSchema(MaBaseSchema):
-    user_ID = ma.fields.String(required=True, allow_none=False)
-    name = ma.fields.String(required=True, allow_none=False)
-    group = ma.fields.String(required=True, allow_none=False)
-    privileges = ma.fields.String(required=True, allow_none=False)
-    status = ma.fields.String(required=True, allow_none=False)
-    description = ma.fields.String(required=False, allow_none=True)
-
-
-class UserIDSchema(MaBaseSchema):
-    user_id = ma.fields.String(required=True, allow_none=False)
+__all__ = ["UserDtoSchema", "UserDto"]
 
 
 @dataclass
-class USERS:
-    userID: str
-    description: str
-    simulator: bool
+class UserDto:
+    id: int
+    name: str | None = None
+
+
+class UserDtoSchema(MaBaseSchema):
+    id = ma.fields.Int(required=True, allow_none=False)
+    name = ma.fields.String(required=True, allow_none=False)
+
+
+

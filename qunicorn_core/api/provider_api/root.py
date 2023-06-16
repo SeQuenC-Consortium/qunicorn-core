@@ -24,11 +24,11 @@ from flask.views import MethodView
 from ..api_models import RootSchema
 from ..util import SecurityBlueprint as SmorestBlueprint
 
-SERVICES_API = SmorestBlueprint(
-    "provider_api-api",
-    "SERVICES API",
-    description="Services API to list available resources.",
-    url_prefix="/provider_api",
+PROVIDER_API = SmorestBlueprint(
+    "provider-api",
+    "PROVIDER API",
+    description="Provider API to list available resources.",
+    url_prefix="/provider/",
 )
 
 
@@ -37,11 +37,11 @@ class RootData:
     root: str
 
 
-@SERVICES_API.route("/")
+@PROVIDER_API.route("/")
 class RootView(MethodView):
-    """Root endpoint of the provider_api api, to list all available provider_api."""
+    """Root endpoint of the provider api, to list all available provider_api."""
 
-    @SERVICES_API.response(HTTPStatus.OK, RootSchema())
+    @PROVIDER_API.response(HTTPStatus.OK, RootSchema())
     def get(self):
-        """Get the urls of the next endpoints of the provider_api api to call."""
-        return RootData(root=url_for("provider_api-api.ServicesView", _external=True))
+        """Get the urls of the next endpoints of the provider api to call."""
+        return RootData(root=url_for("provider_api.ServicesView", _external=True))

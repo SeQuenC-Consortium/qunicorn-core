@@ -13,14 +13,14 @@
 # limitations under the License.
 
 
-"""Module containing the routes of the Taskmanager API."""
+"""Module containing the routes of the devices API."""
 
 from http import HTTPStatus
 
 from flask.views import MethodView
 
 from .root import DEVICES_API
-from ..api_models.device_dtos import DevicesSchema, DeviceIDSchema
+from ..api_models.device_dtos import DevicesDtoSchema, DeviceIDSchema
 
 
 @DEVICES_API.route("/<string:device_id>/")
@@ -28,7 +28,7 @@ class DevicesView(MethodView):
     """Devices Endpoint to get properties of a specific device."""
 
     @DEVICES_API.arguments(DeviceIDSchema(), location="path")
-    @DEVICES_API.response(HTTPStatus.OK, DevicesSchema())
+    @DEVICES_API.response(HTTPStatus.OK, DevicesDtoSchema())
     def get(self):
         """Get information about a specific device."""
 
@@ -40,7 +40,7 @@ class DevicesView(MethodView):
     """Devices Endpoint to get properties of a specific device."""
 
     @DEVICES_API.arguments(DeviceIDSchema(), location="path")
-    @DEVICES_API.response(HTTPStatus.OK, DevicesSchema())
+    @DEVICES_API.response(HTTPStatus.OK, DevicesDtoSchema())
     def get(self):
         """Get the status of a specific device."""
 
@@ -52,7 +52,7 @@ class DevicesView(MethodView):
     """Devices Endpoint to get properties of a specific device."""
 
     @DEVICES_API.arguments(DeviceIDSchema(), location="path")
-    @DEVICES_API.response(HTTPStatus.OK, DevicesSchema())
+    @DEVICES_API.response(HTTPStatus.OK, DevicesDtoSchema())
     def get(self):
         """Get calibration data for a specific device in a uniform way."""
 
@@ -63,7 +63,7 @@ class DevicesView(MethodView):
 class DevicesView(MethodView):
     """Devices Endpoint to get properties of a specific device/service."""
 
-    @DEVICES_API.response(HTTPStatus.OK, DevicesSchema())
+    @DEVICES_API.response(HTTPStatus.OK, DevicesDtoSchema())
     def get(self):
         """Get the active jobs of a device."""
 

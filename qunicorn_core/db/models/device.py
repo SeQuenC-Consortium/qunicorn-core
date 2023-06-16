@@ -20,7 +20,7 @@ from ..db import REGISTRY
 
 
 @REGISTRY.mapped_as_dataclass
-class CloudDeviceDataclass:
+class DeviceDataclass:
     """Dataclass for storing CloudDevices of a provider
     
     Attributes:

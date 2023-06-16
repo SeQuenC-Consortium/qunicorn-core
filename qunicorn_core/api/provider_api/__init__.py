@@ -16,4 +16,4 @@
 """Module containing the Services API."""
 
 from . import provider_view
-from .root import SERVICES_API
+from .root import PROVIDER_API

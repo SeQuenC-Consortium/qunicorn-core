@@ -14,6 +14,7 @@
 from datetime import datetime
 from typing import Optional
 
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import sqltypes as sql
 
@@ -34,7 +35,7 @@ class DeploymentDataclass:
     __tablename__ = "Deployment"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    # deployed_by: Mapped[int] = mapped_column(ForeignKey("User.id"))
-    # quantum_program_id: Mapped[int] = mapped_column(ForeignKey("QuantumProgram.id"))
+    deployed_by: Mapped[int] = mapped_column(ForeignKey("User.id"))
+    quantum_program_id: Mapped[int] = mapped_column(ForeignKey("QuantumProgram.id"))
     deployed_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)

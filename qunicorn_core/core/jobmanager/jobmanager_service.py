@@ -13,8 +13,9 @@
 # limitations under the License.
 
 
-from qunicorn_core.api.api_models.job_dtos import JobRequestDto
+from qunicorn_core.api.api_models.job_dtos import JobRequestDto, JobCoreDto
 from qunicorn_core.celery import CELERY
+from qunicorn_core.core.jobmanager import job_mapper
 from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
 from qunicorn_core.db.database_services import job_db_service
@@ -27,9 +28,10 @@ awspilot = AWSPilot
 def run_job(job_dto_dict: dict):
     """Create a job and assign to the target pilot which executes the job"""
 
-    job_dto: JobRequestDto = JobRequestDto(**job_dto_dict)
-
-    if job_dto.provider == 'IBMQ':
+    job_dto: JobCoreDto = JobCoreDto(**job_dto_dict)
+    device = job_dto.executed_on
+    print(device)
+    if device.provider.name == 'IBMQ':
         pilot = qiskitpilot("QP")
         pilot.execute(job_dto)
     else:
@@ -39,21 +41,16 @@ def run_job(job_dto_dict: dict):
 
 def create_and_run_job(job_dto: JobRequestDto):
     job = job_db_service.create_database_job(job_dto)
-    job_dto.id = job.id
+    job_core_dto = job_mapper.job_to_job_core_dto(job)
     # TODO: execute asynchronous (has been that way before)
-    job_dict = vars(job_dto)
-    run_job.delay(job_dict)
-    return job_dto.id
+    job_dict = vars(job_core_dto)
+    run_job(job_dict)
+    return job_core_dto.id
 
 
 def get_job(job_id: int) -> JobRequestDto:
     job_db_service.get_job()
     return
-
-
-def run_job():
-    """create new Job from request"""
-    None
 
 
 def save_job_to_storage():
