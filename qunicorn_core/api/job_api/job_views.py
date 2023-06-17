@@ -22,7 +22,7 @@ from flask.helpers import url_for
 from flask.views import MethodView
 
 from .root import JOBMANAGER_API
-from ..api_models.job_dtos import JobRequestDtoSchema, JobResponseDtoSchema, JobRequestDto, JobID
+from ..api_models.job_dtos import JobRequestDtoSchema, JobResponseDtoSchema, JobRequestDto, JobID, JobResponseDto
 from ..api_models.job_dtos import JobIDSchema
 from ...core.jobmanager import jobmanager_service
 
@@ -57,15 +57,15 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema())
     def get(self, job_id: str):
         """Get the urls for the job_api api for job control."""
-        job_response_dto: JobResponseDto = jobmanager_service.get_job(job_id)
+        job_response_dto: JobResponseDto = jobmanager_service.get_job(int(job_id))
         return jsonify(job_response_dto), 200
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def post(self, job_id: str):
-        """Run a job execution via id."""
-        jobmanager_service.run_job()
-        pass
+        """Run a job execution via id. tbd"""
+        return jsonify(jobmanager_service.run_job_by_id(int(job_id))), 200
+    
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())

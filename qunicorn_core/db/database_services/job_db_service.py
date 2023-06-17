@@ -43,4 +43,5 @@ def update_result_and_state(job_id: int, job_state: JobState, results: str):
 
 
 def get_job(job_id: int) -> Job:
-    return db_service.get_database_object(int(job_id), Job)
+    """Gets the job with the job_id from the database"""
+    return db_service.get_database_object(job_id, Job)

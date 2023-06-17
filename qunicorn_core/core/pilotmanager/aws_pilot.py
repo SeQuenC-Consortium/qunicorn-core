@@ -25,4 +25,4 @@ class AWSPilot(Pilot):
     def transpile(self, job):
         """Transpile job on an IBM backend, needs a device_id"""
 
-        print(f"Transpile a quantum circuit for a specific AWS backend")
+        print("Transpile a quantum circuit for a specific AWS backend")
