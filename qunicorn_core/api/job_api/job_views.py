@@ -46,8 +46,8 @@ class JobIDView(MethodView):
     def post(self, new_job_data):
         """Create/Register and run new job."""
         job_dto: JobRequestDto = JobRequestDto(**new_job_data)
-        job_id = jobmanager_service.create_and_run_job(job_dto)
-        return jsonify({'job_id': job_id}), 200
+        job_id: JobID = jobmanager_service.create_and_run_job(job_dto)
+        return jsonify(job_id), 200
 
 
 @JOBMANAGER_API.route("/<string:job_id>/")
@@ -57,8 +57,8 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema())
     def get(self, job_id: str):
         """Get the urls for the job_api api for job control."""
-        results = jobmanager_service.get_job()
-        return jsonify({'results': results}), 200
+        job_response_dto: JobResponseDto = jobmanager_service.get_job(job_id)
+        return jsonify(job_response_dto), 200
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())

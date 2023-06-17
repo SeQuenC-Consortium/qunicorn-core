@@ -40,6 +40,19 @@ def core_to_response(job: JobCoreDto) -> JobResponseDto:
                           results=job.results,
                           parameters=job.parameter)
 
+def job_to_response(job: Job) -> JobResponseDto:
+    return JobResponseDto(id=job.id, 
+                          executed_by=str(job.executed_by), 
+                          executed_on=str(job.executed_on.provider),
+                          progress=str(job.progress),
+                          state=str(job.state),
+                          started_at=job.started_at, 
+                          finished_at=job.finished_at, 
+                          name=job.name, 
+                          data=job.data,
+                          results=job.results,
+                          parameters=job.parameter)
+
 
 def job_core_dto_to_job(job: JobCoreDto) -> Job:
     return Job(id=job.id, executed_by=job.executed_by.id, executed_on=job.executed_on.device_id,

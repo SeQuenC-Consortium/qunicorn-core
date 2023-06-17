@@ -38,19 +38,16 @@ def run_job(job_dto_dict: dict):
         print("No valid target specified")
     return 0
 
-
-def create_and_run_job(job_dto: JobRequestDto):
-    job = job_db_service.create_database_job(job_dto)
-    job_core_dto = job_mapper.job_to_job_core_dto(job)
-    # TODO: execute asynchronous (has been that way before)
-    job_dict = vars(job_core_dto)
-    run_job(job_dict)
-    return job_core_dto.id
+def create_and_run_job(job_request_dto: JobRequestDto) -> JobID:
+    job: Job = job_db_service.create_database_job(job_request_dto)
+    job_core_dto: JobCoreDto = job_mapper.job_to_job_core_dto(job)
+    run_job(vars(job_core_dto))
+    return JobID(id=job_core_dto.id, name=job_core_dto, state=JobState.RUNNING)
 
 
-def get_job(job_id: int) -> JobRequestDto:
-    job_db_service.get_job()
-    return
+def get_job(job_id: int) -> JobResponseDto:
+    db_job: Job = job_db_service.get_job(job_id)
+    return job_mapper.job_to_response(db_job)
 
 
 def save_job_to_storage():
