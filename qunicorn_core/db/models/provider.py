@@ -36,5 +36,7 @@ class ProviderDataclass:
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
     with_token: Mapped[bool] = mapped_column(sql.BOOLEAN, default=None)
-    supported_language: Mapped[ProgrammingLanguage] = mapped_column(sql.String(50), default=None)  # TODO: another Table for languages?
+    supported_language: Mapped[ProgrammingLanguage] = mapped_column(
+        sql.String(50), default=None
+    )  # TODO: another Table for languages?
     name: Mapped[ProviderName] = mapped_column(sql.String(50), default=None)

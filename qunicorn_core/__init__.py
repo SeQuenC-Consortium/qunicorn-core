@@ -53,7 +53,10 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
 
     # load defaults
     config = app.config
-    flask_debug: bool = config.get("DEBUG", False) or environ.get("FLASK_ENV", "production").lower() == "development"
+    flask_debug: bool = (
+        config.get("DEBUG", False)
+        or environ.get("FLASK_ENV", "production").lower() == "development"  # noqa
+    )
     if flask_debug:
         config.from_object(DebugConfig)
     elif test_config is None:
@@ -110,7 +113,9 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
     )
 
     if config.get("SECRET_KEY") == "debug_secret":
-        logger.error('The configured SECRET_KEY="debug_secret" is unsafe and must not be used in production!')
+        logger.error(
+            'The configured SECRET_KEY="debug_secret" is unsafe and must not be used in production!'
+        )
 
     # ensure the instance folder exists
     try:

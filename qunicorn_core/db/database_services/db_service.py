@@ -19,7 +19,7 @@ session = DB.session
 
 
 def save_database_object(db_object) -> object:
-    """ Creates or Updates a database object, as long as it is a database-model"""
+    """Creates or Updates a database object, as long as it is a database-model"""
     session.add(db_object)
     session.commit()
     session.refresh(db_object)
@@ -27,13 +27,13 @@ def save_database_object(db_object) -> object:
 
 
 def remove_database_object(db_object):
-    """ Deletes a database object, as long as it is a database-model"""
+    """Deletes a database object, as long as it is a database-model"""
     session.remove(db_object)
     session.commit()
 
 
 def get_database_object(db_object_id: int, database_object_class):
-    """ Gets a database object
+    """Gets a database object
 
     Arguments:
         db_object_id            - id of the database object

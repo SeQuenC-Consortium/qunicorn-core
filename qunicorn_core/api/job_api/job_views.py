@@ -22,7 +22,14 @@ from flask.helpers import url_for
 from flask.views import MethodView
 
 from .root import JOBMANAGER_API
-from ..api_models.job_dtos import JobRequestDtoSchema, JobResponseDtoSchema, JobRequestDto, JobID, JobResponseDto, JobIDSchema
+from ..api_models.job_dtos import (
+    JobRequestDtoSchema,
+    JobResponseDtoSchema,
+    JobRequestDto,
+    JobID,
+    JobResponseDto,
+    JobIDSchema,
+)
 from ...core.jobmanager import jobmanager_service
 
 
@@ -33,7 +40,12 @@ class JobIDView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
     def get(self):
         """Get registered job list."""
-        return [JobID(id=url_for("job_api-api.JobIDView", _external=True), name="Placeholder for Jobs")]
+        return [
+            JobID(
+                id=url_for("job_api-api.JobIDView", _external=True),
+                name="Placeholder for Jobs",
+            )
+        ]
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())

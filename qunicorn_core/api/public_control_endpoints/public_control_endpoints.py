@@ -30,15 +30,14 @@ class JobIDView(MethodView):
     @PUBLIC_CONTROL_API.response(HTTPStatus.OK, JobIDSchema())
     def get(self):
         """Get registered job list."""
-        return jsonify("{[\"myDummyJob1\",\"myDummyJob2\"]}"), 200
+        return jsonify('{["myDummyJob1","myDummyJob2"]}'), 200
 
     @PUBLIC_CONTROL_API.arguments(JobRequestDtoSchema(), location="json")
     @PUBLIC_CONTROL_API.response(HTTPStatus.OK, JobIDSchema())
     def post(self, new_job_data: dict):
         """Create/Register new job."""
 
-        return jsonify({"taskmode": "Job type ",
-                        "JobID": "1234"}), 200
+        return jsonify({"taskmode": "Job type ", "JobID": "1234"}), 200
 
 
 @PUBLIC_CONTROL_API.route("/<string:job_id>/")

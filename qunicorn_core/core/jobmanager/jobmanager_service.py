@@ -13,7 +13,12 @@
 # limitations under the License.
 
 
-from qunicorn_core.api.api_models.job_dtos import JobRequestDto, JobCoreDto, JobID, JobResponseDto
+from qunicorn_core.api.api_models.job_dtos import (
+    JobRequestDto,
+    JobCoreDto,
+    JobID,
+    JobResponseDto,
+)
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.jobmanager import job_mapper
 from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
@@ -33,7 +38,7 @@ def run_job(job_core_dto_dict: dict):
     job_core_dto: JobCoreDto = JobCoreDto(**job_core_dto_dict)
     device = job_core_dto.executed_on
     print(device)
-    if device.provider.name == 'IBMQ':
+    if device.provider.name == "IBMQ":
         pilot = qiskitpilot("QP")
         pilot.execute(job_core_dto)
     else:
@@ -47,7 +52,9 @@ def create_and_run_job(job_request_dto: JobRequestDto) -> JobID:
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job_core_dto.id = job.id
     run_job(vars(job_core_dto))
-    return JobID(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
+    return JobID(
+        id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING
+    )
 
 
 def run_job_by_id(job_id: int) -> JobID:
@@ -57,7 +64,9 @@ def run_job_by_id(job_id: int) -> JobID:
     new_job: Job = job_db_service.create_database_job(job)
     job_core_dto: JobCoreDto = job_mapper.job_to_job_core_dto(new_job)
     # TODO run job
-    return JobID(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
+    return JobID(
+        id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING
+    )
 
 
 def get_job(job_id: int) -> JobResponseDto:

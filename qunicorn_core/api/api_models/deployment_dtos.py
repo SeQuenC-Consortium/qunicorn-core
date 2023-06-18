@@ -36,8 +36,19 @@ class DeploymentDto:
 
 
 class DeploymentDtoSchema(MaBaseSchema):
-    uid = ma.fields.Integer(required=False, metadata={"descrption": "UID for the deployment_api"})
-    deployed_by = ma.fields.Integer(required=False, metadata={"descrption": "Id of the User"})
-    quantum_program = ma.fields.Integer(required=False, metadata={"descrption": "Id of the quantum program"})
-    deployed_at = ma.fields.Date(required=False, metadata={"descrption": "Time of Deployment"})
-    name = ma.fields.String(required=True, metadata={"description": "An optional Name for the deployment_api."})
+    uid = ma.fields.Integer(
+        required=False, metadata={"descrption": "UID for the deployment_api"}
+    )
+    deployed_by = ma.fields.Integer(
+        required=False, metadata={"descrption": "Id of the User"}
+    )
+    quantum_program = ma.fields.Integer(
+        required=False, metadata={"descrption": "Id of the quantum program"}
+    )
+    deployed_at = ma.fields.Date(
+        required=False, metadata={"descrption": "Time of Deployment"}
+    )
+    name = ma.fields.String(
+        required=True,
+        metadata={"description": "An optional Name for the deployment_api."},
+    )

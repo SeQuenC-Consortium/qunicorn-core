@@ -26,8 +26,15 @@ from .device_dtos import DeviceDto
 from .user_dtos import UserDto
 from ..util import MaBaseSchema
 
-__all__ = ["JobIDSchema", "JobID", "JobResponseDtoSchema", "JobRequestDtoSchema", "JobCoreDto", "JobResponseDto",
-           "JobRequestDto"]
+__all__ = [
+    "JobIDSchema",
+    "JobID",
+    "JobResponseDtoSchema",
+    "JobRequestDtoSchema",
+    "JobCoreDto",
+    "JobResponseDto",
+    "JobRequestDto",
+]
 
 from ...static.enums.job_state import JobState
 
@@ -102,11 +109,16 @@ class JobRequestDtoSchema(MaBaseSchema):
     name = ma.fields.String(required=True, example="Name")
     circuit = CircuitField(required=True, example=get_quasm_string())
     provider_name = ma.fields.String(required=True, example="IBMQ")
-    shots = ma.fields.Int(required=False, allow_none=True, metada={
-        "label": "Shots",
-        "description": "Number of shots",
-        "input_type": "number"
-    }, example=4000)
+    shots = ma.fields.Int(
+        required=False,
+        allow_none=True,
+        metada={
+            "label": "Shots",
+            "description": "Number of shots",
+            "input_type": "number",
+        },
+        example=4000,
+    )
     parameters = ma.fields.List(ma.fields.Float(), required=False)
     token = ma.fields.String(required=True, example="")
 

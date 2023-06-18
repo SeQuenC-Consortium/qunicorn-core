@@ -32,9 +32,17 @@ class DeviceDto:
 
 
 class DevicesDtoSchema(MaBaseSchema):
-    device_id = ma.fields.Integer(required=True, allow_none=False, metadata={"description": "The unique deviceID."})
-    address_url = ma.fields.String(required=True, allow_none=False, metadata={"description": "URL of a device."})
-    provider_id = ma.fields.Integer(required=True, allow_none=False, metadata={"description": "The unique providerId."})
+    device_id = ma.fields.Integer(
+        required=True, allow_none=False, metadata={"description": "The unique deviceID."}
+    )
+    address_url = ma.fields.String(
+        required=True, allow_none=False, metadata={"description": "URL of a device."}
+    )
+    provider_id = ma.fields.Integer(
+        required=True,
+        allow_none=False,
+        metadata={"description": "The unique providerId."},
+    )
 
 
 class DeviceIDSchema(MaBaseSchema):
