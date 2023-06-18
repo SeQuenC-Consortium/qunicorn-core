@@ -23,7 +23,7 @@ from ..db import REGISTRY
 @REGISTRY.mapped_as_dataclass
 class UserDataclass:
     """Dataclass for storing Users
-    
+
     Attributes:
         id (int): Automatically generated database id. Use the id to fetch this information from the database.
         name (str): Name of the user.

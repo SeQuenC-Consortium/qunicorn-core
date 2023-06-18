@@ -26,7 +26,7 @@ from ...static.enums.job_state import JobState
 @REGISTRY.mapped_as_dataclass
 class Job:
     """Dataclass for storing Jobs
-    
+
     Attributes:
         id (int): Automatically generated database id. Use the id to fetch this information from the database.
         name (str, optional): Optional name for a job

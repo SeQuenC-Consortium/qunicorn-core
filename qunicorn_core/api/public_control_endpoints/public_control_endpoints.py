@@ -37,7 +37,7 @@ class JobIDView(MethodView):
     def post(self, new_job_data: dict):
         """Create/Register new job."""
 
-        return jsonify({"taskmode": f"Job type ",
+        return jsonify({"taskmode": "Job type ",
                         "JobID": "1234"}), 200
 
 

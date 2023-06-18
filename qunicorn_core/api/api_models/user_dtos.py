@@ -32,6 +32,3 @@ class UserDto:
 class UserDtoSchema(MaBaseSchema):
     id = ma.fields.Int(required=True, allow_none=False)
     name = ma.fields.String(required=True, allow_none=False)
-
-
-

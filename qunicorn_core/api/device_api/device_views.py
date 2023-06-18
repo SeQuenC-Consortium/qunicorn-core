@@ -36,7 +36,7 @@ class DevicesView(MethodView):
 
 
 @DEVICES_API.route("/<string:device_id>/status")
-class DevicesView(MethodView):
+class DevicesStatusStatus(MethodView):
     """Devices Endpoint to get properties of a specific device."""
 
     @DEVICES_API.arguments(DeviceIDSchema(), location="path")
@@ -48,7 +48,7 @@ class DevicesView(MethodView):
 
 
 @DEVICES_API.route("/<string:device_id>/calibration")
-class DevicesView(MethodView):
+class DevicesCalibrationView(MethodView):
     """Devices Endpoint to get properties of a specific device."""
 
     @DEVICES_API.arguments(DeviceIDSchema(), location="path")
@@ -60,7 +60,7 @@ class DevicesView(MethodView):
 
 
 @DEVICES_API.route("/<string:device_id>/jobs")
-class DevicesView(MethodView):
+class DevicesJobsView(MethodView):
     """Devices Endpoint to get properties of a specific device/service."""
 
     @DEVICES_API.response(HTTPStatus.OK, DevicesDtoSchema())

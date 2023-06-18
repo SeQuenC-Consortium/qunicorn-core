@@ -64,5 +64,5 @@ class QiskitPilot(Pilot):
         backend = provider.get_backend(self.IBMQ_BACKEND)
         transpiled = transpile(qasm_circ, backend=backend)
 
-        print(f"Transpile a quantum circuit for a specific IBM backend")
+        print("Transpile a quantum circuit for a specific IBM backend")
         return backend, transpiled

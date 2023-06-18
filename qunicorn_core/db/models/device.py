@@ -22,7 +22,7 @@ from ..db import REGISTRY
 @REGISTRY.mapped_as_dataclass
 class DeviceDataclass:
     """Dataclass for storing CloudDevices of a provider
-    
+
     Attributes:
         id (int): Automatically generated database id. Use the id to fetch this information from the database.
         rest_endpoint (str): Rest-endpoint how to connect to the Cloud device

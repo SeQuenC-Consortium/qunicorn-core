@@ -71,7 +71,7 @@ class DeploymentDetailView(MethodView):
 
 
 @DEPLOYMENT_API.route("/<string:deployment_id>/jobs")
-class DeploymentDetailView(MethodView):
+class DeploymentDetailJobView(MethodView):
     """API endpoint for running jobs of a single pre-deployment_api."""
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)

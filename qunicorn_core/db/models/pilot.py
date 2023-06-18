@@ -25,7 +25,7 @@ from ...static.enums.programming_language import ProgrammingLanguage
 @REGISTRY.mapped_as_dataclass
 class PilotDataclass:
     """Dataclass for storing Pilots
-    
+
     Attributes:
         id (int): Automatically generated database id. Use the id to fetch this information from the database.
         programming_language (ProgrammingLanguage): Programming language that the code should have after translation

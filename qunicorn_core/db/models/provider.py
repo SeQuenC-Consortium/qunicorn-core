@@ -24,7 +24,7 @@ from ...static.enums.programming_language import ProgrammingLanguage
 @REGISTRY.mapped_as_dataclass
 class ProviderDataclass:
     """Dataclass for storing Providers
-    
+
     Attributes:
         id (int): Automatically generated database id. Use the id to fetch this information from the database.
         with_token (bool): If authentication is needed and can be done by passing a token this attribute true.
@@ -36,5 +36,5 @@ class ProviderDataclass:
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
     with_token: Mapped[bool] = mapped_column(sql.BOOLEAN, default=None)
-    supported_language: Mapped[ProgrammingLanguage] = mapped_column(sql.String(50), default=None) # TODO: Do we need another table to store multiple languages ?
+    supported_language: Mapped[ProgrammingLanguage] = mapped_column(sql.String(50), default=None)  # TODO: another Table for languages?
     name: Mapped[ProviderName] = mapped_column(sql.String(50), default=None)
