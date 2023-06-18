@@ -26,7 +26,8 @@ from .device_dtos import DeviceDto
 from .user_dtos import UserDto
 from ..util import MaBaseSchema
 
-__all__ = ["JobIDSchema", "JobID", "JobResponseDtoSchema", "JobRequestDtoSchema", "JobCoreDto", "JobResponseDto", "JobRequestDto"]
+__all__ = ["JobIDSchema", "JobID", "JobResponseDtoSchema", "JobRequestDtoSchema", "JobCoreDto", "JobResponseDto",
+           "JobRequestDto"]
 
 from ...static.enums.job_state import JobState
 
@@ -37,7 +38,7 @@ class JobRequestDto:
     circuit: str
     provider_name: str
     shots: int
-    parameters: float
+    parameters: str
     token: str
 
 
@@ -49,6 +50,7 @@ class JobCoreDto:
     deployment: DeploymentDto
     progress: str
     state: str
+    shots: int
     started_at: datetime
     finished_at: datetime
     name: str
@@ -56,6 +58,7 @@ class JobCoreDto:
     results: str
     parameters: str
     token: str | None = None
+
 
 @dataclass
 class JobResponseDto:

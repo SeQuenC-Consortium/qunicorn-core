@@ -26,8 +26,8 @@ class JobState(str, Enum):
         ERROR: When an error occurred while executing a quantum circuit
     """
 
-    READY = 1
-    RUNNING = 2
-    FINISHED = 3
-    BLOCKED = 4
-    ERROR = 5
+    READY = "READY"
+    RUNNING = "RUNNING"
+    FINISHED = "FINISHED"
+    BLOCKED = "BLOCKED"
+    ERROR = "ERROR"

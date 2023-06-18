@@ -51,6 +51,7 @@ class Job:
     deployment_id: Mapped[int] = mapped_column(ForeignKey("Deployment.id"), default=None, nullable=True)
     progress: Mapped[str] = mapped_column(sql.INTEGER(), default=None)
     state: Mapped[str] = mapped_column(sql.Enum(JobState), default=None)
+    shots: Mapped[int] = mapped_column(sql.INTEGER(), default=4000)
     started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
