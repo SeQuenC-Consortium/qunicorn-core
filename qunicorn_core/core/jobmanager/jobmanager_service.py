@@ -26,6 +26,7 @@ from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import Job
 from qunicorn_core.static.enums.job_state import JobState
+from qunicorn_core.static.enums.provider_name import ProviderName
 
 qiskitpilot = QiskitPilot
 awspilot = AWSPilot
@@ -38,8 +39,8 @@ def run_job(job_core_dto_dict: dict):
     job_core_dto: JobCoreDto = JobCoreDto(**job_core_dto_dict)
     device = job_core_dto.executed_on
     print(device)
-    if device.provider.name == "IBMQ":
-        pilot = qiskitpilot("QP")
+    if device.provider.name == ProviderName.IBM:
+        pilot: QiskitPilot = qiskitpilot("QP")
         pilot.execute(job_core_dto)
     else:
         print("No valid target specified")

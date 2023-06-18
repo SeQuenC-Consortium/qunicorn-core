@@ -15,7 +15,7 @@
 from enum import Enum
 
 
-class ProgrammingLanguage(Enum):
+class ProgrammingLanguage(str, Enum):
     """Enum to save the different programming languages for quantum circuits
 
     Values:
@@ -24,6 +24,6 @@ class ProgrammingLanguage(Enum):
         QMWARE: The programming language is QMWARE
     """
 
-    QISKIT = 1
-    PYQUIL = 2
-    QMWARE = 3
+    QISKIT = "QISKIT"
+    PYQUIL = "PYQUIL"
+    QMWARE = "QMWARE"

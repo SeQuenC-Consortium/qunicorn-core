@@ -15,7 +15,7 @@
 from enum import Enum
 
 
-class PilotState(Enum):
+class PilotState(str, Enum):
     """Enum to save the different states of the pilots
 
     Values:
@@ -23,5 +23,5 @@ class PilotState(Enum):
         BLOCKED: Pilot currently executes a job and cannot used otherwise
     """
 
-    READY = 1
-    BLOCKED = 2
+    READY = "READY"
+    BLOCKED = "BLOCKED"

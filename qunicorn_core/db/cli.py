@@ -26,6 +26,8 @@ from .db import DB
 from .models.device import DeviceDataclass
 from .models.provider import ProviderDataclass
 from .models.user import UserDataclass
+from ..static.enums.programming_language import ProgrammingLanguage
+from ..static.enums.provider_name import ProviderName
 from ..util.logging import get_logger
 
 DB_CLI_BLP = Blueprint("db_cli", __name__, cli_group=None)
@@ -62,7 +64,9 @@ def load_test_data():
 
 
 def load_db_function(app: Flask):
-    provider = ProviderDataclass(with_token=True, supported_language="", name="IBMQ")
+    provider = ProviderDataclass(with_token=True,
+                                 supported_language=ProgrammingLanguage.QISKIT,
+                                 name=ProviderName.IBM)
     DB.session.add(provider)
     DB.session.commit()
     DB.session.refresh(provider)

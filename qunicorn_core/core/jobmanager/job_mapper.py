@@ -31,14 +31,10 @@ from qunicorn_core.static.enums.job_state import JobState
 def request_to_core(job: JobRequestDto):
     """Helper class. When the db objects are saved correctly we do not need it anymore"""
     user = UserDto(id=0, name="default")
-    provider = ProviderDto(
-        id=0, with_token=True, supported_language="all", name=job.provider_name
-    )
+    provider = ProviderDto(id=0, with_token=True, supported_language="all", name=job.provider_name)
     device = DeviceDto(id=0, provider=provider, url="")
     quantum_program = QuantumProgramDto(id=0, quantum_circuit=job.circuit)
-    deployment = DeploymentDto(
-        id=0, deployed_by=user, quantum_program=quantum_program, name=""
-    )
+    deployment = DeploymentDto(id=0, deployed_by=user, quantum_program=quantum_program, name="")
 
     return JobCoreDto(
         id=0,

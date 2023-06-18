@@ -15,7 +15,7 @@
 from enum import Enum
 
 
-class ProviderName(Enum):
+class ProviderName(str, Enum):
     """Enum to save the different provider names
 
     Values:
@@ -23,5 +23,5 @@ class ProviderName(Enum):
         AWS: Amazon Web Services
     """
 
-    IBM = 1
-    AWS = 2
+    IBM = "IBM"
+    AWS = "AWS"

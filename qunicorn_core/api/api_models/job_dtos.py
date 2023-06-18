@@ -37,6 +37,7 @@ __all__ = [
 ]
 
 from ...static.enums.job_state import JobState
+from ...static.enums.provider_name import ProviderName
 
 
 @dataclass
@@ -106,9 +107,9 @@ def get_quasm_string() -> str:
 
 
 class JobRequestDtoSchema(MaBaseSchema):
-    name = ma.fields.String(required=True, example="Name")
+    name = ma.fields.String(required=True, example="JobName")
     circuit = CircuitField(required=True, example=get_quasm_string())
-    provider_name = ma.fields.String(required=True, example="IBMQ")
+    provider_name = ma.fields.Enum(required=True, example="IBM", enum=ProviderName)
     shots = ma.fields.Int(
         required=False,
         allow_none=True,
