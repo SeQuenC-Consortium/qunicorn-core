@@ -64,9 +64,11 @@ def load_test_data():
 
 
 def load_db_function(app: Flask):
-    provider = ProviderDataclass(with_token=True,
-                                 supported_language=ProgrammingLanguage.QISKIT,
-                                 name=ProviderName.IBM)
+    provider = ProviderDataclass(
+        with_token=True,
+        supported_language=ProgrammingLanguage.QISKIT,
+        name=ProviderName.IBM,
+    )
     DB.session.add(provider)
     DB.session.commit()
     DB.session.refresh(provider)
