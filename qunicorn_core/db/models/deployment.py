@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -37,10 +37,16 @@ class DeploymentDataclass:
     __tablename__ = "Deployment"
 
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
-    deployed_by: Mapped[int] = mapped_column(ForeignKey(UserDataclass.__tablename__+".id"), default=None, nullable=True)
-    quantum_program_id: Mapped[int] = mapped_column(ForeignKey(QuantumProgramDataclass.__tablename__+".id"), default=None)
+    deployed_by: Mapped[int] = mapped_column(
+        ForeignKey(UserDataclass.__tablename__ + ".id"), default=None, nullable=True
+    )
+    quantum_program_id: Mapped[int] = mapped_column(
+        ForeignKey(QuantumProgramDataclass.__tablename__ + ".id"), default=None
+    )
     quantum_program: Mapped[QuantumProgramDataclass.__name__] = relationship(
-        QuantumProgramDataclass.__name__, backref=QuantumProgramDataclass.__tablename__, default=None
+        QuantumProgramDataclass.__name__,
+        backref=QuantumProgramDataclass.__tablename__,
+        default=None,
     )
     deployed_at: Mapped[datetime] = mapped_column(
         sql.TIMESTAMP(timezone=True), default=datetime.utcnow()

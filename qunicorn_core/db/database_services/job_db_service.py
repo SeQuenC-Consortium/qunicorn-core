@@ -26,10 +26,17 @@ from qunicorn_core.static.enums.job_state import JobState
 
 def create_database_job(job: JobRequestDto):
     """Creates a database job with the given circuit and saves it in the database"""
-    db_quantum_program = QuantumProgramDataclass(quantum_circuit = job.circuit)
-    db_deployment = DeploymentDataclass(quantum_program = db_quantum_program, name = "new deployment")
+    db_quantum_program = QuantumProgramDataclass(quantum_circuit=job.circuit)
+    db_deployment = DeploymentDataclass(
+        quantum_program=db_quantum_program, name="new deployment"
+    )
     db_job: JobDataclass = JobDataclass(
-        data=job.circuit, state=JobState.READY, progress=0, started_at=datetime.now(), shots = job.shots, deployment = db_deployment
+        data=job.circuit,
+        state=JobState.READY,
+        progress=0,
+        started_at=datetime.now(),
+        shots=job.shots,
+        deployment=db_deployment,
     )
     return db_service.save_database_object(db_job)
 

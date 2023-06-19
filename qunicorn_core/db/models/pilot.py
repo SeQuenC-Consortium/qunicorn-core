@@ -18,7 +18,6 @@ from sqlalchemy.sql.schema import ForeignKey
 
 from .job import JobDataclass
 from ..db import REGISTRY
-
 from ...static.enums.pilot_state import PilotState
 from ...static.enums.programming_language import ProgrammingLanguage
 
@@ -38,12 +37,12 @@ class PilotDataclass:
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
 
-    job_id: Mapped[int] = mapped_column(ForeignKey(JobDataclass.__tablename__+".id"))
+    job_id: Mapped[int] = mapped_column(ForeignKey(JobDataclass.__tablename__ + ".id"))
     job: Mapped[JobDataclass.__name__] = relationship(
         JobDataclass.__name__, backref=JobDataclass.__tablename__, default=None
     )
 
-    programming_language: Mapped[ProgrammingLanguage] = mapped_column(
-        sql.String(50), default=None
+    programming_language: Mapped[str] = mapped_column(
+        sql.Enum(ProgrammingLanguage), default=None
     )
     state: Mapped[PilotState] = mapped_column(sql.String(50), default=None)
