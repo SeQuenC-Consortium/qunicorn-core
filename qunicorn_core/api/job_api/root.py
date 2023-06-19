@@ -21,7 +21,7 @@ from ..util import SecurityBlueprint as SmorestBlueprint
 
 JOBMANAGER_API = SmorestBlueprint(
     "job-api",
-    "JOBMANAGER API",
+    "JOB API",
     description="Jobmanager API for the control plane.",
     url_prefix="/jobs/",
 )

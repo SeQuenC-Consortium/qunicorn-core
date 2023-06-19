@@ -24,7 +24,7 @@ from ..api_models.device_dtos import DevicesDtoSchema, DeviceIDSchema
 
 
 @DEVICES_API.route("/<string:device_id>/")
-class DevicesView(MethodView):
+class DeviceView(MethodView):
     """Devices Endpoint to get properties of a specific device."""
 
     @DEVICES_API.arguments(DeviceIDSchema(), location="path")

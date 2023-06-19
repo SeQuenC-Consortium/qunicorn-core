@@ -24,7 +24,7 @@ from ..api_models.user_dtos import UserDtoSchema
 
 
 @USER_API.route("/<string:users_id>/")
-class UsersView(MethodView):
+class UserView(MethodView):
     """Users Endpoint to get properties of a specific user via ID."""
 
     @USER_API.arguments(UserDtoSchema(), location="path")

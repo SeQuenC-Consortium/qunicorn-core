@@ -556,7 +556,7 @@ def await_db(c):
 
 @task
 def upgrade_db(c):
-    """Upgrade the datzabase to the newest migration."""
+    """Upgrade the database to the newest migration."""
     c.run(join(["python", "-m", "flask", "db", "upgrade"]), echo=True, warn=True)
 
 

@@ -78,19 +78,15 @@ def get_job(job_id: int) -> JobResponseDto:
 
 def save_job_to_storage():
     """store job for later use"""
-    None
 
 
 def check_registered_pilots():
     """get all registered pilots for computing the schedule"""
-    None
 
 
 def schedule_jobs():
     """start the scheduling"""
-    None
 
 
 def send_job_to_pilot():
     """send job to pilot for execution after it is scheduled"""
-    None

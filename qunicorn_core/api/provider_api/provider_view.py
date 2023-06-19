@@ -23,7 +23,7 @@ from ..api_models.provider_dtos import ProviderDtoSchema, ProviderIDSchema
 
 
 @PROVIDER_API.route("/<string:service_id>/")
-class ServicesView(MethodView):
+class ProviderView(MethodView):
     """Services Endpoint to get properties of a specific service."""
 
     @PROVIDER_API.arguments(ProviderIDSchema(), location="path")
