@@ -16,6 +16,4 @@ def routes():
         }
         output.append(line)
     output.sort(key=lambda x: x["url"])
-    return render_template(
-        "debug/routes/all.html", title="Flask Template – Routes", routes=output
-    )
+    return render_template("debug/routes/all.html", title="Flask Template – Routes", routes=output)

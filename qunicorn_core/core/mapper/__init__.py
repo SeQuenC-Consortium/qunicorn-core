@@ -12,18 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from qunicorn_core.api.api_models import DeviceDto
-from qunicorn_core.core.provider import provider_mapper
-from qunicorn_core.db.models.device import DeviceDataclass
-
-
-def device_dto_to_device(device: DeviceDto) -> DeviceDataclass:
-    return DeviceDataclass(
-        provider=provider_mapper.provider_dto_to_provider(device.provider), url=device.url
-    )
-
-
-def device_to_device_dto(device: DeviceDataclass) -> DeviceDto:
-    return DeviceDto(
-        provider=provider_mapper.provider_to_provider_dto(device.provider), url=device.url
-    )
+from . import deployment_mapper, device_mapper, job_mapper, provider_mapper, quantum_program_mapper, user_mapper

@@ -12,7 +12,7 @@ Flask-JWT-Extended = "^4.4.4"
 Flask-Migrate = "^4.0.4"
 Flask-SQLAlchemy = "^3.0.3"
 SQLAlchemy = "^2.0.4"
-flask = {extras = ["dotenv"], version = "^2.2.3"}
+flask = { extras = ["dotenv"], version = "^2.2.3" }
 flask-babel = "^3.0.0"
 flask-smorest = "^0.40.0"
 python = "^3.8.1"
@@ -40,7 +40,7 @@ sphinxcontrib-redoc = "^1.6.0"
 
 [tool.black]
 include = '\.pyi?$'
-line-length = 90
+line-length = 140
 target-version = ["py38"]
 
 [tool.isort]
@@ -70,16 +70,16 @@ python = ["https://docs.python.org/3"]
 # settings documentation: <https://myst-parser.readthedocs.io/en/latest/syntax/optional.html>
 # create anchors for h1 and h2
 extensions = [
-  #"amsmath",
-  "colon_fence",
-  "deflist",
-  "dollarmath",
-  "html_admonition",
-  "html_image", #"linkify", # requires installation of linkify-it-py
-  "replacements",
-  "smartquotes",
-  "substitution",
-  "tasklist",
+    #"amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "html_admonition",
+    "html_image", #"linkify", # requires installation of linkify-it-py
+    "replacements",
+    "smartquotes",
+    "substitution",
+    "tasklist",
 ]
 heading_anchors = 2
 # substitutions = {"key": "substitution value"}

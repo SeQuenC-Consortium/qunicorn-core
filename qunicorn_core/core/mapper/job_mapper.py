@@ -24,9 +24,7 @@ from qunicorn_core.api.api_models.job_dtos import (
 )
 from qunicorn_core.api.api_models.quantum_program_dtos import QuantumProgramDto
 from qunicorn_core.api.api_models.user_dtos import UserDto
-from qunicorn_core.core.deployment import deployment_mapper
-from qunicorn_core.core.device import device_mapper
-from qunicorn_core.core.user import user_mapper
+from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_mapper
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 
@@ -34,14 +32,10 @@ from qunicorn_core.static.enums.job_state import JobState
 def request_to_core(job: JobRequestDto):
     """Helper class. When the db objects are saved correctly we do not need it anymore"""
     user = UserDto(id=0, name="default")
-    provider = ProviderDto(
-        id=0, with_token=True, supported_language="all", name=job.provider_name
-    )
+    provider = ProviderDto(id=0, with_token=True, supported_language="all", name=job.provider_name)
     device = DeviceDto(id=0, provider=provider, url="")
     quantum_program = QuantumProgramDto(id=0, quantum_circuit=job.circuit)
-    deployment = DeploymentDto(
-        id=0, deployed_by=user, quantum_program=quantum_program, name=""
-    )
+    deployment = DeploymentDto(id=0, deployed_by=user, quantum_program=quantum_program, name="")
 
     return JobCoreDto(
         id=0,

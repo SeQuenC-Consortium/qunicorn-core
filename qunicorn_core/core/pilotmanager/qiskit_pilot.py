@@ -32,9 +32,7 @@ class QiskitPilot(Pilot):
         """Execute a job on an IBM backend using the Qiskit Pilot"""
 
         provider = self.__get_ibm_provider(job_dto.token)
-        backend, transpiled = self.transpile(
-            provider, job_dto.deployment.quantum_program.quantum_circuit
-        )
+        backend, transpiled = self.transpile(provider, job_dto.deployment.quantum_program.quantum_circuit)
         job_id = job_dto.id
 
         job_db_service.update_attribute(job_id, JobState.RUNNING, JobDataclass.state)
@@ -44,10 +42,7 @@ class QiskitPilot(Pilot):
         job_db_service.update_result_and_state(job_id, JobState.FINISHED, str(counts))
 
         print(f"Job with id {job_id} complete")
-        print(
-            f"Executing job {job_from_ibm} "
-            f"on {job_dto.executed_on.provider.name} with the Qiskit Pilot and get the result {counts}"
-        )
+        print(f"Executing job {job_from_ibm} " f"on {job_dto.executed_on.provider.name} with the Qiskit Pilot and get the result {counts}")
         return counts
 
     @staticmethod

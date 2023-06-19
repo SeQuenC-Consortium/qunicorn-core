@@ -27,9 +27,7 @@ from qunicorn_core.static.enums.job_state import JobState
 def create_database_job(job: JobRequestDto):
     """Creates a database job with the given circuit and saves it in the database"""
     db_quantum_program = QuantumProgramDataclass(quantum_circuit=job.circuit)
-    db_deployment = DeploymentDataclass(
-        quantum_program=db_quantum_program, name="new deployment"
-    )
+    db_deployment = DeploymentDataclass(quantum_program=db_quantum_program, name="new deployment")
     db_job: JobDataclass = JobDataclass(
         data=job.circuit,
         state=JobState.READY,
@@ -43,9 +41,7 @@ def create_database_job(job: JobRequestDto):
 
 def update_attribute(job_id: int, job_state: JobState, attribute_name):
     """Updates one attribute (attribute_name) of the job with the id job_id"""
-    db_service.get_session().query(JobDataclass).filter(JobDataclass.id == job_id).update(
-        {attribute_name: job_state}
-    )
+    db_service.get_session().query(JobDataclass).filter(JobDataclass.id == job_id).update({attribute_name: job_state})
     db_service.get_session().commit()
 
 

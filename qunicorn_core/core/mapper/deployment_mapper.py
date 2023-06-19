@@ -13,8 +13,7 @@
 # limitations under the License.
 
 from qunicorn_core.api.api_models import DeploymentDto
-from qunicorn_core.core.quantum_program import quantum_program_mapper
-from qunicorn_core.core.user import user_mapper
+from qunicorn_core.core.mapper import quantum_program_mapper, user_mapper
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 
 
@@ -22,9 +21,7 @@ def deployment_dto_to_deployment(deployment: DeploymentDto) -> DeploymentDatacla
     return DeploymentDataclass(
         id=deployment.id,
         deployed_by=user_mapper.user_dto_to_user(deployment.deployed_by),
-        quantum_program=quantum_program_mapper.quantum_program_dto_to_quantum_program(
-            deployment.quantum_program
-        ),
+        quantum_program=quantum_program_mapper.quantum_program_dto_to_quantum_program(deployment.quantum_program),
         deployed_at=deployment.deployed_at,
         name=deployment.name,
     )
@@ -34,9 +31,7 @@ def deployment_to_deployment_dto(deployment: DeploymentDataclass) -> DeploymentD
     return DeploymentDto(
         id=deployment.id,
         deployed_by=user_mapper.user_to_user_dto(deployment.deployed_by),
-        quantum_program=quantum_program_mapper.quantum_program_to_quantum_program_dto(
-            deployment.quantum_program
-        ),
+        quantum_program=quantum_program_mapper.quantum_program_to_quantum_program_dto(deployment.quantum_program),
         deployed_at=deployment.deployed_at,
         name=deployment.name,
     )

@@ -16,17 +16,9 @@ from qunicorn_core.api.api_models import QuantumProgramDto
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 
 
-def quantum_program_dto_to_quantum_program(
-    quantum_program: QuantumProgramDto,
-) -> QuantumProgramDataclass:
-    return QuantumProgramDataclass(
-        id=quantum_program.id, quantum_circuit=quantum_program.quantum_circuit
-    )
+def quantum_program_dto_to_quantum_program(quantum_program: QuantumProgramDto) -> QuantumProgramDataclass:
+    return QuantumProgramDataclass(id=quantum_program.id, quantum_circuit=quantum_program.quantum_circuit)
 
 
-def quantum_program_to_quantum_program_dto(
-    quantum_program: QuantumProgramDataclass,
-) -> QuantumProgramDto:
-    return QuantumProgramDto(
-        id=quantum_program.id, quantum_circuit=quantum_program.quantum_circuit
-    )
+def quantum_program_to_quantum_program_dto(quantum_program: QuantumProgramDataclass) -> QuantumProgramDto:
+    return QuantumProgramDto(id=quantum_program.id, quantum_circuit=quantum_program.quantum_circuit)

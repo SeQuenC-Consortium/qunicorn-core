@@ -20,7 +20,7 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobResponseDto,
 )
 from qunicorn_core.celery import CELERY
-from qunicorn_core.core.jobmanager import job_mapper
+from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
 from qunicorn_core.db.database_services import job_db_service
@@ -53,9 +53,7 @@ def create_and_run_job(job_request_dto: JobRequestDto) -> JobID:
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job_core_dto.id = job.id
     run_job(vars(job_core_dto))
-    return JobID(
-        id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING
-    )
+    return JobID(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
 
 
 def run_job_by_id(job_id: int) -> JobID:
@@ -65,9 +63,7 @@ def run_job_by_id(job_id: int) -> JobID:
     new_job: JobDataclass = job_db_service.create_database_job(job)
     job_core_dto: JobCoreDto = job_mapper.job_to_job_core_dto(new_job)
     # TODO run job
-    return JobID(
-        id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING
-    )
+    return JobID(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
 
 
 def get_job(job_id: int) -> JobResponseDto:
