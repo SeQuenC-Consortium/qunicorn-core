@@ -39,6 +39,7 @@ DB_COMMAND_LOGGER = "db"
 @DB_CLI.command("create-and-load-db")
 def create_load_db():
     """Create all db tables."""
+    drop_db_function(current_app)
     create_db_function(current_app)
     load_db_function(current_app)
     click.echo("Database created and loaded.")
@@ -69,9 +70,6 @@ def load_db_function(app: Flask):
         supported_language=ProgrammingLanguage.QISKIT,
         name=ProviderName.IBM,
     )
-    DB.session.add(provider)
-    DB.session.commit()
-    DB.session.refresh(provider)
     device = DeviceDataclass(provider=provider, url="")
     DB.session.add(device)
     DB.session.commit()
