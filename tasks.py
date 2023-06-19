@@ -294,6 +294,24 @@ def worker(
 
 
 @task
+def check_linting(c):
+    """Checks if there are some linting issues which would be detected by the python pipeline"""
+
+    print("First check if there are some flake8 warnings/errors:")
+    c.run(
+        join(["flake8", "."]),
+        echo=True,
+        warn=True,
+    )
+    print("\nNow check if there are some black warnings/errors:")
+    c.run(
+        join(["black", "--check", "."]),
+        echo=True,
+        warn=True,
+    )
+
+
+@task
 def celery_status(c):
     """Show the status of celery workers.
 
