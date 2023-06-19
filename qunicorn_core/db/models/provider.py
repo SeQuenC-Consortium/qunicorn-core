@@ -41,6 +41,3 @@ class ProviderDataclass:
         sql.String(50), default=None
     )  # TODO: another Table for languages?
     name: Mapped[ProviderName] = mapped_column(sql.String(50), default=None)
-    devices: Mapped[List["DeviceDataclass"]] = relationship(
-        "DeviceDataclass", back_populates="provider", default_factory=list
-    )

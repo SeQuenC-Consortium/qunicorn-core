@@ -19,6 +19,9 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 
+from .deployment import DeploymentDataclass
+from .device import DeviceDataclass
+from .user import UserDataclass
 from ..db import REGISTRY
 from ...static.enums.job_state import JobState
 
@@ -48,24 +51,24 @@ class JobDataclass:
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
 
     executed_by_id: Mapped[int] = mapped_column(
-        ForeignKey("User.id"), default=None, nullable=True
+        ForeignKey(UserDataclass.__tablename__+".id"), default=None, nullable=True
     )
-    executed_by: Mapped["UserDataclass"] = relationship(
-        "UserDataclass", back_populates="jobs", default=None
+    executed_by: Mapped[UserDataclass.__name__] = relationship(
+        UserDataclass.__name__, backref=UserDataclass.__tablename__, default=None
     )
 
     executed_on_id: Mapped[int] = mapped_column(
-        ForeignKey("Device.id"), default=None, nullable=True
+        ForeignKey(DeviceDataclass.__tablename__+".id"), default=None, nullable=True
     )
-    executed_on: Mapped["DeviceDataclass"] = relationship(
-        "DeviceDataclass", back_populates="jobs", default=None
+    executed_on: Mapped[DeviceDataclass.__name__] = relationship(
+        DeviceDataclass.__name__, backref=DeviceDataclass.__tablename__, default=None
     )
 
     deployment_id: Mapped[int] = mapped_column(
-        ForeignKey("Deployment.id"), default=None, nullable=True
+        ForeignKey(DeploymentDataclass.__tablename__+".id"), default=None, nullable=True
     )
-    deployment: Mapped["DeploymentDataclass"] = relationship(
-        "DeploymentDataclass", back_populates="jobs", default=None
+    deployment: Mapped[DeploymentDataclass.__name__] = relationship(
+        DeploymentDataclass.__name__, backref=DeploymentDataclass.__tablename__, default=None
     )
 
     progress: Mapped[str] = mapped_column(sql.INTEGER(), default=None)
@@ -81,7 +84,3 @@ class JobDataclass:
     data: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     results: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     parameters: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-
-    pilots: Mapped[List["PilotDataclass"]] = relationship(
-        "PilotDataclass", back_populates="job", default_factory=list
-    )

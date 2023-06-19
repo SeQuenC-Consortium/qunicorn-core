@@ -16,6 +16,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 from sqlalchemy.sql.schema import ForeignKey
 
+from .job import JobDataclass
 from ..db import REGISTRY
 
 from ...static.enums.pilot_state import PilotState
@@ -37,9 +38,9 @@ class PilotDataclass:
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
 
-    job_id: Mapped[int] = mapped_column(ForeignKey("Job.id"))
-    job: Mapped["JobDataclass"] = relationship(
-        "JobDataclass", back_populates="pilots", default=None
+    job_id: Mapped[int] = mapped_column(ForeignKey(JobDataclass.__tablename__+".id"))
+    job: Mapped[JobDataclass.__name__] = relationship(
+        JobDataclass.__name__, backref=JobDataclass.__tablename__, default=None
     )
 
     programming_language: Mapped[ProgrammingLanguage] = mapped_column(

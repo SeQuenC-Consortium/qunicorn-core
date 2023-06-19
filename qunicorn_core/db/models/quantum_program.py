@@ -31,7 +31,4 @@ class QuantumProgramDataclass:
     __tablename__ = "QuantumProgram"
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
-    quantum_circuit: Mapped[str] = mapped_column(sql.BLOB, default=None)
-    deployments: Mapped[List["DeploymentDataclass"]] = relationship(
-        "DeploymentDataclass", back_populates="quantum_program", default_factory=list
-    )
+    quantum_circuit: Mapped[str] = mapped_column(sql.String(500), default=None)

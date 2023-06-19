@@ -33,6 +33,3 @@ class UserDataclass:
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-    jobs: Mapped[List["JobDataclass"]] = relationship(
-        "JobDataclass", back_populates="executed_by", default_factory=list
-    )

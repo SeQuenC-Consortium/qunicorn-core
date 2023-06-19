@@ -17,6 +17,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 from sqlalchemy.sql.schema import ForeignKey
 
+from .provider import ProviderDataclass
 from ..db import REGISTRY
 
 
@@ -34,13 +35,10 @@ class DeviceDataclass:
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
 
-    provider_id: Mapped[int] = mapped_column(ForeignKey("Provider.id"), default=None)
-    provider: Mapped["ProviderDataclass"] = relationship(
-        "ProviderDataclass", back_populates="devices", default=None
+    provider_id: Mapped[int] = mapped_column(ForeignKey(ProviderDataclass.__tablename__+".id"), default=None)
+    provider: Mapped[ProviderDataclass.__name__] = relationship(
+        ProviderDataclass.__name__, backref=ProviderDataclass.__tablename__, default=None
     )
 
     url: Mapped[str] = mapped_column(sql.String(50), default=None)
 
-    jobs: Mapped[List["JobDataclass"]] = relationship(
-        "JobDataclass", back_populates="executed_on", default_factory=list
-    )

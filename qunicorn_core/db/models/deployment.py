@@ -18,6 +18,8 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 
+from .quantum_program import QuantumProgramDataclass
+from .user import UserDataclass
 from ..db import REGISTRY
 
 
@@ -34,16 +36,13 @@ class DeploymentDataclass:
 
     __tablename__ = "Deployment"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    deployed_by: Mapped[int] = mapped_column(ForeignKey("User.id"))
-    quantum_program_id: Mapped[int] = mapped_column(ForeignKey("QuantumProgram.id"))
-    quantum_program: Mapped["QuantumProgramDataclass"] = relationship(
-        "QuantumProgramDataclass", back_populates="deployments", default=None
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    deployed_by: Mapped[int] = mapped_column(ForeignKey(UserDataclass.__tablename__+".id"), default=None, nullable=True)
+    quantum_program_id: Mapped[int] = mapped_column(ForeignKey(QuantumProgramDataclass.__tablename__+".id"), default=None)
+    quantum_program: Mapped[QuantumProgramDataclass.__name__] = relationship(
+        QuantumProgramDataclass.__name__, backref=QuantumProgramDataclass.__tablename__, default=None
     )
     deployed_at: Mapped[datetime] = mapped_column(
         sql.TIMESTAMP(timezone=True), default=datetime.utcnow()
     )
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-    jobs: Mapped[List["JobDataclass"]] = relationship(
-        "JobDataclass", back_populates="deployment", default_factory=list
-    )
