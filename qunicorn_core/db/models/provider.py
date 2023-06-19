@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import List
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 
 from ..db import REGISTRY
@@ -36,7 +37,7 @@ class ProviderDataclass:
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
     with_token: Mapped[bool] = mapped_column(sql.BOOLEAN, default=None)
-    supported_language: Mapped[ProgrammingLanguage] = mapped_column(
-        sql.String(50), default=None
-    )  # TODO: another Table for languages?
+    supported_language: Mapped[ProgrammingLanguage] = mapped_column(sql.String(50), default=None)  # TODO: another Table for languages?
     name: Mapped[ProviderName] = mapped_column(sql.String(50), default=None)
+    devices: Mapped[List["DeviceDataclass"]] = relationship("DeviceDataclass", back_populates="provider", default_factory=list)
+

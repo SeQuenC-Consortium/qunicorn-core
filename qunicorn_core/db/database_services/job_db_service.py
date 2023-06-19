@@ -18,13 +18,13 @@ from datetime import datetime
 
 from qunicorn_core.api.api_models.job_dtos import JobRequestDto
 from qunicorn_core.db.database_services import db_service
-from qunicorn_core.db.models.job import Job
+from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 
 
 def create_database_job(job: JobRequestDto):
     """Creates a database job with the given circuit and saves it in the database"""
-    db_job: Job = Job(
+    db_job: JobDataclass = JobDataclass(
         data=job.circuit, state=JobState.READY, progress=0, started_at=datetime.now()
     )
     return db_service.save_database_object(db_job)
@@ -32,7 +32,7 @@ def create_database_job(job: JobRequestDto):
 
 def update_attribute(job_id: int, job_state: JobState, attribute_name):
     """Updates one attribute (attribute_name) of the job with the id job_id"""
-    db_service.get_session().query(Job).filter(Job.id == job_id).update(
+    db_service.get_session().query(JobDataclass).filter(JobDataclass.id == job_id).update(
         {attribute_name: job_state}
     )
     db_service.get_session().commit()
@@ -40,12 +40,12 @@ def update_attribute(job_id: int, job_state: JobState, attribute_name):
 
 def update_result_and_state(job_id: int, job_state: JobState, results: str):
     """Updates the attributes state and results of the job with the id job_id"""
-    db_service.get_session().query(Job).filter(Job.id == job_id).update(
-        {Job.state: job_state, Job.results: results}
+    db_service.get_session().query(JobDataclass).filter(JobDataclass.id == job_id).update(
+        {JobDataclass.state: job_state, JobDataclass.results: results}
     )
     db_service.get_session().commit()
 
 
-def get_job(job_id: int) -> Job:
+def get_job(job_id: int) -> JobDataclass:
     """Gets the job with the job_id from the database"""
-    return db_service.get_database_object(job_id, Job)
+    return db_service.get_database_object(job_id, JobDataclass)

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 from sqlalchemy.sql.schema import ForeignKey
 
@@ -36,8 +36,9 @@ class PilotDataclass:
     __tablename__ = "Pilot"
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
-    job: Mapped[int] = mapped_column(ForeignKey("Job.id"))
-    programming_language: Mapped[ProgrammingLanguage] = mapped_column(
-        sql.String(50), default=None
-    )
+
+    job_id: Mapped[int] = mapped_column(ForeignKey("Job.id"))
+    job: Mapped["JobDataclass"] = relationship("JobDataclass", back_populates="pilots", default=None)
+
+    programming_language: Mapped[ProgrammingLanguage] = mapped_column(sql.String(50), default=None)
     state: Mapped[PilotState] = mapped_column(sql.String(50), default=None)

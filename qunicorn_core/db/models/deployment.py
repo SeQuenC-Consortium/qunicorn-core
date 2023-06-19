@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 
 from ..db import REGISTRY
@@ -37,7 +37,9 @@ class DeploymentDataclass:
     id: Mapped[int] = mapped_column(primary_key=True)
     deployed_by: Mapped[int] = mapped_column(ForeignKey("User.id"))
     quantum_program_id: Mapped[int] = mapped_column(ForeignKey("QuantumProgram.id"))
+    quantum_program: Mapped["QuantumProgramDataclass"] = relationship("QuantumProgramDataclass", back_populates="deployments", default=None)
     deployed_at: Mapped[datetime] = mapped_column(
         sql.TIMESTAMP(timezone=True), default=datetime.utcnow()
     )
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
+    jobs: Mapped[List["JobDataclass"]] = relationship("JobDataclass", back_populates="deployment", default_factory=list)

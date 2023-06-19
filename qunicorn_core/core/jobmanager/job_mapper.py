@@ -24,7 +24,7 @@ from qunicorn_core.api.api_models.job_dtos import (
 )
 from qunicorn_core.api.api_models.quantum_program_dtos import QuantumProgramDto
 from qunicorn_core.api.api_models.user_dtos import UserDto
-from qunicorn_core.db.models.job import Job
+from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 
 
@@ -74,11 +74,11 @@ def core_to_response(job: JobCoreDto) -> JobResponseDto:
     )
 
 
-def job_to_response(job: Job) -> JobResponseDto:
+def job_to_response(job: JobDataclass) -> JobResponseDto:
     return JobResponseDto(
         id=job.id,
-        executed_by=str(job.executed_by),
-        executed_on=str(job.executed_on),
+        executed_by=str(job.executed_by_id),
+        executed_on=str(job.executed_on_id),
         progress=str(job.progress),
         state=job.state,
         started_at=job.started_at,
@@ -90,8 +90,8 @@ def job_to_response(job: Job) -> JobResponseDto:
     )
 
 
-def job_core_dto_to_job(job: JobCoreDto) -> Job:
-    return Job(
+def job_core_dto_to_job(job: JobCoreDto) -> JobDataclass:
+    return JobDataclass(
         id=job.id,
         executed_by=job.executed_by.id,
         executed_on=job.executed_on.id,
@@ -108,11 +108,11 @@ def job_core_dto_to_job(job: JobCoreDto) -> Job:
     )
 
 
-def job_to_job_core_dto(job: Job) -> JobCoreDto:
+def job_to_job_core_dto(job: JobDataclass) -> JobCoreDto:
     return JobCoreDto(
         id=job.id,
-        executed_by=UserDto(id=job.executed_by),
-        executed_on=DeviceDto(id=job.executed_on),
+        executed_by=UserDto(id=job.executed_by_id),
+        executed_on=DeviceDto(id=job.executed_on_id),
         deployment=DeploymentDto(id=job.deployment_id),
         progress=job.progress,
         state=job.state,

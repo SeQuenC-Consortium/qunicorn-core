@@ -19,7 +19,7 @@ from qiskit_ibm_provider import IBMProvider
 from qunicorn_core.api.api_models import JobCoreDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.db.database_services import job_db_service
-from qunicorn_core.db.models.job import Job
+from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 
 
@@ -37,7 +37,7 @@ class QiskitPilot(Pilot):
         )
         job_id = job_dto.id
 
-        job_db_service.update_attribute(job_id, JobState.RUNNING, Job.state)
+        job_db_service.update_attribute(job_id, JobState.RUNNING, JobDataclass.state)
 
         job_from_ibm = backend.run(transpiled, shots=job_dto.shots)
         counts = job_from_ibm.result().get_counts()

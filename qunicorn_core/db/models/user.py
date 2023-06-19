@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
+from typing import Optional, List
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 
 from ..db import REGISTRY
@@ -33,3 +33,4 @@ class UserDataclass:
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
+    jobs: Mapped[List["JobDataclass"]] = relationship("JobDataclass", back_populates="executed_by", default_factory=list)
