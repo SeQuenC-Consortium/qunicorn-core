@@ -38,7 +38,11 @@ class PilotDataclass:
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
 
     job_id: Mapped[int] = mapped_column(ForeignKey("Job.id"))
-    job: Mapped["JobDataclass"] = relationship("JobDataclass", back_populates="pilots", default=None)
+    job: Mapped["JobDataclass"] = relationship(
+        "JobDataclass", back_populates="pilots", default=None
+    )
 
-    programming_language: Mapped[ProgrammingLanguage] = mapped_column(sql.String(50), default=None)
+    programming_language: Mapped[ProgrammingLanguage] = mapped_column(
+        sql.String(50), default=None
+    )
     state: Mapped[PilotState] = mapped_column(sql.String(50), default=None)

@@ -50,17 +50,23 @@ class JobDataclass:
     executed_by_id: Mapped[int] = mapped_column(
         ForeignKey("User.id"), default=None, nullable=True
     )
-    executed_by: Mapped["UserDataclass"] = relationship("UserDataclass", back_populates="jobs", default=None)
+    executed_by: Mapped["UserDataclass"] = relationship(
+        "UserDataclass", back_populates="jobs", default=None
+    )
 
     executed_on_id: Mapped[int] = mapped_column(
         ForeignKey("Device.id"), default=None, nullable=True
     )
-    executed_on: Mapped["DeviceDataclass"] = relationship("DeviceDataclass", back_populates="jobs", default=None)
+    executed_on: Mapped["DeviceDataclass"] = relationship(
+        "DeviceDataclass", back_populates="jobs", default=None
+    )
 
     deployment_id: Mapped[int] = mapped_column(
         ForeignKey("Deployment.id"), default=None, nullable=True
     )
-    deployment: Mapped["DeploymentDataclass"] = relationship("DeploymentDataclass", back_populates="jobs", default=None)
+    deployment: Mapped["DeploymentDataclass"] = relationship(
+        "DeploymentDataclass", back_populates="jobs", default=None
+    )
 
     progress: Mapped[str] = mapped_column(sql.INTEGER(), default=None)
     state: Mapped[str] = mapped_column(sql.Enum(JobState), default=None)
@@ -76,4 +82,6 @@ class JobDataclass:
     results: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     parameters: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
 
-    pilots: Mapped[List["PilotDataclass"]] = relationship("PilotDataclass", back_populates="job", default_factory=list)
+    pilots: Mapped[List["PilotDataclass"]] = relationship(
+        "PilotDataclass", back_populates="job", default_factory=list
+    )

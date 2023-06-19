@@ -26,7 +26,7 @@ class DeviceDataclass:
 
     Attributes:
         id (int): Automatically generated database id. Use the id to fetch this information from the database.
-        rest_endpoint (str): Rest-endpoint how to connect to the Cloud device
+        url (str): Rest-endpoint how to connect to the Cloud device
         provider: The provider of the cloud_service with the needed configurations
     """
 
@@ -35,8 +35,12 @@ class DeviceDataclass:
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
 
     provider_id: Mapped[int] = mapped_column(ForeignKey("Provider.id"), default=None)
-    provider: Mapped["ProviderDataclass"] = relationship("ProviderDataclass", back_populates="devices", default=None)
+    provider: Mapped["ProviderDataclass"] = relationship(
+        "ProviderDataclass", back_populates="devices", default=None
+    )
 
-    rest_endpoint: Mapped[str] = mapped_column(sql.String(50), default=None)
+    url: Mapped[str] = mapped_column(sql.String(50), default=None)
 
-    jobs: Mapped[List["JobDataclass"]] = relationship("JobDataclass", back_populates="executed_on", default_factory=list)
+    jobs: Mapped[List["JobDataclass"]] = relationship(
+        "JobDataclass", back_populates="executed_on", default_factory=list
+    )

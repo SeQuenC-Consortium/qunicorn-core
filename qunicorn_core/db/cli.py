@@ -72,7 +72,7 @@ def load_db_function(app: Flask):
     DB.session.add(provider)
     DB.session.commit()
     DB.session.refresh(provider)
-    device = DeviceDataclass(provider=provider, rest_endpoint="")
+    device = DeviceDataclass(provider=provider, url="")
     DB.session.add(device)
     DB.session.commit()
     user = UserDataclass(name="Default User")

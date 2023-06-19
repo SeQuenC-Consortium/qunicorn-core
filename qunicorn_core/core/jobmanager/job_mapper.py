@@ -24,6 +24,9 @@ from qunicorn_core.api.api_models.job_dtos import (
 )
 from qunicorn_core.api.api_models.quantum_program_dtos import QuantumProgramDto
 from qunicorn_core.api.api_models.user_dtos import UserDto
+from qunicorn_core.core.deployment import deployment_mapper
+from qunicorn_core.core.device import device_mapper
+from qunicorn_core.core.user import user_mapper
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 
@@ -93,9 +96,9 @@ def job_to_response(job: JobDataclass) -> JobResponseDto:
 def job_core_dto_to_job(job: JobCoreDto) -> JobDataclass:
     return JobDataclass(
         id=job.id,
-        executed_by=job.executed_by.id,
-        executed_on=job.executed_on.id,
-        deployment_id=job.deployment.id,
+        executed_by=user_mapper.user_dto_to_user(job.executed_by),
+        executed_on=device_mapper.device_dto_to_device(job.executed_on),
+        deployment=deployment_mapper.deployment_dto_to_deployment(job.deployment),
         progress=job.progress,
         state=job.state,
         shots=job.shots,
@@ -111,9 +114,9 @@ def job_core_dto_to_job(job: JobCoreDto) -> JobDataclass:
 def job_to_job_core_dto(job: JobDataclass) -> JobCoreDto:
     return JobCoreDto(
         id=job.id,
-        executed_by=UserDto(id=job.executed_by_id),
-        executed_on=DeviceDto(id=job.executed_on_id),
-        deployment=DeploymentDto(id=job.deployment_id),
+        executed_by=user_mapper.user_to_user_dto(job.executed_by),
+        executed_on=device_mapper.device_to_device_dto(job.executed_on),
+        deployment=deployment_mapper.deployment_to_deployment_dto(job.deployment),
         progress=job.progress,
         state=job.state,
         shots=job.shots,
