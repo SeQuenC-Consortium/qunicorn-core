@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import Enum
+from enum import StrEnum
 
 
-class ProviderName(str, Enum):
+class ProviderName(StrEnum):
     """Enum to save the different provider names
 
     Values:

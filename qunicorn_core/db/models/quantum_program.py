@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import sqltypes as sql
 
@@ -29,5 +28,5 @@ class QuantumProgramDataclass:
 
     __tablename__ = "QuantumProgram"
 
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, nullable=True, default=None)
     quantum_circuit: Mapped[str] = mapped_column(sql.String(500), default=None)

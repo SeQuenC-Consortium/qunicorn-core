@@ -31,5 +31,5 @@ class UserDataclass:
 
     __tablename__ = "User"
 
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, nullable=True, default=None)
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)

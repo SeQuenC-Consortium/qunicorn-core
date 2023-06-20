@@ -22,8 +22,8 @@ from marshmallow import fields, ValidationError
 from qiskit import QuantumCircuit
 
 from .deployment_dtos import DeploymentDto
-from .device_dtos import DeviceDto
-from .user_dtos import UserDto
+from .device_dtos import DeviceDto, DeviceDtoSchema
+from .user_dtos import UserDto, UserDtoSchema
 from ..util import MaBaseSchema
 
 __all__ = [
@@ -71,8 +71,8 @@ class JobCoreDto:
 @dataclass
 class JobResponseDto:
     id: int
-    executed_by: str
-    executed_on: str
+    executed_by: UserDto
+    executed_on: DeviceDto
     progress: str
     state: str
     started_at: datetime
@@ -126,8 +126,8 @@ class JobRequestDtoSchema(MaBaseSchema):
 
 class JobResponseDtoSchema(MaBaseSchema):
     id = ma.fields.Int(required=True, dump_only=True)
-    executed_by = ma.fields.String(required=True, dump_only=True)
-    executed_on = ma.fields.String(required=True, dump_only=True)
+    executed_by = UserDtoSchema()
+    executed_on = DeviceDtoSchema()
     progress = ma.fields.Int(required=True, dump_only=True)
     state = ma.fields.String(required=True, dump_only=True)
     started_at = ma.fields.String(required=True, dump_only=True)

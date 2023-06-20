@@ -32,11 +32,11 @@ class ProviderDto:
 
 
 class ProviderDtoSchema(MaBaseSchema):
-    service_id = ma.fields.Integer(required=True, allow_none=False)
+    id = ma.fields.Integer(required=True, allow_none=False)
     with_token = ma.fields.Boolean(required=False, allow_none=True)
     supported_language = ma.fields.String(required=False, allow_none=True)
     name = ma.fields.String(required=True, allow_none=False)
 
 
 class ProviderIDSchema(MaBaseSchema):
-    service_id = ma.fields.String(required=True, allow_none=False)
+    id = ma.fields.String(required=True, allow_none=False)

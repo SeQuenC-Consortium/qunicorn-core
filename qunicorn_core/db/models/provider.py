@@ -33,7 +33,7 @@ class ProviderDataclass:
 
     __tablename__ = "Provider"
 
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, nullable=True, default=None)
     with_token: Mapped[bool] = mapped_column(sql.BOOLEAN, default=None)
     supported_language: Mapped[str] = mapped_column(sql.Enum(ProgrammingLanguage), default=None)
     name: Mapped[str] = mapped_column(sql.Enum(ProviderName), default=None)

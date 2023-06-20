@@ -15,5 +15,5 @@
 
 """Module containing the JobManager API."""
 
-from . import job_views
+from . import job_view
 from .root import JOBMANAGER_API

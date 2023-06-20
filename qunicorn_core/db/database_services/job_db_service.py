@@ -14,28 +14,25 @@
 
 # originally from <https://github.com/buehlefs/flask-template/>
 
-from datetime import datetime
-
-from qunicorn_core.api.api_models.job_dtos import JobRequestDto
+from qunicorn_core.api.api_models.job_dtos import JobCoreDto
+from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import db_service
-from qunicorn_core.db.models.deployment import DeploymentDataclass
+from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
+from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.job_state import JobState
 
 
-def create_database_job(job: JobRequestDto):
+def create_database_job(job_core: JobCoreDto):
     """Creates a database job with the given circuit and saves it in the database"""
-    db_quantum_program = QuantumProgramDataclass(quantum_circuit=job.circuit)
-    db_deployment = DeploymentDataclass(quantum_program=db_quantum_program, name="new deployment")
-    db_job: JobDataclass = JobDataclass(
-        data=job.circuit,
-        state=JobState.READY,
-        progress=0,
-        started_at=datetime.now(),
-        shots=job.shots,
-        deployment=db_deployment,
-    )
+    default_user: UserDataclass = db_service.get_database_object(1, UserDataclass)
+
+    db_job: JobDataclass = job_mapper.job_core_dto_to_job_without_id(job_core)
+    db_job.state = JobState.RUNNING
+    db_job.progress = 0
+    db_job.executed_by = default_user
+    db_job.executed_on = db_service.get_database_object(1, DeviceDataclass)
+    db_job.deployment.deployed_by = default_user
     return db_service.save_database_object(db_job)
 
 

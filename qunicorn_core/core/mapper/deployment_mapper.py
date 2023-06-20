@@ -21,7 +21,16 @@ def deployment_dto_to_deployment(deployment: DeploymentDto) -> DeploymentDatacla
     return DeploymentDataclass(
         id=deployment.id,
         deployed_by=user_mapper.user_dto_to_user(deployment.deployed_by),
-        quantum_program=quantum_program_mapper.quantum_program_dto_to_quantum_program(deployment.quantum_program),
+        quantum_program=quantum_program_mapper.dto_to_quantum_program(deployment.quantum_program),
+        deployed_at=deployment.deployed_at,
+        name=deployment.name,
+    )
+
+
+def deployment_dto_to_deployment_without_id(deployment: DeploymentDto) -> DeploymentDataclass:
+    return DeploymentDataclass(
+        deployed_by=user_mapper.user_dto_to_user_without_id(deployment.deployed_by),
+        quantum_program=quantum_program_mapper.dto_to_quantum_program_without_id(deployment.quantum_program),
         deployed_at=deployment.deployed_at,
         name=deployment.name,
     )
@@ -31,7 +40,7 @@ def deployment_to_deployment_dto(deployment: DeploymentDataclass) -> DeploymentD
     return DeploymentDto(
         id=deployment.id,
         deployed_by=user_mapper.user_to_user_dto(deployment.deployed_by),
-        quantum_program=quantum_program_mapper.quantum_program_to_quantum_program_dto(deployment.quantum_program),
+        quantum_program=quantum_program_mapper.quantum_program_to_dto(deployment.quantum_program),
         deployed_at=deployment.deployed_at,
         name=deployment.name,
     )

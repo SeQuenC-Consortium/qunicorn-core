@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import Enum
+from enum import StrEnum
 
 
-class JobState(str, Enum):
+class JobState(StrEnum):
     """Enum to save the different states of the jobs
 
     Values:

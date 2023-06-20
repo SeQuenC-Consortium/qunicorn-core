@@ -18,8 +18,12 @@ from qunicorn_core.db.models.device import DeviceDataclass
 
 
 def device_dto_to_device(device: DeviceDto) -> DeviceDataclass:
-    return DeviceDataclass(provider=provider_mapper.provider_dto_to_provider(device.provider), url=device.url)
+    return DeviceDataclass(id=device.id, provider=provider_mapper.provider_dto_to_provider(device.provider), url=device.url)
+
+
+def device_dto_to_device_without_id(device: DeviceDto) -> DeviceDataclass:
+    return DeviceDataclass(provider=provider_mapper.provider_dto_to_provider_without_id(device.provider), url=device.url)
 
 
 def device_to_device_dto(device: DeviceDataclass) -> DeviceDto:
-    return DeviceDto(provider=provider_mapper.provider_to_provider_dto(device.provider), url=device.url)
+    return DeviceDto(id=device.id, provider=provider_mapper.provider_to_provider_dto(device.provider), url=device.url)

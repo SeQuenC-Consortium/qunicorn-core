@@ -48,20 +48,20 @@ class JobDataclass:
 
     __tablename__ = "Job"
 
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, nullable=True, default=None)
 
     executed_by_id: Mapped[int] = mapped_column(ForeignKey(UserDataclass.__tablename__ + ".id"), default=None, nullable=True)
-    executed_by: Mapped[UserDataclass.__name__] = relationship(UserDataclass.__name__, backref=UserDataclass.__tablename__, default=None)
+    executed_by: Mapped[UserDataclass.__name__] = relationship(UserDataclass.__name__, default=None)
 
     executed_on_id: Mapped[int] = mapped_column(ForeignKey(DeviceDataclass.__tablename__ + ".id"), default=None, nullable=True)
     executed_on: Mapped[DeviceDataclass.__name__] = relationship(
-        DeviceDataclass.__name__, backref=DeviceDataclass.__tablename__, default=None
+        DeviceDataclass.__name__,
+        default=None,
     )
 
     deployment_id: Mapped[int] = mapped_column(ForeignKey(DeploymentDataclass.__tablename__ + ".id"), default=None, nullable=True)
     deployment: Mapped[DeploymentDataclass.__name__] = relationship(
         DeploymentDataclass.__name__,
-        backref=DeploymentDataclass.__tablename__,
         default=None,
     )
 

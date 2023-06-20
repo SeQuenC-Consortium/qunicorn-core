@@ -27,15 +27,16 @@ from qunicorn_core.api.api_models.user_dtos import UserDto
 from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_mapper
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
+from qunicorn_core.static.enums.programming_language import ProgrammingLanguage
 
 
 def request_to_core(job: JobRequestDto):
     """Helper class. When the db objects are saved correctly we do not need it anymore"""
     user = UserDto(id=0, name="default")
-    provider = ProviderDto(id=0, with_token=True, supported_language="all", name=job.provider_name)
-    device = DeviceDto(id=0, provider=provider, url="")
+    provider = ProviderDto(id=0, with_token=True, supported_language=ProgrammingLanguage.QISKIT, name=job.provider_name)
+    device = DeviceDto(id=0, provider=provider, url="DefaultUrl")
     quantum_program = QuantumProgramDto(id=0, quantum_circuit=job.circuit)
-    deployment = DeploymentDto(id=0, deployed_by=user, quantum_program=quantum_program, name="")
+    deployment = DeploymentDto(id=0, deployed_by=user, quantum_program=quantum_program, name="DefaultDeployment")
 
     return JobCoreDto(
         id=0,
@@ -58,8 +59,8 @@ def request_to_core(job: JobRequestDto):
 def core_to_response(job: JobCoreDto) -> JobResponseDto:
     return JobResponseDto(
         id=job.id,
-        executed_by=job.executed_by.name,
-        executed_on=job.executed_on.provider.name,
+        executed_by=job.executed_by,
+        executed_on=job.executed_on,
         progress=job.progress,
         state=job.state,
         started_at=job.started_at,
@@ -74,8 +75,8 @@ def core_to_response(job: JobCoreDto) -> JobResponseDto:
 def job_to_response(job: JobDataclass) -> JobResponseDto:
     return JobResponseDto(
         id=job.id,
-        executed_by=str(job.executed_by_id),
-        executed_on=str(job.executed_on_id),
+        executed_by=user_mapper.user_to_user_dto(job.executed_by),
+        executed_on=device_mapper.device_to_device_dto(job.executed_on),
         progress=str(job.progress),
         state=job.state,
         started_at=job.started_at,
@@ -101,7 +102,24 @@ def job_core_dto_to_job(job: JobCoreDto) -> JobDataclass:
         name=job.name,
         data=job.data,
         results=job.results,
-        parameters=job.parameters,
+        parameters=str(job.parameters),
+    )
+
+
+def job_core_dto_to_job_without_id(job: JobCoreDto) -> JobDataclass:
+    return JobDataclass(
+        executed_by=user_mapper.user_dto_to_user_without_id(job.executed_by),
+        executed_on=device_mapper.device_dto_to_device_without_id(job.executed_on),
+        deployment=deployment_mapper.deployment_dto_to_deployment_without_id(job.deployment),
+        progress=job.progress,
+        state=job.state,
+        shots=job.shots,
+        started_at=job.started_at,
+        finished_at=job.finished_at,
+        name=job.name,
+        data=job.data,
+        results=job.results,
+        parameters=str(job.parameters),
     )
 
 

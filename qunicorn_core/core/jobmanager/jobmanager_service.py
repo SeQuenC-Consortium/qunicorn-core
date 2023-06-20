@@ -49,8 +49,8 @@ def run_job(job_core_dto_dict: dict):
 
 def create_and_run_job(job_request_dto: JobRequestDto) -> JobID:
     """First creates a job to let it run afterwards on a pilot"""
-    job: JobDataclass = job_db_service.create_database_job(job_request_dto)
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
+    job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
     run_job(vars(job_core_dto))
     return JobID(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)

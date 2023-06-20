@@ -16,8 +16,12 @@ from qunicorn_core.api.api_models import UserDto
 from qunicorn_core.db.models.user import UserDataclass
 
 
-def user_dto_to_user(user: UserDto) -> UserDataclass:
-    return UserDataclass(id=user.id, name=user.name)
+def user_dto_to_user(user_dto: UserDto) -> UserDataclass:
+    return UserDataclass(id=user_dto.id, name=user_dto.name)
+
+
+def user_dto_to_user_without_id(user_dto: UserDto) -> UserDataclass:
+    return UserDataclass(name=user_dto.name)
 
 
 def user_to_user_dto(user: UserDataclass) -> UserDto:

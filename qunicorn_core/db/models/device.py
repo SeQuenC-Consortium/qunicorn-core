@@ -32,9 +32,7 @@ class DeviceDataclass:
 
     __tablename__ = "Device"
 
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, nullable=True, default=None)
     provider_id: Mapped[int] = mapped_column(ForeignKey(ProviderDataclass.__tablename__ + ".id"), default=None)
-    provider: Mapped[ProviderDataclass.__name__] = relationship(
-        ProviderDataclass.__name__, backref=ProviderDataclass.__tablename__, default=None
-    )
+    provider: Mapped[ProviderDataclass.__name__] = relationship(ProviderDataclass.__name__, default=None)
     url: Mapped[str] = mapped_column(sql.String(50), default=None)

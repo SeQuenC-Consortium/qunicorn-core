@@ -15,5 +15,5 @@
 
 """Module containing the TaskManager API."""
 
-from . import device_views
+from . import device_view
 from .root import DEVICES_API
