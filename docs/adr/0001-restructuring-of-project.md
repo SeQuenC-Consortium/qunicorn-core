@@ -17,7 +17,8 @@ The Project Structure needed to be restructured in order to have api and logic s
 
 ## Decision Outcome
 
-Chosen option: "[option 1]"
+Chosen option: ""Core" Folder with logic"
+
 Core Folder created, which includes:
 * services classes for computation
 * mapper classes to map from dtos to db objects
