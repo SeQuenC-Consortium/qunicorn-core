@@ -25,6 +25,7 @@ class QuantumProgramDataclass:
     Attributes:
         id (int): Automatically generated database id. Use the id to fetch this information from the database.
         quantum_circuit (str): Quantum code that needs to be executed.
+        assembler_language (enum): Assembler language in which the code should be interpreted
     """
 
     __tablename__ = "QuantumProgram"

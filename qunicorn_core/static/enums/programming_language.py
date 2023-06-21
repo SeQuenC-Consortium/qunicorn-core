@@ -22,8 +22,12 @@ class ProgrammingLanguage(StrEnum):
         QISKIT: The programming language is QISKIT
         PYQUIL: The programming language is PYQUIL
         QMWARE: The programming language is QMWARE
+        QRISP: Assembler format from Frauenhofer
+        BASIQ: Assembler format from QMWARE
     """
 
     QISKIT = "QISKIT"
     PYQUIL = "PYQUIL"
     QMWARE = "QMWARE"
+    QRISP = "QRISP"
+    BASIQ = "BASIQ"
