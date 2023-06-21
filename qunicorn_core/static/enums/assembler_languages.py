@@ -1,4 +1,4 @@
-# Copyright 2023 University of Stuttgart
+# Copyright 2023 University of Stuttgart.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-"""Module containing all Dtos and their Schemas  for tasks in the QuantumProgram API."""
-from dataclasses import dataclass
-
-__all__ = ["QuantumProgramDto"]
-
-from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
+from enum import StrEnum
 
 
-@dataclass
-class QuantumProgramDto:
-    id: int
-    quantum_circuit: str
-    assembler_language: AssemblerLanguage
+class AssemblerLanguage(StrEnum):
+    """Enum to save the different assembler languages
+
+    Values:
+        QASM: Standard assembler format from IBM
+        BRAKET: Assembler format from AWS
+    """
+
+    QASM = "QASM"
+    BRAKET = "BRAKET"

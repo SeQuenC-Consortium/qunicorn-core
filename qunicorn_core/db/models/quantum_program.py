@@ -15,6 +15,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import sqltypes as sql
 
 from ..db import REGISTRY
+from ...static.enums.assembler_languages import AssemblerLanguage
 
 
 @REGISTRY.mapped_as_dataclass
@@ -30,3 +31,4 @@ class QuantumProgramDataclass:
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, nullable=True, default=None)
     quantum_circuit: Mapped[str] = mapped_column(sql.String(500), default=None)
+    assembler_language: Mapped[str] = mapped_column(sql.Enum(AssemblerLanguage), default=None)

@@ -17,12 +17,17 @@ from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 
 
 def dto_to_quantum_program(quantum_program: QuantumProgramDto) -> QuantumProgramDataclass:
-    return QuantumProgramDataclass(id=quantum_program.id, quantum_circuit=quantum_program.quantum_circuit)
+    return QuantumProgramDataclass(id=quantum_program.id,
+                                   quantum_circuit=quantum_program.quantum_circuit,
+                                   assembler_language=quantum_program.assembler_language)
 
 
 def dto_to_quantum_program_without_id(quantum_program: QuantumProgramDto) -> QuantumProgramDataclass:
-    return QuantumProgramDataclass(quantum_circuit=quantum_program.quantum_circuit)
+    return QuantumProgramDataclass(quantum_circuit=quantum_program.quantum_circuit,
+                                   assembler_language=quantum_program.assembler_language)
 
 
 def quantum_program_to_dto(quantum_program: QuantumProgramDataclass) -> QuantumProgramDto:
-    return QuantumProgramDto(id=quantum_program.id, quantum_circuit=quantum_program.quantum_circuit)
+    return QuantumProgramDto(id=quantum_program.id,
+                             quantum_circuit=quantum_program.quantum_circuit,
+                             assembler_language=quantum_program.assembler_language)

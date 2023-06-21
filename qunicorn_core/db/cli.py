@@ -31,6 +31,7 @@ from .models.job import JobDataclass
 from .models.provider import ProviderDataclass
 from .models.quantum_program import QuantumProgramDataclass
 from .models.user import UserDataclass
+from ..static.enums.assembler_languages import AssemblerLanguage
 from ..static.enums.job_state import JobState
 from ..static.enums.programming_language import ProgrammingLanguage
 from ..static.enums.provider_name import ProviderName
@@ -80,8 +81,9 @@ def get_quasm_string() -> str:
 
 def load_db_function(app: Flask):
     user = UserDataclass(name="DefaultUser")
-    qc = QuantumProgramDataclass(quantum_circuit=get_quasm_string())
-    deployment = DeploymentDataclass(deployed_by=user, quantum_program=qc, deployed_at=datetime.datetime.now(), name="DeploymentName")
+    qc = QuantumProgramDataclass(quantum_circuit=get_quasm_string(), assembler_language=AssemblerLanguage.QASM)
+    deployment = DeploymentDataclass(deployed_by=user, quantum_program=qc, deployed_at=datetime.datetime.now(),
+                                     name="DeploymentName")
     provider = ProviderDataclass(
         with_token=True,
         supported_language=ProgrammingLanguage.QISKIT,

@@ -24,8 +24,9 @@ class FlaskTask(Task):
 
 
 CELERY = Celery(
-    "task",
+    __name__,
     flask_app=None,
+    task_cls=FlaskTask,
     broker="redis://localhost:6379",
     backend="redis://localhost:6379",
 )

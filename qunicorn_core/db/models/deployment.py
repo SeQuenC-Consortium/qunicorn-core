@@ -38,10 +38,12 @@ class DeploymentDataclass:
 
     id: Mapped[int] = mapped_column(primary_key=True, nullable=True, default=None)
 
-    deployed_by_id: Mapped[int] = mapped_column(ForeignKey(UserDataclass.__tablename__ + ".id"), default=None, nullable=True)
+    deployed_by_id: Mapped[int] = mapped_column(ForeignKey(UserDataclass.__tablename__ + ".id"), default=None,
+                                                nullable=True)
     deployed_by: Mapped[UserDataclass.__name__] = relationship(UserDataclass.__name__, default=None)
 
-    quantum_program_id: Mapped[int] = mapped_column(ForeignKey(QuantumProgramDataclass.__tablename__ + ".id"), default=None)
+    quantum_program_id: Mapped[int] = mapped_column(ForeignKey(QuantumProgramDataclass.__tablename__ + ".id"),
+                                                    default=None)
     quantum_program: Mapped[QuantumProgramDataclass.__name__] = relationship(
         QuantumProgramDataclass.__name__,
         default=None,

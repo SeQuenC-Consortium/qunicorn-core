@@ -36,6 +36,8 @@ __all__ = [
     "JobRequestDto",
 ]
 
+from ...static.enums.assembler_languages import AssemblerLanguage
+
 from ...static.enums.job_state import JobState
 from ...static.enums.provider_name import ProviderName
 
@@ -48,6 +50,7 @@ class JobRequestDto:
     shots: int
     parameters: str
     token: str
+    assembler_language: AssemblerLanguage
 
 
 @dataclass
@@ -109,7 +112,7 @@ def get_quasm_string() -> str:
 class JobRequestDtoSchema(MaBaseSchema):
     name = ma.fields.String(required=True, example="JobName")
     circuit = CircuitField(required=True, example=get_quasm_string())
-    provider_name = ma.fields.Enum(required=True, example="IBM", enum=ProviderName)
+    provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     shots = ma.fields.Int(
         required=False,
         allow_none=True,
@@ -122,6 +125,7 @@ class JobRequestDtoSchema(MaBaseSchema):
     )
     parameters = ma.fields.List(ma.fields.Float(), required=False)
     token = ma.fields.String(required=True, example="")
+    assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
 
 
 class JobResponseDtoSchema(MaBaseSchema):

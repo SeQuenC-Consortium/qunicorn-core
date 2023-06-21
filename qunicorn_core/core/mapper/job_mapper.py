@@ -35,7 +35,7 @@ def request_to_core(job: JobRequestDto):
     user = UserDto(id=0, name="default")
     provider = ProviderDto(id=0, with_token=True, supported_language=ProgrammingLanguage.QISKIT, name=job.provider_name)
     device = DeviceDto(id=0, provider=provider, url="DefaultUrl")
-    quantum_program = QuantumProgramDto(id=0, quantum_circuit=job.circuit)
+    quantum_program = QuantumProgramDto(id=0, quantum_circuit=job.circuit, assembler_language=job.assembler_language)
     deployment = DeploymentDto(id=0, deployed_by=user, quantum_program=quantum_program, name="DefaultDeployment")
 
     return JobCoreDto(

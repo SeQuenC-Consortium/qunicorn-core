@@ -62,7 +62,7 @@ class JobDetailView(MethodView):
 
     @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema())
     def get(self, job_id: str):
-        """Get the urls for the job_api api for job control."""
+        """Get the details of a job."""
         job_response_dto: JobResponseDto = jobmanager_service.get_job(int(job_id))
         return jsonify(job_response_dto), 200
 
