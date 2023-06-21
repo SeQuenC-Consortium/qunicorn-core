@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from qunicorn_core.db import DB
+from qunicorn_core.db.models.db_model import DbModel
 
 """Module containing all general database requests"""
 
 session = DB.session
 
 
-def save_database_object(db_object) -> object:
+def save_database_object(db_object: DbModel) -> DbModel:
     """Creates or Updates a database object, as long as it is a database-model"""
     session.add(db_object)
     session.commit()
@@ -26,13 +27,13 @@ def save_database_object(db_object) -> object:
     return db_object
 
 
-def remove_database_object(db_object):
+def remove_database_object(db_object: DbModel):
     """Deletes a database object, as long as it is a database-model"""
     session.remove(db_object)
     session.commit()
 
 
-def get_database_object(db_object_id: int, database_object_class):
+def get_database_object(db_object_id: int, database_object_class: DbModel) -> DbModel:
     """Gets a database object
 
     Arguments:

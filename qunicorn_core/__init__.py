@@ -51,8 +51,7 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
 
     # load defaults
     config = app.config
-    flask_debug: bool = config.get("DEBUG", False) or environ.get("FLASK_ENV",
-                                                                  "production").lower() == "development"  # noqa
+    flask_debug: bool = config.get("DEBUG", False) or environ.get("FLASK_ENV", "production").lower() == "development"  # noqa
     if flask_debug:
         config.from_object(DebugConfig)
     elif test_config is None:

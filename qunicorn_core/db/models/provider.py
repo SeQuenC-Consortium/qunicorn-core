@@ -15,25 +15,22 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import sqltypes as sql
 
+from .db_model import DbModel
 from ..db import REGISTRY
 from ...static.enums.programming_language import ProgrammingLanguage
 from ...static.enums.provider_name import ProviderName
 
 
 @REGISTRY.mapped_as_dataclass
-class ProviderDataclass:
+class ProviderDataclass(DbModel):
     """Dataclass for storing Providers
 
     Attributes:
-        id (int): Automatically generated database id. Use the id to fetch this information from the database.
         with_token (bool): If authentication is needed and can be done by passing a token this attribute true.
         supported_language (ProgrammingLanguage): The programming language that this provider supports.
         name (ProviderName): Name of the cloud service.
     """
 
-    __tablename__ = "Provider"
-
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, nullable=True, default=None)
     with_token: Mapped[bool] = mapped_column(sql.BOOLEAN, default=None)
     supported_language: Mapped[str] = mapped_column(sql.Enum(ProgrammingLanguage), default=None)
     name: Mapped[str] = mapped_column(sql.Enum(ProviderName), default=None)

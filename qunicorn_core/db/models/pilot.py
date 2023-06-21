@@ -16,6 +16,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 from sqlalchemy.sql.schema import ForeignKey
 
+from .db_model import DbModel
 from .job import JobDataclass
 from ..db import REGISTRY
 from ...static.enums.pilot_state import PilotState
@@ -23,22 +24,17 @@ from ...static.enums.programming_language import ProgrammingLanguage
 
 
 @REGISTRY.mapped_as_dataclass
-class PilotDataclass:
+class PilotDataclass(DbModel):
     """Dataclass for storing Pilots
 
     Attributes:
-        id (int): Automatically generated database id. Use the id to fetch this information from the database.
         programming_language (ProgrammingLanguage): Programming language that the code should have after translation
         job (int): ID of the job that is executed by the pilot.
         state (PilotState): Represents progress and current state of pilot.
     """
 
-    __tablename__ = "Pilot"
-
     job_id: Mapped[int] = mapped_column(ForeignKey(JobDataclass.__tablename__ + ".id"))
     job: Mapped[JobDataclass.__name__] = relationship(JobDataclass.__name__, default=None)
-
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, nullable=True, default=None)
 
     programming_language: Mapped[str] = mapped_column(sql.Enum(ProgrammingLanguage), default=None)
     state: Mapped[PilotState] = mapped_column(sql.String(50), default=None)

@@ -44,4 +44,4 @@ class RootView(MethodView):
     @DEVICES_API.response(HTTPStatus.OK, RootSchema())
     def get(self):
         """Get the urls of the next endpoints of the device_api api to call."""
-        return RootData(root=url_for("device_api.DevicesView", _external=True))
+        return RootData(root=url_for("device-api.DevicesView", _external=True))

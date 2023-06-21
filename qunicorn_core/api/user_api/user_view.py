@@ -30,6 +30,6 @@ class UserView(MethodView):
     @USER_API.arguments(UserDtoSchema(), location="path")
     @USER_API.response(HTTPStatus.OK, UserDtoSchema())
     def get(self):
-        """Get information about a sinlge user."""
+        """Get information about a single user."""
 
         pass

@@ -19,6 +19,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 
+from .db_model import DbModel
 from .deployment import DeploymentDataclass
 from .device import DeviceDataclass
 from .user import UserDataclass
@@ -27,11 +28,10 @@ from ...static.enums.job_state import JobState
 
 
 @REGISTRY.mapped_as_dataclass
-class JobDataclass:
+class JobDataclass(DbModel):
     """Dataclass for storing Jobs
 
     Attributes:
-        id (int): Automatically generated database id. Use the id to fetch this information from the database.
         name (str, optional): Optional name for a job
         executed_by_id (str): A user_id associated to the job, user that wants to execute the job
         deployment_id (int): A deployment_id associated with the job
@@ -45,10 +45,6 @@ class JobDataclass:
         parameters (str, optional): The parameters for the Job. Job parameters should already be prepared and error
             checked before starting the task.
     """
-
-    __tablename__ = "Job"
-
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, nullable=True, default=None)
 
     executed_by_id: Mapped[int] = mapped_column(ForeignKey(UserDataclass.__tablename__ + ".id"), default=None, nullable=True)
     executed_by: Mapped[UserDataclass.__name__] = relationship(UserDataclass.__name__, default=None)

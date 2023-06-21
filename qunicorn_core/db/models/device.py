@@ -16,23 +16,20 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 from sqlalchemy.sql.schema import ForeignKey
 
+from .db_model import DbModel
 from .provider import ProviderDataclass
 from ..db import REGISTRY
 
 
 @REGISTRY.mapped_as_dataclass
-class DeviceDataclass:
+class DeviceDataclass(DbModel):
     """Dataclass for storing CloudDevices of a provider
 
     Attributes:
-        id (int): Automatically generated database id. Use the id to fetch this information from the database.
         url (str): Rest-endpoint how to connect to the Cloud device
         provider: The provider of the cloud_service with the needed configurations
     """
 
-    __tablename__ = "Device"
-
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, nullable=True, default=None)
     provider_id: Mapped[int] = mapped_column(ForeignKey(ProviderDataclass.__tablename__ + ".id"), default=None)
     provider: Mapped[ProviderDataclass.__name__] = relationship(ProviderDataclass.__name__, default=None)
     url: Mapped[str] = mapped_column(sql.String(50), default=None)

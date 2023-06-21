@@ -57,7 +57,7 @@ class RootView(MethodView):
         """Get the Root API information containing the links to all versions of this api."""
         return {
             "title": API.spec.title,
-            "v1": url_for("job_api-api.JobIDView", _external=True),
+            "v1": url_for("job-api.JobIDView", _external=True),
             # "v1": url_for("device_api-api.DeviceView", _external=True),
         }
 

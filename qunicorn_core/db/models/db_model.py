@@ -11,22 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from typing import Optional
-
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, declared_attr
 from sqlalchemy.sql import sqltypes as sql
 
-from .db_model import DbModel
-from ..db import REGISTRY
 
-
-@REGISTRY.mapped_as_dataclass
-class UserDataclass(DbModel):
-    """Dataclass for storing Users
+class DbModel:
+    """Dataclass for database model to create a table name and the id column
 
     Attributes:
-        name (str): Name of the user.
+        id (int): Automatically generated id of the database entity
     """
 
-    name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
+    @declared_attr
+    def __tablename__(self):
+        return self.__name__.replace("Dataclass", "")
+
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
