@@ -122,13 +122,17 @@ class JWTMixin:
         """Actually prepare the documentation."""
         operation: Optional[List[Dict[str, List[Any]]]] = doc_info.get("security")
         if operation:
-            available_schemas: Dict[str, Any] = spec.to_dict().get("components").get("securitySchemes")
+            available_schemas: Dict[str, Any] = (
+                spec.to_dict().get("components").get("securitySchemes")
+            )
             for scheme in operation:
                 if not scheme:
                     continue  # encountered empty schema for optional security
                 schema_name = next(iter(scheme.keys()))
                 if schema_name not in available_schemas:
-                    warn(f"The schema '{scheme}' is not specified in the available securitySchemes.")
+                    warn(
+                        f"The schema '{scheme}' is not specified in the available securitySchemes."
+                    )
             doc = deepupdate(doc, {"security": operation})
         return doc
 
