@@ -46,7 +46,7 @@ Below is a description of the different packages and what they  include:
 * Its "good practice" of accessing and saving whole objects instead of id. (Unless you really know what you are doing.) 
 
 #### Job_dtos were extended:
-* JobCoreDto: Working with the job, includes most data and links to other Dtos
+* JobCoreDto: Internal Job Handling: includes most data and links to other DTOs, furthermore used for internal communication.
 * JobRequestDto: Request received from API
 * JobResponseDto: DTO used to respond via API
 
