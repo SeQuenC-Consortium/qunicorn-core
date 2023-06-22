@@ -19,21 +19,20 @@ from flask import jsonify
 from flask.views import MethodView
 
 from .root import PUBLIC_CONTROL_API
-from ..api_models.job_dtos import JobRequestDtoSchema
-from ..api_models.job_dtos import JobIDSchema
+from ..api_models.job_dtos import JobRequestDtoSchema, SimpleJobDtoSchema
 
 
 @PUBLIC_CONTROL_API.route("/jobs/")
 class JobIDView(MethodView):
     """Jobs endpoint for collection of all jobs."""
 
-    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, JobIDSchema())
+    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def get(self):
         """Get registered job list."""
         return jsonify('{["myDummyJob1","myDummyJob2"]}'), 200
 
     @PUBLIC_CONTROL_API.arguments(JobRequestDtoSchema(), location="json")
-    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, JobIDSchema())
+    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, new_job_data: dict):
         """Create/Register new job."""
 
@@ -44,35 +43,35 @@ class JobIDView(MethodView):
 class JobDetailView(MethodView):
     """Jobs endpoint for a single job."""
 
-    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, JobIDSchema())
+    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def get(self, job_id: str):
         """Get the Results by ID"""
 
         return jsonify({"result": "42"}), 200
 
     @PUBLIC_CONTROL_API.arguments(JobRequestDtoSchema(), location="json")
-    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, JobIDSchema())
+    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, job_id: str):
         """Run a job execution via id."""
 
         return jsonify({"status": "running"}), 200
 
     @PUBLIC_CONTROL_API.arguments(JobRequestDtoSchema(), location="json")
-    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, JobIDSchema())
+    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def delete(self, job_id: str):
         """Delete job data via id."""
 
         return jsonify({"status": "deleted"}), 200
 
     @PUBLIC_CONTROL_API.arguments(JobRequestDtoSchema(), location="json")
-    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, JobIDSchema())
+    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def patch(self, job_id: str):
         """Pause a job via id."""
 
         return jsonify({"status": "pause"}), 200
 
     @PUBLIC_CONTROL_API.arguments(JobRequestDtoSchema(), location="json")
-    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, JobIDSchema())
+    @PUBLIC_CONTROL_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def put(self, job_id: str):
         """cancel a job via id."""
 

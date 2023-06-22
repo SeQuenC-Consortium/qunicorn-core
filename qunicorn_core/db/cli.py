@@ -101,9 +101,6 @@ def load_db_function(app: Flask):
     )
     DB.session.add(job)
     DB.session.commit()
-    user = UserDataclass(name="DefaultUser")
-    DB.session.add(user)
-    DB.session.commit()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
 
 

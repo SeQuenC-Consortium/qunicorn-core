@@ -26,9 +26,9 @@ from ..api_models.job_dtos import (
     JobRequestDtoSchema,
     JobResponseDtoSchema,
     JobRequestDto,
-    JobID,
+    SimpleJobDto,
     JobResponseDto,
-    JobIDSchema,
+    SimpleJobDtoSchema,
 )
 from ...core.jobmanager import jobmanager_service
 
@@ -37,22 +37,22 @@ from ...core.jobmanager import jobmanager_service
 class JobIDView(MethodView):
     """Jobs endpoint for collection of all jobs."""
 
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
+    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def get(self):
         """Get registered job list."""
         return [
-            JobID(
+            SimpleJobDto(
                 id=url_for("job_api-api.JobIDView", _external=True),
                 name="Placeholder for Jobs",
             )
         ]
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
+    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, new_job_data):
         """Create/Register and run new job."""
         job_dto: JobRequestDto = JobRequestDto(**new_job_data)
-        job_id: JobID = jobmanager_service.create_and_run_job(job_dto)
+        job_id: SimpleJobDto = jobmanager_service.create_and_run_job(job_dto)
         return jsonify(job_id), 200
 
 
@@ -67,26 +67,26 @@ class JobDetailView(MethodView):
         return jsonify(job_response_dto), 200
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
+    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, job_id: str):
         """Run a job execution via id. tbd"""
         return jsonify(jobmanager_service.run_job_by_id(int(job_id))), 200
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
+    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, job_id: str):  # noqa
         """Cancel a job execution via id."""
         pass
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
+    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def delete(self, job_id: str):
         """Delete job data via id."""
 
         pass
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobIDSchema())
+    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def put(self, job_id: str):
         """Pause a job via id."""
 

@@ -27,8 +27,8 @@ from .user_dtos import UserDto, UserDtoSchema
 from ..util import MaBaseSchema
 
 __all__ = [
-    "JobIDSchema",
-    "JobID",
+    "SimpleJobDtoSchema",
+    "SimpleJobDto",
     "JobResponseDtoSchema",
     "JobRequestDtoSchema",
     "JobCoreDto",
@@ -44,6 +44,8 @@ from ...static.enums.provider_name import ProviderName
 
 @dataclass
 class JobRequestDto:
+    """JobDto that was sent from the user as a request"""
+
     name: str
     circuit: str
     provider_name: str
@@ -55,6 +57,8 @@ class JobRequestDto:
 
 @dataclass
 class JobCoreDto:
+    """JobDto that is used for all internal job handling"""
+
     id: int
     executed_by: UserDto
     executed_on: DeviceDto
@@ -73,6 +77,8 @@ class JobCoreDto:
 
 @dataclass
 class JobResponseDto:
+    """JobDto that is sent to the user as a response"""
+
     id: int
     executed_by: UserDto
     executed_on: DeviceDto
@@ -87,7 +93,7 @@ class JobResponseDto:
 
 
 @dataclass
-class JobID:
+class SimpleJobDto:
     id: str
     name: str
     job_state: str = JobState.RUNNING
@@ -141,7 +147,7 @@ class JobResponseDtoSchema(MaBaseSchema):
     parameters = ma.fields.String(required=True, dump_only=True)
 
 
-class JobIDSchema(MaBaseSchema):
+class SimpleJobDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=True, allow_none=False, dump_only=True, example=123)
     job_name = ma.fields.String(required=False, allow_none=False, dump_only=True)
     job_state = ma.fields.String(required=False, allow_none=False, dump_only=True)
