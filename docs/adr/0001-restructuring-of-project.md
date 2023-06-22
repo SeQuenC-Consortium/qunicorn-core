@@ -19,16 +19,24 @@ The Project Structure needed to be restructured in order to have api and logic s
 
 Chosen option: ""Core" Folder with logic"
 
-Core Folder created, which includes:
-* services classes for computation
-* mapper classes to map from dtos to db objects
-
-Api Folder edited, which includes:
-* Api Definition (Views, Routes, etc.)
-* Model definitions (Schemas and dtos)
-
-DB Folder edited, which includes:
-* Database services, which serve to access the database
-* Database model definitions
+## Description of Changes
+Below is a description of the different packages and what they  include:
+* api package:
+  * api_models: DTOs and Schemas for all Objects.
+    * These are used for Computation and to define the Schemas for the API Views
+  * object_api
+    * These include the Definition of the different Views
+* core package:
+  * mapper:
+    * This Includes Mapper from DTOs to Database Objects, Helper Class
+  * (object)manager
+    * Computational Classes for different Object
+    * Service Classes, which get called from API
+    * Celery tasks
+* db package:
+  * database_services
+    * Services to access the database (add, get, update, remove)
+  * models
+    * Definition of various database models
 
 <!-- markdownlint-disable-file MD013 -->
