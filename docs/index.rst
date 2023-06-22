@@ -12,6 +12,7 @@ Welcome to Qunicorn_Core's documentation!
 
    readme
    cli
+   adr/index
    changelog
 
 `Api documentation <api.html>`_
