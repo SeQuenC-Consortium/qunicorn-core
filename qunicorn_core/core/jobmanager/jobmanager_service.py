@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from flask import jsonify
 
 from qunicorn_core.api.api_models.job_dtos import (
     JobRequestDto,
@@ -51,7 +51,7 @@ def create_and_run_job(job_request_dto: JobRequestDto) -> SimpleJobDto:
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
-    run_job(vars(job_core_dto))
+    run_job.delay(vars(job_core_dto))
     return SimpleJobDto(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
 
 
