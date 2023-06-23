@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from flask import jsonify
+import yaml
 
 from qunicorn_core.api.api_models.job_dtos import (
     JobRequestDto,
@@ -36,7 +36,8 @@ awspilot = AWSPilot
 def run_job(job_core_dto_dict: dict):
     """Assign the job to the target pilot which executes the job"""
 
-    job_core_dto: JobCoreDto = JobCoreDto(**job_core_dto_dict)
+    job_core_dto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
+
     device = job_core_dto.executed_on
     if device.provider.name == ProviderName.IBM:
         pilot: QiskitPilot = qiskitpilot("QP")
@@ -51,7 +52,8 @@ def create_and_run_job(job_request_dto: JobRequestDto) -> SimpleJobDto:
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
-    run_job.delay(vars(job_core_dto))
+    serialized_job_core_dto = yaml.dump(job_core_dto)
+    run_job.delay({"data": serialized_job_core_dto})
     return SimpleJobDto(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
 
 

@@ -64,7 +64,7 @@ class JobCoreDto:
     executed_on: DeviceDto
     deployment: DeploymentDto
     progress: str
-    state: str
+    state: JobState
     shots: int
     started_at: datetime
     finished_at: datetime
@@ -96,7 +96,7 @@ class JobResponseDto:
 class SimpleJobDto:
     id: str
     name: str
-    job_state: str = JobState.RUNNING
+    job_state: JobState = JobState.RUNNING
 
 
 class CircuitField(fields.Field):

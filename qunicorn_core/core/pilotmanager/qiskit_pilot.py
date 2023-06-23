@@ -15,6 +15,7 @@
 
 from qiskit import QuantumCircuit, transpile
 from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_provider.api.exceptions import RequestsApiError
 
 from qunicorn_core.api.api_models import JobCoreDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
@@ -31,7 +32,12 @@ class QiskitPilot(Pilot):
     def execute(self, job_dto: JobCoreDto):
         """Execute a job on an IBM backend using the Qiskit Pilot"""
 
-        provider = self.__get_ibm_provider(job_dto.token)
+        try:
+            provider = self.__get_ibm_provider(job_dto.token)
+        except RequestsApiError:
+            job_db_service.update_attribute(job_dto.id, JobState.ERROR, JobDataclass.state)
+            raise ValueError("The passed token is not valid.")
+
         backend, transpiled = self.transpile(provider, job_dto.deployment.quantum_program.quantum_circuit)
         job_id = job_dto.id
 

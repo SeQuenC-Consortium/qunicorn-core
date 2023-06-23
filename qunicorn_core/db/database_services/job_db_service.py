@@ -36,9 +36,9 @@ def create_database_job(job_core: JobCoreDto):
     return db_service.save_database_object(db_job)
 
 
-def update_attribute(job_id: int, job_state: JobState, attribute_name):
+def update_attribute(job_id: int, attribute_value, attribute_name):
     """Updates one attribute (attribute_name) of the job with the id job_id"""
-    db_service.get_session().query(JobDataclass).filter(JobDataclass.id == job_id).update({attribute_name: job_state})
+    db_service.get_session().query(JobDataclass).filter(JobDataclass.id == job_id).update({attribute_name: attribute_value})
     db_service.get_session().commit()
 
 
