@@ -15,9 +15,11 @@
 """"Test class to test the functionality of the job_api"""
 import json
 import os
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
+import pytest
 import yaml
+from sqlalchemy.exc import OperationalError
 
 from qunicorn_core import create_app
 from qunicorn_core.api.api_models import JobRequestDto, JobCoreDto
@@ -26,16 +28,17 @@ from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.cli import create_db_function
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.static.enums.job_state import JobState
 
 DEFAULT_TEST_CONFIG = {"SECRET_KEY": "test", "DEBUG": False, "TESTING": True, "JSON_SORT_KEYS": True, "JSONIFY_PRETTYPRINT_REGULAR": False,
-    "DEFAULT_LOG_FORMAT_STYLE": "{",
-    "DEFAULT_LOG_FORMAT": "{asctime} [{levelname:^7}] [{module:<30}] {message}    <{funcName}, {lineno}; {pathname}>",
-    "DEFAULT_FILE_STORE": "local_filesystem", "FILE_STORE_ROOT_PATH": "files", "OPENAPI_VERSION": "3.0.2",
-    "OPENAPI_JSON_PATH": "api-spec.json", "OPENAPI_URL_PREFIX": "", }
+                       "DEFAULT_LOG_FORMAT_STYLE": "{",
+                       "DEFAULT_LOG_FORMAT": "{asctime} [{levelname:^7}] [{module:<30}] {message}    <{funcName}, {lineno}; {pathname}>",
+                       "DEFAULT_FILE_STORE": "local_filesystem", "FILE_STORE_ROOT_PATH": "files", "OPENAPI_VERSION": "3.0.2",
+                       "OPENAPI_JSON_PATH": "api-spec.json", "OPENAPI_URL_PREFIX": "", }
 
 
 def set_up_env():
-    print("SETTING UP ENVIRONMENT FOR TESTS")
+    """Set up Flask app and environment and return app"""
     test_config = {}
     test_config.update(DEFAULT_TEST_CONFIG)
     test_config.update({"SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"})
@@ -44,11 +47,9 @@ def set_up_env():
     with app.app_context():
         create_db_function(app)
 
-
     return app
 
 
-# Will be implemented with #47
 def test_celery_run_job(mocker):
     """Testing the synchronous call of the run_job celery task"""
     # Setting up Mocks for the Test
@@ -78,6 +79,12 @@ def test_celery_run_job(mocker):
         job: JobDataclass = job_db_service.create_database_job(job_core_dto)
         job_core_dto.id = job.id
         serialized_job_core_dto = yaml.dump(job_core_dto)
+
+    # Run Test
+    # Need to restart app.app_context() in Order to get new Job?
+    with app.app_context():
         # Calling the Method to be tested synchronously
-        result = run_job.delay({"data": serialized_job_core_dto})
-    assert 0 == result.as_list()
+        run_job({"data": serialized_job_core_dto})
+        # Assert Job to have finished
+        new_job = job_db_service.get_job(1)
+        assert new_job.state == JobState.FINISHED

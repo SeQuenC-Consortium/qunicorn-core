@@ -2,10 +2,10 @@
   "assembler_language": "QASM",
   "name": "JobName",
   "circuit": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncreg meas[2];\nh q[0];\ncx q[0],q[1];\nbarrier q[0],q[1];\nmeasure q[0] -> meas[0];\nmeasure q[1] -> meas[1];\n",
-  "shots": 4000,
+  "shots": 4010,
   "parameters": [
     0
   ],
-  "token": "cb9e0ad2b132750f2de112a0707fd26f3ac4b17acdd49afbb05ef9a8abe610c55801caaf34f6cfd997fd20e5cbb5a3403a683c6f2d78102c565fa610479918f5",
+  "token": "",
   "provider_name": "IBM"
 }
