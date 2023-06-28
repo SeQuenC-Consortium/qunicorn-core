@@ -59,7 +59,7 @@ def set_up_env():
 
 def test_celery_run_job(mocker):
     """Testing the synchronous call of the run_job celery task"""
-    # Setting up Mocks for the Test
+    # GIVEN: Setting up Mocks and Environment
     backend_mock = Mock()
     run_result_mock = Mock()
     get_result_mock = Mock()
@@ -70,10 +70,9 @@ def test_celery_run_job(mocker):
     mocker.patch("qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot._QiskitPilot__get_ibm_provider", return_value=backend_mock)
     mocker.patch("qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot.transpile", return_value=(backend_mock, None))
 
-    # Setting up Environment for the Test
     app = set_up_env()
 
-    """Tests the create job method"""
+    # WHEN: Executing method to be tested
     root_dir = os.path.dirname(os.path.abspath(__file__))
     file_name = "../job_test_data.json"
     path_dir = "{}{}{}".format(root_dir, os.sep, file_name)
@@ -86,12 +85,10 @@ def test_celery_run_job(mocker):
         job: JobDataclass = job_db_service.create_database_job(job_core_dto)
         job_core_dto.id = job.id
         serialized_job_core_dto = yaml.dump(job_core_dto)
-
-    # Run Test
-    # Need to restart app.app_context() in Order to get new Job?
-    with app.app_context():
         # Calling the Method to be tested synchronously
         run_job({"data": serialized_job_core_dto})
-        # Assert Job to have finished
+
+    # THEN: Test Assertion
+    with app.app_context():
         new_job = job_db_service.get_job(1)
         assert new_job.state == JobState.FINISHED

@@ -13,6 +13,9 @@ Execute tests by executing.
 
 Pytest finds test methods through the "test_" prefix.
 
+## Test Structure
+Structure of a test execution should follow https://pythontest.com/strategy/given-when-then-2/
+
 ## Mocking Methods
 ### Example:
 > mocker.patch("qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot._QiskitPilot__get_ibm_provider", return_value=backend_mock)
