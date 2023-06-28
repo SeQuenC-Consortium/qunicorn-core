@@ -39,4 +39,3 @@ def register_celery(app: Flask):
         beat_schedule={},
     )
     CELERY.flask_app = app
-    Celery.broker = app.config.get("BROKER_URL")  # set flask_app attribute used by
