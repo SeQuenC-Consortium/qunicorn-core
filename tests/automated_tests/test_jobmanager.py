@@ -27,34 +27,7 @@ from qunicorn_core.db.cli import create_db_function
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
-
-DEFAULT_TEST_CONFIG = {
-    "SECRET_KEY": "test",
-    "DEBUG": False,
-    "TESTING": True,
-    "JSON_SORT_KEYS": True,
-    "JSONIFY_PRETTYPRINT_REGULAR": False,
-    "DEFAULT_LOG_FORMAT_STYLE": "{",
-    "DEFAULT_LOG_FORMAT": "{asctime} [{levelname:^7}] [{module:<30}] {message}    <{funcName}, {lineno}; {pathname}>",
-    "DEFAULT_FILE_STORE": "local_filesystem",
-    "FILE_STORE_ROOT_PATH": "files",
-    "OPENAPI_VERSION": "3.0.2",
-    "OPENAPI_JSON_PATH": "api-spec.json",
-    "OPENAPI_URL_PREFIX": "",
-}
-
-
-def set_up_env():
-    """Set up Flask app and environment and return app"""
-    test_config = {}
-    test_config.update(DEFAULT_TEST_CONFIG)
-    test_config.update({"SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"})
-
-    app = create_app(test_config)
-    with app.app_context():
-        create_db_function(app)
-
-    return app
+from tests.automated_tests.conftest import set_up_env
 
 
 def test_celery_run_job(mocker):
@@ -72,13 +45,14 @@ def test_celery_run_job(mocker):
 
     app = set_up_env()
 
-    # WHEN: Executing method to be tested
     root_dir = os.path.dirname(os.path.abspath(__file__))
     file_name = "../job_test_data.json"
     path_dir = "{}{}{}".format(root_dir, os.sep, file_name)
 
     with open(path_dir) as f:
         data = json.load(f)
+
+    # WHEN: Executing method to be tested
     with app.app_context():
         job_dto: JobRequestDto = JobRequestDto(**data)
         job_core_dto: JobCoreDto = job_mapper.request_to_core(job_dto)
