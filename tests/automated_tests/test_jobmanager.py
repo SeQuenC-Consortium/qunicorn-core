@@ -15,11 +15,9 @@
 """"Test class to test the functionality of the job_api"""
 import json
 import os
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
-import pytest
 import yaml
-from sqlalchemy.exc import OperationalError
 
 from qunicorn_core import create_app
 from qunicorn_core.api.api_models import JobRequestDto, JobCoreDto
@@ -68,7 +66,7 @@ def test_celery_run_job(mocker):
 
     """Tests the create job method"""
     root_dir = os.path.dirname(os.path.abspath(__file__))
-    file_name = 'job_test_data.json'
+    file_name = '../job_test_data.json'
     path_dir = "{}{}{}".format(root_dir, os.sep, file_name)
 
     with open(path_dir) as f:
