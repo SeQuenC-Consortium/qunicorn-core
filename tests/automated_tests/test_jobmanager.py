@@ -28,11 +28,20 @@ from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 
-DEFAULT_TEST_CONFIG = {"SECRET_KEY": "test", "DEBUG": False, "TESTING": True, "JSON_SORT_KEYS": True, "JSONIFY_PRETTYPRINT_REGULAR": False,
-                       "DEFAULT_LOG_FORMAT_STYLE": "{",
-                       "DEFAULT_LOG_FORMAT": "{asctime} [{levelname:^7}] [{module:<30}] {message}    <{funcName}, {lineno}; {pathname}>",
-                       "DEFAULT_FILE_STORE": "local_filesystem", "FILE_STORE_ROOT_PATH": "files", "OPENAPI_VERSION": "3.0.2",
-                       "OPENAPI_JSON_PATH": "api-spec.json", "OPENAPI_URL_PREFIX": "", }
+DEFAULT_TEST_CONFIG = {
+    "SECRET_KEY": "test",
+    "DEBUG": False,
+    "TESTING": True,
+    "JSON_SORT_KEYS": True,
+    "JSONIFY_PRETTYPRINT_REGULAR": False,
+    "DEFAULT_LOG_FORMAT_STYLE": "{",
+    "DEFAULT_LOG_FORMAT": "{asctime} [{levelname:^7}] [{module:<30}] {message}    <{funcName}, {lineno}; {pathname}>",
+    "DEFAULT_FILE_STORE": "local_filesystem",
+    "FILE_STORE_ROOT_PATH": "files",
+    "OPENAPI_VERSION": "3.0.2",
+    "OPENAPI_JSON_PATH": "api-spec.json",
+    "OPENAPI_URL_PREFIX": "",
+}
 
 
 def set_up_env():
@@ -66,7 +75,7 @@ def test_celery_run_job(mocker):
 
     """Tests the create job method"""
     root_dir = os.path.dirname(os.path.abspath(__file__))
-    file_name = '../job_test_data.json'
+    file_name = "../job_test_data.json"
     path_dir = "{}{}{}".format(root_dir, os.sep, file_name)
 
     with open(path_dir) as f:
