@@ -34,6 +34,7 @@ __all__ = [
     "JobCoreDto",
     "JobResponseDto",
     "JobRequestDto",
+    "JobPostRequestTypesSchema",
 ]
 
 from ...static.enums.assembler_languages import AssemblerLanguage
@@ -132,6 +133,10 @@ class JobRequestDtoSchema(MaBaseSchema):
     parameters = ma.fields.List(ma.fields.Float(), required=False)
     token = ma.fields.String(required=True, example="")
     assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
+
+
+class JobPostRequestTypesSchema(MaBaseSchema):
+    postReqTyp = ma.fields.String(required=True, example="-cancel/-run/-pause")
 
 
 class JobResponseDtoSchema(MaBaseSchema):

@@ -29,7 +29,6 @@ from .device_api import DEVICES_API
 from .job_api import JOBMANAGER_API
 from .jwt import SECURITY_SCHEMES
 from .provider_api import PROVIDER_API
-from .public_control_endpoints import PUBLIC_CONTROL_API
 from .user_api import USER_API
 from .util import MaBaseSchema
 
@@ -77,4 +76,3 @@ def register_root_api(app: Flask):
     API.register_blueprint(DEPLOYMENT_API)
     API.register_blueprint(PROVIDER_API)
     API.register_blueprint(USER_API)
-    API.register_blueprint(PUBLIC_CONTROL_API)
