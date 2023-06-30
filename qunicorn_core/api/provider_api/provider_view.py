@@ -19,16 +19,15 @@ from http import HTTPStatus
 from flask.views import MethodView
 
 from .root import PROVIDER_API
-from ..api_models.provider_dtos import ProviderDtoSchema, ProviderIDSchema
+from ..api_models.provider_dtos import ProviderDtoSchema
 
 
-@PROVIDER_API.route("/<string:service_id>/")
+@PROVIDER_API.route("/<string:provider_id>/")
 class ProviderView(MethodView):
-    """Services Endpoint to get properties of a specific service."""
+    """Provider Endpoint to get properties of a specific provider."""
 
-    @PROVIDER_API.arguments(ProviderIDSchema(), location="path")
     @PROVIDER_API.response(HTTPStatus.OK, ProviderDtoSchema())
-    def get(self):
-        """Get information about a single service."""
+    def get(self, provider_id):
+        """Get information about a single provider."""
 
         pass

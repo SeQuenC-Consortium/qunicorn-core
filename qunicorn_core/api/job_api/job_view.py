@@ -23,7 +23,6 @@ from flask.views import MethodView
 
 from .root import JOBMANAGER_API
 from ..api_models.job_dtos import (
-    JobPostRequestTypesSchema,
     JobRequestDtoSchema,
     JobResponseDtoSchema,
     JobRequestDto,
@@ -41,12 +40,13 @@ class JobIDView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def get(self):
         """Get registered job list."""
-        return  # [
-        # SimpleJobDto(
-        #   id=url_for("job_api-api.JobIDView", _external=True),
-        #  name="Placeholder for Jobs",
-        # )
-        # ]
+        jobmanager_service.get_all_jobs()
+        return [
+            SimpleJobDto(
+                id=url_for("job-api.JobIDView", _external=True),
+                name="Placeholder for Jobs",
+            )
+        ]
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
@@ -64,15 +64,15 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema())
     def get(self, job_id: str):
         """Get the details/results of a job."""
-        # job_response_dto: JobResponseDto = jobmanager_service.get_job(int(job_id))
-        return  # jsonify(job_response_dto), 200
+        job_response_dto: JobResponseDto = jobmanager_service.get_job(int(job_id))
+        return jsonify(job_response_dto), 200
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def delete(self, body, job_id: str):
         """Delete job data via id."""
 
-        pass
+        return jsonify(jobmanager_service.delete_job_data_by_id(job_id))
 
 
 @JOBMANAGER_API.route("/run/<string:job_id>/")
@@ -99,7 +99,7 @@ class JobCancelView(MethodView):
         """Cancel a job execution via id."""
         print("Request: cancel job")
 
-        return # jsonify(jobmanager_service.run_job_by_id(int(job_id))), 200
+        return jsonify(jobmanager_service.cancel_job_by_id(job_id)), 200
 
 
 @JOBMANAGER_API.route("/pause/<string:job_id>/")
@@ -112,5 +112,5 @@ class JobPauseView(MethodView):
     def post(self, body, job_id: str):
         """Pause a job via id."""
         print("Request: pause job")
-
-        return # jsonify(jobmanager_service.run_job_by_id(int(job_id))), 200
+        
+        return jsonify(jobmanager_service.pause_job_by_id(job_id)), 200

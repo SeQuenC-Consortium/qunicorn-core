@@ -87,3 +87,23 @@ def schedule_jobs():
 
 def send_job_to_pilot():
     """send job to pilot for execution after it is scheduled"""
+
+
+def pause_job_by_id(job_id):
+    """pause job execution"""
+    return "Not implemented yet"
+
+
+def cancel_job_by_id(job_id):
+    """cancel job execution"""
+    return "Not implemented yet"
+
+
+def delete_job_data_by_id(job_id):
+    """delete job data"""
+    return "Not implemented yet"
+
+
+def get_all_jobs():
+    """get all jobs from the db"""
+    return "Not implemented yet"
