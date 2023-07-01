@@ -80,7 +80,6 @@ class JobRunView(MethodView):
     """Jobs endpoint for a single job."""
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
-    # @JOBMANAGER_API.arguments(JobPostRequestTypesSchema(), location="path")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, body, job_id: str):
         """Run a job execution via id. tbd"""
@@ -93,7 +92,6 @@ class JobCancelView(MethodView):
     """Jobs endpoint for a single job."""
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
-    # @JOBMANAGER_API.arguments(JobPostRequestTypesSchema(), location="path")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, body, job_id: str):
         """Cancel a job execution via id."""
@@ -107,7 +105,6 @@ class JobPauseView(MethodView):
     """Jobs endpoint for a single job."""
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
-    # @JOBMANAGER_API.arguments(JobPostRequestTypesSchema(), location="path")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, body, job_id: str):
         """Pause a job via id."""
