@@ -38,5 +38,5 @@ class ProviderDtoSchema(MaBaseSchema):
     name = ma.fields.String(required=True, allow_none=False)
 
 
-class ProviderIDSchema(MaBaseSchema): 
+class ProviderIDSchema(MaBaseSchema):
     provider_id = ma.fields.String(required=True, allow_none=False)

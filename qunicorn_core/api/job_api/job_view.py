@@ -112,5 +112,5 @@ class JobPauseView(MethodView):
     def post(self, body, job_id: str):
         """Pause a job via id."""
         print("Request: pause job")
-        
+
         return jsonify(jobmanager_service.pause_job_by_id(job_id)), 200
