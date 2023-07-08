@@ -14,15 +14,16 @@
 
 
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
+from qunicorn_core.util import logging
 
 
 class AWSPilot(Pilot):
     """The AWS Pilot"""
 
     def execute(self, job):
-        print(f"Executing job {job} with AWS Pilot")
+        logging.info(f"Executing job {job} with AWS Pilot")
 
     def transpile(self, job):
         """Transpile job on an IBM backend, needs a device_id"""
 
-        print("Transpile a quantum circuit for a specific AWS backend")
+        logging.info("Transpile a quantum circuit for a specific AWS backend")

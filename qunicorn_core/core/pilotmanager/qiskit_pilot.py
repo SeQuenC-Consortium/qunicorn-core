@@ -30,6 +30,7 @@ from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
+from qunicorn_core.util import logging
 
 
 class QiskitPilot(Pilot):
@@ -46,7 +47,7 @@ class QiskitPilot(Pilot):
         elif job_core_dto.type == JobType.SAMPLER:
             self.__sample(job_core_dto)
         else:
-            print("WARNING: No valid Job Type specified")
+            logging.warn("No valid Job Type specified")
 
     def __run(self, job_dto: JobCoreDto):
         """Run a job on an IBM backend using the Qiskit Pilot"""
@@ -58,7 +59,7 @@ class QiskitPilot(Pilot):
         ibm_result = job_from_ibm.result()
         results: list[ResultDataclass] = result_mapper.runner_result_to_db_results(ibm_result, job_dto)
         job_db_service.update_finished_job(job_dto.id, results)
-        print(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
+        logging.info(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the Qiskit Pilot"""
@@ -69,7 +70,7 @@ class QiskitPilot(Pilot):
         ibm_result: SamplerResult = job_from_ibm.result()
         results: list[ResultDataclass] = result_mapper.sampler_result_to_db_results(ibm_result, job_dto)
         job_db_service.update_finished_job(job_dto.id, results)
-        print(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
+        logging.info(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
 
     def __estimate(self, job_dto: JobCoreDto):
         """Uses the Estimator to execute a job on an IBM backend using the Qiskit Pilot"""
@@ -81,7 +82,7 @@ class QiskitPilot(Pilot):
         ibm_result: EstimatorResult = job_from_ibm.result()
         results: list[ResultDataclass] = result_mapper.estimator_result_to_db_results(ibm_result, job_dto, "IY")
         job_db_service.update_finished_job(job_dto.id, results)
-        print(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
+        logging.info(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
 
     def __get_backend_circuits_and_id_for_qiskit_runtime(self, job_dto):
         """Instantiate all important configurations and updates the job_state"""
@@ -122,5 +123,5 @@ class QiskitPilot(Pilot):
         backend = provider.get_backend(self.IBMQ_BACKEND)
         transpiled = transpile(circuits, backend=backend)
 
-        print("Transpiled quantum circuit(s) for a specific IBM backend")
+        logging.info("Transpiled quantum circuit(s) for a specific IBM backend")
         return backend, transpiled

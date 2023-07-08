@@ -26,6 +26,7 @@ from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.provider_name import ProviderName
+from qunicorn_core.util import logging
 
 
 @CELERY.task()
@@ -38,11 +39,10 @@ def run_job(job_core_dto_dict: dict):
         pilot: QiskitPilot = QiskitPilot("QP")
         pilot.execute(job_core_dto)
     else:
-        print("WARNING: No valid target specified")
-    return 0
+        logging.warn("No valid target specified")
 
 
-def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = True) -> SimpleJobDto:
+def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = False) -> SimpleJobDto:
     """First creates a job to let it run afterwards on a pilot"""
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
@@ -60,7 +60,7 @@ def run_job_by_id(job_id: int) -> SimpleJobDto:
     new_job: JobDataclass = job_db_service.create_database_job(job)
     job_core_dto: JobCoreDto = job_mapper.job_to_job_core_dto(new_job)
     # TODO: run job
-    return SimpleJobDto(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
+    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, job_state=JobState.RUNNING)
 
 
 def get_job(job_id: int) -> JobResponseDto:
