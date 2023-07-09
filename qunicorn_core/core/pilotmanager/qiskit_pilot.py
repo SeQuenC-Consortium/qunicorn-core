@@ -17,8 +17,10 @@ from typing import List
 from qiskit import QuantumCircuit, transpile
 from qiskit.primitives import SamplerResult, EstimatorResult
 from qiskit.providers import BackendV1
+from qiskit.qasm import QasmError
 from qiskit.quantum_info import SparsePauliOp
 from qiskit_ibm_provider import IBMProvider
+from qiskit_ibm_provider.accounts import InvalidAccountError
 from qiskit_ibm_provider.api.exceptions import RequestsApiError
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob
 
@@ -40,6 +42,7 @@ class QiskitPilot(Pilot):
 
     def execute(self, job_core_dto: JobCoreDto):
         """Execute the job regarding his JobType"""
+
         if job_core_dto.type == JobType.RUNNER:
             self.__run(job_core_dto)
         elif job_core_dto.type == JobType.ESTIMATOR:
@@ -47,7 +50,9 @@ class QiskitPilot(Pilot):
         elif job_core_dto.type == JobType.SAMPLER:
             self.__sample(job_core_dto)
         else:
-            logging.warn("No valid Job Type specified")
+            exception: Exception = ValueError("No valid Job Type specified")
+            job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception), JobState.ERROR)
+            raise exception
 
     def __run(self, job_dto: JobCoreDto):
         """Run a job on an IBM backend using the Qiskit Pilot"""
@@ -94,9 +99,24 @@ class QiskitPilot(Pilot):
         return backend, circuits
 
     @staticmethod
-    def __get_circuits_as_QuantumCircuits(job_dto: JobCoreDto) -> List[QuantumCircuit]:
+    def __get_circuits_as_QuantumCircuits(job_dto: JobCoreDto) -> list[QuantumCircuit]:
         """Transforms the circuit string into IBM QuantumCircuit objects"""
-        return [QuantumCircuit().from_qasm_str(program.quantum_circuit) for program in job_dto.deployment.programs]
+        circuits: list[QuantumCircuit] = []
+        error_results: list[ResultDataclass] = []
+
+        # transform each circuit into a QuantumCircuit-Object
+        for program in job_dto.deployment.programs:
+            try:
+                circuits.append(QuantumCircuit().from_qasm_str(program.quantum_circuit))
+            except QasmError as exception:
+                error_results.extend(result_mapper.get_error_results(exception, program.quantum_circuit))
+
+        # If an error was caught -> Update the job and raise it again
+        if len(error_results) > 0:
+            job_db_service.update_finished_job(job_dto.id, error_results, JobState.ERROR)
+            raise QasmError("Invalide Qasm String.")
+
+        return circuits
 
     @staticmethod
     def __get_ibm_provider_and_login(token: str, job_dto_id: int) -> IBMProvider:
@@ -109,9 +129,9 @@ class QiskitPilot(Pilot):
         # Try to save the account. Update job_dto to job_state = Error, if it is not possible
         try:
             IBMProvider.save_account(token=token, overwrite=True)
-        except RequestsApiError:
-            job_db_service.update_attribute(job_dto_id, JobState.ERROR, JobDataclass.state)
-            raise ValueError("The passed token is not valid.")
+        except InvalidAccountError or RequestsApiError as exception:
+            job_db_service.update_finished_job(job_dto_id, result_mapper.get_error_results(exception), JobState.ERROR)
+            raise exception
 
         # Load previously saved account credentials.
         return IBMProvider()

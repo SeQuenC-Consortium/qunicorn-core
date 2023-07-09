@@ -29,6 +29,7 @@ class ResultType(StrEnum):
     COUNTS = "COUNTS"
     QUASI_DIST = "QUASI_DIST"
     VALUE_AND_VARIANCE = "VALUE_AND_VARIANCE"
+    ERROR = "ERROR"
 
     @staticmethod
     def get_result_type(job_type: JobType):

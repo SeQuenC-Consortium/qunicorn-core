@@ -20,13 +20,12 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobResponseDto,
 )
 from qunicorn_core.celery import CELERY
-from qunicorn_core.core.mapper import job_mapper
+from qunicorn_core.core.mapper import job_mapper, result_mapper
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.provider_name import ProviderName
-from qunicorn_core.util import logging
 
 
 @CELERY.task()
@@ -39,7 +38,9 @@ def run_job(job_core_dto_dict: dict):
         pilot: QiskitPilot = QiskitPilot("QP")
         pilot.execute(job_core_dto)
     else:
-        logging.warn("No valid target specified")
+        exception: Exception = ValueError("No valid Target specified")
+        job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception), JobState.ERROR)
+        raise exception
 
 
 def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = False) -> SimpleJobDto:
