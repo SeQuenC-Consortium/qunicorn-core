@@ -60,3 +60,12 @@ def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto)
             )
         )
     return result_dtos
+
+
+def get_error_result(error_message: str, stack_trace: str, circuit: str) -> ResultDataclass:
+    return ResultDataclass(
+        result_type=ResultType.ERROR,
+        circuit=circuit,
+        result_dict={"error_message" : error_message},
+        meta_data={"stack_trace" : stack_trace},
+    )
