@@ -67,9 +67,11 @@ def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto)
 def get_error_results(exception: Exception, circuit: str | None = None) -> list[ResultDataclass]:
     exception_message: str = str(exception)
     stack_trace: str = traceback.format_exc()
-    return [ResultDataclass(
-        result_type=ResultType.ERROR,
-        circuit=circuit,
-        result_dict={"exception_message": exception_message},
-        meta_data={"stack_trace": stack_trace},
-    )]
+    return [
+        ResultDataclass(
+            result_type=ResultType.ERROR,
+            circuit=circuit,
+            result_dict={"exception_message": exception_message},
+            meta_data={"stack_trace": stack_trace},
+        )
+    ]

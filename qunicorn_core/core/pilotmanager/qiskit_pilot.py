@@ -20,8 +20,6 @@ from qiskit.providers import BackendV1
 from qiskit.qasm import QasmError
 from qiskit.quantum_info import SparsePauliOp
 from qiskit_ibm_provider import IBMProvider
-from qiskit_ibm_provider.accounts import InvalidAccountError
-from qiskit_ibm_provider.api.exceptions import RequestsApiError
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob
 
 from qunicorn_core.api.api_models import JobCoreDto
@@ -91,8 +89,8 @@ class QiskitPilot(Pilot):
 
     def __get_backend_circuits_and_id_for_qiskit_runtime(self, job_dto):
         """Instantiate all important configurations and updates the job_state"""
-        service: QiskitRuntimeService = QiskitRuntimeService()
         self.__get_ibm_provider_and_login(job_dto.token, job_dto.id)
+        service: QiskitRuntimeService = QiskitRuntimeService()
         job_db_service.update_attribute(job_dto.id, JobState.RUNNING, JobDataclass.state)
         circuits: List[QuantumCircuit] = QiskitPilot.__get_circuits_as_QuantumCircuits(job_dto)
         backend: BackendV1 = service.get_backend(self.IBMQ_BACKEND)
@@ -129,12 +127,13 @@ class QiskitPilot(Pilot):
         # Try to save the account. Update job_dto to job_state = Error, if it is not possible
         try:
             IBMProvider.save_account(token=token, overwrite=True)
-        except InvalidAccountError or RequestsApiError as exception:
+            ibm_provider: IBMProvider = IBMProvider()
+        except Exception as exception:
             job_db_service.update_finished_job(job_dto_id, result_mapper.get_error_results(exception), JobState.ERROR)
             raise exception
 
-        # Load previously saved account credentials.
-        return IBMProvider()
+        # return previously saved account credentials.
+        return ibm_provider
 
     def transpile(self, provider: IBMProvider, job_dto: JobCoreDto):
         """Transpile job on an IBM backend"""
