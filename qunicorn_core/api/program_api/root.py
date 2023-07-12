@@ -1,4 +1,4 @@
-# Copyright 2023 University of Stuttgart.
+# Copyright 2023 University of Stuttgart
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,19 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import StrEnum
+
+"""Module containing the root endpoint of the quantumProgram API."""
+
+from dataclasses import dataclass
+
+from ..flask_api_utils import SecurityBlueprint as SmorestBlueprint
+
+PROGRAM_API = SmorestBlueprint(
+    "program-api",
+    "PROGRAM API",
+    description="Quantum program API to list available resources.",
+    url_prefix="/programs/",
+)
 
 
-class JobType(StrEnum):
-    """Enum to save the different states of the jobs
-
-    Values:
-        RUNNER: Normal execution of a job
-        SAMPLER: Samples multiple quantum programs
-        ESTIMATOR: Estimates multiple quantum programs
-    """
-
-    RUNNER = "RUNNER"
-    SAMPLER = "SAMPLER"
-    ESTIMATOR = "ESTIMATOR"
-    FILE = "FILE"
+@dataclass()
+class RootData:
+    root: str

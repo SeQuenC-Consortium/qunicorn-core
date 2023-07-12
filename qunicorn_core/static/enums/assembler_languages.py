@@ -25,3 +25,4 @@ class AssemblerLanguage(StrEnum):
 
     QASM = "QASM"
     BRAKET = "BRAKET"
+    PYTHON = "PYTHON"

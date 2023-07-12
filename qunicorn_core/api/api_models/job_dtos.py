@@ -50,6 +50,7 @@ class JobRequestDto:
 
     name: str
     circuits: list[str]
+    programs: list[int]
     provider_name: str
     shots: int
     parameters: str
@@ -115,6 +116,7 @@ class CircuitField(fields.Field):
 class JobRequestDtoSchema(MaBaseSchema):
     name = ma.fields.String(required=True, example="JobName")
     circuits = CircuitField(required=True, example=[utils.get_default_qasm_string(), utils.get_default_qasm_string(2)])
+    programs = ma.fields.List(ma.fields.Integer, required=False, example=[1])
     provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     shots = ma.fields.Int(
         required=False,

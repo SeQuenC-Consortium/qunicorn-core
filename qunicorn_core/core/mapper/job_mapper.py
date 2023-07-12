@@ -24,9 +24,11 @@ from qunicorn_core.api.api_models.job_dtos import (
 )
 from qunicorn_core.api.api_models.quantum_program_dtos import QuantumProgramDto
 from qunicorn_core.api.api_models.user_dtos import UserDto
-from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_mapper
+from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_mapper, quantum_program_mapper
+from qunicorn_core.db.database_services import quantum_program_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
+from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.programming_language import ProgrammingLanguage
 
 
@@ -35,10 +37,18 @@ def request_to_core(job: JobRequestDto):
     user = UserDto(id=0, name="default")
     provider = ProviderDto(id=0, with_token=True, supported_language=ProgrammingLanguage.QISKIT, name=job.provider_name)
     device = DeviceDto(id=0, provider=provider, url="DefaultUrl")
-    quantum_programs = [
-        QuantumProgramDto(id=0, quantum_circuit=circuit, assembler_language=job.assembler_language) for circuit in job.circuits
-    ]
-    deployment = DeploymentDto(id=0, deployed_by=user, programs=quantum_programs, name="DefaultDeployment", deployed_at=datetime.now())
+    if job.type != JobType.FILE:
+        quantum_programs = [
+            QuantumProgramDto(id=0, quantum_circuit=circuit, assembler_language=job.assembler_language) for circuit in job.circuits
+        ]
+        deployment = DeploymentDto(id=0, deployed_by=user, programs=quantum_programs, name="DefaultDeployment", deployed_at=datetime.now())
+    else:
+        deployment_programs = []
+        for program in job.programs:
+            deployment_programs.append(quantum_program_mapper.quantum_program_to_dto(quantum_program_db_service.get_program(program)))
+        deployment = DeploymentDto(
+            id=0, deployed_by=user, programs=deployment_programs, name="DefaultDeployment", deployed_at=datetime.now()
+        )
 
     return JobCoreDto(
         id=0,

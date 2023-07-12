@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 import os
 from typing import List
 
@@ -45,6 +46,8 @@ class QiskitPilot(Pilot):
             self.__estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
             self.__sample(job_core_dto)
+        elif job_core_dto.type == JobType.FILE:
+            self.__upload_and_run_program(job_core_dto)
         else:
             print("WARNING: No valid Job Type specified")
 
@@ -124,3 +127,19 @@ class QiskitPilot(Pilot):
 
         print("Transpiled quantum circuit(s) for a specific IBM backend")
         return backend, transpiled
+
+    @staticmethod
+    def __upload_and_run_program(self, job_core_dto):
+        """Upload and then run a quantum program on the QiskitRuntimeService"""
+        service = QiskitRuntimeService(token=job_core_dto.token, channel="ibm_quantum")
+        ibm_program_ids = []
+        for program in job_core_dto.deployment.programs:
+            working_directory_path = os.path.abspath(os.getcwd())
+            python_file_path = working_directory_path + "/resources/upload_files/" + program.python_file_path
+            python_file_metadata_path = working_directory_path + "/resources/upload_files/" + program.python_file_metadata
+            ibm_program_ids.append(service.upload_program(python_file_path, python_file_metadata_path))
+        for ibm_program_id in ibm_program_ids:
+            options_dict = json.loads(program.python_file_options)
+            input_dict = json.loads(program.python_file_inputs)
+            service.run(ibm_program_id, inputs=input_dict, options=options_dict)
+        pass

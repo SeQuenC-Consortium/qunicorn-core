@@ -26,11 +26,19 @@ from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 @dataclass
 class QuantumProgramDto:
     id: int
-    quantum_circuit: str
-    assembler_language: AssemblerLanguage
+    quantum_circuit: str | None = None
+    assembler_language: AssemblerLanguage | None = None
+    python_file_path: str | None = None
+    python_file_metadata: str | None = None
+    python_file_options: dict | None = None
+    python_file_inputs: dict | None = None
 
 
 class QuantumProgramSchema(MaBaseSchema):
     id = ma.fields.Integer(required=True, allow_none=False)
     quantum_circuit = ma.fields.String(required=False, allow_none=True)
     assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
+    python_file_path = ma.fields.String(required=False, example="hello.py", allow_none=True)
+    python_file_metadata = ma.fields.String(required=False, example="hello.json", eallow_none=True)
+    python_file_options = ma.fields.Dict(required=False, example={"backend": "ibmq_qasm_simulator"}, allow_none=True)
+    python_file_inputs = ma.fields.Dict(required=False, allow_none=True)
