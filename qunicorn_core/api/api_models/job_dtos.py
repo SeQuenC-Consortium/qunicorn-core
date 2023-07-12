@@ -49,14 +49,14 @@ class JobRequestDto:
     """JobDto that was sent from the user as a request"""
 
     name: str
-    circuits: list[str]
-    programs: list[int]
     provider_name: str
     shots: int
     parameters: str
     token: str
     type: JobType
     assembler_language: AssemblerLanguage
+    programs: list[int] | None = None
+    circuits: list[str] | None = None
 
 
 @dataclass
