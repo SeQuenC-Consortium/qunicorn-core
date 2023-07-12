@@ -17,4 +17,5 @@ jobs:
       - name: Run flake8
         run: flake8
       - name: Run black
-        run: black --check --exclude '/resources\.py/' .
+        run: black --check --verbose --extend-exclude=".resources." .   
+
