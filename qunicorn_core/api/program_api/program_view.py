@@ -17,6 +17,7 @@
 
 from http import HTTPStatus
 
+from flask import jsonify
 from flask.views import MethodView
 
 from .root import PROGRAM_API
@@ -39,5 +40,5 @@ class QuantumProgramView(MethodView):
     def post(self, body):
         """Create a specific quantum program"""
         program_dto: QuantumProgramDto = QuantumProgramDto(**body)
-        programmanager_service.create_database_program(program_dto)
-        return
+        program_response_dto = programmanager_service.create_database_program(program_dto)
+        return jsonify(program_response_dto), 200

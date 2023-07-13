@@ -17,14 +17,7 @@ from qunicorn_core.api.api_models import QuantumProgramDto
 from qunicorn_core.db.database_services import quantum_program_db_service
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 
-
-def create_program(quantum_program_dto: QuantumProgramDto) -> QuantumProgramDto:
-    """Creates a quantum program and saves it in the database"""
-    quantum_program_dto.id = create_database_program(quantum_program_dto)
-    return quantum_program_dto
-
-
 def create_database_program(quantum_program_dto: QuantumProgramDto):
     """Saves a quantum program in the database"""
     program: QuantumProgramDataclass = quantum_program_db_service.create_database_quantum_program(quantum_program_dto)
-    return program.id
+    return program

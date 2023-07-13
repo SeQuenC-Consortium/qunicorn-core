@@ -31,6 +31,7 @@ from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
+from qunicorn_core.static.enums.result_type import ResultType
 
 
 class QiskitPilot(Pilot):
@@ -124,22 +125,26 @@ class QiskitPilot(Pilot):
         circuits: list[QuantumCircuit] = self.__get_circuits_as_QuantumCircuits(job_dto)
         backend = provider.get_backend(self.IBMQ_BACKEND)
         transpiled = transpile(circuits, backend=backend)
-
         print("Transpiled quantum circuit(s) for a specific IBM backend")
         return backend, transpiled
 
     @staticmethod
+    def __get_file_path_to_resources(file_name):
+        working_directory_path = os.path.abspath(os.getcwd())
+        return working_directory_path + os.sep + "resources" + os.sep + "upload_files" + os.sep + file_name
+
     def __upload_and_run_program(self, job_core_dto):
         """Upload and then run a quantum program on the QiskitRuntimeService"""
-        service = QiskitRuntimeService(token=job_core_dto.token, channel="ibm_quantum")
+
+        service = QiskitRuntimeService()
+        service.save_account(token=job_core_dto.token, channel="ibm_quantum", overwrite=True)
         ibm_program_ids = []
         for program in job_core_dto.deployment.programs:
-            working_directory_path = os.path.abspath(os.getcwd())
-            python_file_path = working_directory_path + "/resources/upload_files/" + program.python_file_path
-            python_file_metadata_path = working_directory_path + "/resources/upload_files/" + program.python_file_metadata
+            python_file_path = self.__get_file_path_to_resources(program.python_file_path)
+            python_file_metadata_path = self.__get_file_path_to_resources(program.python_file_metadata)
             ibm_program_ids.append(service.upload_program(python_file_path, python_file_metadata_path))
         for ibm_program_id in ibm_program_ids:
             options_dict = json.loads(program.python_file_options)
             input_dict = json.loads(program.python_file_inputs)
             service.run(ibm_program_id, inputs=input_dict, options=options_dict)
-        pass
+        job_db_service.update_finished_job(job_core_dto.id, [])
