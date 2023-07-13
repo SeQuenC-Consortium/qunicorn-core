@@ -34,9 +34,9 @@ class DeploymentIDView(MethodView):
         pass
 
     @DEPLOYMENT_API.arguments(DeploymentDtoSchema(), location="json")
-    @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema())
+    @DEPLOYMENT_API.response(HTTPStatus.CREATED, DeploymentDtoSchema())
     def post(self, new_task_data: dict):
-        """Deploy new Job-definition."""
+        """Create/Deploy new Job-definition."""
 
         pass
 

@@ -49,7 +49,7 @@ class JobIDView(MethodView):
         ]
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
-    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
+    @JOBMANAGER_API.response(HTTPStatus.CREATED, SimpleJobDtoSchema())
     def post(self, body):
         """Create/Register and run new job."""
         job_dto: JobRequestDto = JobRequestDto(**body)

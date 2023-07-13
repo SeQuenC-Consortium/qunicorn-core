@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    qunicorn_core.api
+   qunicorn_core.core
    qunicorn_core.db
    qunicorn_core.util
 
