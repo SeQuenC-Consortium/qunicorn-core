@@ -31,7 +31,6 @@ from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
-from qunicorn_core.static.enums.result_type import ResultType
 
 
 class QiskitPilot(Pilot):
