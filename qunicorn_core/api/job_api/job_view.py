@@ -72,10 +72,6 @@ class JobDetailView(MethodView):
     def delete(self, body, job_id: str):
         """Delete job data via id."""
 
-        logging.info("Test")
-        logging.warn("TestWarn")
-        logging.error("TestError")
-
         return jsonify(jobmanager_service.delete_job_data_by_id(job_id))
 
 
