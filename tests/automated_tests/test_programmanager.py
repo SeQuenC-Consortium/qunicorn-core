@@ -12,7 +12,6 @@
 # limitations under the License.
 
 """"Test class to test the functionality of the job_api"""
-from unittest.mock import Mock
 
 from qunicorn_core.api.api_models import QuantumProgramDto
 from qunicorn_core.core.programmanager import programmanager_service

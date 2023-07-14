@@ -13,10 +13,9 @@
 # limitations under the License.
 
 """"Test class to test the functionality of the job_api"""
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock
 
 import yaml
-from qiskit_ibm_runtime import QiskitRuntimeService
 
 from qunicorn_core.api.api_models import JobRequestDto, JobCoreDto, QuantumProgramDto
 from qunicorn_core.core.jobmanager.jobmanager_service import run_job
@@ -69,10 +68,11 @@ def test_celery_run_job(mocker):
 def test_celery_run_job_for_ibm_upload(mocker):
     """Testing the synchronous call of the run_job celery task for ibm file upload"""
     # GIVEN: Setting up Mocks and Environment
-    path_to_service: str = "qiskit_ibm_runtime.qiskit_runtime_service.QiskitRuntimeService"
-    mocker.patch(f"{path_to_service}.save_account", return_value=None)
-    mocker.patch(f"{path_to_service}.upload_program", return_value="test-id")
-    mocker.patch(f"{path_to_service}.run", return_value=None)
+    mock = Mock()
+    mock.upload_program.return_value = "test-id"
+    mock.run.return_value = None
+    path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
+    mocker.patch(f"{path_to_pilot}.get_runtime_service", return_value=mock)
 
     app = set_up_env()
 

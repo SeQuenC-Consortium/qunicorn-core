@@ -135,8 +135,7 @@ class QiskitPilot(Pilot):
     def __upload_and_run_program(self, job_core_dto):
         """Upload and then run a quantum program on the QiskitRuntimeService"""
 
-        service = QiskitRuntimeService()
-        service.save_account(token=job_core_dto.token, channel="ibm_quantum", overwrite=True)
+        service = self.get_runtime_service(job_core_dto)
         ibm_program_ids = []
         for program in job_core_dto.deployment.programs:
             python_file_path = self.__get_file_path_to_resources(program.python_file_path)
@@ -147,3 +146,8 @@ class QiskitPilot(Pilot):
             input_dict = json.loads(program.python_file_inputs)
             service.run(ibm_program_id, inputs=input_dict, options=options_dict)
         job_db_service.update_finished_job(job_core_dto.id, [])
+
+    def get_runtime_service(self, job_core_dto) -> QiskitRuntimeService:
+        service = QiskitRuntimeService(token=None, channel=None, filename=None, name=None)
+        service.save_account(token=job_core_dto.token, channel="ibm_quantum", overwrite=True)
+        return service
