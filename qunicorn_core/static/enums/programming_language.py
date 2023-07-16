@@ -31,3 +31,4 @@ class ProgrammingLanguage(StrEnum):
     QMWARE = "QMWARE"
     QRISP = "QRISP"
     BASIQ = "BASIQ"
+    BRAKET = "BRAKET"

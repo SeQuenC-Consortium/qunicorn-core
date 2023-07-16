@@ -91,7 +91,13 @@ def load_db_function(app: Flask):
         supported_language=ProgrammingLanguage.QISKIT,
         name=ProviderName.IBM,
     )
+    provider2 = ProviderDataclass(
+        with_token=False,
+        supported_language=ProgrammingLanguage.BRAKET,
+        name=ProviderName.AWS,
+    )
     device = DeviceDataclass(provider=provider, url="")
+    device2 = DeviceDataclass(provider=provider2, url="")
     job = JobDataclass(
         executed_by=user,
         executed_on=device,
@@ -104,7 +110,20 @@ def load_db_function(app: Flask):
         name="JobName",
         results=[ResultDataclass(result_dict={"0x": "550", "1x": "450"})],
     )
+    job2 = JobDataclass(
+        executed_by=user,
+        executed_on=device2,
+        deployment=deployment,
+        progress=0,
+        state=JobState.READY,
+        shots=4000,
+        type=JobType.RUNNER,
+        started_at=datetime.datetime.now(),
+        name="Job2Name",
+        results=[ResultDataclass(result_dict={"0x": "550", "1x": "450"})],
+    )
     DB.session.add(job)
+    DB.session.add(job2)
     DB.session.commit()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
 

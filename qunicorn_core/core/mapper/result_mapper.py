@@ -60,3 +60,17 @@ def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto)
             )
         )
     return result_dtos
+
+
+def aws_local_simulator_result_to_db_results(aws_result, job_dto: JobCoreDto) -> list[ResultDataclass]:
+    result_dtos: list[ResultDataclass] = []
+    result_dtos.append(
+        ResultDataclass(
+            result_dict={"resultString": str(aws_result)},
+            job_id=job_dto.id,
+            circuit=job_dto.deployment.programs[0].quantum_circuit,
+            meta_data="",
+            result_type=ResultType.AWS_RESULT,
+        )
+    )
+    return result_dtos

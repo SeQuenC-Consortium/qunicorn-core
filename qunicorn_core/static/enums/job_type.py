@@ -27,3 +27,4 @@ class JobType(StrEnum):
     RUNNER = "RUNNER"
     SAMPLER = "SAMPLER"
     ESTIMATOR = "ESTIMATOR"
+    AWS_SIMULATOR = "AWS_SIMULATOR"

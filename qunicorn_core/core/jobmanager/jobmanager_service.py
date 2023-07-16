@@ -21,6 +21,7 @@ from qunicorn_core.api.api_models.job_dtos import (
 )
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import job_mapper
+from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
@@ -36,6 +37,9 @@ def run_job(job_core_dto_dict: dict):
 
     if job_core_dto.executed_on.provider.name == ProviderName.IBM:
         pilot: QiskitPilot = QiskitPilot("QP")
+        pilot.execute(job_core_dto)
+    elif job_core_dto.executed_on.provider.name == ProviderName.AWS:
+        pilot: AWSPilot = AWSPilot("AP")
         pilot.execute(job_core_dto)
     else:
         print("WARNING: No valid target specified")
@@ -66,6 +70,7 @@ def run_job_by_id(job_id: int) -> SimpleJobDto:
 def get_job(job_id: int) -> JobResponseDto:
     """Gets the job from the database service with its id"""
     db_job: JobDataclass = job_db_service.get_job(job_id)
+    print("§$$§$§$§$§$§$§$§$$§$§$§$§$§$§$§$§$§$§$hier§$§$§$§$§$§$$§$§hier:", str(db_job))
     return job_mapper.job_to_response(db_job)
 
 

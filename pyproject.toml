@@ -24,6 +24,7 @@ qiskit-ibm-provider = "^0.6.0"
 qiskit-ibm-runtime = "^0.11.1"
 PyYAML = "^6.0"
 mocker = "^1.1.1"
+amazon-braket-sdk = "^1.49.1"
 
 [tool.poetry.dev-dependencies]
 Sphinx = "^5.0.0"

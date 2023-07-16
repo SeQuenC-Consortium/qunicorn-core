@@ -29,6 +29,7 @@ class ResultType(StrEnum):
     COUNTS = "COUNTS"
     QUASI_DIST = "QUASI_DIST"
     VALUE_AND_VARIANCE = "VALUE_AND_VARIANCE"
+    AWS_RESULT = "AWS_RESULT"   # placeholderName
 
     @staticmethod
     def get_result_type(job_type: JobType):
@@ -36,5 +37,7 @@ class ResultType(StrEnum):
             return ResultType.COUNTS
         elif job_type == JobType.SAMPLER:
             return ResultType.QUASI_DIST
-        else:
+        elif job_type == JobType.ESTIMATOR:
             return ResultType.VALUE_AND_VARIANCE
+        elif job_type == JobType.AWS_SIMULATOR:
+            return ResultType.AWS_RESULT
