@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import json
 import os
 from typing import List
 
@@ -132,22 +131,23 @@ class QiskitPilot(Pilot):
         working_directory_path = os.path.abspath(os.getcwd())
         return working_directory_path + os.sep + "resources" + os.sep + "upload_files" + os.sep + file_name
 
-    def __upload_and_run_program(self, job_core_dto):
+    def __upload_and_run_program(self, job_core_dto: JobCoreDto):
         """Upload and then run a quantum program on the QiskitRuntimeService"""
 
-        service = self.get_runtime_service(job_core_dto)
+        service = self.__get_runtime_service(job_core_dto)
         ibm_program_ids = []
         for program in job_core_dto.deployment.programs:
             python_file_path = self.__get_file_path_to_resources(program.python_file_path)
             python_file_metadata_path = self.__get_file_path_to_resources(program.python_file_metadata)
             ibm_program_ids.append(service.upload_program(python_file_path, python_file_metadata_path))
         for ibm_program_id in ibm_program_ids:
-            options_dict = json.loads(program.python_file_options)
-            input_dict = json.loads(program.python_file_inputs)
+            options_dict: dict = program.python_file_options
+            input_dict: dict = program.python_file_inputs
             service.run(ibm_program_id, inputs=input_dict, options=options_dict)
         job_db_service.update_finished_job(job_core_dto.id, [])
 
-    def get_runtime_service(self, job_core_dto) -> QiskitRuntimeService:
+    @staticmethod
+    def __get_runtime_service(job_core_dto) -> QiskitRuntimeService:
         service = QiskitRuntimeService(token=None, channel=None, filename=None, name=None)
         service.save_account(token=job_core_dto.token, channel="ibm_quantum", overwrite=True)
         return service

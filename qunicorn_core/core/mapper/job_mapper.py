@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import logging
 from datetime import datetime
 
 from qunicorn_core.api.api_models import ProviderDto
@@ -27,6 +27,7 @@ from qunicorn_core.api.api_models.user_dtos import UserDto
 from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_mapper, quantum_program_mapper
 from qunicorn_core.db.database_services import quantum_program_db_service
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.programming_language import ProgrammingLanguage
@@ -41,14 +42,15 @@ def request_to_core(job: JobRequestDto):
         quantum_programs = [
             QuantumProgramDto(id=0, quantum_circuit=circuit, assembler_language=job.assembler_language) for circuit in job.circuits
         ]
-        deployment = DeploymentDto(id=0, deployed_by=user, programs=quantum_programs, name="DefaultDeployment", deployed_at=datetime.now())
     else:
-        deployment_programs = []
-        for program in job.programs:
-            deployment_programs.append(quantum_program_mapper.quantum_program_to_dto(quantum_program_db_service.get_program(program)))
-        deployment = DeploymentDto(
-            id=0, deployed_by=user, programs=deployment_programs, name="DefaultDeployment", deployed_at=datetime.now()
-        )
+        quantum_programs = []
+        for program_id in job.program_ids:
+            program_from_db: QuantumProgramDataclass = quantum_program_db_service.get_program(program_id)
+            if program_from_db is not None:
+                quantum_programs.append(quantum_program_mapper.quantum_program_to_dto(program_from_db))
+            else:
+                logging.warning("No program of this id exists")
+    deployment = DeploymentDto(id=0, deployed_by=user, programs=quantum_programs, name="DefaultDeployment", deployed_at=datetime.now())
 
     return JobCoreDto(
         id=0,

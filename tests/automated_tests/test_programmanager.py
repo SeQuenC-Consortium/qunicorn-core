@@ -33,8 +33,8 @@ def test_create_program():
     # THEN: Test Assertion
     with app.app_context():
         assert result_program.id is not None
-        assert result_program.python_file_path == "hello.py"
+        assert result_program.python_file_path == "test.py"
         assert result_program.python_file_inputs == '{"my_obj": "MyCustomClass(my foo, my bar)"}'
-        assert result_program.python_file_metadata == "hello.json"
+        assert result_program.python_file_metadata == "test.json"
         assert result_program.python_file_options == '{"backend": "ibmq_qasm_simulator"}'
         assert result_program.assembler_language == "QASM"

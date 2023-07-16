@@ -146,4 +146,4 @@ def check_if_job_estimator_result_correct(job: JobDataclass):
 def check_standard_result_data(i, job, result):
     assert result.result_type == ResultType.get_result_type(job.type)
     assert result.job_id == job.id
-    assert result.circuit == job.deployment.programs[i].quantum_circuit
+    assert result.circuit == job.deployment.program_ids[i].quantum_circuit

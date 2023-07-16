@@ -72,7 +72,7 @@ def test_celery_run_job_for_ibm_upload(mocker):
     mock.upload_program.return_value = "test-id"
     mock.run.return_value = None
     path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
-    mocker.patch(f"{path_to_pilot}.get_runtime_service", return_value=mock)
+    mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
 
     app = set_up_env()
 
@@ -81,7 +81,7 @@ def test_celery_run_job_for_ibm_upload(mocker):
         result_program: QuantumProgramDataclass = programmanager_service.create_database_program(quantum_program_dto)
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
     job_request_dto.type = JobType.FILE
-    job_request_dto.programs = [result_program.id]
+    job_request_dto.program_ids = [result_program.id]
 
     # WHEN: Executing method to be tested
     with app.app_context():

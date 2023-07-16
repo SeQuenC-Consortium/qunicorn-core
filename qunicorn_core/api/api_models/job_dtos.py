@@ -55,7 +55,7 @@ class JobRequestDto:
     token: str
     type: JobType
     assembler_language: AssemblerLanguage
-    programs: list[int] | None = None
+    program_ids: list[int] | None = None
     circuits: list[str] | None = None
 
 

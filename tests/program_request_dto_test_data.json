@@ -1,9 +1,9 @@
 {
   "quantum_circuit": "",
-  "python_file_path": "hello.py",
+  "python_file_path": "test.py",
   "python_file_inputs": {
     "my_obj": "MyCustomClass(my foo, my bar)"},
-  "python_file_metadata": "hello.json",
+  "python_file_metadata": "test.json",
   "python_file_options": {
     "backend": "ibmq_qasm_simulator"
   },
