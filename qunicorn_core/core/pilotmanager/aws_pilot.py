@@ -15,9 +15,7 @@
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from braket.circuits import Circuit, Gate, Observable
 from braket.devices import LocalSimulator
-from braket.aws import AwsDevice
 from braket.ir.openqasm import Program as OpenQASMProgram
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
@@ -42,7 +40,6 @@ class AWSPilot(Pilot):
         """Transpile job for an AWS backend, needs a device_id"""
         print("Transpile a quantum circuit for a specific AWS backend")
         circuit = OpenQASMProgram(source=job_core_dto.deployment.programs[0].quantum_circuit)
-        # circuit = OpenQASMProgram(source="OPENQASM 3; \nqubit[3] q;\nbit[3] c;\nh q[0];\ncnot q[0], q[1];\ncnot q[1], q[2];\nc = measure q;")
         return circuit
 
     def __localSimulation(self, job_core_dto: JobCoreDto):
