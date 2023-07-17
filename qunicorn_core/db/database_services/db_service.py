@@ -29,8 +29,13 @@ def save_database_object(db_object: DbModel) -> DbModel:
 
 def remove_database_object(db_object: DbModel):
     """Deletes a database object, as long as it is a database-model"""
-    session.remove(db_object)
+    session.delete(db_object)
     session.commit()
+
+
+def delete_database_object_by_id(db_object: DbModel, id: int):
+    """Deletes a database object, as long as it is a database-model"""
+    session.query(db_object).filter_by(id=id).delete()
 
 
 def get_database_object(db_object_id: int, database_object_class: DbModel) -> DbModel:
@@ -41,6 +46,15 @@ def get_database_object(db_object_id: int, database_object_class: DbModel) -> Db
         database_object_class   - class of the database object
     """
     return session.get(database_object_class, db_object_id)
+
+
+def get_all_database_objects(database_object_class: DbModel) -> list[DbModel]:
+    """Gets all database objects of a table
+
+    Arguments:
+        database_object_class   - class of the database objects
+    """
+    return session.query(database_object_class).all()
 
 
 def get_session():

@@ -20,25 +20,25 @@ from http import HTTPStatus
 from flask.views import MethodView
 
 from .root import DEPLOYMENT_API
-from ..api_models.deployment_dtos import DeploymentDtoSchema
+from ..api_models.deployment_dtos import DeploymentDtoSchema, DeploymentRequestDtoSchema, DeploymentRequestDto
+from ...core.jobmanager import deployment_service
 
 
 @DEPLOYMENT_API.route("/")
 class DeploymentIDView(MethodView):
     """Deployments endpoint for collection of all deployed jobs."""
 
-    @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema())
+    @DEPLOYMENT_API.response(HTTPStatus.OK)  # TODO: DeploymentListSchema ?
     def get(self):
-        """Get deployed job definition list."""
+        """Get the list of deployments."""
+        return deployment_service.get_all_deployments()
 
-        pass
-
-    @DEPLOYMENT_API.arguments(DeploymentDtoSchema(), location="json")
+    @DEPLOYMENT_API.arguments(DeploymentRequestDtoSchema(), location="json")
     @DEPLOYMENT_API.response(HTTPStatus.CREATED, DeploymentDtoSchema())
-    def post(self, new_task_data: dict):
+    def post(self, body):
         """Create/Deploy new Job-definition."""
-
-        pass
+        deployment_dto: DeploymentRequestDto = DeploymentRequestDto.from_dict(body)
+        return deployment_service.create_deployment(deployment_dto)
 
 
 @DEPLOYMENT_API.route("/<string:deployment_id>/")
@@ -46,28 +46,29 @@ class DeploymentDetailView(MethodView):
     """API endpoint for single pre-deployments."""
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
-    def get(self, deployment_id: str):
+    def get(self, deployment_id: int):
         """Get detailed information for single deployed job-definition."""
 
-        pass
+        return deployment_service.get_deployment(deployment_id)
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
-    def delete(self, deployment_id: str):
+    def delete(self, deployment_id: int):
         """Delete single deployment by ID."""
 
-        pass
+        return deployment_service.remove_deployment(deployment_id)
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
-    def put(self, deployment_id: str):
+    @DEPLOYMENT_API.arguments(DeploymentRequestDtoSchema(), location="json")
+    def put(self, body):
         """Update single deployment by ID."""
-
-        pass
+        deployment_dto: DeploymentRequestDto = DeploymentRequestDto.from_dict(body)
+        return deployment_service.update_deployment(deployment_dto)
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
-    def patch(self, deployment_id: str):
-        """Update parts of a single deployment by ID."""
+    def patch(self, deployment_id: int):
+        """TBD: Update parts of a single deployment by ID."""
 
-        pass
+        raise NotImplementedError
 
 
 @DEPLOYMENT_API.route("/<string:deployment_id>/jobs")
@@ -76,6 +77,6 @@ class DeploymentDetailJobView(MethodView):
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     def get(self, deployment_id: str):
-        """Get job definitions of a single deployment."""
+        """TBD: Get job definitions of a single deployment."""
 
-        pass
+        raise NotImplementedError

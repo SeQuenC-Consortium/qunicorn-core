@@ -13,12 +13,19 @@
 # limitations under the License.
 
 from qunicorn_core.api.api_models import QuantumProgramDto
+from qunicorn_core.api.api_models.quantum_program_dtos import QuantumProgramRequestDto
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 
 
 def dto_to_quantum_program(quantum_program: QuantumProgramDto) -> QuantumProgramDataclass:
     return QuantumProgramDataclass(
         id=quantum_program.id, quantum_circuit=quantum_program.quantum_circuit, assembler_language=quantum_program.assembler_language
+    )
+
+
+def request_to_quantum_program(quantum_program: QuantumProgramRequestDto) -> QuantumProgramDataclass:
+    return QuantumProgramDataclass(
+        quantum_circuit=quantum_program.quantum_circuit, assembler_language=quantum_program.assembler_language
     )
 
 

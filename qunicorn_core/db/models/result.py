@@ -33,7 +33,7 @@ class ResultDataclass(DbModel):
         result_type (Enum): Result type depending on the Job_Type of the job
     """
 
-    result_dict: Mapped[dict] = mapped_column(sql.JSON)
+    result_dict: Mapped[dict] = mapped_column(sql.JSON, default=None, nullable=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("Job.id"), default=None, nullable=True)
     circuit: Mapped[str] = mapped_column(sql.String(100), default=None, nullable=True)
     meta_data: Mapped[dict] = mapped_column(sql.JSON, default=None, nullable=True)

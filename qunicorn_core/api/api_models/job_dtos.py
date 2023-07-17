@@ -34,6 +34,7 @@ __all__ = [
     "JobCoreDto",
     "JobResponseDto",
     "JobRequestDto",
+    "TokenSchema",
 ]
 
 from ...static.enums.assembler_languages import AssemblerLanguage
@@ -49,20 +50,21 @@ class JobRequestDto:
     """JobDto that was sent from the user as a request"""
 
     name: str
-    circuits: list[str]
+    circuits: list[str] | None
     provider_name: str
     shots: int
     parameters: str
     token: str
     type: JobType
     assembler_language: AssemblerLanguage
+    deployment_id: int
 
 
 @dataclass
 class JobCoreDto:
     """JobDto that is used for all internal job handling"""
 
-    id: int
+    id: int | None
     executed_by: UserDto
     executed_on: DeviceDto
     deployment: DeploymentDto
@@ -114,12 +116,15 @@ class CircuitField(fields.Field):
 
 class JobRequestDtoSchema(MaBaseSchema):
     name = ma.fields.String(required=True, example="JobName")
-    circuits = CircuitField(required=True, example=[utils.get_default_qasm_string(), utils.get_default_qasm_string(2)])
+    circuits = CircuitField(required=False,
+                            allow_none=True,
+                            example=[utils.get_default_qasm_string(), utils.get_default_qasm_string(2)],
+                            metadata={"description": "This field is deprecated, please use deployments instead. "})
     provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     shots = ma.fields.Int(
         required=False,
         allow_none=True,
-        metada={
+        metadata={
             "label": "Shots",
             "description": "Number of shots",
             "input_type": "number",
@@ -130,12 +135,13 @@ class JobRequestDtoSchema(MaBaseSchema):
     token = ma.fields.String(required=True, example="")
     type = ma.fields.Enum(required=True, example=JobType.RUNNER, enum=JobType)
     assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
+    deployment_id = ma.fields.Integer(required=False, allow_none=True, example=1)
 
 
 class JobResponseDtoSchema(MaBaseSchema):
     id = ma.fields.Int(required=True, dump_only=True)
-    executed_by = UserDtoSchema()
-    executed_on = DeviceDtoSchema()
+    executed_by = ma.fields.Nested(UserDtoSchema())
+    executed_on = ma.fields.Nested(DeviceDtoSchema())
     progress = ma.fields.Int(required=True, dump_only=True)
     state = ma.fields.String(required=True, dump_only=True)
     type = ma.fields.String(required=True, dump_only=True)
@@ -150,3 +156,7 @@ class SimpleJobDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=True, allow_none=False, dump_only=True)
     job_name = ma.fields.String(required=False, allow_none=False, dump_only=True)
     job_state = ma.fields.String(required=False, allow_none=False, dump_only=True)
+
+
+class TokenSchema(MaBaseSchema):
+    token = ma.fields.String(required=True, example="")

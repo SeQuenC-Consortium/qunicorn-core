@@ -27,6 +27,7 @@ def provider_dto_to_provider(provider_dto: ProviderDto) -> ProviderDataclass:
 
 def provider_dto_to_provider_without_id(provider_dto: ProviderDto) -> ProviderDataclass:
     return ProviderDataclass(
+        id=0,
         with_token=provider_dto.with_token,
         supported_language=provider_dto.supported_language,
         name=provider_dto.name,

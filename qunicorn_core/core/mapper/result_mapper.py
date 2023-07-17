@@ -23,11 +23,13 @@ from qunicorn_core.static.enums.result_type import ResultType
 
 def runner_result_to_db_results(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
     result_dtos: list[ResultDataclass] = []
-    for i in range(len(ibm_result.get_counts())):
-        counts: dict = ibm_result.get_counts()[i]
+
+    for i in range(len(ibm_result.results)):
+        counts: dict = ibm_result.results[i].data.counts
         circuit: str = job_dto.deployment.programs[i].quantum_circuit
         result_dtos.append(
-            ResultDataclass(circuit=circuit, result_dict=counts, result_type=ResultType.COUNTS, meta_data=ibm_result.results[i].to_dict())
+            ResultDataclass(circuit=circuit, result_dict=counts, result_type=ResultType.COUNTS,
+                            meta_data=ibm_result.results[i].to_dict())
         )
     return result_dtos
 

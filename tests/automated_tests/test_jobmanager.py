@@ -58,5 +58,5 @@ def test_celery_run_job(mocker):
 
     # THEN: Test Assertion
     with app.app_context():
-        new_job = job_db_service.get_job(job_core_dto.id)
+        new_job = job_db_service.get(job_core_dto.id)
         assert new_job.state == JobState.FINISHED

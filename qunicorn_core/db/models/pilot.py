@@ -33,7 +33,7 @@ class PilotDataclass(DbModel):
         state (PilotState): Represents progress and current state of pilot.
     """
 
-    job_id: Mapped[int] = mapped_column(ForeignKey(JobDataclass.__tablename__ + ".id"))
+    job_id: Mapped[int] = mapped_column(ForeignKey(JobDataclass.__tablename__ + ".id"), default=None)
     job: Mapped[JobDataclass.__name__] = relationship(JobDataclass.__name__, default=None)
 
     programming_language: Mapped[str] = mapped_column(sql.Enum(ProgrammingLanguage), default=None)

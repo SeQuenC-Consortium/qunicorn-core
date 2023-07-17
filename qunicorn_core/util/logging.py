@@ -37,4 +37,4 @@ def warn(message: str):
 
 
 def error(message: str):
-    logging.getLogger(ALEMBIC_ENV).error(message)
+    logging.getLogger(ALEMBIC_ENV).error(message, exc_info=True)

@@ -30,6 +30,7 @@ from tomli import load as load_toml
 
 from . import api, celery, db, licenses
 from .api import jwt
+from .util import logging
 from .util.config import ProductionConfig, DebugConfig
 
 # change this to change tha flask app name and the config env var prefix
@@ -139,6 +140,7 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
     # To display the errors differently in the swagger ui
     @app.errorhandler(Exception)
     def handle_internal_server_error(error):
+        logging.error(str(error))
         return {
             "code": 500 if not hasattr(error, "status_code") else error.status_code,
             "error": type(error).__name__,

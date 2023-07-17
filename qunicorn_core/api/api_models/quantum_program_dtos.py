@@ -15,12 +15,14 @@
 
 """Module containing all Dtos and their Schemas  for tasks in the QuantumProgram API."""
 from dataclasses import dataclass
+
 import marshmallow as ma
 
-__all__ = ["QuantumProgramDto", "QuantumProgramSchema"]
+__all__ = ["QuantumProgramDto", "QuantumProgramRequestDto", "QuantumProgramRequestSchema", "QuantumProgramDtoSchema"]
 
 from qunicorn_core.api.flask_api_utils import MaBaseSchema
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
+from qunicorn_core.util import utils
 
 
 @dataclass
@@ -30,7 +32,18 @@ class QuantumProgramDto:
     assembler_language: AssemblerLanguage
 
 
-class QuantumProgramSchema(MaBaseSchema):
-    id = ma.fields.Integer(required=True, allow_none=False)
-    quantum_circuit = ma.fields.String(required=False, allow_none=True)
+@dataclass
+class QuantumProgramRequestDto:
+    quantum_circuit: str
+    assembler_language: AssemblerLanguage
+
+
+class QuantumProgramRequestSchema(MaBaseSchema):
+    quantum_circuit = ma.fields.String(required=True, allow_none=True, example=utils.get_default_qasm_string())
     assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
+
+
+class QuantumProgramDtoSchema(MaBaseSchema):
+    id = ma.fields.Integer(required=True, dump_only=True)
+    quantum_circuit = ma.fields.String(required=True, dump_only=True)
+    assembler_language = ma.fields.Enum(required=True, enum=AssemblerLanguage, dump_only=True)

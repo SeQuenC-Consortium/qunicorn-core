@@ -26,4 +26,4 @@ class DbModel:
     def __tablename__(self):
         return self.__name__.replace("Dataclass", "")
 
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, init=False)
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from qunicorn_core.api.api_models import DeploymentDto
+from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto
 from qunicorn_core.core.mapper import quantum_program_mapper, user_mapper
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 
@@ -27,11 +27,9 @@ def deployment_dto_to_deployment(deployment: DeploymentDto) -> DeploymentDatacla
     )
 
 
-def deployment_dto_to_deployment_without_id(deployment: DeploymentDto) -> DeploymentDataclass:
+def request_dto_to_deployment(deployment: DeploymentRequestDto) -> DeploymentDataclass:
     return DeploymentDataclass(
-        deployed_by=user_mapper.user_dto_to_user_without_id(deployment.deployed_by),
-        programs=[quantum_program_mapper.dto_to_quantum_program_without_id(qc) for qc in deployment.programs],
-        deployed_at=deployment.deployed_at,
+        programs=[quantum_program_mapper.request_to_quantum_program(qc) for qc in deployment.programs],
         name=deployment.name,
     )
 
