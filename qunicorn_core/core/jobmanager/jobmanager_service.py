@@ -37,9 +37,7 @@ def run_job(job_core_dto_dict: dict):
     device = job_core_dto.executed_on
     pilot: QiskitPilot = QiskitPilot("QP")
 
-    if device.device_name == "aer_simulator":
-        pilot.execute_on_aer_simulator(job_core_dto)
-    elif device.provider.name == ProviderName.IBM:
+    if device.provider.name == ProviderName.IBM:
         pilot.execute(job_core_dto)
     else:
         exception: Exception = ValueError("No valid Target specified")
