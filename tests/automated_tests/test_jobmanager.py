@@ -46,6 +46,7 @@ def test_celery_run_job(mocker):
 
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
+    job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: Executing method to be tested
     with app.app_context():

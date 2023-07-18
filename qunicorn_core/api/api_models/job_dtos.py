@@ -52,6 +52,7 @@ class JobRequestDto:
     name: str
     circuits: list[str] | None
     provider_name: str
+    device_name: str
     shots: int
     parameters: str
     token: str
@@ -121,6 +122,7 @@ class JobRequestDtoSchema(MaBaseSchema):
                             example=[utils.get_default_qasm_string(), utils.get_default_qasm_string(2)],
                             metadata={"description": "This field is deprecated, please use deployments instead. "})
     provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
+    device_name = ma.fields.String(required=True, example="aer_simulator")
     shots = ma.fields.Int(
         required=False,
         allow_none=True,

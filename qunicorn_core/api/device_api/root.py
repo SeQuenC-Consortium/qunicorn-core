@@ -16,12 +16,7 @@
 """Module containing the root endpoint of the DEVICES API."""
 
 from dataclasses import dataclass
-from http import HTTPStatus
 
-from flask.helpers import url_for
-from flask.views import MethodView
-
-from ..api_models import RootSchema
 from ..flask_api_utils import SecurityBlueprint as SmorestBlueprint
 
 DEVICES_API = SmorestBlueprint(
@@ -35,13 +30,3 @@ DEVICES_API = SmorestBlueprint(
 @dataclass()
 class RootData:
     root: str
-
-
-@DEVICES_API.route("/")
-class RootView(MethodView):
-    """Root endpoint of the device api, to list all available device_api."""
-
-    @DEVICES_API.response(HTTPStatus.OK, RootSchema())
-    def get(self):
-        """Get the urls of the next endpoints of the device_api api to call."""
-        return RootData(root=url_for("device-api.DeviceView", device_id=1, _external=True))  # device_id=1 only a dummy value

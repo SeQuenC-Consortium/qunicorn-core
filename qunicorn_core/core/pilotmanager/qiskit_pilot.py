@@ -14,6 +14,7 @@
 import os
 from typing import List
 
+import qiskit
 from qiskit import QuantumCircuit, transpile
 from qiskit.primitives import SamplerResult, EstimatorResult
 from qiskit.providers import BackendV1
@@ -36,13 +37,14 @@ from qunicorn_core.util import logging
 class QiskitPilot(Pilot):
     """The Qiskit Pilot"""
 
-    IBMQ_BACKEND = "ibmq_qasm_simulator"
-
     def execute(self, job_core_dto: JobCoreDto):
-        """Execute the job regarding his JobType"""
+        """Execute a job on an IBM backend using the Qiskit Pilot"""
 
         if job_core_dto.type == JobType.RUNNER:
-            self.__run(job_core_dto)
+            if job_core_dto.executed_on.device_name == "aer_simulator":
+                self.__execute_on_aer_simulator(job_core_dto)
+            else:
+                self.__run(job_core_dto)
         elif job_core_dto.type == JobType.ESTIMATOR:
             self.__estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
@@ -51,6 +53,22 @@ class QiskitPilot(Pilot):
             exception: Exception = ValueError("No valid Job Type specified")
             job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception), JobState.ERROR)
             raise exception
+
+    def __execute_on_aer_simulator(self, job_dto: JobCoreDto):
+        """Execute a job on the air_simulator using the qasm_simulator backend"""
+        job_id = job_dto.id
+
+        job_db_service.update_attribute(job_id, JobState.RUNNING, JobDataclass.state)
+        circuits = self.__get_circuits_as_QuantumCircuits(job_dto)
+        backend = qiskit.Aer.get_backend("qasm_simulator")
+        result = qiskit.execute(circuits, backend=backend, shots=job_dto.shots).result()
+
+        results: list[ResultDataclass] = result_mapper.runner_result_to_db_results(result, job_dto)
+        # AerCircuit is not serializable and needs to be removed
+        for res in results:
+            res.meta_data.pop("circuit")
+        job_db_service.update_finished_job(job_id, results)
+        logging.info(f"Run job with id {job_dto.id} locally on aer_simulator and get the result {results}")
 
     def __run(self, job_dto: JobCoreDto):
         """Run a job on an IBM backend using the Qiskit Pilot"""
@@ -93,7 +111,7 @@ class QiskitPilot(Pilot):
         service: QiskitRuntimeService = QiskitRuntimeService()
         job_db_service.update_attribute(job_dto.id, JobState.RUNNING, JobDataclass.state)
         circuits: List[QuantumCircuit] = QiskitPilot.__get_circuits_as_QuantumCircuits(job_dto)
-        backend: BackendV1 = service.get_backend(self.IBMQ_BACKEND)
+        backend: BackendV1 = service.get_backend(job_dto.executed_on.device_name)
         return backend, circuits
 
     @staticmethod
@@ -139,7 +157,7 @@ class QiskitPilot(Pilot):
         """Transpile job on an IBM backend"""
 
         circuits: list[QuantumCircuit] = self.__get_circuits_as_QuantumCircuits(job_dto)
-        backend = provider.get_backend(self.IBMQ_BACKEND)
+        backend = provider.get_backend(job_dto.executed_on.device_name)
         transpiled = transpile(circuits, backend=backend)
 
         logging.info("Transpiled quantum circuit(s) for a specific IBM backend")

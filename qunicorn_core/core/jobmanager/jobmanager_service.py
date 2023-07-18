@@ -34,8 +34,10 @@ def run_job(job_core_dto_dict: dict):
 
     job_core_dto: JobCoreDto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
 
-    if job_core_dto.executed_on.provider.name == ProviderName.IBM:
-        pilot: QiskitPilot = QiskitPilot("QP")
+    device = job_core_dto.executed_on
+    pilot: QiskitPilot = QiskitPilot("QP")
+
+    if device.provider.name == ProviderName.IBM:
         pilot.execute(job_core_dto)
     else:
         exception: Exception = ValueError("No valid Target specified")
@@ -43,7 +45,7 @@ def run_job(job_core_dto_dict: dict):
         raise exception
 
 
-def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = False) -> SimpleJobDto:
+def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = True) -> SimpleJobDto:
     """First creates a job to let it run afterwards on a pilot"""
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
