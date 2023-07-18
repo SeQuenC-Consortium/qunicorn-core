@@ -30,8 +30,6 @@ class QuantumProgramDto:
     assembler_language: AssemblerLanguage | None = None
     python_file_path: str | None = None
     python_file_metadata: str | None = None
-    python_file_options: dict | None = None
-    python_file_inputs: dict | None = None
 
 
 class QuantumProgramSchema(MaBaseSchema):
@@ -39,5 +37,3 @@ class QuantumProgramSchema(MaBaseSchema):
     assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
     python_file_path = ma.fields.String(required=False, example="test.py", allow_none=True)
     python_file_metadata = ma.fields.String(required=False, example="test.json", eallow_none=True)
-    python_file_options = ma.fields.Dict(required=False, example={"backend": "ibmq_qasm_simulator"}, allow_none=True)
-    python_file_inputs = ma.fields.Dict(required=False, allow_none=True)

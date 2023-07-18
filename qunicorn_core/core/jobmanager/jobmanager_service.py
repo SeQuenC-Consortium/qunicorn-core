@@ -18,6 +18,7 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobCoreDto,
     SimpleJobDto,
     JobResponseDto,
+    JobExecutionDto,
 )
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import job_mapper
@@ -42,23 +43,30 @@ def run_job(job_core_dto_dict: dict):
     return 0
 
 
-def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = True) -> SimpleJobDto:
+def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = False) -> SimpleJobDto:
     """First creates a job to let it run afterwards on a pilot"""
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
+
     serialized_job_core_dto = yaml.dump(job_core_dto)
     job_core_dto_dict = {"data": serialized_job_core_dto}
     run_job.delay(job_core_dto_dict) if asynchronous else run_job(job_core_dto_dict)
     return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, job_state=JobState.RUNNING)
 
 
-def run_job_by_id(job_id: int) -> SimpleJobDto:
+def run_job_by_id(job_id: int, job_execution_dto: JobExecutionDto, asynchronous: bool = False) -> SimpleJobDto:
     """Get job from DB, Save it as new job and run it with the new id"""
     job: JobDataclass = job_db_service.get_job(job_id)
-    job.id = None
-    new_job: JobDataclass = job_db_service.create_database_job(job)
-    job_core_dto: JobCoreDto = job_mapper.job_to_job_core_dto(new_job)
+    job_core_dto: JobCoreDto = job_mapper.job_to_job_core_dto(job)
+    job_core_dto.ibm_file_inputs = job_execution_dto.python_file_inputs
+    job_core_dto.ibm_file_options = job_execution_dto.python_file_options
+    job_core_dto.token = job_execution_dto.token
+
+    serialized_job_core_dto = yaml.dump(job_core_dto)
+    job_core_dto_dict = {"data": serialized_job_core_dto}
+    run_job.delay(job_core_dto_dict) if asynchronous else run_job(job_core_dto_dict)
+
     # TODO: run job
     return SimpleJobDto(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
 

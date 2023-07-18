@@ -73,3 +73,4 @@ class JobDataclass(DbModel):
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     data: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     parameters: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
+    ibm_cloud_id: Mapped[Optional[int]] = mapped_column(sql.INTEGER(), default=None, nullable=True)

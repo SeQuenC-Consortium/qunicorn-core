@@ -28,13 +28,7 @@ def deployment_dto_to_deployment(deployment: DeploymentDto) -> DeploymentDatacla
 
 
 def deployment_dto_to_deployment_without_id(deployment: DeploymentDto) -> DeploymentDataclass:
-    quantum_programs = []
-    for program in deployment.programs:
-        quantum_programs.append(
-            quantum_program_mapper.dto_to_quantum_program(program)
-            if program.id not in [None, 0]
-            else quantum_program_mapper.dto_to_quantum_program_without_id(program)
-        )
+    quantum_programs = [quantum_program_mapper.dto_to_quantum_program_without_id(program) for program in deployment.programs]
     return DeploymentDataclass(
         deployed_by=user_mapper.user_dto_to_user_without_id(deployment.deployed_by),
         programs=quantum_programs,

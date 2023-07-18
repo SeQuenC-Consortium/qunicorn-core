@@ -16,14 +16,13 @@
 from unittest.mock import Mock
 
 import yaml
+from qiskit_ibm_runtime import IBMRuntimeError
 
-from qunicorn_core.api.api_models import JobRequestDto, JobCoreDto, QuantumProgramDto
+from qunicorn_core.api.api_models import JobRequestDto, JobCoreDto
 from qunicorn_core.core.jobmanager.jobmanager_service import run_job
 from qunicorn_core.core.mapper import job_mapper
-from qunicorn_core.core.programmanager import programmanager_service
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
@@ -65,8 +64,8 @@ def test_celery_run_job(mocker):
         assert new_job.state == JobState.FINISHED
 
 
-def test_celery_run_job_for_ibm_upload(mocker):
-    """Testing the synchronous call of the run_job celery task for ibm file upload"""
+def test_job_ibm_upload(mocker):
+    """Testing the synchronous call of the upload of a file to IBM"""
     # GIVEN: Setting up Mocks and Environment
     mock = Mock()
     mock.upload_program.return_value = "test-id"
@@ -75,13 +74,8 @@ def test_celery_run_job_for_ibm_upload(mocker):
     mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
 
     app = set_up_env()
-
-    quantum_program_dto: QuantumProgramDto = QuantumProgramDto(**get_object_from_json("program_request_dto_test_data.json"))
-    with app.app_context():
-        result_program: QuantumProgramDataclass = programmanager_service.create_database_program(quantum_program_dto)
-    job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
-    job_request_dto.type = JobType.FILE
-    job_request_dto.program_ids = [result_program.id]
+    job_request_dto: JobRequestDto = JobRequestDto.from_dict(get_object_from_json("job_request_dto_test_data.json"))
+    job_request_dto.type = JobType.IBM_UPLOAD
 
     # WHEN: Executing method to be tested
     with app.app_context():
@@ -90,6 +84,42 @@ def test_celery_run_job_for_ibm_upload(mocker):
         job_core_dto.id = job.id
         serialized_job_core_dto = yaml.dump(job_core_dto)
         # Calling the Method to be tested synchronously
+        run_job({"data": serialized_job_core_dto})
+
+    # THEN: Test Assertion
+    with app.app_context():
+        new_job = job_db_service.get_job(job_core_dto.id)
+        assert new_job.state == JobState.READY
+
+
+def test_job_ibm_runner(mocker):
+    """Testing the synchronous call of the exeuction of an upload file to IBM"""
+    # GIVEN: Setting up Mocks and Environment
+    mock = Mock()
+    mock.upload_program.return_value = "test-id"
+    mock.run.side_effect = IBMRuntimeError
+    path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
+    mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
+
+    app = set_up_env()
+    job_request_dto: JobRequestDto = JobRequestDto.from_dict(get_object_from_json("job_request_dto_test_data.json"))
+    job_request_dto.type = JobType.IBM_UPLOAD
+
+    with app.app_context():
+        job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
+        job: JobDataclass = job_db_service.create_database_job(job_core_dto)
+        job_core_dto.id = job.id
+        serialized_job_core_dto = yaml.dump(job_core_dto)
+        # Calling the Method to be tested synchronously
+        run_job({"data": serialized_job_core_dto})
+
+    # WHEN: Executing method to be tested
+    with app.app_context():
+        job: JobDataclass = job_db_service.get_job(job_core_dto.id)
+        job_core: JobCoreDto = job_mapper.job_to_job_core_dto(job)
+        job_core.ibm_file_options = {"backend": "ibmq_qasm_simulator"}
+        job_core.ibm_file_inputs = {"my_obj": "MyCustomClass(my foo, my bar)"}
+        serialized_job_core_dto = yaml.dump(job_core)
         run_job({"data": serialized_job_core_dto})
 
     # THEN: Test Assertion

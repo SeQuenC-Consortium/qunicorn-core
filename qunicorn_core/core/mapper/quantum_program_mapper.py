@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import json
 
 from qunicorn_core.api.api_models import QuantumProgramDto
 from qunicorn_core.db.database_services import quantum_program_db_service
@@ -25,8 +24,6 @@ def dto_to_quantum_program(quantum_program: QuantumProgramDto) -> QuantumProgram
         program.assembler_language = quantum_program.assembler_language
         program.python_file_path = quantum_program.python_file_path
         program.python_file_metadata = quantum_program.python_file_metadata
-        program.python_file_options = quantum_program.python_file_options
-        program.python_file_inputs = quantum_program.python_file_inputs
     return program
 
 
@@ -36,8 +33,6 @@ def dto_to_quantum_program_without_id(quantum_program: QuantumProgramDto) -> Qua
         assembler_language=quantum_program.assembler_language,
         python_file_path=quantum_program.python_file_path,
         python_file_metadata=quantum_program.python_file_metadata,
-        python_file_options=json.dumps(quantum_program.python_file_options),
-        python_file_inputs=json.dumps(quantum_program.python_file_inputs),
     )
 
 
@@ -48,6 +43,4 @@ def quantum_program_to_dto(quantum_program: QuantumProgramDataclass) -> QuantumP
         assembler_language=quantum_program.assembler_language,
         python_file_path=quantum_program.python_file_path,
         python_file_metadata=quantum_program.python_file_metadata,
-        python_file_options=quantum_program.python_file_options,
-        python_file_inputs=quantum_program.python_file_inputs,
     )

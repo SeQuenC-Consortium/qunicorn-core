@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 import os
 from typing import List
 
@@ -20,7 +21,7 @@ from qiskit.providers import BackendV1
 from qiskit.quantum_info import SparsePauliOp
 from qiskit_ibm_provider import IBMProvider
 from qiskit_ibm_provider.api.exceptions import RequestsApiError
-from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob
+from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
 
 from qunicorn_core.api.api_models import JobCoreDto
 from qunicorn_core.core.mapper import result_mapper
@@ -30,6 +31,7 @@ from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
+from qunicorn_core.static.enums.result_type import ResultType
 
 
 class QiskitPilot(Pilot):
@@ -45,8 +47,10 @@ class QiskitPilot(Pilot):
             self.__estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
             self.__sample(job_core_dto)
-        elif job_core_dto.type == JobType.FILE:
-            self.__upload_and_run_program(job_core_dto)
+        elif job_core_dto.type == JobType.IBM_RUN:
+            self.__run_ibm_program(job_core_dto)
+        elif job_core_dto.type == JobType.IBM_UPLOAD:
+            self.__upload_program(job_core_dto)
         else:
             print("WARNING: No valid Job Type specified")
 
@@ -131,20 +135,34 @@ class QiskitPilot(Pilot):
         working_directory_path = os.path.abspath(os.getcwd())
         return working_directory_path + os.sep + "resources" + os.sep + "upload_files" + os.sep + file_name
 
-    def __upload_and_run_program(self, job_core_dto: JobCoreDto):
+    def __upload_program(self, job_core_dto: JobCoreDto):
         """Upload and then run a quantum program on the QiskitRuntimeService"""
-
         service = self.__get_runtime_service(job_core_dto)
         ibm_program_ids = []
         for program in job_core_dto.deployment.programs:
             python_file_path = self.__get_file_path_to_resources(program.python_file_path)
             python_file_metadata_path = self.__get_file_path_to_resources(program.python_file_metadata)
             ibm_program_ids.append(service.upload_program(python_file_path, python_file_metadata_path))
-        for ibm_program_id in ibm_program_ids:
-            options_dict: dict = program.python_file_options
-            input_dict: dict = program.python_file_inputs
-            service.run(ibm_program_id, inputs=input_dict, options=options_dict)
-        job_db_service.update_finished_job(job_core_dto.id, [])
+        job_core_dto.ibm_cloud_id = ibm_program_ids[0]
+        job_db_service.update_attribute(job_core_dto.id, job_core_dto.ibm_cloud_id, JobDataclass.ibm_cloud_id)
+        job_db_service.update_attribute(job_core_dto.id, JobType.IBM_RUN, JobDataclass.type)
+        job_db_service.update_attribute(job_core_dto.id, JobState.READY, JobDataclass.state)
+
+    def __run_ibm_program(self, job_core_dto: JobCoreDto):
+        service = self.__get_runtime_service(job_core_dto)
+        ibm_results = []
+        options_dict: dict = job_core_dto.ibm_file_options
+        input_dict: dict = job_core_dto.ibm_file_inputs
+
+        try:
+            result = service.run(job_core_dto.ibm_cloud_id, inputs=input_dict, options=options_dict).result()
+            ibm_results.extend(result_mapper.runner_result_to_db_results(result, job_core_dto))
+        except IBMRuntimeError:
+            logging.info("Error when accessing IBM, 403 CLient Error")
+
+        ibm_results.append(ResultDataclass(result_dict={"value": "403 Error when accessing"}, result_type=ResultType.ERROR))
+
+        job_db_service.update_finished_job(job_core_dto.id, ibm_results)
 
     @staticmethod
     def __get_runtime_service(job_core_dto) -> QiskitRuntimeService:

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import logging
 from datetime import datetime
 
 from qunicorn_core.api.api_models import ProviderDto
@@ -24,10 +23,8 @@ from qunicorn_core.api.api_models.job_dtos import (
 )
 from qunicorn_core.api.api_models.quantum_program_dtos import QuantumProgramDto
 from qunicorn_core.api.api_models.user_dtos import UserDto
-from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_mapper, quantum_program_mapper
-from qunicorn_core.db.database_services import quantum_program_db_service
+from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_mapper, result_mapper
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.programming_language import ProgrammingLanguage
@@ -38,18 +35,12 @@ def request_to_core(job: JobRequestDto):
     user = UserDto(id=0, name="default")
     provider = ProviderDto(id=0, with_token=True, supported_language=ProgrammingLanguage.QISKIT, name=job.provider_name)
     device = DeviceDto(id=0, provider=provider, url="DefaultUrl")
-    if job.type != JobType.FILE:
+    if job.type != JobType.IBM_UPLOAD and job.type != JobType.IBM_RUN:
         quantum_programs = [
             QuantumProgramDto(id=0, quantum_circuit=circuit, assembler_language=job.assembler_language) for circuit in job.circuits
         ]
     else:
-        quantum_programs = []
-        for program_id in job.program_ids:
-            program_from_db: QuantumProgramDataclass = quantum_program_db_service.get_program(program_id)
-            if program_from_db is not None:
-                quantum_programs.append(quantum_program_mapper.quantum_program_to_dto(program_from_db))
-            else:
-                logging.warning("No program of this id exists")
+        quantum_programs = job.programs
     deployment = DeploymentDto(id=0, deployed_by=user, programs=quantum_programs, name="DefaultDeployment", deployed_at=datetime.now())
 
     return JobCoreDto(
@@ -156,6 +147,7 @@ def job_to_job_core_dto(job: JobDataclass) -> JobCoreDto:
         finished_at=job.finished_at,
         name=job.name,
         data=job.data,
-        results=job.results,
+        results=[result_mapper.result_to_result_dto(result) for result in job.results],
         parameters=job.parameters,
+        ibm_cloud_id=job.ibm_cloud_id,
     )

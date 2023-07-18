@@ -27,4 +27,5 @@ class JobType(StrEnum):
     RUNNER = "RUNNER"
     SAMPLER = "SAMPLER"
     ESTIMATOR = "ESTIMATOR"
-    FILE = "FILE"
+    IBM_RUN = "IBM_RUN"
+    IBM_UPLOAD = "IBM_UPLOAD"

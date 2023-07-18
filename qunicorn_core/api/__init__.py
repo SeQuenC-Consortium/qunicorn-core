@@ -28,7 +28,6 @@ from .deployment_api import DEPLOYMENT_API
 from .device_api import DEVICES_API
 from .job_api import JOBMANAGER_API
 from .jwt import SECURITY_SCHEMES
-from .program_api.root import PROGRAM_API
 from .provider_api import PROVIDER_API
 from .user_api import USER_API
 from .flask_api_utils import MaBaseSchema
@@ -77,4 +76,3 @@ def register_root_api(app: Flask):
     API.register_blueprint(DEPLOYMENT_API)
     API.register_blueprint(PROVIDER_API)
     API.register_blueprint(USER_API)
-    API.register_blueprint(PROGRAM_API)

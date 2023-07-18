@@ -29,6 +29,8 @@ from ..api_models.job_dtos import (
     SimpleJobDto,
     JobResponseDto,
     SimpleJobDtoSchema,
+    JobExecutionDtoSchema,
+    JobExecutionDto,
 )
 from ...core.jobmanager import jobmanager_service
 
@@ -52,7 +54,7 @@ class JobIDView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, body):
         """Create/Register and run new job."""
-        job_dto: JobRequestDto = JobRequestDto(**body)
+        job_dto: JobRequestDto = JobRequestDto.from_dict(body)
         job_id: SimpleJobDto = jobmanager_service.create_and_run_job(job_dto)
         return jsonify(job_id), 200
 
@@ -79,12 +81,13 @@ class JobDetailView(MethodView):
 class JobRunView(MethodView):
     """Jobs endpoint for a single job."""
 
-    @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
+    @JOBMANAGER_API.arguments(JobExecutionDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, body, job_id: str):
         """Run a job execution via id. tbd"""
         print("Request: run job")
-        return jsonify(jobmanager_service.run_job_by_id(int(job_id))), 200
+        job_execution_dto: JobExecutionDto = JobExecutionDto(**body)
+        return jsonify(jobmanager_service.run_job_by_id(int(job_id), job_execution_dto)), 200
 
 
 @JOBMANAGER_API.route("/cancel/<string:job_id>/")
