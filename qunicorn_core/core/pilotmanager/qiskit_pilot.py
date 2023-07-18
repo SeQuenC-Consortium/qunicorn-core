@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import logging
 import os
 from typing import List
 
@@ -22,7 +21,6 @@ from qiskit.providers import BackendV1
 from qiskit.qasm import QasmError
 from qiskit.quantum_info import SparsePauliOp
 from qiskit_ibm_provider import IBMProvider
-from qiskit_ibm_provider.api.exceptions import RequestsApiError
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
 
 from qunicorn_core.api.api_models import JobCoreDto

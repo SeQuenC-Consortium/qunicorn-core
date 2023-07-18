@@ -59,7 +59,6 @@ class JobIDView(MethodView):
         return jsonify(simple_job), 200
 
 
-
 @JOBMANAGER_API.route("/<string:job_id>/")
 class JobDetailView(MethodView):
     """Jobs endpoint for a single job."""
