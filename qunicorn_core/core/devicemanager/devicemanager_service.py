@@ -27,10 +27,10 @@ awspilot = AWSPilot
 
 @CELERY.task()
 def update_devices(device_request: DeviceRequest):
-    """Get all backends"""
+    """Update all backends for the IBM provider"""
     IBMProvider.save_account(token=device_request.token, overwrite=True)
     devices = IBMProvider().backends()
-    all_devices = get_device_dict(devices)
+    all_devices: dict = get_device_dict(devices)
 
     update_devices_in_db(all_devices=all_devices)
 
@@ -38,7 +38,7 @@ def update_devices(device_request: DeviceRequest):
 
 
 def update_devices_in_db(all_devices: dict):
-    """Preformatting the device data to update/create device data in the database"""
+    """Preformatting the device data and update/create device data in the database"""
     for device in all_devices["all_devices"]:
         final_device: DeviceDataclass = DeviceDataclass(
             provider_id=device["provider_id"],
@@ -48,12 +48,12 @@ def update_devices_in_db(all_devices: dict):
             is_simulator=device["is_simulator"],
             provider=db_service.get_database_object(1, ProviderDataclass),
         )
-        db_service.update_device(final_device)
+        db_service.save_device_by_name(final_device)
 
 
 def get_device_dict(devices: [IBMBackend]) -> dict:
     """Create dict from retrieved list of devices"""
-    all_devices = {"all_devices": []}
+    all_devices: dict = {"all_devices": []}
     for device in devices:
         device_dict = {
             "name": device.name,

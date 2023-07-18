@@ -44,7 +44,7 @@ def get_database_object(db_object_id: int, database_object_class: DbModel) -> Db
     return session.get(database_object_class, db_object_id)
 
 
-def update_device(device: DeviceDataclass):
+def save_device_by_name(device: DeviceDataclass):
     """Updates device object in database if is exists and creates new entry if it doesn't exist"""
     successful = (
         session.query(DeviceDataclass)

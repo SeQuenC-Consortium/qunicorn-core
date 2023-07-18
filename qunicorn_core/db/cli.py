@@ -116,18 +116,20 @@ def load_db_function(app: Flask):
 def add_devices(provider: ProviderDataclass):
     root_dir = os.path.dirname(os.path.abspath(__file__))
     path_dir = "{}{}{}".format(root_dir, os.sep, "qunicorn_devices.json")
+
     with open(path_dir, "r", encoding="utf-8") as f:
         all_devices = json.load(f)
-        for device in all_devices["all_devices"]:
-            final_device: DeviceDataclass = DeviceDataclass(
-                provider_id=device["provider_id"],
-                num_qubits=device["num_qubits"],
-                device_name=device["name"],
-                url=device["url"],
-                is_simulator=device["is_simulator"],
-                provider=provider,
-            )
-            DB.session.add(final_device)
+
+    for device in all_devices["all_devices"]:
+        final_device: DeviceDataclass = DeviceDataclass(
+            provider_id=device["provider_id"],
+            num_qubits=device["num_qubits"],
+            device_name=device["name"],
+            url=device["url"],
+            is_simulator=device["is_simulator"],
+            provider=provider,
+        )
+        DB.session.add(final_device)
 
 
 @DB_CLI.command("drop-db")
