@@ -18,6 +18,7 @@
 """CLI functions for the db module."""
 import datetime
 import json
+import os
 
 import click
 from flask import Flask, Blueprint, current_app
@@ -113,7 +114,9 @@ def load_db_function(app: Flask):
 
 
 def add_devices(provider: ProviderDataclass):
-    with open("C:/Users/Nora Hengst/Projekte/qunicorn-core/qunicorn_core/db/qunicorn_devices.json", "r", encoding="utf-8") as f:
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    path_dir = "{}{}{}".format(root_dir, os.sep, "qunicorn_devices.json")
+    with open(path_dir, "r", encoding="utf-8") as f:
         all_devices = json.load(f)
         for device in all_devices["all_devices"]:
             final_device: DeviceDataclass = DeviceDataclass(
