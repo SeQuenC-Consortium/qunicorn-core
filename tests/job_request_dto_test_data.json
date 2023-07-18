@@ -11,5 +11,6 @@
   ],
   "token": "",
   "provider_name": "IBM",
-  "device_name": "aer_simulator"
+  "device_name": "aer_simulator",
+  "type": "RUNNER"
 }

@@ -40,21 +40,18 @@ class QiskitPilot(Pilot):
     def execute(self, job_core_dto: JobCoreDto):
         """Execute a job on an IBM backend using the Qiskit Pilot"""
 
-        if job_core_dto.executed_on.device_name == "aer_simulator":
-            self.__execute_on_aer_simulator(job_core_dto)
-        elif job_core_dto.type == JobType.RUNNER:
-            self.__run(job_core_dto)
+        if job_core_dto.type == JobType.RUNNER:
+            if job_core_dto.executed_on.device_name == "aer_simulator":
+                self.__execute_on_aer_simulator(job_core_dto)
+            else:
+                self.__run(job_core_dto)
         elif job_core_dto.type == JobType.ESTIMATOR:
             self.__estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
             self.__sample(job_core_dto)
         else:
             exception: Exception = ValueError("No valid Job Type specified")
-            job_db_service.update_finished_job(
-                job_core_dto.id,
-                result_mapper.get_error_results(exception),
-                JobState.ERROR
-            )
+            job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception), JobState.ERROR)
             raise exception
 
     def __execute_on_aer_simulator(self, job_dto: JobCoreDto):
@@ -69,10 +66,9 @@ class QiskitPilot(Pilot):
         results: list[ResultDataclass] = result_mapper.runner_result_to_db_results(result, job_dto)
         # AerCircuit is not serializable and needs to be removed
         for res in results:
-            res.meta_data.pop('circuit')
+            res.meta_data.pop("circuit")
         job_db_service.update_finished_job(job_id, results)
-        logging.info(
-            f"Run job with id {job_dto.id} locally on aer_simulator and get the result {results}")
+        logging.info(f"Run job with id {job_dto.id} locally on aer_simulator and get the result {results}")
 
     def __run(self, job_dto: JobCoreDto):
         """Run a job on an IBM backend using the Qiskit Pilot"""
@@ -84,8 +80,7 @@ class QiskitPilot(Pilot):
         ibm_result = job_from_ibm.result()
         results: list[ResultDataclass] = result_mapper.runner_result_to_db_results(ibm_result, job_dto)
         job_db_service.update_finished_job(job_dto.id, results)
-        logging.info(
-            f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
+        logging.info(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the Qiskit Pilot"""
@@ -96,8 +91,7 @@ class QiskitPilot(Pilot):
         ibm_result: SamplerResult = job_from_ibm.result()
         results: list[ResultDataclass] = result_mapper.sampler_result_to_db_results(ibm_result, job_dto)
         job_db_service.update_finished_job(job_dto.id, results)
-        logging.info(
-            f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
+        logging.info(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
 
     def __estimate(self, job_dto: JobCoreDto):
         """Uses the Estimator to execute a job on an IBM backend using the Qiskit Pilot"""
@@ -109,8 +103,7 @@ class QiskitPilot(Pilot):
         ibm_result: EstimatorResult = job_from_ibm.result()
         results: list[ResultDataclass] = result_mapper.estimator_result_to_db_results(ibm_result, job_dto, "IY")
         job_db_service.update_finished_job(job_dto.id, results)
-        logging.info(
-            f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
+        logging.info(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
 
     def __get_backend_circuits_and_id_for_qiskit_runtime(self, job_dto):
         """Instantiate all important configurations and updates the job_state"""
