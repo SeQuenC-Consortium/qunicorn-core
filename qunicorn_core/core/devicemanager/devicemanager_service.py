@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import yaml
 from qiskit_ibm_provider import IBMProvider, IBMBackend
 
 from qunicorn_core.api.api_models.device_dtos import DeviceRequest
@@ -56,15 +55,9 @@ def get_device_dict(devices: [IBMBackend]) -> dict:
     """Create dict from retrieved list of devices"""
     all_devices = {"all_devices": []}
     for device in devices:
-        # Simulators don't always have a number of qubits
-        try:
-            num_qubits = device.num_qubits
-        except:
-            num_qubits = -1
-
         device_dict = {
             "name": device.name,
-            "num_qubits": num_qubits,
+            "num_qubits": -1 if device.name.__contains__("stabilizer") else device.num_qubits,
             "url": "",
             "is_simulator": 1 if device.name.__contains__("simulator") else 0,
             "provider_id": 1,

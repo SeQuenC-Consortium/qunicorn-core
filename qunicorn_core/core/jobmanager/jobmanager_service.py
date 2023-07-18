@@ -56,7 +56,7 @@ def create_and_run_job(job_request_dto: JobRequestDto) -> SimpleJobDto:
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
     serialized_job_core_dto = yaml.dump(job_core_dto)
-    run_job.delay({"data": serialized_job_core_dto})
+    run_job({"data": serialized_job_core_dto})
     return SimpleJobDto(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
 
 
