@@ -57,7 +57,7 @@ class QiskitPilot(Pilot):
 
         job_db_service.update_attribute(job_id, JobState.RUNNING, JobDataclass.state)
         circuit = job_dto.deployment.quantum_program.quantum_circuit
-        backend = qiskit.Aer.get_backend('qasm_simulator')
+        backend = qiskit.Aer.get_backend("qasm_simulator")
         qasm_circ = QuantumCircuit().from_qasm_str(circuit)
         result = qiskit.execute([qasm_circ], backend=backend, shots=job_dto.shots).result()
 

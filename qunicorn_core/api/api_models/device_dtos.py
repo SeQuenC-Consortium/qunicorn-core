@@ -31,6 +31,7 @@ class DeviceDto:
     provider: ProviderDto | None = None
     url: str | None = None
 
+
 @dataclass
 class DeviceRequest:
     token: str

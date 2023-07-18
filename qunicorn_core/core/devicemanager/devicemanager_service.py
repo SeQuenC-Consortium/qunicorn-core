@@ -40,22 +40,22 @@ def update_devices(device_request: DeviceRequest):
 
 def update_devices_in_db(all_devices: dict):
     """Preformatting the device data to update/create device data in the database"""
-    for device in all_devices['all_devices']:
+    for device in all_devices["all_devices"]:
         final_device: DeviceDataclass = DeviceDataclass(
-            provider_id=device['provider_id'],
-            num_qubits=device['num_qubits'],
-            device_name=device['name'],
-            url=device['url'],
-            is_simulator=device['is_simulator'],
-            provider=db_service.get_database_object(1, ProviderDataclass))
+            provider_id=device["provider_id"],
+            num_qubits=device["num_qubits"],
+            device_name=device["name"],
+            url=device["url"],
+            is_simulator=device["is_simulator"],
+            provider=db_service.get_database_object(1, ProviderDataclass),
+        )
         db_service.update_device(final_device)
 
 
 def get_device_dict(devices: [IBMBackend]) -> dict:
     """Create dict from retrieved list of devices"""
-    all_devices = {'all_devices': []}
+    all_devices = {"all_devices": []}
     for device in devices:
-
         # Simulators don't always have a number of qubits
         try:
             num_qubits = device.num_qubits
@@ -63,13 +63,13 @@ def get_device_dict(devices: [IBMBackend]) -> dict:
             num_qubits = -1
 
         device_dict = {
-            'name': device.name,
-            'num_qubits': num_qubits,
-            'url': '',
-            'is_simulator': 1 if device.name.__contains__('simulator') else 0,
-            'provider_id': 1,
-            'provider': None
+            "name": device.name,
+            "num_qubits": num_qubits,
+            "url": "",
+            "is_simulator": 1 if device.name.__contains__("simulator") else 0,
+            "provider_id": 1,
+            "provider": None,
         }
-        all_devices['all_devices'].append(device_dict)
+        all_devices["all_devices"].append(device_dict)
 
     return all_devices

@@ -83,12 +83,7 @@ def get_quasm_string() -> str:
 def load_db_function(app: Flask):
     user = UserDataclass(name="DefaultUser")
     qc = QuantumProgramDataclass(quantum_circuit=get_quasm_string(), assembler_language=AssemblerLanguage.QASM)
-    deployment = DeploymentDataclass(
-        deployed_by=user,
-        quantum_program=qc,
-        deployed_at=datetime.datetime.now(),
-        name="DeploymentName"
-    )
+    deployment = DeploymentDataclass(deployed_by=user, quantum_program=qc, deployed_at=datetime.datetime.now(), name="DeploymentName")
     provider = ProviderDataclass(
         with_token=True,
         supported_language=ProgrammingLanguage.QISKIT,
@@ -113,17 +108,16 @@ def load_db_function(app: Flask):
 
 
 def add_devices(provider: ProviderDataclass):
-    with open('C:/Users/Nora Hengst/Projekte/qunicorn-core/qunicorn_core/db/qunicorn_devices.json', 'r',
-              encoding='utf-8') as f:
+    with open("C:/Users/Nora Hengst/Projekte/qunicorn-core/qunicorn_core/db/qunicorn_devices.json", "r", encoding="utf-8") as f:
         all_devices = json.load(f)
-        for device in all_devices['all_devices']:
+        for device in all_devices["all_devices"]:
             final_device: DeviceDataclass = DeviceDataclass(
-                provider_id=device['provider_id'],
-                num_qubits=device['num_qubits'],
-                device_name=device['name'],
-                url=device['url'],
-                is_simulator=device['is_simulator'],
-                provider=provider
+                provider_id=device["provider_id"],
+                num_qubits=device["num_qubits"],
+                device_name=device["name"],
+                url=device["url"],
+                is_simulator=device["is_simulator"],
+                provider=provider,
             )
             DB.session.add(final_device)
 
