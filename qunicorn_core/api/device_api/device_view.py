@@ -17,10 +17,32 @@
 
 from http import HTTPStatus
 
+from flask import jsonify
 from flask.views import MethodView
 
 from .root import DEVICES_API
-from ..api_models.device_dtos import DeviceDtoSchema, DeviceIDSchema
+from ..api_models.device_dtos import (
+    DeviceDtoSchema,
+    DeviceIDSchema,
+    DeviceRequestSchema,
+    DeviceRequest,
+)
+from ..api_models import RootSchema
+
+from ...core.devicemanager import devicemanager_service
+
+
+@DEVICES_API.route("/")
+class RootView(MethodView):
+    """Root endpoint of the device api, to list all available device_api."""
+
+    @DEVICES_API.arguments(DeviceRequestSchema(), location="json")
+    @DEVICES_API.response(HTTPStatus.OK, RootSchema())
+    def put(self, device_request_data):
+        """Update the devices and get the device information."""
+        device_request: DeviceRequest = DeviceRequest(**device_request_data)
+        all_devices = devicemanager_service.update_devices(device_request)
+        return jsonify(all_devices), 200
 
 
 @DEVICES_API.route("/<string:device_id>/")

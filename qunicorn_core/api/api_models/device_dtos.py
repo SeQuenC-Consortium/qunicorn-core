@@ -21,14 +21,19 @@ import marshmallow as ma
 from .provider_dtos import ProviderDto, ProviderDtoSchema
 from ..util import MaBaseSchema
 
-__all__ = ["DeviceDtoSchema", "DeviceIDSchema", "DeviceDto"]
+__all__ = ["DeviceDtoSchema", "DeviceIDSchema", "DeviceDto", "DeviceRequest", "DeviceRequestSchema"]
 
 
 @dataclass
 class DeviceDto:
     id: int
+    device_name: str
     provider: ProviderDto | None = None
     url: str | None = None
+
+@dataclass
+class DeviceRequest:
+    token: str
 
 
 class DeviceDtoSchema(MaBaseSchema):
@@ -37,13 +42,13 @@ class DeviceDtoSchema(MaBaseSchema):
     provider = ProviderDtoSchema()
 
 
+class DeviceRequestSchema(MaBaseSchema):
+    token = ma.fields.String(required=True, example="")
+
+
 class DeviceIDSchema(MaBaseSchema):
     device_type = ma.fields.String(required=True, allow_none=False)
     device_id = ma.fields.Integer(required=True, allow_none=False)
-
-
-class DevicesRequestSchema(MaBaseSchema):
-    pass
 
 
 class DevicesResponseSchema(MaBaseSchema):

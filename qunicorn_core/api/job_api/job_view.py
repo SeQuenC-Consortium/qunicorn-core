@@ -52,8 +52,8 @@ class JobIDView(MethodView):
     def post(self, new_job_data):
         """Create/Register and run new job."""
         job_dto: JobRequestDto = JobRequestDto(**new_job_data)
-        job_id: SimpleJobDto = jobmanager_service.create_and_run_job(job_dto)
-        return jsonify(job_id), 200
+        simple_job: SimpleJobDto = jobmanager_service.create_and_run_job(job_dto)
+        return jsonify(simple_job), 200
 
 
 @JOBMANAGER_API.route("/<string:job_id>/")

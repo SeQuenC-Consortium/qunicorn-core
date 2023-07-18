@@ -13,6 +13,7 @@
 # limitations under the License.
 from qunicorn_core.db import DB
 from qunicorn_core.db.models.db_model import DbModel
+from qunicorn_core.db.models.device import DeviceDataclass
 
 """Module containing all general database requests"""
 
@@ -42,6 +43,17 @@ def get_database_object(db_object_id: int, database_object_class: DbModel) -> Db
     """
     return session.get(database_object_class, db_object_id)
 
+
+def update_device(device: DeviceDataclass):
+    """Updates device object in database if is exists and creates new entry if it doesn't exist"""
+    successful = session.query(DeviceDataclass).filter(DeviceDataclass.device_name == device.device_name).update({
+        'num_qubits': device.num_qubits,
+        'provider_id': device.provider_id,
+        'is_simulator': device.is_simulator
+    })
+    if not successful:
+        session.add(device)
+    session.commit()
 
 def get_session():
     return session

@@ -39,8 +39,11 @@ def run_job(job_core_dto_dict: dict):
     job_core_dto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
 
     device = job_core_dto.executed_on
-    if device.provider.name == ProviderName.IBM:
-        pilot: QiskitPilot = qiskitpilot("QP")
+    pilot: QiskitPilot = qiskitpilot("QP")
+
+    if device.device_name == 'aer_simulator':
+        pilot.execute_on_aer_simulator(job_core_dto)
+    elif device.provider.name == ProviderName.IBM:
         pilot.execute(job_core_dto)
     else:
         print("No valid target specified")

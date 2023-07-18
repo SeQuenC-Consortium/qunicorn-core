@@ -49,6 +49,7 @@ class JobRequestDto:
     name: str
     circuit: str
     provider_name: str
+    device_name: str
     shots: int
     parameters: str
     token: str
@@ -119,6 +120,7 @@ class JobRequestDtoSchema(MaBaseSchema):
     name = ma.fields.String(required=True, example="JobName")
     circuit = CircuitField(required=True, example=get_quasm_string())
     provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
+    device_name = ma.fields.String(required=True, example="aer_simulator")
     shots = ma.fields.Int(
         required=False,
         allow_none=True,
