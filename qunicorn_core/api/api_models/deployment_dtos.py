@@ -16,12 +16,13 @@
 """Module containing all Dtos and their Schemas for tasks in the Deployment API."""
 from dataclasses import dataclass
 from datetime import datetime
+from typing import List
 
 import marshmallow as ma
 
-from .user_dtos import UserDto
 from .quantum_program_dtos import QuantumProgramDto
-from ..util import MaBaseSchema
+from .user_dtos import UserDto, UserDtoSchema
+from ..flask_api_utils import MaBaseSchema
 
 __all__ = ["DeploymentDtoSchema", "DeploymentDto"]
 
@@ -29,17 +30,17 @@ __all__ = ["DeploymentDtoSchema", "DeploymentDto"]
 @dataclass
 class DeploymentDto:
     id: int
-    deployed_by: UserDto | None = None
-    quantum_program: QuantumProgramDto | None = None
-    deployed_at: datetime | None = None
-    name: str | None = None
+    programs: List[QuantumProgramDto]
+    deployed_by: UserDto
+    deployed_at: datetime
+    name: str
 
 
 class DeploymentDtoSchema(MaBaseSchema):
-    uid = ma.fields.Integer(required=False, metadata={"descrption": "UID for the deployment_api"})
-    deployed_by = ma.fields.Integer(required=False, metadata={"descrption": "Id of the User"})
-    quantum_program = ma.fields.Integer(required=False, metadata={"descrption": "Id of the quantum program"})
-    deployed_at = ma.fields.Date(required=False, metadata={"descrption": "Time of Deployment"})
+    id = ma.fields.Integer(required=False, metadata={"description": "UID for the deployment_api"})
+    deployed_by = UserDtoSchema()
+    programs = ma.fields.List(ma.fields.Int, required=False, netadata={"description": "Ids of quantum programs"})
+    deployed_at = ma.fields.Date(required=False, metadata={"description": "Time of Deployment"})
     name = ma.fields.String(
         required=True,
         metadata={"description": "An optional Name for the deployment_api."},

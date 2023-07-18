@@ -19,7 +19,7 @@ from dataclasses import dataclass
 import marshmallow as ma
 
 from .provider_dtos import ProviderDto, ProviderDtoSchema
-from ..util import MaBaseSchema
+from ..flask_api_utils import MaBaseSchema
 
 __all__ = ["DeviceDtoSchema", "DeviceIDSchema", "DeviceDto", "DeviceRequest", "DeviceRequestSchema"]
 

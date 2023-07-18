@@ -13,8 +13,6 @@
 # limitations under the License.
 
 """"Test class to test the functionality of the job_api"""
-import json
-import os
 from unittest.mock import Mock
 
 import yaml
@@ -24,8 +22,10 @@ from qunicorn_core.core.jobmanager.jobmanager_service import run_job
 from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
-from tests.automated_tests.conftest import set_up_env
+from tests.conftest import set_up_env
+from tests.test_utils import get_object_from_json
 
 
 def test_celery_run_job(mocker):
@@ -33,27 +33,23 @@ def test_celery_run_job(mocker):
     # GIVEN: Setting up Mocks and Environment
     backend_mock = Mock()
     run_result_mock = Mock()
-    get_result_mock = Mock()
-    get_result_mock.get_counts.return_value = 1000
-    run_result_mock.result.return_value = get_result_mock
-    backend_mock.run.return_value = run_result_mock
 
-    mocker.patch("qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot._QiskitPilot__get_ibm_provider", return_value=backend_mock)
-    mocker.patch("qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot.transpile", return_value=(backend_mock, None))
+    run_result_mock.result.return_value = Mock()  # mocks the job_from_ibm.result() call
+    backend_mock.run.return_value = run_result_mock  # mocks the backend.run(transpiled, shots=job_dto.shots) call
+
+    path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
+    mocker.patch(f"{path_to_pilot}._QiskitPilot__get_ibm_provider_and_login", return_value=backend_mock)
+    mocker.patch(f"{path_to_pilot}.transpile", return_value=(backend_mock, None))
+
+    results: list[ResultDataclass] = [ResultDataclass(result_dict={"00": 4000})]
+    mocker.patch("qunicorn_core.core.mapper.result_mapper.runner_result_to_db_results", return_value=results)
 
     app = set_up_env()
-
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    file_name = "../job_test_data.json"
-    path_dir = "{}{}{}".format(root_dir, os.sep, file_name)
-
-    with open(path_dir) as f:
-        data = json.load(f)
+    job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
 
     # WHEN: Executing method to be tested
     with app.app_context():
-        job_dto: JobRequestDto = JobRequestDto(**data)
-        job_core_dto: JobCoreDto = job_mapper.request_to_core(job_dto)
+        job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
         job: JobDataclass = job_db_service.create_database_job(job_core_dto)
         job_core_dto.id = job.id
         serialized_job_core_dto = yaml.dump(job_core_dto)
@@ -62,5 +58,5 @@ def test_celery_run_job(mocker):
 
     # THEN: Test Assertion
     with app.app_context():
-        new_job = job_db_service.get_job(1)
+        new_job = job_db_service.get_job(job_core_dto.id)
         assert new_job.state == JobState.FINISHED

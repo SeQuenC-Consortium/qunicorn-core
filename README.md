@@ -10,15 +10,16 @@ This package uses Poetry ([documentation](https://python-poetry.org/docs/)).
 
 ## VSCode
 
-For vscode install the python extension and add the poetry venv path to the folders the python extension searches for venvs.
+For vscode install the python extension and add the poetry venv path to the folders the python extension searches for
+venvs.
 
 On linux:
 
 ```json
 {
-    "python.venvFolders": [
-        "~/.cache/pypoetry/virtualenvs"
-    ]
+  "python.venvFolders": [
+    "~/.cache/pypoetry/virtualenvs"
+  ]
 }
 ```
 
@@ -31,10 +32,35 @@ To override any variable create a `.env` file.
 Environment variables in `.env` take precedence over `.flaskenv`.
 See the content of the `.flaskenv` file for the default environment variables.
 
+The currently available endpoints are:
+* **POST /jobs/** *(Create/Register and run new job)*
+  * Needs a valid token to connect to IBM
+  * Runs asynchronously so the results are not shown in the api response  
+* **GET /jobs/{job_id}/** *(Get details/results of a job)*
+
 Run the development server with
 
 ```bash
 poetry run flask run
+```
+
+Start Docker, init the celery worker and then start it
+
+```bash
+poetry run invoke start-broker
+poetry run invoke worker
+```
+
+Create the initial database
+
+```bash
+flask create-and-load-db
+```
+
+Check Linting Errors
+
+```bash
+poetry run invoke check-linting
 ```
 
 ### Trying out the Template
@@ -51,27 +77,36 @@ Settings can be changed in the .flaskenv.
 
 Configured in `qunicorn_core/util/config/smorest_config.py`.
 
-   * Redoc (view only): <http://localhost:5005/redoc>
-   * Rapidoc: <http://localhost:5005/rapidoc>
-   * Swagger-UI: <http://localhost:5005/swagger-ui>
-   * OpenAPI Spec (JSON): <http://localhost:5005/api-spec.json>
+* Redoc (view only): <http://localhost:5005/redoc>
+* Rapidoc: <http://localhost:5005/rapidoc>
+* Swagger-UI: <http://localhost:5005/swagger-ui>
+* OpenAPI Spec (JSON): <http://localhost:5005/api-spec.json>
 
 #### Debug pages:
 
-  * Index: <http://localhost:5005/debug/>
-  * Registered Routes: <http://localhost:5005/debug/routes>\
-    Useful for looking up which endpoint is served under a route or what routes are available.
+* Index: <http://localhost:5005/debug/>
+* Registered Routes: <http://localhost:5005/debug/routes>\
+  Useful for looking up which endpoint is served under a route or what routes are available.
 
 #### Remarks
 
 For more detailed information about additional commands see the readme.md in docs.
 
-
 ## Disclaimer of Warranty
-Unless required by applicable law or agreed to in writing, Licensor provides the Work (and each Contributor provides its Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of using or redistributing the Work and assume any risks associated with Your exercise of permissions under this License.
+
+Unless required by applicable law or agreed to in writing, Licensor provides the Work (and each Contributor provides its
+Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including,
+without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of using or redistributing the Work
+and assume any risks associated with Your exercise of permissions under this License.
 
 ## Haftungsausschluss
-Dies ist ein Forschungsprototyp. Die Haftung für entgangenen Gewinn, Produktionsausfall, Betriebsunterbrechung, entgangene Nutzungen, Verlust von Daten und Informationen, Finanzierungsaufwendungen sowie sonstige Vermögens- und Folgeschäden ist, außer in Fällen von grober Fahrlässigkeit, Vorsatz und Personenschäden, ausgeschlossen.
+
+Dies ist ein Forschungsprototyp. Die Haftung für entgangenen Gewinn, Produktionsausfall, Betriebsunterbrechung,
+entgangene Nutzungen, Verlust von Daten und Informationen, Finanzierungsaufwendungen sowie sonstige Vermögens- und
+Folgeschäden ist, außer in Fällen von grober Fahrlässigkeit, Vorsatz und Personenschäden, ausgeschlossen.
 
 ## Acknowledgements
-The initial code contribution has been supported by the project [SeQuenC](https://www.iaas.uni-stuttgart.de/forschung/projekte/sequenc/).
+
+The initial code contribution has been supported by the
+project [SeQuenC](https://www.iaas.uni-stuttgart.de/forschung/projekte/sequenc/).

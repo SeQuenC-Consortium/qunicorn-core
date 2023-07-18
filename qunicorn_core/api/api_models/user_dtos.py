@@ -18,7 +18,7 @@ from dataclasses import dataclass
 
 import marshmallow as ma
 
-from ..util import MaBaseSchema
+from ..flask_api_utils import MaBaseSchema
 
 __all__ = ["UserDtoSchema", "UserDto"]
 

@@ -10,20 +10,20 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-from typing import Any, Dict, List, Optional, Tuple, Union
+import os
+import subprocess
+import sys
+from json import load
 from os import environ
-from tomli import load as load_toml
 from pathlib import Path
 from shutil import copyfile
-import subprocess
-from json import load
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+from tomli import load as load_toml
+
+sys.path.insert(0, os.path.abspath(".."))
 
 ON_READTHEDOCS = environ.get("READTHEDOCS") == "True"
-
 
 # -- Project information -----------------------------------------------------
 
@@ -80,10 +80,7 @@ with api_spec_path.open() as api_spec:
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-    "sphinxcontrib.redoc",
-    "sphinx_click",
-]
+extensions = ["sphinxcontrib.redoc", "sphinx_click", "sphinx.ext.autodoc"]
 
 autosectionlabel_prefix_document = False
 autosectionlabel_maxdepth = None
@@ -121,7 +118,6 @@ if sphinx_config.get("intersphinx-mapping", None):
     mapping = sphinx_config.get("intersphinx-mapping", None)
     intersphinx_mapping = {key: (val[0], val[1] if len(val) > 1 and val[1] else None) for key, val in mapping.items()}
 
-
 myst_enable_extensions: List[str] = []
 
 # enable markdown parsing
@@ -138,7 +134,6 @@ if sphinx_config.get("enable-markdown", False):
 
     source_suffix[".txt"] = "markdown"
     source_suffix[".md"] = "markdown"
-
 
 # enable sphinx githubpages
 if sphinx_config.get("enable-githubpages", False):
@@ -177,7 +172,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -191,8 +185,12 @@ if ON_READTHEDOCS:
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
-
+# html_static_path = ["_static"]
+html_logo = "images/qunicorn_vertical_website_version.png"
+html_theme_options = {
+    "logo_only": True,
+    "display_version": False,
+}
 
 # -- Further extension options -----------------------------------------------
 
@@ -227,7 +225,6 @@ allowed_md_extensions = {
 _heading_achors = _myst_options.get("heading_anchors", None)
 if _heading_achors and isinstance(_heading_achors, int) and _heading_achors > 0:
     myst_heading_anchors = _heading_achors
-
 
 _md_extensions = _myst_options.get("extensions", None)
 if _md_extensions and isinstance(_md_extensions, list):

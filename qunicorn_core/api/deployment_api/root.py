@@ -17,7 +17,7 @@
 
 from dataclasses import dataclass
 
-from ..util import SecurityBlueprint as SmorestBlueprint
+from ..flask_api_utils import SecurityBlueprint as SmorestBlueprint
 
 DEPLOYMENT_API = SmorestBlueprint(
     "deployment-api",

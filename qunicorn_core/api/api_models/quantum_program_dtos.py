@@ -15,9 +15,11 @@
 
 """Module containing all Dtos and their Schemas  for tasks in the QuantumProgram API."""
 from dataclasses import dataclass
+import marshmallow as ma
 
-__all__ = ["QuantumProgramDto"]
+__all__ = ["QuantumProgramDto", "QuantumProgramSchema"]
 
+from qunicorn_core.api.flask_api_utils import MaBaseSchema
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
 
@@ -26,3 +28,9 @@ class QuantumProgramDto:
     id: int
     quantum_circuit: str
     assembler_language: AssemblerLanguage
+
+
+class QuantumProgramSchema(MaBaseSchema):
+    id = ma.fields.Integer(required=True, allow_none=False)
+    quantum_circuit = ma.fields.String(required=False, allow_none=True)
+    assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)

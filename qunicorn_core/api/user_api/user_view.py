@@ -23,13 +23,12 @@ from .root import USER_API
 from ..api_models.user_dtos import UserDtoSchema
 
 
-@USER_API.route("/<string:users_id>/")
+@USER_API.route("/<string:user_id>/")
 class UserView(MethodView):
     """Users Endpoint to get properties of a specific user via ID."""
 
-    @USER_API.arguments(UserDtoSchema(), location="path")
     @USER_API.response(HTTPStatus.OK, UserDtoSchema())
-    def get(self):
+    def get(self, user_id):
         """Get information about a single user."""
 
         pass

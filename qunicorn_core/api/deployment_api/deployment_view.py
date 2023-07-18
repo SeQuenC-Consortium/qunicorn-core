@@ -29,14 +29,14 @@ class DeploymentIDView(MethodView):
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema())
     def get(self):
-        """Get pre-deployed job definition list."""
+        """Get deployed job definition list."""
 
         pass
 
     @DEPLOYMENT_API.arguments(DeploymentDtoSchema(), location="json")
-    @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema())
+    @DEPLOYMENT_API.response(HTTPStatus.CREATED, DeploymentDtoSchema())
     def post(self, new_task_data: dict):
-        """Deploy new Job-definition."""
+        """Create/Deploy new Job-definition."""
 
         pass
 
@@ -47,35 +47,35 @@ class DeploymentDetailView(MethodView):
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     def get(self, deployment_id: str):
-        """Get detailed information for single pre-deployed job-definitions."""
+        """Get detailed information for single deployed job-definition."""
 
         pass
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     def delete(self, deployment_id: str):
-        """Delete single pre-deployment_api."""
+        """Delete single deployment by ID."""
 
         pass
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
-    def put(self):
-        """Update single pre-deployment_api."""
+    def put(self, deployment_id: str):
+        """Update single deployment by ID."""
 
         pass
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
-    def patch(self):
-        """Update parts of a single pre-deployment_api."""
+    def patch(self, deployment_id: str):
+        """Update parts of a single deployment by ID."""
 
         pass
 
 
 @DEPLOYMENT_API.route("/<string:deployment_id>/jobs")
 class DeploymentDetailJobView(MethodView):
-    """API endpoint for running jobs of a single pre-deployment_api."""
+    """API endpoint for running jobs of a single deployment."""
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     def get(self, deployment_id: str):
-        """Get job definitions of a single pre-deployment_api."""
+        """Get job definitions of a single deployment."""
 
         pass

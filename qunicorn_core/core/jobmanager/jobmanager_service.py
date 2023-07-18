@@ -20,44 +20,42 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobResponseDto,
 )
 from qunicorn_core.celery import CELERY
-from qunicorn_core.core.mapper import job_mapper
-from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
+from qunicorn_core.core.mapper import job_mapper, result_mapper
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.provider_name import ProviderName
 
-qiskitpilot = QiskitPilot
-awspilot = AWSPilot
-
 
 @CELERY.task()
 def run_job(job_core_dto_dict: dict):
     """Assign the job to the target pilot which executes the job"""
 
-    job_core_dto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
+    job_core_dto: JobCoreDto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
 
     device = job_core_dto.executed_on
-    pilot: QiskitPilot = qiskitpilot("QP")
+    pilot: QiskitPilot = QiskitPilot("QP")
 
     if device.device_name == "aer_simulator":
         pilot.execute_on_aer_simulator(job_core_dto)
     elif device.provider.name == ProviderName.IBM:
         pilot.execute(job_core_dto)
     else:
-        print("No valid target specified")
-    return 0
+        exception: Exception = ValueError("No valid Target specified")
+        job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception), JobState.ERROR)
+        raise exception
 
 
-def create_and_run_job(job_request_dto: JobRequestDto) -> SimpleJobDto:
+def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = True) -> SimpleJobDto:
     """First creates a job to let it run afterwards on a pilot"""
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
     serialized_job_core_dto = yaml.dump(job_core_dto)
-    run_job({"data": serialized_job_core_dto})
-    return SimpleJobDto(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
+    job_core_dto_dict = {"data": serialized_job_core_dto}
+    run_job.delay(job_core_dto_dict) if asynchronous else run_job(job_core_dto_dict)
+    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, job_state=JobState.RUNNING)
 
 
 def run_job_by_id(job_id: int) -> SimpleJobDto:
@@ -66,8 +64,8 @@ def run_job_by_id(job_id: int) -> SimpleJobDto:
     job.id = None
     new_job: JobDataclass = job_db_service.create_database_job(job)
     job_core_dto: JobCoreDto = job_mapper.job_to_job_core_dto(new_job)
-    # TODO run job
-    return SimpleJobDto(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
+    # TODO: run job
+    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, job_state=JobState.RUNNING)
 
 
 def get_job(job_id: int) -> JobResponseDto:
@@ -90,3 +88,23 @@ def schedule_jobs():
 
 def send_job_to_pilot():
     """send job to pilot for execution after it is scheduled"""
+
+
+def pause_job_by_id(job_id):
+    """pause job execution"""
+    return "Not implemented yet"
+
+
+def cancel_job_by_id(job_id):
+    """cancel job execution"""
+    return "Not implemented yet"
+
+
+def delete_job_data_by_id(job_id):
+    """delete job data"""
+    return "Not implemented yet"
+
+
+def get_all_jobs():
+    """get all jobs from the db"""
+    return "Not implemented yet"

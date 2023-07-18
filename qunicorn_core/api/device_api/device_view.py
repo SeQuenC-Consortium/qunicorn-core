@@ -23,7 +23,6 @@ from flask.views import MethodView
 from .root import DEVICES_API
 from ..api_models.device_dtos import (
     DeviceDtoSchema,
-    DeviceIDSchema,
     DeviceRequestSchema,
     DeviceRequest,
 )
@@ -49,9 +48,8 @@ class RootView(MethodView):
 class DeviceView(MethodView):
     """Devices Endpoint to get properties of a specific device."""
 
-    @DEVICES_API.arguments(DeviceIDSchema(), location="path")
     @DEVICES_API.response(HTTPStatus.OK, DeviceDtoSchema())
-    def get(self):
+    def get(self, device_id):
         """Get information about a specific device."""
 
         pass
@@ -61,9 +59,8 @@ class DeviceView(MethodView):
 class DevicesStatusStatus(MethodView):
     """Devices Endpoint to get properties of a specific device."""
 
-    @DEVICES_API.arguments(DeviceIDSchema(), location="path")
     @DEVICES_API.response(HTTPStatus.OK, DeviceDtoSchema())
-    def get(self):
+    def get(self, device_id):
         """Get the status of a specific device."""
 
         pass
@@ -73,9 +70,8 @@ class DevicesStatusStatus(MethodView):
 class DevicesCalibrationView(MethodView):
     """Devices Endpoint to get properties of a specific device."""
 
-    @DEVICES_API.arguments(DeviceIDSchema(), location="path")
     @DEVICES_API.response(HTTPStatus.OK, DeviceDtoSchema())
-    def get(self):
+    def get(self, device_id):
         """Get calibration data for a specific device in a uniform way."""
 
         pass
@@ -86,7 +82,7 @@ class DevicesJobsView(MethodView):
     """Devices Endpoint to get properties of a specific device/service."""
 
     @DEVICES_API.response(HTTPStatus.OK, DeviceDtoSchema())
-    def get(self):
+    def get(self, device_id):
         """Get the active jobs of a device."""
 
         pass

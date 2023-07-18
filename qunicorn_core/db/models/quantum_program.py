@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import sqltypes as sql
 
@@ -26,7 +27,9 @@ class QuantumProgramDataclass(DbModel):
     Attributes:
         quantum_circuit (str): Quantum code that needs to be executed.
         assembler_language (enum): Assembler language in which the code should be interpreted
+        deployment_id (int): The deployment where a list of quantum program is used
     """
 
     quantum_circuit: Mapped[str] = mapped_column(sql.String(500), default=None)
-    assembler_language: Mapped[str] = mapped_column(sql.Enum(AssemblerLanguage), default=None)
+    assembler_language: Mapped[str] = mapped_column(sql.Enum(AssemblerLanguage), default=AssemblerLanguage.QASM)
+    deployment_id: Mapped[int] = mapped_column(ForeignKey("Deployment.id"), default=None)

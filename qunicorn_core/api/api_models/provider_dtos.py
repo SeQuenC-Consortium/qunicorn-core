@@ -18,7 +18,7 @@ from dataclasses import dataclass
 
 import marshmallow as ma
 
-from ..util import MaBaseSchema
+from ..flask_api_utils import MaBaseSchema
 
 __all__ = ["ProviderDtoSchema", "ProviderIDSchema", "ProviderDto"]
 
@@ -39,4 +39,4 @@ class ProviderDtoSchema(MaBaseSchema):
 
 
 class ProviderIDSchema(MaBaseSchema):
-    id = ma.fields.String(required=True, allow_none=False)
+    provider_id = ma.fields.String(required=True, allow_none=False)

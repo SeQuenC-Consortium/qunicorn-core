@@ -22,7 +22,7 @@ from flask.helpers import url_for
 from flask.views import MethodView
 
 from ..api_models import RootSchema
-from ..util import SecurityBlueprint as SmorestBlueprint
+from ..flask_api_utils import SecurityBlueprint as SmorestBlueprint
 
 USER_API = SmorestBlueprint(
     "user-api",
@@ -44,4 +44,4 @@ class RootView(MethodView):
     @USER_API.response(HTTPStatus.OK, RootSchema())
     def get(self):
         """Get the urls of the next endpoints of the users api to call."""
-        return RootData(root=url_for("user_api.UsersView", _external=True))
+        return RootData(root=url_for("user-api.UserView", user_id=1, _external=True))  # users_id=1 only a dummy value

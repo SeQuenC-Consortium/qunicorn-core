@@ -31,11 +31,13 @@ from .models.device import DeviceDataclass
 from .models.job import JobDataclass
 from .models.provider import ProviderDataclass
 from .models.quantum_program import QuantumProgramDataclass
+from .models.result import ResultDataclass
 from .models.user import UserDataclass
-from ..static.enums.assembler_languages import AssemblerLanguage
 from ..static.enums.job_state import JobState
+from ..static.enums.job_type import JobType
 from ..static.enums.programming_language import ProgrammingLanguage
 from ..static.enums.provider_name import ProviderName
+from ..util import utils
 from ..util.logging import get_logger
 
 DB_CLI_BLP = Blueprint("db_cli", __name__, cli_group=None)
@@ -82,8 +84,9 @@ def get_quasm_string() -> str:
 
 def load_db_function(app: Flask):
     user = UserDataclass(name="DefaultUser")
-    qc = QuantumProgramDataclass(quantum_circuit=get_quasm_string(), assembler_language=AssemblerLanguage.QASM)
-    deployment = DeploymentDataclass(deployed_by=user, quantum_program=qc, deployed_at=datetime.datetime.now(), name="DeploymentName")
+    qc = QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(1))
+    qc2 = QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(2))
+    deployment = DeploymentDataclass(deployed_by=user, programs=[qc, qc2], deployed_at=datetime.datetime.now(), name="DeploymentName")
     provider = ProviderDataclass(
         with_token=True,
         supported_language=ProgrammingLanguage.QISKIT,
@@ -98,8 +101,10 @@ def load_db_function(app: Flask):
         progress=0,
         state=JobState.READY,
         shots=4000,
+        type=JobType.RUNNER,
         started_at=datetime.datetime.now(),
         name="JobName",
+        results=[ResultDataclass(result_dict={"0x": "550", "1x": "450"})],
     )
     add_devices(provider=provider)
     DB.session.add(job)
