@@ -36,6 +36,7 @@ def test_create_and_run_runner():
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
+    job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
@@ -55,6 +56,7 @@ def test_create_and_run_sampler():
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
     job_request_dto.type = JobType.SAMPLER
+    job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
@@ -74,6 +76,7 @@ def test_create_and_run_estimator():
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
     job_request_dto.type = JobType.ESTIMATOR
+    job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():

@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   qunicorn_core.db.database_services
    qunicorn_core.db.models
 
 Submodules

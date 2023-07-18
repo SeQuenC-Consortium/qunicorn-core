@@ -21,7 +21,7 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobExecutionDto,
 )
 from qunicorn_core.celery import CELERY
-from qunicorn_core.core.mapper import job_mapper
+from qunicorn_core.core.mapper import job_mapper, result_mapper
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
@@ -35,12 +35,15 @@ def run_job(job_core_dto_dict: dict):
 
     job_core_dto: JobCoreDto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
 
-    if job_core_dto.executed_on.provider.name == ProviderName.IBM:
-        pilot: QiskitPilot = QiskitPilot("QP")
+    device = job_core_dto.executed_on
+    pilot: QiskitPilot = QiskitPilot("QP")
+
+    if device.provider.name == ProviderName.IBM:
         pilot.execute(job_core_dto)
     else:
-        print("WARNING: No valid target specified")
-    return 0
+        exception: Exception = ValueError("No valid Target specified")
+        job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception), JobState.ERROR)
+        raise exception
 
 
 def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = False) -> SimpleJobDto:
@@ -68,7 +71,7 @@ def run_job_by_id(job_id: int, job_execution_dto: JobExecutionDto, asynchronous:
     run_job.delay(job_core_dto_dict) if asynchronous else run_job(job_core_dto_dict)
 
     # TODO: run job
-    return SimpleJobDto(id=str(job_core_dto.id), name=job_core_dto.name, job_state=JobState.RUNNING)
+    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, job_state=JobState.RUNNING)
 
 
 def get_job(job_id: int) -> JobResponseDto:

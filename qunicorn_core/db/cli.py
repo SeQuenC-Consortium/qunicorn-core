@@ -17,6 +17,8 @@
 
 """CLI functions for the db module."""
 import datetime
+import json
+import os
 
 import click
 from flask import Flask, Blueprint, current_app
@@ -91,6 +93,7 @@ def load_db_function(app: Flask):
         supported_language=ProgrammingLanguage.QISKIT,
         name=ProviderName.IBM,
     )
+    # TODO delete default device since devices are loaded into db from start
     device = DeviceDataclass(provider=provider, url="")
     job = JobDataclass(
         executed_by=user,
@@ -104,9 +107,29 @@ def load_db_function(app: Flask):
         name="JobName",
         results=[ResultDataclass(result_dict={"0x": "550", "1x": "450"})],
     )
+    add_devices(provider=provider)
     DB.session.add(job)
     DB.session.commit()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
+
+
+def add_devices(provider: ProviderDataclass):
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    path_dir = "{}{}{}".format(root_dir, os.sep, "qunicorn_devices.json")
+
+    with open(path_dir, "r", encoding="utf-8") as f:
+        all_devices = json.load(f)
+
+    for device in all_devices["all_devices"]:
+        final_device: DeviceDataclass = DeviceDataclass(
+            provider_id=device["provider_id"],
+            num_qubits=device["num_qubits"],
+            device_name=device["name"],
+            url=device["url"],
+            is_simulator=device["is_simulator"],
+            provider=provider,
+        )
+        DB.session.add(final_device)
 
 
 @DB_CLI.command("drop-db")

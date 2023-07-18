@@ -17,6 +17,7 @@
 from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.util import logging
 
 
 def get_device_with_name(provider_name: str) -> DeviceDataclass:
@@ -24,6 +25,6 @@ def get_device_with_name(provider_name: str) -> DeviceDataclass:
     devices: list[DeviceDataclass] = db_service.get_session().query(DeviceDataclass).filter(ProviderDataclass.name == provider_name).all()
 
     if len(devices) != 1:
-        print(f"WARNING: There exists multiple or zero devices with the same name {provider_name}")
+        logging.warn(f"There exists multiple or zero devices with the same name {provider_name}")
 
     return devices[0]

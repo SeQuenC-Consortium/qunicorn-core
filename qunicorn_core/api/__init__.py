@@ -26,11 +26,11 @@ from flask_smorest import Api, Blueprint as SmorestBlueprint
 
 from .deployment_api import DEPLOYMENT_API
 from .device_api import DEVICES_API
+from .flask_api_utils import MaBaseSchema
 from .job_api import JOBMANAGER_API
 from .jwt import SECURITY_SCHEMES
 from .provider_api import PROVIDER_API
 from .user_api import USER_API
-from .flask_api_utils import MaBaseSchema
 
 """A single API instance. All api versions should be blueprints."""
 API = Api(spec_kwargs={"title": "QUNICORN_API", "version": "v1"})

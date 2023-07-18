@@ -14,7 +14,6 @@
 
 
 """Module containing the routes of the job manager API."""
-
 from http import HTTPStatus
 
 from flask import jsonify
@@ -33,6 +32,7 @@ from ..api_models.job_dtos import (
     JobExecutionDto,
 )
 from ...core.jobmanager import jobmanager_service
+from ...util import logging
 
 
 @JOBMANAGER_API.route("/")
@@ -51,12 +51,13 @@ class JobIDView(MethodView):
         ]
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
-    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
+    @JOBMANAGER_API.response(HTTPStatus.CREATED, SimpleJobDtoSchema())
     def post(self, body):
         """Create/Register and run new job."""
         job_dto: JobRequestDto = JobRequestDto.from_dict(body)
-        job_id: SimpleJobDto = jobmanager_service.create_and_run_job(job_dto)
-        return jsonify(job_id), 200
+        simple_job: SimpleJobDto = jobmanager_service.create_and_run_job(job_dto)
+        return jsonify(simple_job), 200
+
 
 
 @JOBMANAGER_API.route("/<string:job_id>/")
@@ -85,7 +86,7 @@ class JobRunView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, body, job_id: str):
         """Run a job execution via id. tbd"""
-        print("Request: run job")
+        logging.info("Request: run job")
         job_execution_dto: JobExecutionDto = JobExecutionDto(**body)
         return jsonify(jobmanager_service.run_job_by_id(int(job_id), job_execution_dto)), 200
 
@@ -98,7 +99,7 @@ class JobCancelView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, body, job_id: str):
         """Cancel a job execution via id."""
-        print("Request: cancel job")
+        logging.info("Request: cancel job")
 
         return jsonify(jobmanager_service.cancel_job_by_id(job_id)), 200
 
@@ -111,6 +112,6 @@ class JobPauseView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, body, job_id: str):
         """Pause a job via id."""
-        print("Request: pause job")
+        logging.info("Request: pause job")
 
         return jsonify(jobmanager_service.pause_job_by_id(job_id)), 200

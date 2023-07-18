@@ -136,6 +136,15 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
 
         register_debug_routes(app)
 
+    # To display the errors differently in the swagger ui
+    @app.errorhandler(Exception)
+    def handle_internal_server_error(error):
+        return {
+            "code": 500 if not hasattr(error, "status_code") else error.status_code,
+            "error": type(error).__name__,
+            "message": str(error),
+        }
+
     return app
 
 

@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import traceback
+
 from qiskit.primitives import EstimatorResult, SamplerResult
 from qiskit.result import Result
 
@@ -66,3 +68,16 @@ def result_to_result_dto(result: ResultDataclass) -> ResultDto:
     return ResultDto(
         id=result.id, circuit=result.circuit, results=result.result_dict, header=result.meta_data, result_type=result.result_type
     )
+
+
+def get_error_results(exception: Exception, circuit: str | None = None) -> list[ResultDataclass]:
+    exception_message: str = str(exception)
+    stack_trace: str = traceback.format_exc()
+    return [
+        ResultDataclass(
+            result_type=ResultType.ERROR,
+            circuit=circuit,
+            result_dict={"exception_message": exception_message},
+            meta_data={"stack_trace": stack_trace},
+        )
+    ]
