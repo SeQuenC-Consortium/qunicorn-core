@@ -36,6 +36,7 @@ def test_invalid_token():
     # GIVEN: Create JobRequestDto with an invalid token
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
+    job_request_dto.device_name = "ibmq_qasm_simulator"
     job_request_dto.token = "Invalid Token"
 
     # WHEN: Executing create and run
@@ -54,6 +55,7 @@ def test_invalid_circuit():
     # GIVEN: Create JobRequestDto with an invalid circuit
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
+    job_request_dto.device_name = "ibmq_qasm_simulator"
     job_request_dto.circuits[0] = "Invalid Circuit"
 
     # WHEN: Executing create and run
@@ -72,6 +74,7 @@ def test_invalid_token_for_sampler():
     # GIVEN: Create JobRequestDto with an invalid token and job type sampler
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
+    job_request_dto.device_name = "ibmq_qasm_simulator"
     job_request_dto.token = "Invalid Token"
     job_request_dto.type = JobType.SAMPLER
 
