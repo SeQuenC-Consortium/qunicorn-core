@@ -36,6 +36,7 @@ __all__ = [
     "JobCoreDto",
     "JobResponseDto",
     "JobRequestDto",
+    "JobExecutionDto",
 ]
 
 from ...static.enums.assembler_languages import AssemblerLanguage

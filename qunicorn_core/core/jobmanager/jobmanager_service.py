@@ -13,7 +13,13 @@
 # limitations under the License.
 import yaml
 
-from qunicorn_core.api.api_models.job_dtos import (JobRequestDto, JobCoreDto, SimpleJobDto, JobResponseDto, JobExecutionDto, )
+from qunicorn_core.api.api_models.job_dtos import (
+    JobRequestDto,
+    JobCoreDto,
+    SimpleJobDto,
+    JobResponseDto,
+    JobExecutionDto,
+)
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import job_mapper, result_mapper
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
