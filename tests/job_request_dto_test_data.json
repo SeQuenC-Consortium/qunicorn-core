@@ -1,16 +1,24 @@
 {
-  "assembler_language": "QASM",
   "name": "JobName",
+  "provider_name": "IBM",
+  "type": "RUNNER",
+  "assembler_language": "QASM",
+  "token": "f96dff891c6f5d7a403c2c510003febbce8e4ea59e5d47207d2b9ce7614aaec46f68f3c75d29b6c7e3621914b844d88093e608a833258f46ae8e9f56b0ff8163",
+  "programs": [
+    {
+      "quantum_circuit": "",
+      "assembler_language": "QASM",
+      "python_file_metadata": "test.json",
+      "python_file_path": "test.py"
+    }
+  ],
+  "parameters": [
+    0
+  ],
+  "device_name": "aer_simulator",
   "circuits": [
     "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncreg meas[2];\nh q[0];\ncx q[0],q[1];\nbarrier q[0],q[1];\nmeasure q[0] -> meas[0];\nmeasure q[1] -> meas[1];\n",
     "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncreg meas[2];\nh q[0];\nh q[0];\ncx q[0],q[1];\nbarrier q[0],q[1];\nmeasure q[0] -> meas[0];\nmeasure q[1] -> meas[1];\n"
   ],
-  "shots": 4000,
-  "parameters": [
-    0
-  ],
-  "token": "",
-  "provider_name": "IBM",
-  "device_name": "aer_simulator",
-  "type": "RUNNER"
+  "shots": 4000
 }

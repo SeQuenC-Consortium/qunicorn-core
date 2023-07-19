@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from datetime import datetime
 
 from qunicorn_core.api.api_models import ProviderDto
@@ -24,7 +23,7 @@ from qunicorn_core.api.api_models.job_dtos import (
 )
 from qunicorn_core.api.api_models.quantum_program_dtos import QuantumProgramDto
 from qunicorn_core.api.api_models.user_dtos import UserDto
-from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_mapper
+from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_mapper, result_mapper
 from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.job import JobDataclass
@@ -149,7 +148,7 @@ def job_to_job_core_dto(job: JobDataclass) -> JobCoreDto:
         finished_at=job.finished_at,
         name=job.name,
         data=job.data,
-        results=job.results,
+        results=[result_mapper.result_to_result_dto(result) for result in job.results],
         parameters=job.parameters,
     )
 
@@ -164,7 +163,8 @@ def job_to_request(job: JobDataclass) -> JobRequestDto:
         token="",
         type=job.type,
         assembler_language=job.deployment.programs[0].assembler_language,
-        deployment_id=job.deployment.id)
+        deployment_id=job.deployment.id,
+        device_name=job.executed_on.device_name)
 
 
 def job_to_simple(job: JobDataclass) -> SimpleJobDto:

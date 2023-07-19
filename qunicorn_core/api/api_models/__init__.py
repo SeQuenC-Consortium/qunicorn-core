@@ -24,3 +24,4 @@ from .provider_dtos import *
 from .root import *
 from .user_dtos import *
 from .quantum_program_dtos import *
+from .result_dtos import *

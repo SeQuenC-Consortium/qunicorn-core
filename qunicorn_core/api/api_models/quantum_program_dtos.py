@@ -18,7 +18,7 @@ from dataclasses import dataclass
 
 import marshmallow as ma
 
-__all__ = ["QuantumProgramDto", "QuantumProgramRequestDto", "QuantumProgramRequestSchema", "QuantumProgramDtoSchema"]
+__all__ = ["QuantumProgramDto", "QuantumProgramRequestDto", "QuantumProgramRequestDtoSchema", "QuantumProgramDtoSchema"]
 
 from qunicorn_core.api.flask_api_utils import MaBaseSchema
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
@@ -27,9 +27,11 @@ from qunicorn_core.util import utils
 
 @dataclass
 class QuantumProgramDto:
-    id: int
-    quantum_circuit: str
-    assembler_language: AssemblerLanguage
+    id: int | None = None
+    quantum_circuit: str | None = None
+    assembler_language: AssemblerLanguage | None = None
+    python_file_path: str | None = None
+    python_file_metadata: str | None = None
 
 
 @dataclass
@@ -38,12 +40,14 @@ class QuantumProgramRequestDto:
     assembler_language: AssemblerLanguage
 
 
-class QuantumProgramRequestSchema(MaBaseSchema):
+class QuantumProgramRequestDtoSchema(MaBaseSchema):
     quantum_circuit = ma.fields.String(required=True, allow_none=True, example=utils.get_default_qasm_string())
     assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
 
 
 class QuantumProgramDtoSchema(MaBaseSchema):
-    id = ma.fields.Integer(required=True, dump_only=True)
-    quantum_circuit = ma.fields.String(required=True, dump_only=True)
-    assembler_language = ma.fields.Enum(required=True, enum=AssemblerLanguage, dump_only=True)
+    quantum_circuit = ma.fields.String(required=False, allow_none=True)
+    assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
+    python_file_path = ma.fields.String(required=False, example="ibm_upload_test_data_file.py", allow_none=True)
+    python_file_metadata = ma.fields.String(required=False, example="ibm_upload_test_data_metadata.json",
+                                            eallow_none=True)

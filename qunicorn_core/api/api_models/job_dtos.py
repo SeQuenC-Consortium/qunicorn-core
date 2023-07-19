@@ -14,6 +14,7 @@
 
 
 """Module containing all Dtos and their Schemas for tasks in the Jobmanager API."""
+import typing
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -22,6 +23,7 @@ from marshmallow import fields, ValidationError
 
 from .deployment_dtos import DeploymentDto
 from .device_dtos import DeviceDto, DeviceDtoSchema
+from .quantum_program_dtos import QuantumProgramDto
 from .result_dtos import ResultDto
 from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
@@ -35,6 +37,8 @@ __all__ = [
     "JobResponseDto",
     "JobRequestDto",
     "TokenSchema",
+    "JobExecutionDto",
+    "JobExecutionDtoSchema",
 ]
 
 from ...static.enums.assembler_languages import AssemblerLanguage
@@ -50,7 +54,6 @@ class JobRequestDto:
     """JobDto that was sent from the user as a request"""
 
     name: str
-    circuits: list[str] | None
     provider_name: str
     device_name: str
     shots: int
@@ -59,6 +62,14 @@ class JobRequestDto:
     type: JobType
     assembler_language: AssemblerLanguage
     deployment_id: int
+    programs: typing.List["QuantumProgramDto"] | None = None
+    circuits: list[str] | None = None
+
+    @staticmethod
+    def from_dict(body: dict) -> "JobRequestDto":
+        job_dto: JobRequestDto = JobRequestDto(**body)
+        job_dto.programs = [QuantumProgramDto(**program) for program in body["programs"]]
+        return job_dto
 
 
 @dataclass
@@ -79,6 +90,8 @@ class JobCoreDto:
     data: str
     results: list[ResultDto]
     parameters: str
+    ibm_file_options: dict | None = None
+    ibm_file_inputs: dict | None = None
     token: str | None = None
 
 
@@ -107,6 +120,13 @@ class SimpleJobDto:
     job_state: JobState = JobState.RUNNING
 
 
+@dataclass
+class JobExecutionDto:
+    token: str | None = None
+    python_file_options: str | None = None
+    python_file_inputs: str | None = None
+
+
 class CircuitField(fields.Field):
     def _deserialize(self, value, attr, data, **kwargs):
         if isinstance(value, str) or isinstance(value, list):
@@ -121,6 +141,7 @@ class JobRequestDtoSchema(MaBaseSchema):
                             allow_none=True,
                             example=[utils.get_default_qasm_string(), utils.get_default_qasm_string(2)],
                             metadata={"description": "This field is deprecated, please use deployments instead. "})
+    programs = ma.fields.Nested("QuantumProgramSchema", many=True)
     provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     device_name = ma.fields.String(required=True, example="aer_simulator")
     shots = ma.fields.Int(
@@ -160,5 +181,11 @@ class SimpleJobDtoSchema(MaBaseSchema):
     job_state = ma.fields.String(required=False, allow_none=False, dump_only=True)
 
 
-class TokenSchema(MaBaseSchema):
+class TokenSchema(MaBaseSchema):  # TODO woanders hin ?
     token = ma.fields.String(required=True, example="")
+
+
+class JobExecutionDtoSchema(MaBaseSchema):
+    token = ma.fields.String(required=True, example="")
+    python_file_options = ma.fields.Dict(required=True, example={"backend": "ibmq_qasm_simulator"})
+    python_file_inputs = ma.fields.Dict(required=True)

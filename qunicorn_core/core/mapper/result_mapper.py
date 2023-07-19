@@ -16,7 +16,7 @@ import traceback
 from qiskit.primitives import EstimatorResult, SamplerResult
 from qiskit.result import Result
 
-from qunicorn_core.api.api_models import JobCoreDto
+from qunicorn_core.api.api_models import JobCoreDto, ResultDto
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.result_type import ResultType
 
@@ -64,6 +64,12 @@ def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto)
             )
         )
     return result_dtos
+
+
+def result_to_result_dto(result: ResultDataclass) -> ResultDto:
+    return ResultDto(
+        id=result.id, circuit=result.circuit, result_dict=result.result_dict, header=result.meta_data, result_type=result.result_type
+    )
 
 
 def get_error_results(exception: Exception, circuit: str | None = None) -> list[ResultDataclass]:

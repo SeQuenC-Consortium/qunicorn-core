@@ -25,7 +25,10 @@ from ..api_models.job_dtos import (
     JobResponseDtoSchema,
     JobRequestDto,
     JobResponseDto,
-    SimpleJobDtoSchema, TokenSchema,
+    TokenSchema,
+    SimpleJobDtoSchema,
+    JobExecutionDtoSchema,
+    JobExecutionDto,
 )
 from ...core.jobmanager import jobmanager_service
 from ...util import logging
@@ -59,9 +62,8 @@ class JobDetailView(MethodView):
         job_response_dto: JobResponseDto = jobmanager_service.get_job(int(job_id))
         return jsonify(job_response_dto), 200
 
-    @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
-    def delete(self, body, job_id: str):
+    def delete(self, job_id: str):
         """Delete job data via id."""
 
         return jsonify(jobmanager_service.delete_job_data_by_id(job_id))
@@ -71,12 +73,25 @@ class JobDetailView(MethodView):
 class JobRunView(MethodView):
     """Jobs endpoint for a single job."""
 
+    @JOBMANAGER_API.arguments(JobExecutionDtoSchema(), location="json")
+    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
+    def post(self, body, job_id: int):
+        """Run job on IBM that was previously Uploaded."""
+        logging.info("Request: run job")
+        job_execution_dto: JobExecutionDto = JobExecutionDto(**body)
+        return jsonify(jobmanager_service.run_job_by_id(int(job_id), job_execution_dto)), 200
+
+
+@JOBMANAGER_API.route("/rerun/<string:job_id>/")
+class JobRunView(MethodView):
+    """Jobs endpoint for a single job."""
+
     @JOBMANAGER_API.arguments(TokenSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, body, job_id: int):
         """Create a new job on basis of an existing job and execute it."""
         logging.info("Request: run job")
-        return jsonify(jobmanager_service.run_job_by_id(job_id, body["token"]))
+        return jsonify(jobmanager_service.re_run_job_by_id(job_id, body["token"]))
 
 
 @JOBMANAGER_API.route("/cancel/<string:job_id>/")

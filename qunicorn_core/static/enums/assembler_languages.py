@@ -21,7 +21,9 @@ class AssemblerLanguage(StrEnum):
     Values:
         QASM: Standard assembler format from IBM
         BRAKET: Assembler format from AWS
+        PYTHON: Python language for IBM File Upload
     """
 
     QASM = "QASM"
     BRAKET = "BRAKET"
+    PYTHON = "PYTHON"

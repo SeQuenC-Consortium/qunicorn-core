@@ -21,7 +21,7 @@ from qiskit.providers import BackendV1
 from qiskit.qasm import QasmError
 from qiskit.quantum_info import SparsePauliOp
 from qiskit_ibm_provider import IBMProvider
-from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob
+from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
 
 from qunicorn_core.api.api_models import JobCoreDto
 from qunicorn_core.core.mapper import result_mapper
@@ -31,6 +31,7 @@ from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
+from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.util import logging
 
 
@@ -49,6 +50,10 @@ class QiskitPilot(Pilot):
             self.__estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
             self.__sample(job_core_dto)
+        elif job_core_dto.type == JobType.IBM_RUN:
+            self.__run_ibm_program(job_core_dto)
+        elif job_core_dto.type == JobType.IBM_UPLOAD:
+            self.__upload_program(job_core_dto)
         else:
             exception: Exception = ValueError("No valid Job Type specified")
             job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception), JobState.ERROR)
@@ -159,6 +164,48 @@ class QiskitPilot(Pilot):
         circuits: list[QuantumCircuit] = self.__get_circuits_as_QuantumCircuits(job_dto)
         backend = provider.get_backend(job_dto.executed_on.device_name)
         transpiled = transpile(circuits, backend=backend)
-
         logging.info("Transpiled quantum circuit(s) for a specific IBM backend")
         return backend, transpiled
+
+    @staticmethod
+    def __get_file_path_to_resources(file_name):
+        working_directory_path = os.path.abspath(os.getcwd())
+        return working_directory_path + os.sep + "resources" + os.sep + "upload_files" + os.sep + file_name
+
+    def __upload_program(self, job_core_dto: JobCoreDto):
+        """Upload and then run a quantum program on the QiskitRuntimeService"""
+        service = self.__get_runtime_service(job_core_dto)
+        ibm_program_ids = []
+        for program in job_core_dto.deployment.programs:
+            python_file_path = self.__get_file_path_to_resources(program.python_file_path)
+            python_file_metadata_path = self.__get_file_path_to_resources(program.python_file_metadata)
+            ibm_program_ids.append(service.upload_program(python_file_path, python_file_metadata_path))
+        job_db_service.update_attribute(job_core_dto.id, JobType.IBM_RUN, JobDataclass.type)
+        job_db_service.update_attribute(job_core_dto.id, JobState.READY, JobDataclass.state)
+        ibm_results = [ResultDataclass(result_dict={"ibm_job_id": ibm_program_ids[0]}, result_type=ResultType.UPLOAD_SUCCESSFUL)]
+        job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.READY)
+
+    def __run_ibm_program(self, job_core_dto: JobCoreDto):
+        service = self.__get_runtime_service(job_core_dto)
+        ibm_results = []
+        options_dict: dict = job_core_dto.ibm_file_options
+        input_dict: dict = job_core_dto.ibm_file_inputs
+
+        try:
+            result = service.run(job_core_dto.results[0].result_dict["ibm_job_id"], inputs=input_dict, options=options_dict).result()
+            ibm_results.extend(result_mapper.runner_result_to_db_results(result, job_core_dto))
+        except IBMRuntimeError as exception:
+            logging.info("Error when accessing IBM, 403 CLient Error")
+            ibm_results.append(ResultDataclass(result_dict={"value": "403 Error when accessing"}, result_type=ResultType.ERROR))
+            job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.ERROR)
+            raise exception
+        job_db_service.update_finished_job(job_core_dto.id, ibm_results)
+
+    @staticmethod
+    def __get_runtime_service(job_core_dto) -> QiskitRuntimeService:
+        if job_core_dto.token == "" and os.getenv("IBM_TOKEN") is not None:
+            job_core_dto.token = os.getenv("IBM_TOKEN")
+
+        service = QiskitRuntimeService(token=None, channel=None, filename=None, name=None)
+        service.save_account(token=job_core_dto.token, channel="ibm_quantum", overwrite=True)
+        return service
