@@ -13,13 +13,7 @@
 # limitations under the License.
 import yaml
 
-from qunicorn_core.api.api_models.job_dtos import (
-    JobRequestDto,
-    JobCoreDto,
-    SimpleJobDto,
-    JobResponseDto,
-    JobExecutionDto,
-)
+from qunicorn_core.api.api_models.job_dtos import (JobRequestDto, JobCoreDto, SimpleJobDto, JobResponseDto, JobExecutionDto, )
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import job_mapper, result_mapper
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
@@ -46,7 +40,7 @@ def run_job(job_core_dto_dict: dict):
         raise exception
 
 
-def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = False) -> SimpleJobDto:
+def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = True) -> SimpleJobDto:
     """First creates a job to let it run afterwards on a pilot"""
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
@@ -58,7 +52,7 @@ def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = Fals
     return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, job_state=JobState.RUNNING)
 
 
-def run_job_by_id(job_id: int, job_execution_dto: JobExecutionDto, asynchronous: bool = False) -> SimpleJobDto:
+def run_job_by_id(job_id: int, job_execution_dto: JobExecutionDto, asynchronous: bool = True) -> SimpleJobDto:
     """Get job from DB, Save it as new job and run it with the new id"""
     job: JobDataclass = job_db_service.get_job(job_id)
     job_core_dto: JobCoreDto = job_mapper.job_to_job_core_dto(job)
@@ -70,7 +64,6 @@ def run_job_by_id(job_id: int, job_execution_dto: JobExecutionDto, asynchronous:
     job_core_dto_dict = {"data": serialized_job_core_dto}
     run_job.delay(job_core_dto_dict) if asynchronous else run_job(job_core_dto_dict)
 
-    # TODO: run job
     return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, job_state=JobState.RUNNING)
 
 

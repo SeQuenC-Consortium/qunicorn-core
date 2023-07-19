@@ -15,6 +15,7 @@
 """"Test class to test the functionality of the job_api"""
 from unittest.mock import Mock
 
+import pytest
 import yaml
 from qiskit_ibm_runtime import IBMRuntimeError
 
@@ -97,7 +98,7 @@ def test_job_ibm_runner(mocker):
     """Testing the synchronous call of the exeuction of an upload file to IBM"""
     # GIVEN: Setting up Mocks and Environment
     mock = Mock()
-    mock.upload_program.return_value = "test-id"
+    mock.upload_program.return_value = "test-id"  # Returning an id value after uploading a file to IBM
     mock.run.side_effect = IBMRuntimeError
     path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
     mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
@@ -121,9 +122,10 @@ def test_job_ibm_runner(mocker):
         job_core.ibm_file_options = {"backend": "ibmq_qasm_simulator"}
         job_core.ibm_file_inputs = {"my_obj": "MyCustomClass(my foo, my bar)"}
         serialized_job_core_dto = yaml.dump(job_core)
-        run_job({"data": serialized_job_core_dto})
+        with pytest.raises(IBMRuntimeError):
+            run_job({"data": serialized_job_core_dto})
 
     # THEN: Test Assertion
     with app.app_context():
         new_job = job_db_service.get_job(job_core_dto.id)
-        assert new_job.state == JobState.FINISHED
+        assert new_job.state == JobState.ERROR

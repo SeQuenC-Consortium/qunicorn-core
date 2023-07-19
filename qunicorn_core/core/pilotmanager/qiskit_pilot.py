@@ -194,15 +194,18 @@ class QiskitPilot(Pilot):
         try:
             result = service.run(job_core_dto.ibm_cloud_id, inputs=input_dict, options=options_dict).result()
             ibm_results.extend(result_mapper.runner_result_to_db_results(result, job_core_dto))
-        except IBMRuntimeError:
+        except IBMRuntimeError as exception:
             logging.info("Error when accessing IBM, 403 CLient Error")
-
-        ibm_results.append(ResultDataclass(result_dict={"value": "403 Error when accessing"}, result_type=ResultType.ERROR))
-
+            ibm_results.append(ResultDataclass(result_dict={"value": "403 Error when accessing"}, result_type=ResultType.ERROR))
+            job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.ERROR)
+            raise exception
         job_db_service.update_finished_job(job_core_dto.id, ibm_results)
 
     @staticmethod
     def __get_runtime_service(job_core_dto) -> QiskitRuntimeService:
+        if job_core_dto.token == "" and os.getenv("IBM_TOKEN") is not None:
+            job_core_dto.token = os.getenv("IBM_TOKEN")
+
         service = QiskitRuntimeService(token=None, channel=None, filename=None, name=None)
         service.save_account(token=job_core_dto.token, channel="ibm_quantum", overwrite=True)
         return service
