@@ -180,10 +180,10 @@ class QiskitPilot(Pilot):
             python_file_path = self.__get_file_path_to_resources(program.python_file_path)
             python_file_metadata_path = self.__get_file_path_to_resources(program.python_file_metadata)
             ibm_program_ids.append(service.upload_program(python_file_path, python_file_metadata_path))
-        job_core_dto.ibm_cloud_id = ibm_program_ids[0]
-        job_db_service.update_attribute(job_core_dto.id, job_core_dto.ibm_cloud_id, JobDataclass.ibm_cloud_id)
         job_db_service.update_attribute(job_core_dto.id, JobType.IBM_RUN, JobDataclass.type)
         job_db_service.update_attribute(job_core_dto.id, JobState.READY, JobDataclass.state)
+        ibm_results = [ResultDataclass(result_dict={"ibm_job_id": ibm_program_ids[0]}, result_type=ResultType.UPLOAD_SUCCESSFUL)]
+        job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.READY)
 
     def __run_ibm_program(self, job_core_dto: JobCoreDto):
         service = self.__get_runtime_service(job_core_dto)
@@ -192,7 +192,7 @@ class QiskitPilot(Pilot):
         input_dict: dict = job_core_dto.ibm_file_inputs
 
         try:
-            result = service.run(job_core_dto.ibm_cloud_id, inputs=input_dict, options=options_dict).result()
+            result = service.run(job_core_dto.results[0].result_dict["ibm_job_id"], inputs=input_dict, options=options_dict).result()
             ibm_results.extend(result_mapper.runner_result_to_db_results(result, job_core_dto))
         except IBMRuntimeError as exception:
             logging.info("Error when accessing IBM, 403 CLient Error")

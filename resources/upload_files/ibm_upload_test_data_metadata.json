@@ -1,5 +1,5 @@
 {
-  "name": "test_data",
+  "name": "hello",
   "description": "A sample runtime program.",
   "max_execution_time": 300,
   "spec": {

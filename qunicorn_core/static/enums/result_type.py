@@ -30,6 +30,7 @@ class ResultType(StrEnum):
     QUASI_DIST = "QUASI_DIST"
     VALUE_AND_VARIANCE = "VALUE_AND_VARIANCE"
     ERROR = "ERROR"
+    UPLOAD_SUCCESSFUL = "UPLOAD_SUCCESSFUL"
 
     @staticmethod
     def get_result_type(job_type: JobType):

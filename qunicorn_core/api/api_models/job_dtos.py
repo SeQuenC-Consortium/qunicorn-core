@@ -21,22 +21,15 @@ from datetime import datetime
 import marshmallow as ma
 from marshmallow import fields, ValidationError
 
-from .quantum_program_dtos import QuantumProgramDto
 from .deployment_dtos import DeploymentDto
 from .device_dtos import DeviceDto, DeviceDtoSchema
+from .quantum_program_dtos import QuantumProgramDto
 from .result_dtos import ResultDto
 from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
-__all__ = [
-    "SimpleJobDtoSchema",
-    "SimpleJobDto",
-    "JobResponseDtoSchema",
-    "JobRequestDtoSchema",
-    "JobCoreDto",
-    "JobResponseDto",
-    "JobRequestDto",
-]
+__all__ = ["SimpleJobDtoSchema", "SimpleJobDto", "JobResponseDtoSchema", "JobRequestDtoSchema", "JobCoreDto", "JobResponseDto",
+    "JobRequestDto", ]
 
 from ...static.enums.assembler_languages import AssemblerLanguage
 
@@ -86,7 +79,6 @@ class JobCoreDto:
     data: str
     results: list[ResultDto]
     parameters: str
-    ibm_cloud_id: str | None = None
     ibm_file_options: dict | None = None
     ibm_file_inputs: dict | None = None
     token: str | None = None
@@ -138,16 +130,8 @@ class JobRequestDtoSchema(MaBaseSchema):
     programs = ma.fields.Nested("QuantumProgramSchema", many=True)
     provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     device_name = ma.fields.String(required=True, example="aer_simulator")
-    shots = ma.fields.Int(
-        required=False,
-        allow_none=True,
-        metadata={
-            "label": "Shots",
-            "description": "Number of shots",
-            "input_type": "number",
-        },
-        example=4000,
-    )
+    shots = ma.fields.Int(required=False, allow_none=True,
+        metadata={"label": "Shots", "description": "Number of shots", "input_type": "number", }, example=4000, )
     parameters = ma.fields.List(ma.fields.Float(), required=False)
     token = ma.fields.String(required=True, example="")
     type = ma.fields.Enum(required=True, example=JobType.RUNNER, enum=JobType)
