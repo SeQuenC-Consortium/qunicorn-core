@@ -37,7 +37,9 @@ def get_object_from_json(json_file_name: str):
 
 
 def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, with_circuits=False):
-    deployment_request: DeploymentRequestDto = get_test_deployment_circuits() if with_circuits else get_test_deployment()
+    deployment_request: DeploymentRequestDto = (
+        get_test_deployment_circuits() if with_circuits else get_test_deployment()
+    )
     deployment: DeploymentDto = deployment_service.create_deployment(deployment_request)
     job_request_dto.deployment_id = deployment.id
 
