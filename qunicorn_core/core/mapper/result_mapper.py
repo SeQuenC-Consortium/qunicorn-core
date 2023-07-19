@@ -28,8 +28,7 @@ def runner_result_to_db_results(ibm_result: Result, job_dto: JobCoreDto) -> list
         counts: dict = ibm_result.results[i].data.counts
         circuit: str = job_dto.deployment.programs[i].quantum_circuit
         result_dtos.append(
-            ResultDataclass(circuit=circuit, result_dict=counts, result_type=ResultType.COUNTS,
-                            meta_data=ibm_result.results[i].to_dict())
+            ResultDataclass(circuit=circuit, result_dict=counts, result_type=ResultType.COUNTS, meta_data=ibm_result.results[i].to_dict())
         )
     return result_dtos
 

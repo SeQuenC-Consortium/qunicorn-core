@@ -28,9 +28,7 @@ def dto_to_quantum_program(quantum_program: QuantumProgramDto) -> QuantumProgram
 
 
 def request_to_quantum_program(quantum_program: QuantumProgramRequestDto) -> QuantumProgramDataclass:
-    return QuantumProgramDataclass(
-        quantum_circuit=quantum_program.quantum_circuit, assembler_language=quantum_program.assembler_language
-    )
+    return QuantumProgramDataclass(quantum_circuit=quantum_program.quantum_circuit, assembler_language=quantum_program.assembler_language)
 
 
 def dto_to_quantum_program_without_id(quantum_program: QuantumProgramDto) -> QuantumProgramDataclass:

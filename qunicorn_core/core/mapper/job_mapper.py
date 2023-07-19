@@ -19,7 +19,8 @@ from qunicorn_core.api.api_models.device_dtos import DeviceDto
 from qunicorn_core.api.api_models.job_dtos import (
     JobCoreDto,
     JobRequestDto,
-    JobResponseDto, SimpleJobDto,
+    JobResponseDto,
+    SimpleJobDto,
 )
 from qunicorn_core.api.api_models.quantum_program_dtos import QuantumProgramDto
 from qunicorn_core.api.api_models.user_dtos import UserDto
@@ -165,11 +166,9 @@ def job_to_request(job: JobDataclass) -> JobRequestDto:
         type=job.type,
         assembler_language=job.deployment.programs[0].assembler_language,
         deployment_id=job.deployment.id,
-        device_name=job.executed_on.device_name)
+        device_name=job.executed_on.device_name,
+    )
 
 
 def job_to_simple(job: JobDataclass) -> SimpleJobDto:
-    return SimpleJobDto(
-        id=job.id,
-        name=job.name,
-        job_state=job.state)
+    return SimpleJobDto(id=job.id, name=job.name, job_state=job.state)

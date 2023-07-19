@@ -137,10 +137,12 @@ class CircuitField(fields.Field):
 
 class JobRequestDtoSchema(MaBaseSchema):
     name = ma.fields.String(required=True, example="JobName")
-    circuits = CircuitField(required=False,
-                            allow_none=True,
-                            example=[utils.get_default_qasm_string(), utils.get_default_qasm_string(2)],
-                            metadata={"description": "This field is deprecated, please use deployments instead. "})
+    circuits = CircuitField(
+        required=False,
+        allow_none=True,
+        example=[utils.get_default_qasm_string(), utils.get_default_qasm_string(2)],
+        metadata={"description": "This field is deprecated, please use deployments instead. "},
+    )
     programs = ma.fields.Nested(QuantumProgramDtoSchema(many=True))
     provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     device_name = ma.fields.String(required=True, example="aer_simulator")
