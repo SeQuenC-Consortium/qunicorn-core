@@ -50,7 +50,7 @@ def update_attribute(job_id: int, attribute_value, attribute_name):
 
 def update_finished_job(job_id: int, results: list[ResultDataclass], job_state: JobState = JobState.FINISHED):
     """Updates the attributes state and results of the job with the id job_id"""
-    job: JobDataclass = get(job_id)
+    job: JobDataclass = get_job(job_id)
     job.finished_at = datetime.datetime.now()
     job.progress = 100
     job.results = results
@@ -58,7 +58,7 @@ def update_finished_job(job_id: int, results: list[ResultDataclass], job_state: 
     db_service.save_database_object(job)
 
 
-def get(job_id: int) -> JobDataclass:
+def get_job(job_id: int) -> JobDataclass:
     """Gets the job with the job_id from the database"""
     return db_service.get_database_object(job_id, JobDataclass)
 

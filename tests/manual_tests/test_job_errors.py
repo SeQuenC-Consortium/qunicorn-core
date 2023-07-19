@@ -90,7 +90,7 @@ def test_invalid_token_for_sampler():
 
 
 def job_finished_with_error() -> bool:
-    job: JobDataclass = job_db_service.get(EXPECTED_ID)
+    job: JobDataclass = job_db_service.get_job(EXPECTED_ID)
     is_job_state_error: bool = job.state == JobState.ERROR
     is_result_type_error: bool = job.results[0].result_type == ResultType.ERROR
     is_progress_hundred: bool = job.progress == JOB_FINISHED_PROGRESS

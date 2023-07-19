@@ -63,7 +63,7 @@ def test_celery_run_job(mocker):
 
     # THEN: Test Assertion
     with app.app_context():
-        new_job = job_db_service.get(job_core_dto.id)
+        new_job = job_db_service.get_job(job_core_dto.id)
         assert new_job.state == JobState.FINISHED
 
 
@@ -94,7 +94,7 @@ def test_job_ibm_upload(mocker):
 
     # THEN: Test Assertion
     with app.app_context():
-        new_job = job_db_service.get(job_core_dto.id)
+        new_job = job_db_service.get_job(job_core_dto.id)
         assert new_job.state == JobState.READY
 
 
@@ -124,7 +124,7 @@ def test_job_ibm_runner(mocker):
 
     # WHEN: Executing method to be tested
     with app.app_context():
-        job: JobDataclass = job_db_service.get(job_core_dto.id)
+        job: JobDataclass = job_db_service.get_job(job_core_dto.id)
         job_core: JobCoreDto = job_mapper.job_to_job_core_dto(job)
         job_core.ibm_file_options = {"backend": "ibmq_qasm_simulator"}
         job_core.ibm_file_inputs = {"my_obj": "MyCustomClass(my foo, my bar)"}
@@ -134,5 +134,5 @@ def test_job_ibm_runner(mocker):
 
     # THEN: Test Assertion
     with app.app_context():
-        new_job = job_db_service.get(job_core_dto.id)
+        new_job = job_db_service.get_job(job_core_dto.id)
         assert new_job.state == JobState.ERROR
