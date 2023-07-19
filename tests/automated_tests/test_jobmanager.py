@@ -78,6 +78,8 @@ def test_job_ibm_upload(mocker):
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto.from_dict(get_object_from_json("job_request_dto_test_data.json"))
     job_request_dto.type = JobType.IBM_UPLOAD
+    job_request_dto.device_name = "ibmq_qasm_simulator"
+    job_request_dto.circuits = []
 
     # WHEN: Executing method to be tested
     with app.app_context():
@@ -106,6 +108,8 @@ def test_job_ibm_runner(mocker):
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto.from_dict(get_object_from_json("job_request_dto_test_data.json"))
     job_request_dto.type = JobType.IBM_UPLOAD
+    job_request_dto.device_name = "ibmq_qasm_simulator"
+    job_request_dto.circuits = []
 
     with app.app_context():
         job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)

@@ -90,7 +90,7 @@ class JobRunView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, body, job_id: int):
         """Create a new job on basis of an existing job and execute it."""
-        logging.info("Request: run job")
+        logging.info("Request: re run job")
         return jsonify(jobmanager_service.re_run_job_by_id(job_id, body["token"]))
 
 

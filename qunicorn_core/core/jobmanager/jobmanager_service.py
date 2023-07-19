@@ -46,7 +46,7 @@ def run_job(job_core_dto_dict: dict):
         raise exception
 
 
-def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = True) -> SimpleJobDto:
+def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = False) -> SimpleJobDto:
     """First creates a job to let it run afterwards on a pilot"""
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
@@ -66,7 +66,7 @@ def re_run_job_by_id(job_id: int, token: str) -> SimpleJobDto:
     return create_and_run_job(job_request)
 
 
-def run_job_by_id(job_id: int, job_execution_dto: JobExecutionDto, asynchronous: bool = True) -> SimpleJobDto:
+def run_job_by_id(job_id: int, job_execution_dto: JobExecutionDto, asynchronous: bool = False) -> SimpleJobDto:
     """Get uploaded job from DB, and run it on a provider"""
     job: JobDataclass = job_db_service.get(job_id)
     job_core_dto: JobCoreDto = job_mapper.job_to_job_core_dto(job)

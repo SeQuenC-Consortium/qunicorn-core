@@ -36,6 +36,7 @@ def request_to_core(job: JobRequestDto):
     user = UserDto(id=0, name="default")
     provider = ProviderDto(id=0, with_token=True, supported_language=ProgrammingLanguage.QISKIT, name=job.provider_name)
     device = DeviceDto(id=0, device_name=job.device_name, provider=provider, url="DefaultUrl")
+
     if job.circuits is None or len(job.circuits) == 0:
         deployment = deployment_mapper.deployment_to_deployment_dto(db_service.get_database_object(job.deployment_id, DeploymentDataclass))
     else:

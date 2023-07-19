@@ -38,16 +38,20 @@ class QuantumProgramDto:
 class QuantumProgramRequestDto:
     quantum_circuit: str
     assembler_language: AssemblerLanguage
+    python_file_path: str | None = None
+    python_file_metadata: str | None = None
 
 
 class QuantumProgramRequestDtoSchema(MaBaseSchema):
     quantum_circuit = ma.fields.String(required=True, allow_none=True, example=utils.get_default_qasm_string())
     assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
+    python_file_path = ma.fields.String(required=False, example="ibm_upload_test_data_file.py", allow_none=True)
+    python_file_metadata = ma.fields.String(required=False, example="ibm_upload_test_data_metadata.json", allow_none=True)
 
 
 class QuantumProgramDtoSchema(MaBaseSchema):
-    quantum_circuit = ma.fields.String(required=False, allow_none=True)
-    assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
-    python_file_path = ma.fields.String(required=False, example="ibm_upload_test_data_file.py", allow_none=True)
-    python_file_metadata = ma.fields.String(required=False, example="ibm_upload_test_data_metadata.json",
-                                            eallow_none=True)
+    id = ma.fields.Int(required=True, dump_only=True)
+    quantum_circuit = ma.fields.String(required=False, dump_only=True)
+    assembler_language = ma.fields.Enum(required=True, dump_only=True, enum=AssemblerLanguage)
+    python_file_path = ma.fields.String(required=False, dump_only=True)
+    python_file_metadata = ma.fields.String(required=False, dump_only=True)

@@ -23,7 +23,7 @@ from marshmallow import fields, ValidationError
 
 from .deployment_dtos import DeploymentDto
 from .device_dtos import DeviceDto, DeviceDtoSchema
-from .quantum_program_dtos import QuantumProgramDto
+from .quantum_program_dtos import QuantumProgramDto, QuantumProgramDtoSchema
 from .result_dtos import ResultDto
 from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
@@ -141,7 +141,7 @@ class JobRequestDtoSchema(MaBaseSchema):
                             allow_none=True,
                             example=[utils.get_default_qasm_string(), utils.get_default_qasm_string(2)],
                             metadata={"description": "This field is deprecated, please use deployments instead. "})
-    programs = ma.fields.Nested("QuantumProgramSchema", many=True)
+    programs = ma.fields.Nested(QuantumProgramDtoSchema(many=True))
     provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     device_name = ma.fields.String(required=True, example="aer_simulator")
     shots = ma.fields.Int(
