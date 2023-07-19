@@ -96,8 +96,7 @@ class JobCancelView(MethodView):
     def post(self, body, job_id: str):
         """TBD: Cancel a job execution via id."""
         logging.info("Request: cancel job")
-        os.environ.update("EXECUTE_CELERY_TASK_ASYNCHRONOUS")
-        os.environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS")  # return jsonify(jobmanager_service.cancel_job_by_id(job_id))
+        logging.warn(os.environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS"))  # return jsonify(jobmanager_service.cancel_job_by_id(job_id))
 
 
 @JOBMANAGER_API.route("/pause/<string:job_id>/")
