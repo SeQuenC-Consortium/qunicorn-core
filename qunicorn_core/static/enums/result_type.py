@@ -24,6 +24,8 @@ class ResultType(StrEnum):
         COUNTS: Classical result of a RUNNER
         QUASI_DIST: Classical result of an ESTIMATOR
         VALUE_AND_VARIANCE: Classical result of a SAMPLER
+        ERROR: Classical result of an ERROR
+        UPLOAD_SUCCESSFUL: Classical result of an UPLOAD
     """
 
     COUNTS = "COUNTS"

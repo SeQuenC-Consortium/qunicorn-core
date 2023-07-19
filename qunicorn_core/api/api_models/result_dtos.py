@@ -20,7 +20,10 @@ import marshmallow as ma
 
 from ..flask_api_utils import MaBaseSchema
 
-__all__ = ["ResultDto", "ResultDtoSchema", ]
+__all__ = [
+    "ResultDto",
+    "ResultDtoSchema",
+]
 
 from ...static.enums.result_type import ResultType
 

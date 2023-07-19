@@ -27,7 +27,8 @@ def runner_result_to_db_results(ibm_result: Result, job_dto: JobCoreDto) -> list
         counts: dict = ibm_result.get_counts()[i]
         circuit: str = job_dto.deployment.programs[i].quantum_circuit
         result_dtos.append(
-            ResultDataclass(circuit=circuit, result_dict=counts, result_type=ResultType.COUNTS, meta_data=ibm_result.results[i].to_dict()))
+            ResultDataclass(circuit=circuit, result_dict=counts, result_type=ResultType.COUNTS, meta_data=ibm_result.results[i].to_dict())
+        )
     return result_dtos
 
 
@@ -37,8 +38,14 @@ def estimator_result_to_db_results(ibm_result: EstimatorResult, job: JobCoreDto,
         value: float = ibm_result.values[i]
         variance: float = ibm_result.metadata[i]["variance"]
         circuit: str = job.deployment.programs[i].quantum_circuit
-        result_dtos.append(ResultDataclass(circuit=circuit, result_dict={"value": str(value), "variance": str(variance)},
-            result_type=ResultType.VALUE_AND_VARIANCE, meta_data={"observer": f"SparsePauliOp-{observer}"}, ))
+        result_dtos.append(
+            ResultDataclass(
+                circuit=circuit,
+                result_dict={"value": str(value), "variance": str(variance)},
+                result_type=ResultType.VALUE_AND_VARIANCE,
+                meta_data={"observer": f"SparsePauliOp-{observer}"},
+            )
+        )
     return result_dtos
 
 
@@ -47,17 +54,30 @@ def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto)
     for i in range(ibm_result.num_experiments):
         quasi_dist: dict = ibm_result.quasi_dists[i]
         circuit: str = job_dto.deployment.programs[i].quantum_circuit
-        result_dtos.append(ResultDataclass(circuit=circuit, result_dict=quasi_dist, result_type=ResultType.QUASI_DIST, ))
+        result_dtos.append(
+            ResultDataclass(
+                circuit=circuit,
+                result_dict=quasi_dist,
+                result_type=ResultType.QUASI_DIST,
+            )
+        )
     return result_dtos
 
 
 def result_to_result_dto(result: ResultDataclass) -> ResultDto:
-    return ResultDto(id=result.id, circuit=result.circuit, result_dict=result.result_dict, header=result.meta_data,
-        result_type=result.result_type)
+    return ResultDto(
+        id=result.id, circuit=result.circuit, result_dict=result.result_dict, header=result.meta_data, result_type=result.result_type
+    )
 
 
 def get_error_results(exception: Exception, circuit: str | None = None) -> list[ResultDataclass]:
     exception_message: str = str(exception)
     stack_trace: str = traceback.format_exc()
-    return [ResultDataclass(result_type=ResultType.ERROR, circuit=circuit, result_dict={"exception_message": exception_message},
-        meta_data={"stack_trace": stack_trace}, )]
+    return [
+        ResultDataclass(
+            result_type=ResultType.ERROR,
+            circuit=circuit,
+            result_dict={"exception_message": exception_message},
+            meta_data={"stack_trace": stack_trace},
+        )
+    ]

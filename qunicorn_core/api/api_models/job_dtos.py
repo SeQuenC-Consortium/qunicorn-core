@@ -28,8 +28,15 @@ from .result_dtos import ResultDto
 from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
-__all__ = ["SimpleJobDtoSchema", "SimpleJobDto", "JobResponseDtoSchema", "JobRequestDtoSchema", "JobCoreDto", "JobResponseDto",
-    "JobRequestDto", ]
+__all__ = [
+    "SimpleJobDtoSchema",
+    "SimpleJobDto",
+    "JobResponseDtoSchema",
+    "JobRequestDtoSchema",
+    "JobCoreDto",
+    "JobResponseDto",
+    "JobRequestDto",
+]
 
 from ...static.enums.assembler_languages import AssemblerLanguage
 
@@ -130,8 +137,16 @@ class JobRequestDtoSchema(MaBaseSchema):
     programs = ma.fields.Nested("QuantumProgramSchema", many=True)
     provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     device_name = ma.fields.String(required=True, example="aer_simulator")
-    shots = ma.fields.Int(required=False, allow_none=True,
-        metadata={"label": "Shots", "description": "Number of shots", "input_type": "number", }, example=4000, )
+    shots = ma.fields.Int(
+        required=False,
+        allow_none=True,
+        metadata={
+            "label": "Shots",
+            "description": "Number of shots",
+            "input_type": "number",
+        },
+        example=4000,
+    )
     parameters = ma.fields.List(ma.fields.Float(), required=False)
     token = ma.fields.String(required=True, example="")
     type = ma.fields.Enum(required=True, example=JobType.RUNNER, enum=JobType)
