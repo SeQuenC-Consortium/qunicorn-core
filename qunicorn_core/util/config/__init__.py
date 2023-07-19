@@ -23,7 +23,9 @@ class ProductionConfig(SQLAchemyProductionConfig, SmorestProductionConfig):
 
     DEFAULT_LOG_SEVERITY = WARNING
     DEFAULT_LOG_FORMAT_STYLE = "{"
-    DEFAULT_LOG_FORMAT = "{asctime} [{levelname:^7}] [{module:<15}] {message:<175}    <{funcName}, {lineno}; {pathname}>"
+    DEFAULT_LOG_FORMAT = (
+        "{asctime} [{levelname:^7}] [{module:<15}] {message:<175}    <{funcName}, {lineno}; {pathname}>"
+    )
     DEFAULT_LOG_DATE_FORMAT = None
 
     CELERY = CELERY_DEBUG_CONFIG

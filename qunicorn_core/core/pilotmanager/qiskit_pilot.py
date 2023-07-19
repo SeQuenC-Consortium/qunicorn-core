@@ -56,7 +56,8 @@ class QiskitPilot(Pilot):
             self.__upload_program(job_core_dto)
         else:
             exception: Exception = ValueError("No valid Job Type specified")
-            job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception), JobState.ERROR)
+            results = result_mapper.get_error_results(exception)
+            job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
             raise exception
 
     def __execute_on_aer_simulator(self, job_dto: JobCoreDto):
@@ -85,7 +86,9 @@ class QiskitPilot(Pilot):
         ibm_result = job_from_ibm.result()
         results: list[ResultDataclass] = result_mapper.runner_result_to_db_results(ibm_result, job_dto)
         job_db_service.update_finished_job(job_dto.id, results)
-        logging.info(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
+        logging.info(
+            f"Run job with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}"
+        )
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the Qiskit Pilot"""
@@ -96,7 +99,9 @@ class QiskitPilot(Pilot):
         ibm_result: SamplerResult = job_from_ibm.result()
         results: list[ResultDataclass] = result_mapper.sampler_result_to_db_results(ibm_result, job_dto)
         job_db_service.update_finished_job(job_dto.id, results)
-        logging.info(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
+        logging.info(
+            f"Run job with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}"
+        )
 
     def __estimate(self, job_dto: JobCoreDto):
         """Uses the Estimator to execute a job on an IBM backend using the Qiskit Pilot"""
@@ -108,7 +113,9 @@ class QiskitPilot(Pilot):
         ibm_result: EstimatorResult = job_from_ibm.result()
         results: list[ResultDataclass] = result_mapper.estimator_result_to_db_results(ibm_result, job_dto, "IY")
         job_db_service.update_finished_job(job_dto.id, results)
-        logging.info(f"Run job {job_from_ibm} with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}")
+        logging.info(
+            f"Run job with id {job_dto.id} on {job_dto.executed_on.provider.name} and get the result {results}"
+        )
 
     def __get_backend_circuits_and_id_for_qiskit_runtime(self, job_dto):
         """Instantiate all important configurations and updates the job_state"""
@@ -182,7 +189,9 @@ class QiskitPilot(Pilot):
             ibm_program_ids.append(service.upload_program(python_file_path, python_file_metadata_path))
         job_db_service.update_attribute(job_core_dto.id, JobType.IBM_RUN, JobDataclass.type)
         job_db_service.update_attribute(job_core_dto.id, JobState.READY, JobDataclass.state)
-        ibm_results = [ResultDataclass(result_dict={"ibm_job_id": ibm_program_ids[0]}, result_type=ResultType.UPLOAD_SUCCESSFUL)]
+        ibm_results = [
+            ResultDataclass(result_dict={"ibm_job_id": ibm_program_ids[0]}, result_type=ResultType.UPLOAD_SUCCESSFUL)
+        ]
         job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.READY)
 
     def __run_ibm_program(self, job_core_dto: JobCoreDto):
@@ -192,11 +201,14 @@ class QiskitPilot(Pilot):
         input_dict: dict = job_core_dto.ibm_file_inputs
 
         try:
-            result = service.run(job_core_dto.results[0].result_dict["ibm_job_id"], inputs=input_dict, options=options_dict).result()
+            ibm_job_id = job_core_dto.results[0].result_dict["ibm_job_id"]
+            result = service.run(ibm_job_id, inputs=input_dict, options=options_dict).result()
             ibm_results.extend(result_mapper.runner_result_to_db_results(result, job_core_dto))
         except IBMRuntimeError as exception:
-            logging.info("Error when accessing IBM, 403 CLient Error")
-            ibm_results.append(ResultDataclass(result_dict={"value": "403 Error when accessing"}, result_type=ResultType.ERROR))
+            logging.info("Error when accessing IBM, 403 Client Error")
+            ibm_results.append(
+                ResultDataclass(result_dict={"value": "403 Error when accessing"}, result_type=ResultType.ERROR)
+            )
             job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.ERROR)
             raise exception
         job_db_service.update_finished_job(job_core_dto.id, ibm_results)

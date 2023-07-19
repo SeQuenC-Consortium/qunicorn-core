@@ -1,0 +1,11 @@
+{
+  "name": "DeploymentName",
+  "programs": [
+    {
+      "quantum_circuit": "",
+      "assembler_language": "QASM",
+      "python_file_metadata": "test.py",
+      "python_file_path": "test.py"
+    }
+  ]
+}

@@ -44,4 +44,6 @@ class RootView(MethodView):
     @PROVIDER_API.response(HTTPStatus.OK, RootSchema())
     def get(self):
         """Get the urls of the next endpoints of the provider api to call."""
-        return RootData(root=url_for("provider-api.ProviderView", provider_id=1, _external=True))  # provider_id=1 only a dummy value
+        return RootData(
+            root=url_for("provider-api.ProviderView", provider_id=1, _external=True)
+        )  # provider_id=1 only a dummy value

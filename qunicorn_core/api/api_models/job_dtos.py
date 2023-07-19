@@ -14,7 +14,6 @@
 
 
 """Module containing all Dtos and their Schemas for tasks in the Jobmanager API."""
-import typing
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -23,7 +22,6 @@ from marshmallow import fields, ValidationError
 
 from .deployment_dtos import DeploymentDto
 from .device_dtos import DeviceDto, DeviceDtoSchema
-from .quantum_program_dtos import QuantumProgramDto, QuantumProgramDtoSchema
 from .result_dtos import ResultDto
 from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
@@ -37,7 +35,7 @@ __all__ = [
     "JobResponseDto",
     "JobRequestDto",
     "TokenSchema",
-    "JobExecutionDto",
+    "JobExecutePythonFileDto",
     "JobExecutionDtoSchema",
 ]
 
@@ -62,14 +60,7 @@ class JobRequestDto:
     type: JobType
     assembler_language: AssemblerLanguage
     deployment_id: int
-    programs: typing.List["QuantumProgramDto"] | None = None
     circuits: list[str] | None = None
-
-    @staticmethod
-    def from_dict(body: dict) -> "JobRequestDto":
-        job_dto: JobRequestDto = JobRequestDto(**body)
-        job_dto.programs = [QuantumProgramDto(**program) for program in body["programs"]]
-        return job_dto
 
 
 @dataclass
@@ -121,7 +112,7 @@ class SimpleJobDto:
 
 
 @dataclass
-class JobExecutionDto:
+class JobExecutePythonFileDto:
     token: str | None = None
     python_file_options: str | None = None
     python_file_inputs: str | None = None
@@ -143,7 +134,6 @@ class JobRequestDtoSchema(MaBaseSchema):
         example=[utils.get_default_qasm_string(), utils.get_default_qasm_string(2)],
         metadata={"description": "This field is deprecated, please use deployments instead. "},
     )
-    programs = ma.fields.Nested(QuantumProgramDtoSchema(many=True))
     provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     device_name = ma.fields.String(required=True, example="aer_simulator")
     shots = ma.fields.Int(
@@ -183,7 +173,7 @@ class SimpleJobDtoSchema(MaBaseSchema):
     job_state = ma.fields.String(required=False, allow_none=False, dump_only=True)
 
 
-class TokenSchema(MaBaseSchema):  # TODO woanders hin ?
+class TokenSchema(MaBaseSchema):
     token = ma.fields.String(required=True, example="")
 
 

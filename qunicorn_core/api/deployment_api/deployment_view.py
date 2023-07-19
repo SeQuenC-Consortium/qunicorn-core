@@ -28,7 +28,7 @@ from ...core.jobmanager import deployment_service
 class DeploymentIDView(MethodView):
     """Deployments endpoint for collection of all deployed jobs."""
 
-    @DEPLOYMENT_API.response(HTTPStatus.OK)  # TODO: DeploymentListSchema ?
+    @DEPLOYMENT_API.response(HTTPStatus.OK)
     def get(self):
         """Get the list of deployments."""
         return deployment_service.get_all_deployments()

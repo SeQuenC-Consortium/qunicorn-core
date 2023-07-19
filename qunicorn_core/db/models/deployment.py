@@ -35,7 +35,9 @@ class DeploymentDataclass(DbModel):
         deployed_at (Date): Date of the creation of a deployment_api
     """
 
-    deployed_by_id: Mapped[int] = mapped_column(ForeignKey(UserDataclass.__tablename__ + ".id"), default=None, nullable=True)
+    deployed_by_id: Mapped[int] = mapped_column(
+        ForeignKey(UserDataclass.__tablename__ + ".id"), default=None, nullable=True
+    )
     deployed_by: Mapped[UserDataclass.__name__] = relationship(UserDataclass.__name__, default=None)
     programs: Mapped[List[QuantumProgramDataclass.__name__]] = relationship(
         QuantumProgramDataclass.__name__,

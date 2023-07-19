@@ -15,7 +15,13 @@ from os import environ
 
 import yaml
 
-from qunicorn_core.api.api_models.job_dtos import (JobRequestDto, JobCoreDto, SimpleJobDto, JobResponseDto, JobExecutionDto, )
+from qunicorn_core.api.api_models.job_dtos import (
+    JobRequestDto,
+    JobCoreDto,
+    SimpleJobDto,
+    JobResponseDto,
+    JobExecutePythonFileDto,
+)
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import job_mapper, result_mapper
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
@@ -64,7 +70,9 @@ def re_run_job_by_id(job_id: int, token: str) -> SimpleJobDto:
     return create_and_run_job(job_request)
 
 
-def run_job_by_id(job_id: int, job_execution_dto: JobExecutionDto, asynchronous: bool = ASYNCHRONOUS) -> SimpleJobDto:
+def run_job_by_id(
+    job_id: int, job_execution_dto: JobExecutePythonFileDto, asynchronous: bool = ASYNCHRONOUS
+) -> SimpleJobDto:
     """Get uploaded job from DB, and run it on a provider"""
     job: JobDataclass = job_db_service.get(job_id)
     job_core_dto: JobCoreDto = job_mapper.job_to_job_core_dto(job)

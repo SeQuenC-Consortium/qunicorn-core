@@ -52,7 +52,9 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
 
     # load defaults
     config = app.config
-    flask_debug: bool = config.get("DEBUG", False) or environ.get("FLASK_ENV", "production").lower() == "development"  # noqa
+    flask_debug: bool = (
+        config.get("DEBUG", False) or environ.get("FLASK_ENV", "production").lower() == "development"
+    )  # noqa
     if flask_debug:
         config.from_object(DebugConfig)
     elif test_config is None:
@@ -105,7 +107,8 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
 
     logger: Logger = app.logger
     logger.info(
-        f"Configuration loaded. Possible config locations are: 'config.py', 'config.json', Environment: '{CONFIG_ENV_VAR_PREFIX}_SETTINGS'"
+        f"Configuration loaded. Possible config locations are: 'config.py', "
+        f"'config.json', Environment: '{CONFIG_ENV_VAR_PREFIX}_SETTINGS'"
     )
 
     if config.get("SECRET_KEY") == "debug_secret":

@@ -21,8 +21,16 @@ from flask import jsonify
 from flask.views import MethodView
 
 from .root import JOBMANAGER_API
-from ..api_models.job_dtos import (JobRequestDtoSchema, JobResponseDtoSchema, JobRequestDto, JobResponseDto, TokenSchema,
-                                   SimpleJobDtoSchema, JobExecutionDtoSchema, JobExecutionDto, )
+from ..api_models.job_dtos import (
+    JobRequestDtoSchema,
+    JobResponseDtoSchema,
+    JobRequestDto,
+    JobResponseDto,
+    TokenSchema,
+    SimpleJobDtoSchema,
+    JobExecutionDtoSchema,
+    JobExecutePythonFileDto,
+)
 from ...core.jobmanager import jobmanager_service
 from ...util import logging
 
@@ -71,12 +79,12 @@ class JobRunView(MethodView):
     def post(self, body, job_id: int):
         """Run job on IBM that was previously Uploaded."""
         logging.info("Request: run job")
-        job_execution_dto: JobExecutionDto = JobExecutionDto(**body)
+        job_execution_dto: JobExecutePythonFileDto = JobExecutePythonFileDto(**body)
         return jsonify(jobmanager_service.run_job_by_id(int(job_id), job_execution_dto)), 200
 
 
 @JOBMANAGER_API.route("/rerun/<string:job_id>/")
-class JobRunView(MethodView):
+class JobReRunView(MethodView):
     """Jobs endpoint for a single job."""
 
     @JOBMANAGER_API.arguments(TokenSchema(), location="json")
@@ -96,7 +104,9 @@ class JobCancelView(MethodView):
     def post(self, body, job_id: str):
         """TBD: Cancel a job execution via id."""
         logging.info("Request: cancel job")
-        logging.warn(os.environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS"))  # return jsonify(jobmanager_service.cancel_job_by_id(job_id))
+        logging.warn(
+            os.environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS")
+        )  # return jsonify(jobmanager_service.cancel_job_by_id(job_id))
 
 
 @JOBMANAGER_API.route("/pause/<string:job_id>/")

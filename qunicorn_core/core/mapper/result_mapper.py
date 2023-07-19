@@ -28,12 +28,19 @@ def runner_result_to_db_results(ibm_result: Result, job_dto: JobCoreDto) -> list
         counts: dict = ibm_result.results[i].data.counts
         circuit: str = job_dto.deployment.programs[i].quantum_circuit
         result_dtos.append(
-            ResultDataclass(circuit=circuit, result_dict=counts, result_type=ResultType.COUNTS, meta_data=ibm_result.results[i].to_dict())
+            ResultDataclass(
+                circuit=circuit,
+                result_dict=counts,
+                result_type=ResultType.COUNTS,
+                meta_data=ibm_result.results[i].to_dict(),
+            )
         )
     return result_dtos
 
 
-def estimator_result_to_db_results(ibm_result: EstimatorResult, job: JobCoreDto, observer: str) -> list[ResultDataclass]:
+def estimator_result_to_db_results(
+    ibm_result: EstimatorResult, job: JobCoreDto, observer: str
+) -> list[ResultDataclass]:
     result_dtos: list[ResultDataclass] = []
     for i in range(ibm_result.num_experiments):
         value: float = ibm_result.values[i]
@@ -67,7 +74,11 @@ def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto)
 
 def result_to_result_dto(result: ResultDataclass) -> ResultDto:
     return ResultDto(
-        id=result.id, circuit=result.circuit, result_dict=result.result_dict, header=result.meta_data, result_type=result.result_type
+        id=result.id,
+        circuit=result.circuit,
+        result_dict=result.result_dict,
+        header=result.meta_data,
+        result_type=result.result_type,
     )
 
 

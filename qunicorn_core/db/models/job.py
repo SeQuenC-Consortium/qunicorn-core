@@ -48,17 +48,25 @@ class JobDataclass(DbModel):
             checked before starting the task.
     """
 
-    results: Mapped[Optional[List[ResultDataclass.__name__]]] = relationship(ResultDataclass.__name__, default_factory=list)
-    executed_by_id: Mapped[int] = mapped_column(ForeignKey(UserDataclass.__tablename__ + ".id"), default=None, nullable=True)
+    results: Mapped[Optional[List[ResultDataclass.__name__]]] = relationship(
+        ResultDataclass.__name__, default_factory=list
+    )
+    executed_by_id: Mapped[int] = mapped_column(
+        ForeignKey(UserDataclass.__tablename__ + ".id"), default=None, nullable=True
+    )
     executed_by: Mapped[UserDataclass.__name__] = relationship(UserDataclass.__name__, default=None)
 
-    executed_on_id: Mapped[int] = mapped_column(ForeignKey(DeviceDataclass.__tablename__ + ".id"), default=None, nullable=True)
+    executed_on_id: Mapped[int] = mapped_column(
+        ForeignKey(DeviceDataclass.__tablename__ + ".id"), default=None, nullable=True
+    )
     executed_on: Mapped[DeviceDataclass.__name__] = relationship(
         DeviceDataclass.__name__,
         default=None,
     )
 
-    deployment_id: Mapped[int] = mapped_column(ForeignKey(DeploymentDataclass.__tablename__ + ".id"), default=None, nullable=True)
+    deployment_id: Mapped[int] = mapped_column(
+        ForeignKey(DeploymentDataclass.__tablename__ + ".id"), default=None, nullable=True
+    )
     deployment: Mapped[DeploymentDataclass.__name__] = relationship(
         DeploymentDataclass.__name__,
         default=None,

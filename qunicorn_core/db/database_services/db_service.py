@@ -63,7 +63,9 @@ def save_device_by_name(device: DeviceDataclass):
     successful = (
         session.query(DeviceDataclass)
         .filter(DeviceDataclass.device_name == device.device_name)
-        .update({"num_qubits": device.num_qubits, "provider_id": device.provider_id, "is_simulator": device.is_simulator})
+        .update(
+            {"num_qubits": device.num_qubits, "provider_id": device.provider_id, "is_simulator": device.is_simulator}
+        )
     )
     if not successful:
         session.add(device)
