@@ -19,7 +19,8 @@ from datetime import datetime
 
 import marshmallow as ma
 
-from .quantum_program_dtos import QuantumProgramDto, QuantumProgramRequestSchema, QuantumProgramRequestDto, QuantumProgramDtoSchema
+from .quantum_program_dtos import QuantumProgramDto, QuantumProgramRequestDtoSchema, QuantumProgramRequestDto, \
+    QuantumProgramDtoSchema
 from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
@@ -59,7 +60,7 @@ class DeploymentDtoSchema(MaBaseSchema):
 
 
 class DeploymentRequestDtoSchema(MaBaseSchema):
-    programs = ma.fields.Nested(QuantumProgramRequestSchema(many=True))
+    programs = ma.fields.Nested(QuantumProgramRequestDtoSchema(many=True))
     name = ma.fields.String(
         required=True,
         example="DeploymentName",
