@@ -80,7 +80,6 @@ def test_job_ibm_upload(mocker):
     job_request_dto: JobRequestDto = test_utils.get_test_job()
     job_request_dto.type = JobType.IBM_UPLOAD
     job_request_dto.device_name = "ibmq_qasm_simulator"
-    job_request_dto.circuits = []
 
     # WHEN: Executing method to be tested
     with app.app_context():
@@ -111,7 +110,6 @@ def test_job_ibm_runner(mocker):
     job_request_dto: JobRequestDto = test_utils.get_test_job()
     job_request_dto.type = JobType.IBM_UPLOAD
     job_request_dto.device_name = "ibmq_qasm_simulator"
-    job_request_dto.circuits = []
 
     with app.app_context():
         test_utils.save_deployment_and_add_id_to_job(job_request_dto)

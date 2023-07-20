@@ -14,7 +14,6 @@
 from datetime import datetime
 
 from qunicorn_core.api.api_models import ProviderDto
-from qunicorn_core.api.api_models.deployment_dtos import DeploymentDto
 from qunicorn_core.api.api_models.device_dtos import DeviceDto
 from qunicorn_core.api.api_models.job_dtos import (
     JobCoreDto,
@@ -22,7 +21,6 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobResponseDto,
     SimpleJobDto,
 )
-from qunicorn_core.api.api_models.quantum_program_dtos import QuantumProgramDto
 from qunicorn_core.api.api_models.user_dtos import UserDto
 from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_mapper, result_mapper
 from qunicorn_core.db.database_services import db_service
@@ -34,28 +32,18 @@ from qunicorn_core.static.enums.programming_language import ProgrammingLanguage
 
 def request_to_core(job: JobRequestDto):
     """Helper class. When the db objects are saved correctly we do not need it anymore"""
-    user = UserDto(id=0, name="default")
     provider = ProviderDto(id=0, with_token=True, supported_language=ProgrammingLanguage.QISKIT, name=job.provider_name)
     device = DeviceDto(id=0, device_name=job.device_name, provider=provider, url="DefaultUrl")
 
-    if job.circuits is None or len(job.circuits) == 0:
-        deployment = deployment_mapper.deployment_to_deployment_dto(
-            db_service.get_database_object(job.deployment_id, DeploymentDataclass)
-        )
-    else:
-        quantum_programs = [
-            QuantumProgramDto(id=0, quantum_circuit=circuit, assembler_language=job.assembler_language)
-            for circuit in job.circuits
-        ]
-        deployment = DeploymentDto(
-            id=0, deployed_by=user, programs=quantum_programs, name="DefaultDeployment", deployed_at=datetime.now()
-        )
+    # Get deployment from db and map to dto
+    deployment: DeploymentDataclass = db_service.get_database_object(job.deployment_id, DeploymentDataclass)
+    deployment_dto = deployment_mapper.deployment_to_deployment_dto(deployment)
 
     return JobCoreDto(
         id=None,
-        executed_by=user,
+        executed_by=UserDto.get_default_user(),
         executed_on=device,
-        deployment=deployment,
+        deployment=deployment_dto,
         token=job.token,
         name=job.name,
         parameters=job.parameters,
@@ -163,7 +151,6 @@ def job_to_job_core_dto(job: JobDataclass) -> JobCoreDto:
 def job_to_request(job: JobDataclass) -> JobRequestDto:
     return JobRequestDto(
         name=job.name,
-        circuits=None,
         provider_name=job.executed_on.provider.name,
         shots=job.shots,
         parameters=job.parameters,

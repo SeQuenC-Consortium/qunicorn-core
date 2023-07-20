@@ -19,13 +19,15 @@ from qiskit.qasm import QasmError
 from qiskit_ibm_provider.accounts import InvalidAccountError
 from qiskit_ibm_provider.api.exceptions import RequestsApiError
 
-from qunicorn_core.api.api_models import JobRequestDto
+from qunicorn_core.api.api_models import JobRequestDto, DeploymentRequestDto
 from qunicorn_core.core.jobmanager import jobmanager_service
-from qunicorn_core.db.database_services import job_db_service
+from qunicorn_core.core.mapper import deployment_mapper
+from qunicorn_core.db.database_services import job_db_service, db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.result_type import ResultType
+from tests import test_utils
 from tests.conftest import set_up_env
 from tests.manual_tests.test_jobmanager_with_ibm import EXPECTED_ID, JOB_FINISHED_PROGRESS, IS_ASYNCHRONOUS
 from tests.test_utils import get_object_from_json
@@ -56,10 +58,13 @@ def test_invalid_circuit():
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
     job_request_dto.device_name = "ibmq_qasm_simulator"
-    job_request_dto.circuits[0] = "Invalid Circuit"
+    deployment_dto: DeploymentRequestDto = test_utils.get_test_deployment()
+    deployment_dto.programs[0].quantum_circuit = "invalid circuit"
 
     # WHEN: Executing create and run
     with app.app_context():
+        depl_id: int = db_service.save_database_object(deployment_mapper.request_dto_to_deployment(deployment_dto)).id
+        job_request_dto.deployment_id = depl_id
         with pytest.raises(Exception) as exception:
             jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 

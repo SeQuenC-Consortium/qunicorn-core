@@ -18,7 +18,6 @@ from dataclasses import dataclass
 from datetime import datetime
 
 import marshmallow as ma
-from marshmallow import fields, ValidationError
 
 from .deployment_dtos import DeploymentDto
 from .device_dtos import DeviceDto, DeviceDtoSchema
@@ -44,7 +43,6 @@ from ...static.enums.assembler_languages import AssemblerLanguage
 from ...static.enums.job_state import JobState
 from ...static.enums.job_type import JobType
 from ...static.enums.provider_name import ProviderName
-from ...util import utils
 
 
 @dataclass
@@ -60,7 +58,6 @@ class JobRequestDto:
     type: JobType
     assembler_language: AssemblerLanguage
     deployment_id: int
-    circuits: list[str] | None = None
 
 
 @dataclass
@@ -118,32 +115,14 @@ class JobExecutePythonFileDto:
     python_file_inputs: str | None = None
 
 
-class CircuitField(fields.Field):
-    def _deserialize(self, value, attr, data, **kwargs):
-        if isinstance(value, str) or isinstance(value, list):
-            return value
-        else:
-            raise ValidationError("Field should be str or list")
-
-
 class JobRequestDtoSchema(MaBaseSchema):
     name = ma.fields.String(required=True, example="JobName")
-    circuits = CircuitField(
-        required=False,
-        allow_none=True,
-        example=[utils.get_default_qasm_string(), utils.get_default_qasm_string(2)],
-        metadata={"description": "This field is deprecated, please use deployments instead. "},
-    )
     provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     device_name = ma.fields.String(required=True, example="aer_simulator")
     shots = ma.fields.Int(
         required=False,
         allow_none=True,
-        metadata={
-            "label": "Shots",
-            "description": "Number of shots",
-            "input_type": "number",
-        },
+        metadata={"label": "Shots", "description": "Number of shots", "input_type": "number"},
         example=4000,
     )
     parameters = ma.fields.List(ma.fields.Float(), required=False)

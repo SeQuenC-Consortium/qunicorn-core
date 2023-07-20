@@ -37,7 +37,6 @@ def test_create_and_run_runner():
     app = set_up_env()
     job_request_dto: JobRequestDto = test_utils.get_test_job()
     job_request_dto.device_name = "ibmq_qasm_simulator"
-    job_request_dto.circuits = []
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
@@ -59,7 +58,6 @@ def test_create_and_run_sampler():
     job_request_dto: JobRequestDto = test_utils.get_test_job()
     job_request_dto.type = JobType.SAMPLER
     job_request_dto.device_name = "ibmq_qasm_simulator"
-    job_request_dto.circuits = []
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
@@ -81,7 +79,6 @@ def test_create_and_run_estimator():
     job_request_dto: JobRequestDto = test_utils.get_test_job()
     job_request_dto.type = JobType.ESTIMATOR
     job_request_dto.device_name = "ibmq_qasm_simulator"
-    job_request_dto.circuits = []
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():

@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from datetime import datetime
 
-from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto
+from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto, UserDto
 from qunicorn_core.core.mapper import quantum_program_mapper, user_mapper
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 
@@ -29,6 +30,8 @@ def deployment_dto_to_deployment(deployment: DeploymentDto) -> DeploymentDatacla
 
 def request_dto_to_deployment(deployment: DeploymentRequestDto) -> DeploymentDataclass:
     return DeploymentDataclass(
+        deployed_by=user_mapper.user_dto_to_user(UserDto.get_default_user()),
+        deployed_at=datetime.now(),
         name=deployment.name,
         programs=[quantum_program_mapper.request_to_quantum_program(qc) for qc in deployment.programs],
     )
