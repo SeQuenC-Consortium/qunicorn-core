@@ -38,8 +38,6 @@ __all__ = [
     "JobExecutionDtoSchema",
 ]
 
-from ...static.enums.assembler_languages import AssemblerLanguage
-
 from ...static.enums.job_state import JobState
 from ...static.enums.job_type import JobType
 from ...static.enums.provider_name import ProviderName
@@ -56,7 +54,6 @@ class JobRequestDto:
     parameters: str
     token: str
     type: JobType
-    assembler_language: AssemblerLanguage
     deployment_id: int
 
 
@@ -128,7 +125,6 @@ class JobRequestDtoSchema(MaBaseSchema):
     parameters = ma.fields.List(ma.fields.Float(), required=False)
     token = ma.fields.String(required=True, example="")
     type = ma.fields.Enum(required=True, example=JobType.RUNNER, enum=JobType)
-    assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
     deployment_id = ma.fields.Integer(required=False, allow_none=True, example=1)
 
 

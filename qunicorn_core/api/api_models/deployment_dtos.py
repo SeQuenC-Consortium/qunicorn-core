@@ -58,7 +58,7 @@ class DeploymentDtoSchema(MaBaseSchema):
     programs = ma.fields.Nested(QuantumProgramDtoSchema(many=True))
     deployed_at = ma.fields.Date(required=False, metadata={"description": "Time of Deployment"})
     name = ma.fields.String(
-        required=True,
+        required=False,
         metadata={"description": "An optional Name for the deployment_api."},
     )
 

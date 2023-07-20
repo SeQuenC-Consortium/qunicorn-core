@@ -33,7 +33,7 @@ def update_deployment(deployment_dto: DeploymentRequestDto) -> DeploymentDto:
     return db_service.save_database_object(deployment)
 
 
-def remove_deployment(id: int) -> DeploymentDto:
+def delete_deployment(id: int) -> DeploymentDto:
     """Remove one deployment by id"""
     return deployment_mapper.deployment_to_deployment_dto(deployment_db_service.delete(id))
 

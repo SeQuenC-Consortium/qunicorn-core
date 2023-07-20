@@ -55,7 +55,7 @@ class DeploymentDetailView(MethodView):
     def delete(self, deployment_id: int):
         """Delete single deployment by ID."""
 
-        return deployment_service.remove_deployment(deployment_id)
+        return deployment_service.delete_deployment(deployment_id)
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     @DEPLOYMENT_API.arguments(DeploymentRequestDtoSchema(), location="json")

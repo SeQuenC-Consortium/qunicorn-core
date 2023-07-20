@@ -156,7 +156,6 @@ def job_to_request(job: JobDataclass) -> JobRequestDto:
         parameters=job.parameters,
         token="",
         type=job.type,
-        assembler_language=job.deployment.programs[0].assembler_language,
         deployment_id=job.deployment.id,
         device_name=job.executed_on.device_name,
     )
