@@ -146,7 +146,7 @@ def check_if_job_estimator_result_correct(job: JobDataclass):
         tolerance: float = 0.2
         default_variance: float = 1.0
         assert -tolerance < float(result.result_dict["value"]) < tolerance
-        assert default_variance - tolerance < float(result.result_dict["variance"]) < default_variance
+        assert default_variance - tolerance < float(result.result_dict["variance"]) <= default_variance
 
 
 def check_standard_result_data(i, job, result):

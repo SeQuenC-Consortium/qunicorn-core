@@ -13,6 +13,9 @@
 # limitations under the License.
 
 """"pytest conftest file"""
+
+from dotenv import load_dotenv
+
 from qunicorn_core import create_app
 from qunicorn_core.db.cli import create_db_function, load_db_function
 
@@ -29,6 +32,7 @@ DEFAULT_TEST_CONFIG = {
     "OPENAPI_VERSION": "3.0.2",
     "OPENAPI_JSON_PATH": "api-spec.json",
     "OPENAPI_URL_PREFIX": "",
+    "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
 }
 
 
@@ -36,7 +40,9 @@ def set_up_env():
     """Set up Flask app and environment and return app"""
     test_config = {}
     test_config.update(DEFAULT_TEST_CONFIG)
-    test_config.update({"SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:"})
+
+    # We need this to load variables from the .env file during testing
+    load_dotenv()
 
     app = create_app(test_config)
     with app.app_context():

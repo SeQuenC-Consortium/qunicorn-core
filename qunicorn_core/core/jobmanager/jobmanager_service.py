@@ -30,7 +30,7 @@ from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.provider_name import ProviderName
 
-ASYNCHRONOUS: bool = bool(environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS"))
+ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
 
 
 @CELERY.task()
