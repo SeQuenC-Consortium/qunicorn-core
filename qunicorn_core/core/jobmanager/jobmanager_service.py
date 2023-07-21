@@ -91,9 +91,9 @@ def get_job(job_id: int) -> JobResponseDto:
     return job_mapper.job_to_response(db_job)
 
 
-def delete_job_data_by_id(job_id) -> JobResponseDto:
+def delete_job_data_by_id(job_id):
     """delete job data from db"""
-    return job_mapper.job_to_response(job_db_service.delete(job_id))
+    job_db_service.delete(job_id)
 
 
 def get_all_jobs() -> list[SimpleJobDto]:

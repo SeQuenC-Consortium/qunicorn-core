@@ -37,6 +37,7 @@ def remove_database_object(db_object: DbModel):
 def delete_database_object_by_id(db_object: DbModel, id: int):
     """Deletes a database object, as long as it is a database-model"""
     session.query(db_object).filter_by(id=id).delete()
+    session.commit()
 
 
 def get_database_object(db_object_id: int, database_object_class: DbModel) -> DbModel:

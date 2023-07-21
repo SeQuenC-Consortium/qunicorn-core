@@ -66,8 +66,7 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def delete(self, job_id: str):
         """Delete job data via id."""
-
-        return jsonify(jobmanager_service.delete_job_data_by_id(job_id))
+        jobmanager_service.delete_job_data_by_id(job_id)
 
 
 @JOBMANAGER_API.route("/run/<string:job_id>/")

@@ -35,10 +35,9 @@ def get_all_deployments() -> list[DeploymentDataclass]:
     return db_service.get_all_database_objects(DeploymentDataclass)
 
 
-def delete(id: int) -> DeploymentDataclass:
+def delete(id: int):
     """Removes one deployment"""
-
-    return db_service.delete_database_object_by_id(DeploymentDataclass, id)
+    db_service.delete_database_object_by_id(DeploymentDataclass, id)
 
 
 def get_deployment(deployment_id: int) -> JobDataclass:

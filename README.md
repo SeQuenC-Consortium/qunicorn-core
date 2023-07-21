@@ -27,16 +27,36 @@ On linux:
 
 Run `poetry install` to install dependencies.
 
+### Environment variables
+
 The flask dev server loads environment variables from `.flaskenv` and `.env`.
 To override any variable create a `.env` file.
 Environment variables in `.env` take precedence over `.flaskenv`.
 See the content of the `.flaskenv` file for the default environment variables.
 
-The currently available endpoints are:
-* **POST /jobs/** *(Create/Register and run new job)*
-  * Needs a valid token to connect to IBM
-  * Runs asynchronously so the results are not shown in the api response  
-* **GET /jobs/{job_id}/** *(Get details/results of a job)*
+You can also add an `IBM_TOKEN` to the `.env` file to use the IBM backend without a token in each request.
+Set the `EXECUTE_CELERY_TASK_ASYNCHRONOUS` in your .env file to False, if you don't want to start a
+celery worker and execute all tasks synchronously.
+
+### Available endpoints are:
+
+* **JOBS**
+    * **POST /jobs/** *(Create/Register and run new job)*
+        * Needs a valid token to connect to IBM
+        * Runs asynchronously so the results are not shown in the api response
+    * **GET /jobs/** *(Get all jobs)*
+    * **GET /jobs/{job_id}/** *(Get details/results of a job)*
+    * **DELETE /jobs/{job_id}/** *(Get details/results of a job)*
+    * **POST /jobs/run/{job_id}/** *(Executes an uploaded python file)*
+    * **POST /jobs/rerun/{job_id}/** *(Copies and Runs again an existing Job)*
+
+* **DEPLOYMENTS**
+    * **GET /deployments/** *(Get all Deployments)*
+    * **POST /deployments/** *(Create a Deployment)*
+    * **GET /deployments/{job_id}/** *(Gets a Deployment)*
+
+* **DEVICES**
+    * **PUT /devices/** *(Updates the devices, by retrieving them from IBM)*
 
 Run the development server with
 
@@ -51,7 +71,7 @@ poetry run invoke start-broker
 poetry run invoke worker
 ```
 
-Create the initial database
+Create the initial database (If this doesn't work, try to delete the db-file from the "instance" folder)
 
 ```bash
 flask create-and-load-db
@@ -61,6 +81,12 @@ Check Linting Errors
 
 ```bash
 poetry run invoke check-linting
+```
+
+Trying out the tests -> See tests/README.md
+
+```bash
+poetry run pytest .
 ```
 
 ### Trying out the Template

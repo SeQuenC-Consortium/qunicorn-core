@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto
-from qunicorn_core.core.mapper import deployment_mapper
+from datetime import datetime
+
+from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto, UserDto
+from qunicorn_core.core.mapper import deployment_mapper, user_mapper, quantum_program_mapper
 from qunicorn_core.db.database_services import deployment_db_service, db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 
@@ -27,10 +29,14 @@ def get_deployment(id: int) -> DeploymentDto:
     return deployment_db_service.get_deployment(id)
 
 
-def update_deployment(deployment_dto: DeploymentRequestDto) -> DeploymentDto:
+def update_deployment(deployment_dto: DeploymentRequestDto, id: int) -> DeploymentDto:
     """Updates one deployment"""
-    deployment: DeploymentDataclass = deployment_mapper.request_dto_to_deployment(deployment_dto)
-    return db_service.save_database_object(deployment)
+    db_deployment = get_deployment(id)
+    db_deployment.deployed_by = (user_mapper.user_dto_to_user(UserDto.get_default_user()),)
+    db_deployment.deployed_at = (datetime.now(),)
+    db_deployment.name = (deployment_dto.name,)
+    db_deployment.programs = [quantum_program_mapper.request_to_quantum_program(qc) for qc in deployment_dto.programs]
+    return db_service.save_database_object(db_deployment)
 
 
 def delete_deployment(id: int) -> DeploymentDto:

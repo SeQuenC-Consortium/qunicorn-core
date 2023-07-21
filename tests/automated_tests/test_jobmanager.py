@@ -41,7 +41,7 @@ def test_celery_run_job(mocker):
     backend_mock.run.return_value = run_result_mock  # mocks the backend.run(transpiled, shots=job_dto.shots) call
 
     path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
-    mocker.patch(f"{path_to_pilot}._QiskitPilot__get_ibm_provider_and_login", return_value=backend_mock)
+    mocker.patch(f"{path_to_pilot}._QiskitPilot__get_ibm_provider_login_and_update_job", return_value=backend_mock)
     mocker.patch(f"{path_to_pilot}.transpile", return_value=(backend_mock, None))
 
     results: list[ResultDataclass] = [ResultDataclass(result_dict={"00": 4000})]

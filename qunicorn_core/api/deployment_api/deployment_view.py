@@ -53,16 +53,19 @@ class DeploymentDetailView(MethodView):
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     def delete(self, deployment_id: int):
-        """Delete single deployment by ID."""
-
+        """TBD: Delete single deployment by ID."""
+        raise NotImplementedError
+        # Otherwise it would return an integrity error
         return deployment_service.delete_deployment(deployment_id)
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     @DEPLOYMENT_API.arguments(DeploymentRequestDtoSchema(), location="json")
-    def put(self, body):
-        """Update single deployment by ID."""
+    def put(self, body, deployment_id: int):
+        """TBD: Update single deployment by ID."""
+        raise NotImplementedError
+        # Otherwise it would return an integrity error
         deployment_dto: DeploymentRequestDto = DeploymentRequestDto.from_dict(body)
-        return deployment_service.update_deployment(deployment_dto)
+        return deployment_service.update_deployment(deployment_dto, deployment_id)
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     def patch(self, deployment_id: int):

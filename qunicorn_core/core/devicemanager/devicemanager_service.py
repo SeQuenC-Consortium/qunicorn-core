@@ -15,21 +15,17 @@ from qiskit_ibm_provider import IBMProvider, IBMBackend
 
 from qunicorn_core.api.api_models.device_dtos import DeviceRequest
 from qunicorn_core.celery import CELERY
-from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
 from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 
-qiskitpilot = QiskitPilot
-awspilot = AWSPilot
-
 
 @CELERY.task()
 def update_devices(device_request: DeviceRequest):
     """Update all backends for the IBM provider"""
-    IBMProvider.save_account(token=device_request.token, overwrite=True)
-    devices = IBMProvider().backends()
+    ibm_provider: IBMProvider = QiskitPilot.get_ibm_provider_and_login(device_request.token)
+    devices = ibm_provider.backends()
     all_devices: dict = get_device_dict(devices)
 
     update_devices_in_db(all_devices=all_devices)

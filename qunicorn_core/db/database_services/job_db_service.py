@@ -63,10 +63,10 @@ def get_job(job_id: int) -> JobDataclass:
     return db_service.get_database_object(job_id, JobDataclass)
 
 
-def delete(id: int) -> JobDataclass:
+def delete(id: int):
     """Removes one job"""
 
-    return db_service.delete_database_object_by_id(JobDataclass, id)
+    db_service.delete_database_object_by_id(JobDataclass, id)
 
 
 def get_all() -> list[JobDataclass]:
