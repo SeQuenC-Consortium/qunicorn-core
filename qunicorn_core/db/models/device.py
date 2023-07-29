@@ -30,7 +30,9 @@ class DeviceDataclass(DbModel):
         provider: The provider of the cloud_service with the needed configurations
     """
 
-    provider_id: Mapped[int] = mapped_column(ForeignKey(ProviderDataclass.__tablename__ + ".id"), default=None)
+    provider_id: Mapped[int] = mapped_column(
+        ForeignKey(ProviderDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None
+    )
     num_qubits: Mapped[int] = mapped_column(sql.INTEGER, default=-1)
     device_name: Mapped[str] = mapped_column(sql.String, default="")
     is_simulator: Mapped[bool] = mapped_column(sql.BOOLEAN, default=False)

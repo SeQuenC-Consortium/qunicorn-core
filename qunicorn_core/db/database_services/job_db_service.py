@@ -65,10 +65,23 @@ def get_job(job_id: int) -> JobDataclass:
 
 def delete(id: int):
     """Removes one job"""
-
     db_service.delete_database_object_by_id(JobDataclass, id)
 
 
 def get_all() -> list[JobDataclass]:
     """Gets all Jobs from the database"""
     return db_service.get_all_database_objects(JobDataclass)
+
+
+def get_jobs_by_deployment_id(deployment_id: int) -> list[JobDataclass]:
+    """Gets the job with the deployment_id from the database"""
+    jobs = db_service.get_session().query(JobDataclass).filter(JobDataclass.deployment_id == deployment_id).all()
+    db_service.get_session().commit()
+    return jobs
+
+
+def delete_jobs_by_deployment_id(deployment_id: int) -> list[JobDataclass]:
+    """Gets the job with the deployment_id from the database"""
+    job_ids = db_service.get_session().query(JobDataclass).filter(JobDataclass.deployment_id == deployment_id).delete()
+    db_service.get_session().commit()
+    return job_ids

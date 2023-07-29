@@ -87,7 +87,7 @@ def job_to_response(job: JobDataclass) -> JobResponseDto:
         finished_at=job.finished_at,
         name=job.name,
         data=job.data,
-        results=job.results,
+        results=[result_mapper.result_to_result_dto(result) for result in job.results],
         parameters=job.parameters,
     )
 

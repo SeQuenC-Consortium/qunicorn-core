@@ -32,7 +32,9 @@ class QuantumProgramDataclass(DbModel):
 
     quantum_circuit: Mapped[str] = mapped_column(sql.String(500), default=None)
     assembler_language: Mapped[str] = mapped_column(sql.Enum(AssemblerLanguage), default=AssemblerLanguage.QASM)
-    deployment_id: Mapped[int] = mapped_column(ForeignKey("Deployment.id"), default=None, nullable=True)
+    deployment_id: Mapped[int] = mapped_column(
+        ForeignKey("Deployment.id", ondelete="CASCADE"), default=None, nullable=True
+    )
     python_file_path: Mapped[str] = mapped_column(sql.String(500), default=None, nullable=True)
     python_file_metadata: Mapped[str] = mapped_column(sql.String(500), default=None, nullable=True)
     python_file_options: Mapped[str] = mapped_column(sql.String(500), default=None, nullable=True)

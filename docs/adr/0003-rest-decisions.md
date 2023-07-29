@@ -23,6 +23,8 @@ Use the HTTP Status Codes and Verbs correctly
     * POST: Create/Run/Pause/Cancel a resource
     * PUT: Update a resource
     * DELETE: Delete a resource
-    * PATCH: Update a resource partially
+    * UPDATE: Update a resource
+* Decision on Patch Verb
+    * Not used due to similarity to update
 
 <!-- markdownlint-disable-file MD013 -->

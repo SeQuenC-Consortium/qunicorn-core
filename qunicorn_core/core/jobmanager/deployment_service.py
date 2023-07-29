@@ -13,10 +13,14 @@
 # limitations under the License.
 from datetime import datetime
 
-from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto, UserDto
-from qunicorn_core.core.mapper import deployment_mapper, user_mapper, quantum_program_mapper
-from qunicorn_core.db.database_services import deployment_db_service, db_service
+from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto
+from qunicorn_core.core.mapper import deployment_mapper, quantum_program_mapper
+from qunicorn_core.db import DB
+from qunicorn_core.db.database_services import deployment_db_service, db_service, job_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
+from qunicorn_core.db.models.user import UserDataclass
+
+session = DB.session
 
 
 def get_all_deployments() -> list[DeploymentDto]:
@@ -31,17 +35,26 @@ def get_deployment(id: int) -> DeploymentDto:
 
 def update_deployment(deployment_dto: DeploymentRequestDto, id: int) -> DeploymentDto:
     """Updates one deployment"""
-    db_deployment = get_deployment(id)
-    db_deployment.deployed_by = (user_mapper.user_dto_to_user(UserDto.get_default_user()),)
-    db_deployment.deployed_at = (datetime.now(),)
-    db_deployment.name = (deployment_dto.name,)
-    db_deployment.programs = [quantum_program_mapper.request_to_quantum_program(qc) for qc in deployment_dto.programs]
-    return db_service.save_database_object(db_deployment)
+    try:
+        db_deployment = get_deployment(id)
+        db_deployment.deployed_by = db_service.get_database_object(0, UserDataclass)
+        db_deployment.deployed_at = datetime.now()
+        db_deployment.name = deployment_dto.name
+        programs = [quantum_program_mapper.request_to_quantum_program(qc) for qc in deployment_dto.programs]
+        db_deployment.programs = programs
+        return db_service.save_database_object(db_deployment)
+    except Exception:
+        db_service.get_session().rollback()
+        raise Exception("Could not update deployment")
 
 
 def delete_deployment(id: int) -> DeploymentDto:
     """Remove one deployment by id"""
-    return deployment_mapper.deployment_to_deployment_dto(deployment_db_service.delete(id))
+    db_deployment = deployment_mapper.deployment_to_deployment_dto(deployment_db_service.get_deployment(id))
+    if len(job_db_service.get_jobs_by_deployment_id(db_deployment.id)) > 0:
+        raise ValueError("Deployment is in use by a job")
+    deployment_db_service.delete(id)
+    return db_deployment
 
 
 def create_deployment(deployment_dto: DeploymentRequestDto) -> DeploymentDto:

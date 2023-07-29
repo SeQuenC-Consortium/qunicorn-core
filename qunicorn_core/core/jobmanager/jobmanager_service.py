@@ -124,3 +124,14 @@ def pause_job_by_id(job_id):
 def cancel_job_by_id(job_id):
     """cancel job execution"""
     raise NotImplementedError
+
+
+def get_jobs_by_deployment_id(deployment_id) -> list[JobResponseDto]:
+    jobs_by_deployment_id = job_db_service.get_jobs_by_deployment_id(deployment_id)
+    return [job_mapper.job_to_response(job) for job in jobs_by_deployment_id]
+
+
+def delete_jobs_by_deployment_id(deployment_id) -> list[JobResponseDto]:
+    jobs = get_jobs_by_deployment_id(deployment_id)
+    job_db_service.delete_jobs_by_deployment_id(deployment_id)
+    return jobs
