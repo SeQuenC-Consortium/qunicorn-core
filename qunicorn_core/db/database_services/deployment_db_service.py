@@ -15,7 +15,6 @@ from datetime import datetime
 
 from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
-from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.user import UserDataclass
 
 
@@ -40,6 +39,6 @@ def delete(id: int):
     db_service.delete_database_object_by_id(DeploymentDataclass, id)
 
 
-def get_deployment(deployment_id: int) -> JobDataclass:
+def get_deployment(deployment_id: int) -> DeploymentDataclass:
     """Gets the Deployment with the deployment_id from the database"""
     return db_service.get_database_object(deployment_id, DeploymentDataclass)

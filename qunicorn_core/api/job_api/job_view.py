@@ -118,7 +118,7 @@ class JobPauseView(MethodView):
         return jsonify(jobmanager_service.pause_job_by_id(job_id))
 
 
-@JOBMANAGER_API.route("/<string:deployment_id>/jobs")
+@JOBMANAGER_API.route("/<string:deployment_id>/")
 class DeploymentDetailJobView(MethodView):
     """API endpoint for jobs of a specific deployment."""
 
@@ -126,10 +126,10 @@ class DeploymentDetailJobView(MethodView):
     def get(self, deployment_id: str):
         """Get the details of all jobs with a specific deployment id."""
         logging.info("Request: get jobs with deployment id")
-        return jsonify(jobmanager_service.get_jobs_by_deployment_id(deployment_id)), 200
+        return jsonify(jobmanager_service.get_jobs_by_deployment_id(deployment_id))
 
     @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))
     def delete(self, deployment_id: str):
         """Delete all jobs with a specific deployment id."""
         logging.info("Request: delete jobs with deployment id")
-        return jsonify(jobmanager_service.delete_jobs_by_deployment_id(deployment_id)), 200
+        return jsonify(jobmanager_service.delete_jobs_by_deployment_id(deployment_id))

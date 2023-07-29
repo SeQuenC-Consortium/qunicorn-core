@@ -28,24 +28,24 @@ def get_all_deployments() -> list[DeploymentDto]:
     return deployment_db_service.get_all_deployments()
 
 
-def get_deployment(id: int) -> DeploymentDto:
+def get_deployment(id: int) -> DeploymentDataclass:
     """Gets one deployment"""
     return deployment_db_service.get_deployment(id)
 
 
-def update_deployment(deployment_dto: DeploymentRequestDto, id: int) -> DeploymentDto:
+def update_deployment(deployment_dto: DeploymentRequestDto, deployment_id: int) -> DeploymentDto:
     """Updates one deployment"""
     try:
-        db_deployment = get_deployment(id)
+        db_deployment = get_deployment(deployment_id)
         db_deployment.deployed_by = db_service.get_database_object(0, UserDataclass)
         db_deployment.deployed_at = datetime.now()
         db_deployment.name = deployment_dto.name
         programs = [quantum_program_mapper.request_to_quantum_program(qc) for qc in deployment_dto.programs]
         db_deployment.programs = programs
         return db_service.save_database_object(db_deployment)
-    except Exception:
+    except AttributeError:
         db_service.get_session().rollback()
-        raise Exception("Could not update deployment")
+        raise ValueError("Error updating deployment with id: " + str(deployment_id))
 
 
 def delete_deployment(id: int) -> DeploymentDto:
