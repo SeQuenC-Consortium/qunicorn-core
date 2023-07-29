@@ -93,7 +93,9 @@ def get_job(job_id: int) -> JobResponseDto:
 
 def delete_job_data_by_id(job_id):
     """delete job data from db"""
+    job = get_job(job_id)
     job_db_service.delete(job_id)
+    return job
 
 
 def get_all_jobs() -> list[SimpleJobDto]:
