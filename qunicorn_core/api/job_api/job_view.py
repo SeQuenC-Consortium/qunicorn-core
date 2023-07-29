@@ -62,9 +62,9 @@ class JobDetailView(MethodView):
         job_response_dto: JobResponseDto = jobmanager_service.get_job(int(job_id))
         return jsonify(job_response_dto), 200
 
-    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
+    @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema())
     def delete(self, job_id: str):
-        """Delete job data via id."""
+        """Delete job data via id and return the deleted job."""
         return jobmanager_service.delete_job_data_by_id(job_id)
 
 
@@ -118,7 +118,7 @@ class JobPauseView(MethodView):
 
 
 @JOBMANAGER_API.route("/<string:deployment_id>/")
-class DeploymentDetailJobView(MethodView):
+class JobsByDeploymentView(MethodView):
     """API endpoint for jobs of a specific deployment."""
 
     @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))

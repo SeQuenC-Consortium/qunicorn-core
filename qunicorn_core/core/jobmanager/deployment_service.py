@@ -15,12 +15,9 @@ from datetime import datetime
 
 from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto
 from qunicorn_core.core.mapper import deployment_mapper, quantum_program_mapper
-from qunicorn_core.db import DB
 from qunicorn_core.db.database_services import deployment_db_service, db_service, job_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.user import UserDataclass
-
-session = DB.session
 
 
 def get_all_deployments() -> list[DeploymentDto]:
