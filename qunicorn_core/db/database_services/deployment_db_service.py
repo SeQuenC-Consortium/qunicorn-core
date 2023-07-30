@@ -30,7 +30,7 @@ def create(deployment: DeploymentDataclass) -> DeploymentDataclass:
 
 
 def get_all_deployments() -> list[DeploymentDataclass]:
-    """Gets the Deployment with the deployment_id from the database"""
+    """Gets all deployments from the database"""
     return db_service.get_all_database_objects(DeploymentDataclass)
 
 

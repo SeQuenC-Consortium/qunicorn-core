@@ -21,13 +21,16 @@ import marshmallow as ma
 from .provider_dtos import ProviderDto, ProviderDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
-__all__ = ["DeviceDtoSchema", "DeviceIDSchema", "DeviceDto", "DeviceRequest", "DeviceRequestSchema"]
+__all__ = ["DeviceDtoSchema", "SimpleDeviceDtoSchema", "SimpleDeviceDto", "DeviceDto", "DeviceRequest",
+           "DeviceRequestSchema"]
 
 
 @dataclass
 class DeviceDto:
     id: int
     device_name: str
+    num_qubits: int
+    is_simulator: bool
     provider: ProviderDto | None = None
     url: str | None = None
 
@@ -39,6 +42,8 @@ class DeviceRequest:
 
 class DeviceDtoSchema(MaBaseSchema):
     device_id = ma.fields.Integer(required=True, allow_none=False, metadata={"description": "The unique deviceID."})
+    num_qubits = ma.fields.Integer(required=True, allow_none=False)
+    is_simulator = ma.fields.Boolean(required=True, allow_none=False)
     address_url = ma.fields.String(required=True, allow_none=False, metadata={"description": "URL of a device."})
     provider = ma.fields.Nested(ProviderDtoSchema())
 
@@ -47,9 +52,17 @@ class DeviceRequestSchema(MaBaseSchema):
     token = ma.fields.String(required=True, example="")
 
 
-class DeviceIDSchema(MaBaseSchema):
-    device_type = ma.fields.String(required=True, allow_none=False)
-    device_id = ma.fields.Integer(required=True, allow_none=False)
+@dataclass
+class SimpleDeviceDto:
+    device_id: int
+    device_name: str
+    provider_name: str
+
+
+class SimpleDeviceDtoSchema(MaBaseSchema):
+    device_id = ma.fields.Integer(required=True, dump_only=True)
+    device_name = ma.fields.String(required=True, dump_only=True)
+    provider_name = ma.fields.String(required=True, dump_only=True)
 
 
 class DevicesResponseSchema(MaBaseSchema):

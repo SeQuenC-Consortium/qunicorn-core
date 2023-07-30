@@ -49,14 +49,22 @@ celery worker and execute all tasks synchronously.
     * **DELETE /jobs/{job_id}/** *(Get details/results of a job)*
     * **POST /jobs/run/{job_id}/** *(Executes an uploaded python file)*
     * **POST /jobs/rerun/{job_id}/** *(Copies and Runs again an existing Job)*
+    * **GET /jobs/{deployment_id}/** *(Get all jobs with the given deploymentId)*
+    * **DELETE /jobs/{deployment_id}/** *(Delete all jobs with the given deploymentId)*
 
 * **DEPLOYMENTS**
     * **GET /deployments/** *(Get all Deployments)*
     * **POST /deployments/** *(Create a Deployment)*
-    * **GET /deployments/{job_id}/** *(Gets a Deployment)*
+    * **GET /deployments/{deployment_id}/** *(Gets a Deployment)*
+    * **PUT /deployments/{deployment_id}/** *(Update a Deployment)*
+    * **DELETE /deployments/{deployment_id}/** *(Deletes a Deployment)*
 
 * **DEVICES**
+    * **GET /devices/** *(Get all currently saved devices)*
     * **PUT /devices/** *(Updates the devices, by retrieving them from IBM)*
+    * **PUT /devices/{device_id}/** *(Get details about one device)*
+    * **PUT /devices/{device_id}/status** *(To check if a device is running)*
+    * **PUT /devices/{device_id}/calibration** *(To get some device properties)*
 
 Run the development server with
 

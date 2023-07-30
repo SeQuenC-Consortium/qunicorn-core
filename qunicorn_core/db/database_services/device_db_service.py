@@ -30,3 +30,13 @@ def get_device_with_name(provider_name: str) -> DeviceDataclass:
         logging.warn(f"There exists multiple or zero devices with the same name {provider_name}")
 
     return devices[0]
+
+
+def get_all_devices() -> list[DeviceDataclass]:
+    """Gets all Devices from the DB"""
+    return db_service.get_all_database_objects(DeviceDataclass)
+
+
+def get_device(device_id: int) -> DeviceDataclass:
+    """Get a device by id"""
+    return db_service.get_database_object(device_id, DeviceDataclass)

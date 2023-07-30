@@ -14,24 +14,23 @@
 
 
 """Module containing the routes of the devices API."""
-
 from http import HTTPStatus
 
-from flask import jsonify, url_for
+from flask import jsonify
 from flask.views import MethodView
 
-from .root import DEVICES_API, RootData
+from .root import DEVICES_API
 from ..api_models import RootSchema
 from ..api_models.device_dtos import (
     DeviceDtoSchema,
     DeviceRequestSchema,
-    DeviceRequest,
+    DeviceRequest, SimpleDeviceDtoSchema,
 )
 from ...core.devicemanager import devicemanager_service
 
 
 @DEVICES_API.route("/")
-class RootView(MethodView):
+class DeviceView(MethodView):
     """Root endpoint of the device api, to list all available device_api."""
 
     @DEVICES_API.arguments(DeviceRequestSchema(), location="json")
@@ -42,51 +41,45 @@ class RootView(MethodView):
         all_devices = devicemanager_service.update_devices(device_request)
         return jsonify(all_devices), 200
 
-    @DEVICES_API.response(HTTPStatus.OK, RootSchema())
+    @DEVICES_API.response(HTTPStatus.OK, SimpleDeviceDtoSchema(many=True))
     def get(self):
-        """TBD: Get the urls of the next endpoints of the device_api api to call."""
-        return RootData(root=url_for("device-api.DeviceView", device_id=1, _external=True))  # id=1 only a dummy value
+        """Get all devices from the database, for more details get the device by id."""
+        return devicemanager_service.get_all_devices()
 
 
 @DEVICES_API.route("/<string:device_id>/")
-class DeviceView(MethodView):
+class DeviceIdView(MethodView):
     """TBD: Devices Endpoint to get properties of a specific device."""
 
     @DEVICES_API.response(HTTPStatus.OK, DeviceDtoSchema())
     def get(self, device_id):
         """Get information about a specific device."""
 
-        pass
+        return devicemanager_service.get_device(device_id)
 
 
 @DEVICES_API.route("/<string:device_id>/status")
 class DevicesStatusStatus(MethodView):
-    """TBD: Devices Endpoint to get properties of a specific device."""
+    """Devices Endpoint to get properties of a specific device."""
 
-    @DEVICES_API.response(HTTPStatus.OK, DeviceDtoSchema())
-    def get(self, device_id):
-        """Get the status of a specific device."""
-
-        pass
+    @DEVICES_API.arguments(DeviceRequestSchema(), location="json")
+    @DEVICES_API.response(HTTPStatus.OK)
+    def post(self, device_request_data, device_id):
+        """To check if a specific device is available."""
+        device_request: DeviceRequest = DeviceRequest(**device_request_data)
+        return devicemanager_service.check_if_device_available(device_id, device_request.token)
 
 
 @DEVICES_API.route("/<string:device_id>/calibration")
 class DevicesCalibrationView(MethodView):
-    """TBD: Devices Endpoint to get properties of a specific device."""
+    """Devices Endpoint to get properties of a specific device."""
 
-    @DEVICES_API.response(HTTPStatus.OK, DeviceDtoSchema())
-    def get(self, device_id):
-        """Get calibration data for a specific device in a uniform way."""
+    @DEVICES_API.arguments(DeviceRequestSchema(), location="json")
+    @DEVICES_API.response(HTTPStatus.OK)
+    def post(self, device_request_data, device_id):
+        """Get configuration data for a specific device in a uniform way."""
 
-        pass
+        device_request: DeviceRequest = DeviceRequest(**device_request_data)
+        device = devicemanager_service.get_device_from_provider(device_id, device_request.token)
 
-
-@DEVICES_API.route("/<string:device_id>/jobs")
-class DevicesJobsView(MethodView):
-    """TBD: Devices Endpoint to get properties of a specific device/service."""
-
-    @DEVICES_API.response(HTTPStatus.OK, DeviceDtoSchema())
-    def get(self, device_id):
-        """Get the active jobs of a device."""
-
-        pass
+        return jsonify(device)

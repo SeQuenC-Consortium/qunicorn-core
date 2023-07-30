@@ -11,14 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from qiskit.providers import QiskitBackendNotFoundError
 from qiskit_ibm_provider import IBMProvider, IBMBackend
 
-from qunicorn_core.api.api_models.device_dtos import DeviceRequest
+from qunicorn_core.api.api_models.device_dtos import DeviceRequest, SimpleDeviceDto, DeviceDto
 from qunicorn_core.celery import CELERY
+from qunicorn_core.core.mapper import device_mapper
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
-from qunicorn_core.db.database_services import db_service
+from qunicorn_core.db.database_services import db_service, device_db_service
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.static.enums.provider_name import ProviderName
 
 
 @CELERY.task()
@@ -62,3 +65,47 @@ def get_device_dict(devices: [IBMBackend]) -> dict:
         all_devices["all_devices"].append(device_dict)
 
     return all_devices
+
+
+def get_all_devices() -> list[SimpleDeviceDto]:
+    """Gets all Devices from the DB and maps them"""
+    return [device_mapper.device_to_simple_device(device) for device in device_db_service.get_all_devices()]
+
+
+def get_device(device_id: int) -> DeviceDto:
+    """Gets all Devices from the DB and maps them"""
+    return device_mapper.device_to_device_dto(device_db_service.get_device(device_id))
+
+
+def check_if_device_available(device_id: int, token: str) -> dict:
+    """Checks if the backend is running"""
+    device: DeviceDto = get_device(device_id)
+    if device.provider.name == ProviderName.IBM:
+        ibm_provider: IBMProvider = QiskitPilot.get_ibm_provider_and_login(token)
+        try:
+            ibm_provider.get_backend(device.device_name)
+        except QiskitBackendNotFoundError:
+            return {"backend": "Not Found"}
+        finally:
+            return {"backend": "Available"}
+    else:
+        raise ValueError("No valid Provider specified")
+
+
+def get_device_from_provider(device_id: int, token: str) -> dict:
+    """Get the device from the provider and return the configuration as dict"""
+    device: DeviceDto = get_device(device_id)
+
+    # TODO add AWS Device and find common calibration data
+    if device.provider.name == ProviderName.IBM:
+        ibm_provider: IBMProvider = QiskitPilot.get_ibm_provider_and_login(token)
+        backend = ibm_provider.get_backend(device.device_name)
+        config_dict: dict = vars(backend.configuration())
+        config_dict['u_channel_lo'] = None
+        config_dict["_qubit_channel_map"] = None
+        config_dict['_channel_qubit_map'] = None
+        config_dict['_control_channels'] = None
+        config_dict['gates'] = None
+        return config_dict
+    else:
+        raise ValueError("No valid Provider specified")
