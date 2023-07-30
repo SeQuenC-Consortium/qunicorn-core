@@ -21,8 +21,14 @@ import marshmallow as ma
 from .provider_dtos import ProviderDto, ProviderDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
-__all__ = ["DeviceDtoSchema", "SimpleDeviceDtoSchema", "SimpleDeviceDto", "DeviceDto", "DeviceRequest",
-           "DeviceRequestSchema"]
+__all__ = [
+    "DeviceDtoSchema",
+    "SimpleDeviceDtoSchema",
+    "SimpleDeviceDto",
+    "DeviceDto",
+    "DeviceRequest",
+    "DeviceRequestSchema",
+]
 
 
 @dataclass

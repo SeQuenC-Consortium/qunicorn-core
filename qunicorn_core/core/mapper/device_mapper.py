@@ -21,7 +21,7 @@ from qunicorn_core.db.models.device import DeviceDataclass
 def device_dto_to_device(device: DeviceDto) -> DeviceDataclass:
     return DeviceDataclass(
         id=device.id,
-        num_quibits=device.num_qubits,
+        num_qubits=device.num_qubits,
         is_simulator=device.is_simulator,
         provider=provider_mapper.provider_dto_to_provider(device.provider),
         device_name=device.device_name,
@@ -31,20 +31,9 @@ def device_dto_to_device(device: DeviceDto) -> DeviceDataclass:
 
 def device_dto_to_device_without_id(device: DeviceDto) -> DeviceDataclass:
     return DeviceDataclass(
-        num_quibits=device.num_qubits,
-        is_simulator=device.is_simulator,
-        provider=provider_mapper.provider_dto_to_provider(device.provider),
-        device_name=device.device_name,
-        url=device.url,
-    )
-
-
-def device_to_device_dto(device: DeviceDataclass) -> DeviceDto:
-    return DeviceDto(
-        id=device.id,
         num_qubits=device.num_qubits,
         is_simulator=device.is_simulator,
-        provider=provider_mapper.provider_to_provider_dto(device.provider),
+        provider=provider_mapper.provider_dto_to_provider(device.provider),
         device_name=device.device_name,
         url=device.url,
     )

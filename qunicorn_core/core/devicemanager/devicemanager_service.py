@@ -84,10 +84,9 @@ def check_if_device_available(device_id: int, token: str) -> dict:
         ibm_provider: IBMProvider = QiskitPilot.get_ibm_provider_and_login(token)
         try:
             ibm_provider.get_backend(device.device_name)
+            return {"backend": "Available"}
         except QiskitBackendNotFoundError:
             return {"backend": "Not Found"}
-        finally:
-            return {"backend": "Available"}
     else:
         raise ValueError("No valid Provider specified")
 
@@ -101,11 +100,11 @@ def get_device_from_provider(device_id: int, token: str) -> dict:
         ibm_provider: IBMProvider = QiskitPilot.get_ibm_provider_and_login(token)
         backend = ibm_provider.get_backend(device.device_name)
         config_dict: dict = vars(backend.configuration())
-        config_dict['u_channel_lo'] = None
+        config_dict["u_channel_lo"] = None
         config_dict["_qubit_channel_map"] = None
-        config_dict['_channel_qubit_map'] = None
-        config_dict['_control_channels'] = None
-        config_dict['gates'] = None
+        config_dict["_channel_qubit_map"] = None
+        config_dict["_control_channels"] = None
+        config_dict["gates"] = None
         return config_dict
     else:
         raise ValueError("No valid Provider specified")

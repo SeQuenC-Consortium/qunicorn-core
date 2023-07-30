@@ -24,7 +24,8 @@ from ..api_models import RootSchema
 from ..api_models.device_dtos import (
     DeviceDtoSchema,
     DeviceRequestSchema,
-    DeviceRequest, SimpleDeviceDtoSchema,
+    DeviceRequest,
+    SimpleDeviceDtoSchema,
 )
 from ...core.devicemanager import devicemanager_service
 

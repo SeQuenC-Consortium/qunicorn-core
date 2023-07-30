@@ -33,7 +33,9 @@ from qunicorn_core.static.enums.programming_language import ProgrammingLanguage
 def request_to_core(job: JobRequestDto):
     """Helper class. When the db objects are saved correctly we do not need it anymore"""
     provider = ProviderDto(id=0, with_token=True, supported_language=ProgrammingLanguage.QISKIT, name=job.provider_name)
-    device = DeviceDto(id=0, device_name=job.device_name, provider=provider, url="DefaultUrl")
+    device = DeviceDto(
+        id=0, device_name=job.device_name, provider=provider, url="DefaultUrl", num_qubits=-1, is_simulator=True
+    )
 
     # Get deployment from db and map to dto
     deployment: DeploymentDataclass = db_service.get_database_object(job.deployment_id, DeploymentDataclass)
