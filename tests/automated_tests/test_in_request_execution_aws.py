@@ -15,13 +15,12 @@
 """test in-request execution for aws"""
 
 from qunicorn_core.api.api_models.job_dtos import SimpleJobDto, JobRequestDto
-from qunicorn_core.api.job_api.job_view import JobIDView
 from qunicorn_core.core.jobmanager import jobmanager_service
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from tests.conftest import set_up_env
-from flask import jsonify
+
 
 def test_create_and_run_aws_local_simulator():
     """Tests the create and run job method for synchronous execution of the aws local simulator"""
@@ -30,6 +29,15 @@ def test_create_and_run_aws_local_simulator():
 
     with app.app_context():
         print("this is my first test")
-        job_dto: JobRequestDto = JobRequestDto(name="JobName", circuits=["OPENQASM 3; qubit[3] q;bit[3] c; h q[0]; cnot q[0], q[1];cnot q[1], q[2];c = measure q;"], provider_name="AWS", shots=4000, parameters="[0]", token="", type=JobType.RUNNER, assembler_language=AssemblerLanguage.QASM)
+        job_dto: JobRequestDto = JobRequestDto(
+            name="JobName",
+            circuits=["OPENQASM 3; qubit[3] q;bit[3] c; h q[0]; cnot q[0], q[1];" "cnot q[1], q[2];c = measure q;"],
+            provider_name="AWS",
+            shots=4000,
+            parameters="[0]",
+            token="",
+            type=JobType.RUNNER,
+            assembler_language=AssemblerLanguage.QASM,
+        )
         job_response: SimpleJobDto = jobmanager_service.create_and_run_job(job_dto)
         assert job_response.job_state == JobState.RUNNING
