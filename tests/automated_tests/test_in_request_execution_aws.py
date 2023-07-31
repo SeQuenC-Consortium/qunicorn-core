@@ -14,11 +14,14 @@
 
 """test in-request execution for aws"""
 
-from qunicorn_core.api.api_models.job_dtos import SimpleJobDto
+from qunicorn_core.api.api_models.job_dtos import SimpleJobDto, JobRequestDto
 from qunicorn_core.api.job_api.job_view import JobIDView
+from qunicorn_core.core.jobmanager import jobmanager_service
+from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
+from qunicorn_core.static.enums.job_state import JobState
+from qunicorn_core.static.enums.job_type import JobType
 from tests.conftest import set_up_env
 from flask import jsonify
-
 
 def test_create_and_run_aws_local_simulator():
     """Tests the create and run job method for synchronous execution of the aws local simulator"""
@@ -26,17 +29,7 @@ def test_create_and_run_aws_local_simulator():
     app = set_up_env()
 
     with app.app_context():
-        result = JobIDView.post(
-            '{"type": "AWS_SIMULATOR", "parameters": [0], "circuits": ["OPENQASM 3; \nqubit[3] q;\nbit[3] c;\
-            \nh q[0]; \ncnot q[0], q[1];\ncnot q[1], q[2];\nc = measure q;"], "shots": 4000, "assemblerLanguage": "BRAKET", \
-            "name": "JobName", "token": "", "providerName": "AWS"}'
-        )
-
-    with app.app_context():
-        print(result)
-        dto = SimpleJobDto(id=1, name="JobName", job_state="RUNNING")
-        testresult = jsonify(dto, 200)
-        assert result == testresult
-
-
-test_create_and_run_aws_local_simulator()
+        print("this is my first test")
+        job_dto: JobRequestDto = JobRequestDto(name="JobName", circuits=["OPENQASM 3; qubit[3] q;bit[3] c; h q[0]; cnot q[0], q[1];cnot q[1], q[2];c = measure q;"], provider_name="AWS", shots=4000, parameters="[0]", token="", type=JobType.RUNNER, assembler_language=AssemblerLanguage.QASM)
+        job_response: SimpleJobDto = jobmanager_service.create_and_run_job(job_dto)
+        assert job_response.job_state == JobState.RUNNING

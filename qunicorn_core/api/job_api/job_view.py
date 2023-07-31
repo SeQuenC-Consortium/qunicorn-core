@@ -54,7 +54,6 @@ class JobIDView(MethodView):
         """Create/Register and run new job."""
         job_dto: JobRequestDto = JobRequestDto(**body)
         job_response: SimpleJobDto = jobmanager_service.create_and_run_job(job_dto)
-        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", str(jsonify(job_response)), 200)
         return jsonify(job_response), 200
 
 
