@@ -1,0 +1,12 @@
+{
+  "name": "JobName",
+  "provider_name": "IBM",
+  "type": "RUNNER",
+  "token": "",
+  "parameters": [
+    0
+  ],
+  "device_name": "aer_simulator",
+  "shots": 4000,
+  "deployment_id": 1
+}

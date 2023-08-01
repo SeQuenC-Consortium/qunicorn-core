@@ -1,0 +1,11 @@
+{
+  "quantum_circuit": "",
+  "python_file_path": "ibm_upload_test_data_file.py",
+  "python_file_inputs": {
+    "my_obj": "MyCustomClass(my foo, my bar)"},
+  "python_file_metadata": "ibm_upload_test_data_metadata.json",
+  "python_file_options": {
+    "backend": "ibmq_qasm_simulator"
+  },
+  "assembler_language": "QASM"
+}

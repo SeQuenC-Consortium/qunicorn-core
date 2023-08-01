@@ -1,10 +1,10 @@
 """Module containing default config values."""
-from os import urandom
 from logging import WARNING, INFO
+from os import urandom
 
-from .sqlalchemy_config import SQLAchemyProductionConfig, SQLAchemyDebugConfig
-from .smorest_config import SmorestProductionConfig, SmorestDebugConfig
 from .celery_config import CELERY_DEBUG_CONFIG
+from .smorest_config import SmorestProductionConfig, SmorestDebugConfig
+from .sqlalchemy_config import SQLAchemyProductionConfig, SQLAchemyDebugConfig
 
 
 class ProductionConfig(SQLAchemyProductionConfig, SmorestProductionConfig):
@@ -23,7 +23,9 @@ class ProductionConfig(SQLAchemyProductionConfig, SmorestProductionConfig):
 
     DEFAULT_LOG_SEVERITY = WARNING
     DEFAULT_LOG_FORMAT_STYLE = "{"
-    DEFAULT_LOG_FORMAT = "{asctime} [{levelname:^7}] [{module:<30}] {message}    <{funcName}, {lineno}; {pathname}>"
+    DEFAULT_LOG_FORMAT = (
+        "{asctime} [{levelname:^7}] [{module:<15}] {message:<175}    <{funcName}, {lineno}; {pathname}>"
+    )
     DEFAULT_LOG_DATE_FORMAT = None
 
     CELERY = CELERY_DEBUG_CONFIG

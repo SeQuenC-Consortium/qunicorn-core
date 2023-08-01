@@ -30,6 +30,7 @@ from tomli import load as load_toml
 
 from . import api, celery, db, licenses
 from .api import jwt
+from .util import logging
 from .util.config import ProductionConfig, DebugConfig
 
 # change this to change tha flask app name and the config env var prefix
@@ -51,7 +52,9 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
 
     # load defaults
     config = app.config
-    flask_debug: bool = config.get("DEBUG", False) or environ.get("FLASK_ENV", "production").lower() == "development"  # noqa
+    flask_debug: bool = (
+        config.get("DEBUG", False) or environ.get("FLASK_ENV", "production").lower() == "development"
+    )  # noqa
     if flask_debug:
         config.from_object(DebugConfig)
     elif test_config is None:
@@ -104,7 +107,8 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
 
     logger: Logger = app.logger
     logger.info(
-        f"Configuration loaded. Possible config locations are: 'config.py', 'config.json', Environment: '{CONFIG_ENV_VAR_PREFIX}_SETTINGS'"
+        f"Configuration loaded. Possible config locations are: 'config.py', "
+        f"'config.json', Environment: '{CONFIG_ENV_VAR_PREFIX}_SETTINGS'"
     )
 
     if config.get("SECRET_KEY") == "debug_secret":
@@ -135,6 +139,17 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
         from .util.debug_routes import register_debug_routes
 
         register_debug_routes(app)
+
+    # To display the errors differently in the swagger ui
+    @app.errorhandler(Exception)
+    def handle_internal_server_error(error):
+        logging.error(str(error))
+        error_code: int = 500 if not hasattr(error, "status_code") else error.status_code
+        return {
+            "code": error_code,
+            "error": type(error).__name__,
+            "message": str(error),
+        }, error_code
 
     return app
 

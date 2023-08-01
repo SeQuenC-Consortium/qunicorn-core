@@ -22,8 +22,8 @@ from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.result_type import ResultType
+from tests import test_utils
 from tests.conftest import set_up_env
-from tests.test_utils import get_object_from_json
 
 EXPECTED_ID: int = 2
 JOB_FINISHED_PROGRESS: int = 100
@@ -35,10 +35,12 @@ def test_create_and_run_runner():
     """Tests the create and run job method for synchronous execution of a runner"""
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
-    job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
+    job_request_dto: JobRequestDto = test_utils.get_test_job()
+    job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, True)
         return_dto: SimpleJobDto = create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
@@ -53,11 +55,13 @@ def test_create_and_run_sampler():
     """Tests the create and run job method for synchronous execution of a sampler"""
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
-    job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
+    job_request_dto: JobRequestDto = test_utils.get_test_job()
     job_request_dto.type = JobType.SAMPLER
+    job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, True)
         return_dto: SimpleJobDto = create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
@@ -72,11 +76,13 @@ def test_create_and_run_estimator():
     """Tests the create and run job method for synchronous execution of an estimator"""
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
-    job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data.json"))
+    job_request_dto: JobRequestDto = test_utils.get_test_job()
     job_request_dto.type = JobType.ESTIMATOR
+    job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, True)
         return_dto: SimpleJobDto = create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
@@ -124,11 +130,11 @@ def check_if_job_runner_result_correct(job: JobDataclass):
         shots: int = job.shots
         if i == 0:
             tolerance: int = 100
-            assert (shots / 2 + tolerance) > result.result_dict["00"] > (shots / 2 - tolerance)
-            assert (shots / 2 + tolerance) > result.result_dict["11"] > (shots / 2 - tolerance)
-            assert (result.result_dict["00"] + result.result_dict["11"]) == shots
+            assert (shots / 2 + tolerance) > result.result_dict["0x0"] > (shots / 2 - tolerance)
+            assert (shots / 2 + tolerance) > result.result_dict["0x3"] > (shots / 2 - tolerance)
+            assert (result.result_dict["0x0"] + result.result_dict["0x3"]) == shots
         else:
-            assert result.result_dict["00"] == shots
+            assert result.result_dict["0x0"] == shots
 
 
 def check_if_job_estimator_result_correct(job: JobDataclass):
@@ -140,7 +146,7 @@ def check_if_job_estimator_result_correct(job: JobDataclass):
         tolerance: float = 0.2
         default_variance: float = 1.0
         assert -tolerance < float(result.result_dict["value"]) < tolerance
-        assert default_variance - tolerance < float(result.result_dict["variance"]) < default_variance
+        assert default_variance - tolerance < float(result.result_dict["variance"]) <= default_variance
 
 
 def check_standard_result_data(i, job, result):

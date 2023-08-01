@@ -28,6 +28,10 @@ class UserDto:
     id: int
     name: str | None = None
 
+    @staticmethod
+    def get_default_user() -> "UserDto":
+        return UserDto(id=0, name="default")
+
 
 class UserDtoSchema(MaBaseSchema):
     id = ma.fields.Int(required=True, allow_none=False)

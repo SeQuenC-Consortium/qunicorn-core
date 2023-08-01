@@ -33,8 +33,8 @@ class ResultDataclass(DbModel):
         result_type (Enum): Result type depending on the Job_Type of the job
     """
 
-    result_dict: Mapped[dict] = mapped_column(sql.JSON)
-    job_id: Mapped[int] = mapped_column(ForeignKey("Job.id"), default=None, nullable=True)
+    result_dict: Mapped[dict] = mapped_column(sql.JSON, default=None, nullable=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("Job.id", ondelete="CASCADE"), default=None, nullable=True)
     circuit: Mapped[str] = mapped_column(sql.String(100), default=None, nullable=True)
     meta_data: Mapped[dict] = mapped_column(sql.JSON, default=None, nullable=True)
     result_type: Mapped[str] = mapped_column(sql.Enum(ResultType), default=ResultType.COUNTS)

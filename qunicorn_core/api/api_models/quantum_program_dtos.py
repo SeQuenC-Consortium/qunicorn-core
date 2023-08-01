@@ -15,22 +15,45 @@
 
 """Module containing all Dtos and their Schemas  for tasks in the QuantumProgram API."""
 from dataclasses import dataclass
+
 import marshmallow as ma
 
-__all__ = ["QuantumProgramDto", "QuantumProgramSchema"]
+__all__ = ["QuantumProgramDto", "QuantumProgramRequestDto", "QuantumProgramRequestDtoSchema", "QuantumProgramDtoSchema"]
 
 from qunicorn_core.api.flask_api_utils import MaBaseSchema
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
+from qunicorn_core.util import utils
 
 
 @dataclass
 class QuantumProgramDto:
-    id: int
+    id: int | None = None
+    quantum_circuit: str | None = None
+    assembler_language: AssemblerLanguage | None = None
+    python_file_path: str | None = None
+    python_file_metadata: str | None = None
+
+
+@dataclass
+class QuantumProgramRequestDto:
     quantum_circuit: str
     assembler_language: AssemblerLanguage
+    python_file_path: str | None = None
+    python_file_metadata: str | None = None
 
 
-class QuantumProgramSchema(MaBaseSchema):
-    id = ma.fields.Integer(required=True, allow_none=False)
-    quantum_circuit = ma.fields.String(required=False, allow_none=True)
+class QuantumProgramRequestDtoSchema(MaBaseSchema):
+    quantum_circuit = ma.fields.String(required=True, allow_none=True, example=utils.get_default_qasm_string())
     assembler_language = ma.fields.Enum(required=True, example=AssemblerLanguage.QASM, enum=AssemblerLanguage)
+    python_file_path = ma.fields.String(required=False, example="ibm_upload_test_data_file.py", allow_none=True)
+    python_file_metadata = ma.fields.String(
+        required=False, example="ibm_upload_test_data_metadata.json", allow_none=True
+    )
+
+
+class QuantumProgramDtoSchema(MaBaseSchema):
+    id = ma.fields.Int(required=True, dump_only=True)
+    quantum_circuit = ma.fields.String(required=False, dump_only=True)
+    assembler_language = ma.fields.Enum(required=True, dump_only=True, enum=AssemblerLanguage)
+    python_file_path = ma.fields.String(required=False, dump_only=True)
+    python_file_metadata = ma.fields.String(required=False, dump_only=True)

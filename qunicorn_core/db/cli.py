@@ -17,6 +17,8 @@
 
 """CLI functions for the db module."""
 import datetime
+import json
+import os
 
 import click
 from flask import Flask, Blueprint, current_app
@@ -85,12 +87,15 @@ def load_db_function(app: Flask):
     user = UserDataclass(name="DefaultUser")
     qc = QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(1))
     qc2 = QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(2))
-    deployment = DeploymentDataclass(deployed_by=user, programs=[qc, qc2], deployed_at=datetime.datetime.now(), name="DeploymentName")
+    deployment = DeploymentDataclass(
+        deployed_by=user, programs=[qc, qc2], deployed_at=datetime.datetime.now(), name="DeploymentName"
+    )
     provider = ProviderDataclass(
         with_token=True,
         supported_language=ProgrammingLanguage.QISKIT,
         name=ProviderName.IBM,
     )
+
     provider2 = ProviderDataclass(
         with_token=False,
         supported_language=ProgrammingLanguage.BRAKET,
@@ -98,6 +103,16 @@ def load_db_function(app: Flask):
     )
     device = DeviceDataclass(provider=provider, url="")
     device2 = DeviceDataclass(provider=provider2, url="")
+
+    # TODO delete default device since devices are loaded into db from start
+    device = DeviceDataclass(
+        provider=provider,
+        url="",
+        device_name="aer_simulator",
+        is_simulator=True,
+        num_qubits=-1,
+    )
+
     job = JobDataclass(
         executed_by=user,
         executed_on=device,
@@ -110,6 +125,7 @@ def load_db_function(app: Flask):
         name="JobName",
         results=[ResultDataclass(result_dict={"0x": "550", "1x": "450"})],
     )
+
     job2 = JobDataclass(
         executed_by=user,
         executed_on=device2,
@@ -122,10 +138,32 @@ def load_db_function(app: Flask):
         name="Job2Name",
         results=[ResultDataclass(result_dict={"0x": "550", "1x": "450"})],
     )
+
+    add_devices(provider=provider)
+
     DB.session.add(job)
     DB.session.add(job2)
     DB.session.commit()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
+
+
+def add_devices(provider: ProviderDataclass):
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    path_dir = "{}{}{}".format(root_dir, os.sep, "qunicorn_devices.json")
+
+    with open(path_dir, "r", encoding="utf-8") as f:
+        all_devices = json.load(f)
+
+    for device in all_devices["all_devices"]:
+        final_device: DeviceDataclass = DeviceDataclass(
+            provider_id=device["provider_id"],
+            num_qubits=device["num_qubits"],
+            device_name=device["name"],
+            url=device["url"],
+            is_simulator=device["is_simulator"],
+            provider=provider,
+        )
+        DB.session.add(final_device)
 
 
 @DB_CLI.command("drop-db")

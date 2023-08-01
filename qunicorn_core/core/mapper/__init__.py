@@ -12,4 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import deployment_mapper, device_mapper, job_mapper, provider_mapper, quantum_program_mapper, user_mapper
+from . import (
+    deployment_mapper,
+    device_mapper,
+    job_mapper,
+    provider_mapper,
+    quantum_program_mapper,
+    user_mapper,
+    result_mapper,
+)

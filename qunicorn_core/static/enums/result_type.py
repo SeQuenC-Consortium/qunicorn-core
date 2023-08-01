@@ -24,12 +24,16 @@ class ResultType(StrEnum):
         COUNTS: Classical result of a RUNNER
         QUASI_DIST: Classical result of an ESTIMATOR
         VALUE_AND_VARIANCE: Classical result of a SAMPLER
+        ERROR: Classical result of an ERROR
+        UPLOAD_SUCCESSFUL: Classical result of an UPLOAD
     """
 
     COUNTS = "COUNTS"
     QUASI_DIST = "QUASI_DIST"
     VALUE_AND_VARIANCE = "VALUE_AND_VARIANCE"
-    AWS_RESULT = "AWS_RESULT"  # placeholderName
+    ERROR = "ERROR"
+    UPLOAD_SUCCESSFUL = "UPLOAD_SUCCESSFUL"
+
 
     @staticmethod
     def get_result_type(job_type: JobType):

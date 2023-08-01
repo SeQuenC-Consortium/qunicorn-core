@@ -28,8 +28,8 @@ Run pytest in poetry
 OR: Install pytest
 > pip install -U pytest
 
-Execute tests by executing.
-> pytest tests/automated_tests
+Execute all tests (also the manual_tests).
+> poetry run pytest .
 
 Pytest finds test methods through the "test_" prefix.
 

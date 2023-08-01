@@ -16,32 +16,57 @@
 """Module containing all Dtos and their Schemas for tasks in the Deployment API."""
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List
 
 import marshmallow as ma
 
-from .quantum_program_dtos import QuantumProgramDto
+from .quantum_program_dtos import (
+    QuantumProgramDto,
+    QuantumProgramRequestDtoSchema,
+    QuantumProgramRequestDto,
+    QuantumProgramDtoSchema,
+)
 from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
-__all__ = ["DeploymentDtoSchema", "DeploymentDto"]
+__all__ = ["DeploymentDtoSchema", "DeploymentRequestDtoSchema", "DeploymentDto", "DeploymentRequestDto"]
 
 
 @dataclass
 class DeploymentDto:
     id: int
-    programs: List[QuantumProgramDto]
+    programs: list[QuantumProgramDto]
     deployed_by: UserDto
     deployed_at: datetime
     name: str
 
 
+@dataclass
+class DeploymentRequestDto:
+    programs: list[QuantumProgramRequestDto]
+    name: str
+
+    @staticmethod
+    def from_dict(body: dict) -> "DeploymentRequestDto":
+        deployment_dto: DeploymentRequestDto = DeploymentRequestDto(**body)
+        deployment_dto.programs = [QuantumProgramRequestDto(**program) for program in body["programs"]]
+        return deployment_dto
+
+
 class DeploymentDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=False, metadata={"description": "UID for the deployment_api"})
-    deployed_by = UserDtoSchema()
-    programs = ma.fields.List(ma.fields.Int, required=False, netadata={"description": "Ids of quantum programs"})
+    deployed_by = ma.fields.Nested(UserDtoSchema())
+    programs = ma.fields.Nested(QuantumProgramDtoSchema(many=True))
     deployed_at = ma.fields.Date(required=False, metadata={"description": "Time of Deployment"})
     name = ma.fields.String(
+        required=False,
+        metadata={"description": "An optional Name for the deployment_api."},
+    )
+
+
+class DeploymentRequestDtoSchema(MaBaseSchema):
+    programs = ma.fields.Nested(QuantumProgramRequestDtoSchema(many=True))
+    name = ma.fields.String(
         required=True,
+        example="DeploymentName",
         metadata={"description": "An optional Name for the deployment_api."},
     )

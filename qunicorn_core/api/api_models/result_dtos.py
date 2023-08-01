@@ -32,7 +32,7 @@ from ...static.enums.result_type import ResultType
 class ResultDto:
     id: int
     circuit: str
-    results: dict
+    result_dict: dict
     header: dict
     result_type: ResultType
 

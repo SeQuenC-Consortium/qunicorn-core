@@ -13,4 +13,4 @@
 # limitations under the License.
 
 
-from . import jobmanager_service
+from . import jobmanager_service, deployment_service

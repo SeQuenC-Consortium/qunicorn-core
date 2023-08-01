@@ -8,3 +8,4 @@ FLASK_DEBUG=True # set to False if in production!
 
 # configure default port
 FLASK_RUN_PORT=5005
+EXECUTE_CELERY_TASK_ASYNCHRONOUS=True
