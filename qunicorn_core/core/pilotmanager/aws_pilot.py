@@ -31,7 +31,7 @@ class AWSPilot(Pilot):
 
     def execute(self, job_core_dto: JobCoreDto):
         print(f"Executing job {job_core_dto} with AWS Pilot")
-        if job_core_dto.type == JobType.AWS_SIMULATOR:
+        if job_core_dto.type == JobType.RUNNER:
             self.__localSimulation(job_core_dto)
         else:
             print("WARNING: No valid Job Type specified")
@@ -49,8 +49,8 @@ class AWSPilot(Pilot):
         # define the circuit
         circuit = self.transpile(job_core_dto)
         # run the circuit
-        quantumTask: LocalQuantumTask = device.run(circuit, shots=job_core_dto.shots)
-        aws_simulator_result = quantumTask.result()
+        quantum_task: LocalQuantumTask = device.run(circuit, shots=job_core_dto.shots)
+        aws_simulator_result = quantum_task.result()
         # save result
         results: list[ResultDataclass] = result_mapper.aws_local_simulator_result_to_db_results(aws_simulator_result, job_core_dto)
         job_db_service.update_finished_job(job_core_dto.id, results)

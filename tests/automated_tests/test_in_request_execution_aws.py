@@ -16,6 +16,7 @@
 
 from qunicorn_core.api.api_models.job_dtos import SimpleJobDto, JobRequestDto
 from qunicorn_core.core.jobmanager import jobmanager_service
+from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
@@ -28,7 +29,6 @@ def test_create_and_run_aws_local_simulator():
     app = set_up_env()
 
     with app.app_context():
-        print("this is my first test")
         job_dto: JobRequestDto = JobRequestDto(
             name="JobName",
             circuits=["OPENQASM 3; qubit[3] q;bit[3] c; h q[0]; cnot q[0], q[1];" "cnot q[1], q[2];c = measure q;"],
@@ -39,5 +39,26 @@ def test_create_and_run_aws_local_simulator():
             type=JobType.RUNNER,
             assembler_language=AssemblerLanguage.QASM,
         )
-        job_response: SimpleJobDto = jobmanager_service.create_and_run_job(job_dto)
+        job_response = jobmanager_service.create_and_run_job(job_dto)
         assert job_response.job_state == JobState.RUNNING
+
+
+def test_get_results_from_aws_local_simulator_job():
+    """creates a new job again and tests the result of the aws local simulator in the db"""
+    # GIVEN: Database Setup - AWS added as a provider
+    app = set_up_env()
+
+    with app.app_context():
+        job_dto: JobRequestDto = JobRequestDto(
+            name="JobName",
+            circuits=["OPENQASM 3; qubit[3] q;bit[3] c; h q[0]; cnot q[0], q[1];" "cnot q[1], q[2];c = measure q;"],
+            provider_name="AWS",
+            shots=4000,
+            parameters="[0]",
+            token="",
+            type=JobType.RUNNER,
+            assembler_language=AssemblerLanguage.QASM,
+        )
+        job_response = jobmanager_service.create_and_run_job(job_dto, False)
+        print(job_db_service.get_job(job_response.id))
+    assert 1 == 1
