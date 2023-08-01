@@ -30,6 +30,8 @@ __all__ = [
     "DeviceRequestSchema",
 ]
 
+from ...static.enums.provider_name import ProviderName
+
 
 @dataclass
 class DeviceDto:
@@ -62,13 +64,13 @@ class DeviceRequestSchema(MaBaseSchema):
 class SimpleDeviceDto:
     device_id: int
     device_name: str
-    provider_name: str
+    provider_name: ProviderName
 
 
 class SimpleDeviceDtoSchema(MaBaseSchema):
     device_id = ma.fields.Integer(required=True, dump_only=True)
     device_name = ma.fields.String(required=True, dump_only=True)
-    provider_name = ma.fields.String(required=True, dump_only=True)
+    provider_name = ma.fields.Enum(required=True, dump_only=True, enum=ProviderName)
 
 
 class DevicesResponseSchema(MaBaseSchema):
