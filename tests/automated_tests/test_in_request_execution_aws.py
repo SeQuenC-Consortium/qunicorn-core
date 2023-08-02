@@ -18,14 +18,10 @@ from collections import Counter
 from qunicorn_core.api.api_models.job_dtos import SimpleJobDto, JobRequestDto
 from qunicorn_core.core.jobmanager import jobmanager_service
 from qunicorn_core.db.database_services import job_db_service
-from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
-from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
-from qunicorn_core.static.enums.job_type import JobType
 from tests import test_utils
 from tests.conftest import set_up_env
-import json
 
 
 IS_ASYNCHRONOUS: bool = False
@@ -61,7 +57,7 @@ def check_aws_local_simulator_results(results_dict: dict):
     counts: Counter = eval(results_dict.get("counts"))
     if not (1900 < counts.get("000") < 2100 and 1900 < counts.get("111") < 2100):
         returnvalue = False
-    if not (
+    elif not (
         0.48 < results_dict.get("probabilities").get("000") < 0.52
         and 0.48 < results_dict.get("probabilities").get("111") < 0.52
     ):
