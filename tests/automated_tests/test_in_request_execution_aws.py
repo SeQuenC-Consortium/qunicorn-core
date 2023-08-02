@@ -13,14 +13,22 @@
 # limitations under the License.
 
 """test in-request execution for aws"""
+from collections import Counter
 
 from qunicorn_core.api.api_models.job_dtos import SimpleJobDto, JobRequestDto
 from qunicorn_core.core.jobmanager import jobmanager_service
 from qunicorn_core.db.database_services import job_db_service
+from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
+from tests import test_utils
 from tests.conftest import set_up_env
+import json
+
+
+IS_ASYNCHRONOUS: bool = False
 
 
 def test_create_and_run_aws_local_simulator():
@@ -29,18 +37,10 @@ def test_create_and_run_aws_local_simulator():
     app = set_up_env()
 
     with app.app_context():
-        job_dto: JobRequestDto = JobRequestDto(
-            name="JobName",
-            circuits=["OPENQASM 3; qubit[3] q;bit[3] c; h q[0]; cnot q[0], q[1];" "cnot q[1], q[2];c = measure q;"],
-            provider_name="AWS",
-            shots=4000,
-            parameters="[0]",
-            token="",
-            type=JobType.RUNNER,
-            assembler_language=AssemblerLanguage.QASM,
-        )
-        job_response = jobmanager_service.create_and_run_job(job_dto)
-        assert job_response.job_state == JobState.RUNNING
+        job_request_dto: JobRequestDto = test_utils.get_test_job("AWS")
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, "AWS", True)
+        return_dto: SimpleJobDto = jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+        assert return_dto.job_state == JobState.RUNNING
 
 
 def test_get_results_from_aws_local_simulator_job():
@@ -49,16 +49,18 @@ def test_get_results_from_aws_local_simulator_job():
     app = set_up_env()
 
     with app.app_context():
-        job_dto: JobRequestDto = JobRequestDto(
-            name="JobName",
-            circuits=["OPENQASM 3; qubit[3] q;bit[3] c; h q[0]; cnot q[0], q[1];" "cnot q[1], q[2];c = measure q;"],
-            provider_name="AWS",
-            shots=4000,
-            parameters="[0]",
-            token="",
-            type=JobType.RUNNER,
-            assembler_language=AssemblerLanguage.QASM,
-        )
-        job_response = jobmanager_service.create_and_run_job(job_dto, False)
-        print(job_db_service.get_job(job_response.id))
-    assert 1 == 1
+        job_request_dto: JobRequestDto = test_utils.get_test_job("AWS")
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, "AWS", True)
+        return_dto: SimpleJobDto = jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+        results: ResultDataclass = job_db_service.get_job(return_dto.id).results
+    assert check_aws_local_simulator_results(results[0].result_dict)
+
+
+def check_aws_local_simulator_results(results_dict: dict):
+    returnvalue = True
+    counts: Counter = eval(results_dict.get("counts"))
+    if not(1900 < counts.get("000") < 2100 and 1900 < counts.get("111") < 2100):
+        returnvalue = False
+    if not(0.48 < results_dict.get("probabilities").get("000") < 0.52 and 0.48 < results_dict.get("probabilities").get("111") < 0.52):
+        returnvalue = False
+    return returnvalue

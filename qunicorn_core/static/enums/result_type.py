@@ -34,7 +34,6 @@ class ResultType(StrEnum):
     ERROR = "ERROR"
     UPLOAD_SUCCESSFUL = "UPLOAD_SUCCESSFUL"
 
-
     @staticmethod
     def get_result_type(job_type: JobType):
         if job_type == JobType.RUNNER:
@@ -43,5 +42,3 @@ class ResultType(StrEnum):
             return ResultType.QUASI_DIST
         elif job_type == JobType.ESTIMATOR:
             return ResultType.VALUE_AND_VARIANCE
-        elif job_type == JobType.AWS_SIMULATOR:
-            return ResultType.AWS_RESULT

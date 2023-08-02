@@ -101,14 +101,20 @@ def load_db_function(app: Flask):
         supported_language=ProgrammingLanguage.BRAKET,
         name=ProviderName.AWS,
     )
-    device = DeviceDataclass(provider=provider, url="")
-    device2 = DeviceDataclass(provider=provider2, url="")
 
     # TODO delete default device since devices are loaded into db from start
     device = DeviceDataclass(
         provider=provider,
         url="",
         device_name="aer_simulator",
+        is_simulator=True,
+        num_qubits=-1,
+    )
+
+    device_aws_local_simulator = DeviceDataclass(
+        provider=provider2,
+        url="",
+        device_name="local_simulator",
         is_simulator=True,
         num_qubits=-1,
     )
@@ -128,7 +134,7 @@ def load_db_function(app: Flask):
 
     job2 = JobDataclass(
         executed_by=user,
-        executed_on=device2,
+        executed_on=device_aws_local_simulator,
         deployment=deployment,
         progress=0,
         state=JobState.READY,

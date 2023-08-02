@@ -35,12 +35,12 @@ def test_create_and_run_runner():
     """Tests the create and run job method for synchronous execution of a runner"""
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job()
+    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, True)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, "IBM", True)
         return_dto: SimpleJobDto = create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
@@ -55,13 +55,13 @@ def test_create_and_run_sampler():
     """Tests the create and run job method for synchronous execution of a sampler"""
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job()
+    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
     job_request_dto.type = JobType.SAMPLER
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, True)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, "IBM", True)
         return_dto: SimpleJobDto = create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
@@ -76,13 +76,13 @@ def test_create_and_run_estimator():
     """Tests the create and run job method for synchronous execution of an estimator"""
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job()
+    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
     job_request_dto.type = JobType.ESTIMATOR
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, True)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, "IBM", True)
         return_dto: SimpleJobDto = create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db

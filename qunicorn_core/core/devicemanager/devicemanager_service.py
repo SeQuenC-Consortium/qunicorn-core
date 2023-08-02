@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from qunicorn_core.util import logging
+
 from qiskit.providers import QiskitBackendNotFoundError
 from qiskit_ibm_provider import IBMProvider, IBMBackend
 
@@ -87,6 +89,9 @@ def check_if_device_available(device_id: int, token: str) -> dict:
             return {"backend": "Available"}
         except QiskitBackendNotFoundError:
             return {"backend": "Not Found"}
+    elif device.provider.name == ProviderName.AWS:
+        logging.info("AWS local simulator is always available")
+        return {"backend": "Available"}
     else:
         raise ValueError("No valid Provider specified")
 

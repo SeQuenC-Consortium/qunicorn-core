@@ -26,6 +26,7 @@ from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_map
 from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.programming_language import ProgrammingLanguage
 

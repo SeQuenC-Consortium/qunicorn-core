@@ -13,6 +13,7 @@
 # limitations under the License.
 import traceback
 
+from braket.tasks import GateModelQuantumTaskResult
 from qiskit.primitives import EstimatorResult, SamplerResult
 from qiskit.result import Result
 
@@ -72,19 +73,17 @@ def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto)
     return result_dtos
 
 
+def aws_local_simulator_result_to_db_results(aws_result: GateModelQuantumTaskResult, job_dto: JobCoreDto) -> list[ResultDataclass]:
 
-def aws_local_simulator_result_to_db_results(aws_result, job_dto: JobCoreDto) -> list[ResultDataclass]:
-    result_dtos: list[ResultDataclass] = []
-    result_dtos.append(
-        ResultDataclass(
-            result_dict={"resultString": str(aws_result)},
-            job_id=job_dto.id,
-            circuit=job_dto.deployment.programs[0].quantum_circuit,
-            meta_data="",
-            result_type=ResultType.AWS_RESULT,
-        )
-    )
+    result_dtos: list[ResultDataclass] = [ResultDataclass(
+        result_dict={"counts": str(aws_result.measurement_counts), "probabilities": (aws_result.measurement_probabilities)},
+        job_id=job_dto.id,
+        circuit=job_dto.deployment.programs[0].quantum_circuit,
+        meta_data="",
+        result_type=ResultType.COUNTS,
+    )]
     return result_dtos
+
 
 def result_to_result_dto(result: ResultDataclass) -> ResultDto:
     return ResultDto(

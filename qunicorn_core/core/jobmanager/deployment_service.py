@@ -56,7 +56,6 @@ def delete_deployment(id: int) -> DeploymentDto:
 
 def create_deployment(deployment_dto: DeploymentRequestDto) -> DeploymentDto:
     """Create a deployment and save it in the database"""
-
     deployment: DeploymentDataclass = deployment_mapper.request_dto_to_deployment(deployment_dto)
     deployment = deployment_db_service.create(deployment)
     return deployment_mapper.deployment_to_deployment_dto(deployment)

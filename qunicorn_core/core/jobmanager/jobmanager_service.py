@@ -95,7 +95,6 @@ def run_job_by_id(job_id: int, job_exec_dto: JobExecutePythonFileDto, asyn: bool
 def get_job(job_id: int) -> JobResponseDto:
     """Gets the job from the database service with its id"""
     db_job: JobDataclass = job_db_service.get_job(job_id)
-    print("§$$§$§$§$§$§$§$§$$§$§$§$§$§$§$§$§$§$§$hier§$§$§$§$§$§$$§$§hier:", str(db_job))
     return job_mapper.job_to_response(db_job)
 
 
