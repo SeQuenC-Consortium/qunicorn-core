@@ -58,8 +58,7 @@ def check_aws_local_simulator_results(results_dict: dict):
     if not (1900 < counts.get("000") < 2100 and 1900 < counts.get("111") < 2100):
         returnvalue = False
     elif not (
-        0.48 < results_dict.get("probabilities").get("000") < 0.52
-        and 0.48 < results_dict.get("probabilities").get("111") < 0.52
+        0.48 < results_dict.get("probabilities").get("000") < 0.52 and 0.48 < results_dict.get("probabilities").get("111") < 0.52
     ):
         returnvalue = False
     return returnvalue
