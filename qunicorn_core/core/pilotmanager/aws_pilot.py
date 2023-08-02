@@ -29,7 +29,6 @@ from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.util import logging
 
 
-
 class AWSPilot(Pilot):
     """The AWS Pilot"""
 
@@ -61,5 +60,7 @@ class AWSPilot(Pilot):
         quantum_task: LocalQuantumTask = device.run(circuit, shots=job_core_dto.shots)
         aws_simulator_result = quantum_task.result()
         # save result
-        results: list[ResultDataclass] = result_mapper.aws_local_simulator_result_to_db_results(aws_simulator_result, job_core_dto)
+        results: list[ResultDataclass] = result_mapper.aws_local_simulator_result_to_db_results(
+            aws_simulator_result, job_core_dto
+        )
         job_db_service.update_finished_job(job_core_dto.id, results)

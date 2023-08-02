@@ -59,8 +59,11 @@ def test_get_results_from_aws_local_simulator_job():
 def check_aws_local_simulator_results(results_dict: dict):
     returnvalue = True
     counts: Counter = eval(results_dict.get("counts"))
-    if not(1900 < counts.get("000") < 2100 and 1900 < counts.get("111") < 2100):
+    if not (1900 < counts.get("000") < 2100 and 1900 < counts.get("111") < 2100):
         returnvalue = False
-    if not(0.48 < results_dict.get("probabilities").get("000") < 0.52 and 0.48 < results_dict.get("probabilities").get("111") < 0.52):
+    if not (
+        0.48 < results_dict.get("probabilities").get("000") < 0.52
+        and 0.48 < results_dict.get("probabilities").get("111") < 0.52
+    ):
         returnvalue = False
     return returnvalue

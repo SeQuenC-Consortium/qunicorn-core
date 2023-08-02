@@ -28,7 +28,8 @@ from ..api_models.job_dtos import (
     TokenSchema,
     SimpleJobDtoSchema,
     JobExecutionDtoSchema,
-    JobExecutePythonFileDto, SimpleJobDto,
+    JobExecutePythonFileDto,
+    SimpleJobDto,
 )
 from ...core.jobmanager import jobmanager_service
 from ...util import logging

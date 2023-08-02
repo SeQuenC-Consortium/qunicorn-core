@@ -53,7 +53,7 @@ def test_celery_run_job(mocker):
 
     # WHEN: Executing method to be tested
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto,"IBM")
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, "IBM")
         job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
         job: JobDataclass = job_db_service.create_database_job(job_core_dto)
         job_core_dto.id = job.id
