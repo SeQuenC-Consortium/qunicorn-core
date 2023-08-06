@@ -62,10 +62,9 @@ def check_aws_local_simulator_results(results_dict: dict, shots: int):
     counts: Counter = results_dict.get("counts")
     probabilities: dict = results_dict.get("probabilities")
     tolerance: int = 100
-    if not (
-        shots / 2 - tolerance < counts.get("000") < shots / 2 + tolerance
-        and shots / 2 - tolerance < counts.get("111") < shots / 2 + tolerance
-    ):
+    condition1 = shots / 2 - tolerance < counts.get("000") < shots / 2 + tolerance
+    condition2 = shots / 2 - tolerance < counts.get("111") < shots / 2 + tolerance
+    if not (condition1 and condition2):
         is_check_successful = False
     elif not (0.48 < probabilities.get("000") < 0.52 and 0.48 < probabilities.get("111") < 0.52):
         is_check_successful = False
