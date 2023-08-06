@@ -24,7 +24,6 @@ from qunicorn_core.static.enums.provider_name import ProviderName
 from tests import test_utils
 from tests.conftest import set_up_env
 
-
 IS_ASYNCHRONOUS: bool = False
 
 
@@ -32,11 +31,13 @@ def test_create_and_run_aws_local_simulator():
     """Tests the create and run job method for synchronous execution of the aws local simulator"""
     # GIVEN: Database Setup - AWS added as a provider
     app = set_up_env()
+
     # WHEN: create_and_run executed
     with app.app_context():
         job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
         test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.AWS, True)
         return_dto: SimpleJobDto = jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+
         # THEN: Check if the correct job with its result is saved in the db
         assert return_dto.job_state == JobState.RUNNING
 
@@ -45,13 +46,14 @@ def test_get_results_from_aws_local_simulator_job():
     """creates a new job again and tests the result of the aws local simulator in the db"""
     # GIVEN: Database Setup - AWS added as a provider
     app = set_up_env()
+
     # WHEN: create_and_run executed
     with app.app_context():
         job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
         test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.AWS, True)
         return_dto: SimpleJobDto = jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
         results: list[ResultDataclass] = job_db_service.get_job(return_dto.id).results
-        print(results)
+
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
         assert check_aws_local_simulator_results(results[0].result_dict, job_request_dto.shots)
