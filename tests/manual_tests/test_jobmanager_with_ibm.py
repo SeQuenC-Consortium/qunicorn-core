@@ -36,7 +36,7 @@ def test_create_and_run_runner():
     """Tests the create and run job method for synchronous execution of a runner"""
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
+    job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: create_and_run executed synchronous
@@ -56,7 +56,7 @@ def test_create_and_run_sampler():
     """Tests the create and run job method for synchronous execution of a sampler"""
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
+    job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
     job_request_dto.type = JobType.SAMPLER
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
@@ -77,7 +77,7 @@ def test_create_and_run_estimator():
     """Tests the create and run job method for synchronous execution of an estimator"""
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
+    job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
     job_request_dto.type = JobType.ESTIMATOR
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
