@@ -87,8 +87,14 @@ def load_db_function(app: Flask):
     user = UserDataclass(name="DefaultUser")
     qc = QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(1))
     qc2 = QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(2))
-    deployment = DeploymentDataclass(
-        deployed_by=user, programs=[qc, qc2], deployed_at=datetime.datetime.now(), name="DeploymentName"
+    qasm3_str: str = "OPENQASM 3; \nqubit[3] q;\nbit[3] c;\nh q[0];\ncnot q[0], q[1];\ncnot q[1], q[2];\nc = measure q;"
+    qasm3_program = QuantumProgramDataclass(quantum_circuit=qasm3_str)
+
+    deployment_ibm = DeploymentDataclass(
+        deployed_by=user, programs=[qc, qc2], deployed_at=datetime.datetime.now(), name="DeploymentIBMName"
+    )
+    deployment_aws = DeploymentDataclass(
+        deployed_by=user, programs=[qasm3_program], deployed_at=datetime.datetime.now(), name="DeploymentAWSName"
     )
     provider_ibm = ProviderDataclass(
         with_token=True,
@@ -122,26 +128,26 @@ def load_db_function(app: Flask):
     ibm_default_job = JobDataclass(
         executed_by=user,
         executed_on=device,
-        deployment=deployment,
+        deployment=deployment_ibm,
         progress=0,
         state=JobState.READY,
         shots=4000,
         type=JobType.RUNNER,
         started_at=datetime.datetime.now(),
-        name="JobName",
+        name="JobIBMName",
         results=[ResultDataclass(result_dict={"0x": "550", "1x": "450"})],
     )
 
     aws_default_job = JobDataclass(
         executed_by=user,
         executed_on=device_aws_local_simulator,
-        deployment=deployment,
+        deployment=deployment_aws,
         progress=0,
         state=JobState.READY,
         shots=4000,
         type=JobType.RUNNER,
         started_at=datetime.datetime.now(),
-        name="Job2Name",
+        name="JobAWSName",
         results=[
             ResultDataclass(
                 result_dict={"counts": {"000": 2007, "111": 1993}, "probabilities": {"000": 0.50175, "111": 0.49825}}

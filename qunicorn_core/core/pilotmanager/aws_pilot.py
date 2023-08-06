@@ -12,20 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from braket.devices import LocalSimulator
+from braket.ir.openqasm import Program as OpenQASMProgram
+from braket.tasks.local_quantum_task import LocalQuantumTask
+
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-
-from braket.devices import LocalSimulator
-from braket.ir.openqasm import Program as OpenQASMProgram
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
-from braket.tasks.local_quantum_task import LocalQuantumTask
-
 from qunicorn_core.static.enums.job_type import JobType
-
 from qunicorn_core.util import logging
 
 
@@ -33,6 +31,8 @@ class AWSPilot(Pilot):
     """The AWS Pilot"""
 
     def execute(self, job_core_dto: JobCoreDto):
+        """Execute a job with AWS Pilot and saves results in the database"""
+
         logging.info(f"Executing job {job_core_dto} with AWS Pilot")
         if job_core_dto.type == JobType.RUNNER:
             if job_core_dto.executed_on.device_name == "local_simulator":
@@ -55,6 +55,8 @@ class AWSPilot(Pilot):
         return circuit
 
     def __local_simulation(self, job_core_dto: JobCoreDto):
+        """Execute the job on a local simulator and saves results in the database"""
+
         job_db_service.update_attribute(job_core_dto.id, JobState.RUNNING, JobDataclass.state)
         device = LocalSimulator()
         circuit = self.transpile(job_core_dto)
