@@ -44,13 +44,13 @@ def run_job(job_core_dto_dict: dict):
     job_core_dto: JobCoreDto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
 
     device = job_core_dto.executed_on
-    pilot: QiskitPilot = QiskitPilot("QP")
 
     if device.provider.name == ProviderName.IBM:
-        pilot.execute(job_core_dto)
+        qiskit_pilot: QiskitPilot = QiskitPilot("QP")
+        qiskit_pilot.execute(job_core_dto)
     elif job_core_dto.executed_on.provider.name == ProviderName.AWS:
-        pilot: AWSPilot = AWSPilot("AP")
-        pilot.execute(job_core_dto)
+        aws_pilot: AWSPilot = AWSPilot("AP")
+        aws_pilot.execute(job_core_dto)
     else:
         exception: Exception = ValueError("No valid Target specified")
         job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception), JobState.ERROR)

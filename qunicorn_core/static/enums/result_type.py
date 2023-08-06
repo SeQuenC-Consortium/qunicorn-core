@@ -42,3 +42,5 @@ class ResultType(StrEnum):
             return ResultType.QUASI_DIST
         elif job_type == JobType.ESTIMATOR:
             return ResultType.VALUE_AND_VARIANCE
+        else:
+            return ResultType.ERROR

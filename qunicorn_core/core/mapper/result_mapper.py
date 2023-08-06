@@ -79,8 +79,8 @@ def aws_local_simulator_result_to_db_results(
     result_dtos: list[ResultDataclass] = [
         ResultDataclass(
             result_dict={
-                "counts": str(aws_result.measurement_counts),
-                "probabilities": (aws_result.measurement_probabilities),
+                "counts": dict(aws_result.measurement_counts.items()),
+                "probabilities": aws_result.measurement_probabilities,
             },
             job_id=job_dto.id,
             circuit=job_dto.deployment.programs[0].quantum_circuit,

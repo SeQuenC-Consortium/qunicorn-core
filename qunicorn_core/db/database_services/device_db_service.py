@@ -20,14 +20,14 @@ from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.util import logging
 
 
-def get_device_with_name(provider_name: str) -> DeviceDataclass:
+def get_device_with_name(device_name: str) -> DeviceDataclass:
     """Returns the default device of the provider with the name provider_name"""
     devices: list[DeviceDataclass] = (
-        db_service.get_session().query(DeviceDataclass).filter(ProviderDataclass.name == provider_name).all()
+        db_service.get_session().query(DeviceDataclass).filter(DeviceDataclass.device_name == device_name).all()
     )
 
     if len(devices) != 1:
-        logging.warn(f"There exists multiple or zero devices with the same name {provider_name}")
+        logging.warn(f"There exists multiple or zero devices with the same name {device_name}")
 
     return devices[0]
 

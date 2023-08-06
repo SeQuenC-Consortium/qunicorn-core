@@ -35,7 +35,11 @@ class AWSPilot(Pilot):
     def execute(self, job_core_dto: JobCoreDto):
         logging.info(f"Executing job {job_core_dto} with AWS Pilot")
         if job_core_dto.type == JobType.RUNNER:
-            self.__local_simulation(job_core_dto)
+            if job_core_dto.executed_on.device_name == "local_simulator":
+                self.__local_simulation(job_core_dto)
+            else:
+                exception: Exception = ValueError("No valid device specified")
+                raise exception
         else:
             exception: Exception = ValueError("No valid Job Type specified")
             results = result_mapper.get_error_results(exception)
@@ -44,7 +48,7 @@ class AWSPilot(Pilot):
 
     @staticmethod
     def transpile(job_core_dto: JobCoreDto):
-        """Transpile job for an AWS backend, needs a device_id"""
+        """Transpile job for an AWS backend"""
         logging.info("Transpile a quantum circuit for a specific AWS backend")
 
         circuit = OpenQASMProgram(source=job_core_dto.deployment.programs[0].quantum_circuit)
@@ -52,14 +56,10 @@ class AWSPilot(Pilot):
 
     def __local_simulation(self, job_core_dto: JobCoreDto):
         job_db_service.update_attribute(job_core_dto.id, JobState.RUNNING, JobDataclass.state)
-        # instantiate local simulator
         device = LocalSimulator()
-        # define the circuit
         circuit = self.transpile(job_core_dto)
-        # run the circuit
         quantum_task: LocalQuantumTask = device.run(circuit, shots=job_core_dto.shots)
         aws_simulator_result = quantum_task.result()
-        # save result
         results: list[ResultDataclass] = result_mapper.aws_local_simulator_result_to_db_results(
             aws_simulator_result, job_core_dto
         )

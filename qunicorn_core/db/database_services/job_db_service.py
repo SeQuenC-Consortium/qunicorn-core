@@ -34,7 +34,7 @@ def create_database_job(job_core: JobCoreDto):
     db_job.state = JobState.RUNNING
     db_job.progress = 0
     db_job.executed_by = default_user
-    db_job.executed_on = device_db_service.get_device_with_name(job_core.executed_on.provider.name)
+    db_job.executed_on = device_db_service.get_device_with_name(job_core.executed_on.device_name)
     db_job.deployment.deployed_by = default_user
     db_job.deployment = deployment
     return db_service.save_database_object(db_job)

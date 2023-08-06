@@ -27,6 +27,7 @@ from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
+from qunicorn_core.static.enums.provider_name import ProviderName
 from tests import test_utils
 from tests.conftest import set_up_env
 
@@ -48,12 +49,12 @@ def test_celery_run_job(mocker):
     mocker.patch("qunicorn_core.core.mapper.result_mapper.runner_result_to_db_results", return_value=results)
 
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job()
+    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: Executing method to be tested
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, "IBM")
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM)
         job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
         job: JobDataclass = job_db_service.create_database_job(job_core_dto)
         job_core_dto.id = job.id
@@ -77,13 +78,13 @@ def test_job_ibm_upload(mocker):
     mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
 
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job()
+    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
     job_request_dto.type = JobType.IBM_UPLOAD
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: Executing method to be tested
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, "IBM")
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM)
         job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
         job: JobDataclass = job_db_service.create_database_job(job_core_dto)
         job_core_dto.id = job.id
@@ -107,12 +108,12 @@ def test_job_ibm_runner(mocker):
     mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
 
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job()
+    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
     job_request_dto.type = JobType.IBM_UPLOAD
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, "IBM")
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM)
         job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
         job: JobDataclass = job_db_service.create_database_job(job_core_dto)
         job_core_dto.id = job.id

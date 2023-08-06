@@ -18,6 +18,7 @@ import os
 
 from qunicorn_core.api.api_models import DeploymentRequestDto, JobRequestDto, DeploymentDto
 from qunicorn_core.core.jobmanager import deployment_service
+from qunicorn_core.static.enums.provider_name import ProviderName
 
 JOB_JSON_IBM = "job_request_dto_test_data_IBM.json"
 JOB_JSON_AWS = "job_request_dto_test_data_AWS.json"
@@ -38,7 +39,7 @@ def get_object_from_json(json_file_name: str):
     return data
 
 
-def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, provider: str, with_circuits=False):
+def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, provider: ProviderName, with_circuits=False):
     deployment_request: DeploymentRequestDto = (
         get_test_deployment_circuits(provider) if with_circuits else get_test_deployment()
     )
