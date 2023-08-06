@@ -52,19 +52,19 @@ def get_test_deployment() -> DeploymentRequestDto:
     return DeploymentRequestDto.from_dict(deployment_dict)
 
 
-def get_test_deployment_circuits(provider: str) -> DeploymentRequestDto:
-    if provider == "IBM":
+def get_test_deployment_circuits(provider: ProviderName) -> DeploymentRequestDto:
+    if provider == ProviderName.IBM:
         deployment_dict: dict = get_object_from_json(DEPLOYMENT_CIRCUITS_JSON_IBM)
         return DeploymentRequestDto.from_dict(deployment_dict)
-    elif provider == "AWS":
+    elif provider == ProviderName.AWS:
         deployment_dict: dict = get_object_from_json(DEPLOYMENT_CIRCUITS_JSON_AWS)
         return DeploymentRequestDto.from_dict(deployment_dict)
 
 
-def get_test_job(provider: str) -> JobRequestDto:
-    if provider == "IBM":
+def get_test_job(provider: ProviderName) -> JobRequestDto:
+    if provider == ProviderName.IBM:
         job_dict: dict = get_object_from_json(JOB_JSON_IBM)
         return JobRequestDto(**job_dict)
-    elif provider == "AWS":
+    elif provider == ProviderName.AWS:
         job_dict: dict = get_object_from_json(JOB_JSON_AWS)
         return JobRequestDto(**job_dict)

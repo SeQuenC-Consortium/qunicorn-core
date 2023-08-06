@@ -49,7 +49,7 @@ def test_celery_run_job(mocker):
     mocker.patch("qunicorn_core.core.mapper.result_mapper.runner_result_to_db_results", return_value=results)
 
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
+    job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
     # WHEN: Executing method to be tested
@@ -78,7 +78,7 @@ def test_job_ibm_upload(mocker):
     mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
 
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
+    job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
     job_request_dto.type = JobType.IBM_UPLOAD
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
@@ -108,7 +108,7 @@ def test_job_ibm_runner(mocker):
     mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
 
     app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job("IBM")
+    job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
     job_request_dto.type = JobType.IBM_UPLOAD
     job_request_dto.device_name = "ibmq_qasm_simulator"
 

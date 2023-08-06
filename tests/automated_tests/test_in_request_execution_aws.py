@@ -34,7 +34,7 @@ def test_create_and_run_aws_local_simulator():
     app = set_up_env()
     # WHEN: create_and_run executed
     with app.app_context():
-        job_request_dto: JobRequestDto = test_utils.get_test_job("AWS")
+        job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
         test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.AWS, True)
         return_dto: SimpleJobDto = jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
         # THEN: Check if the correct job with its result is saved in the db
@@ -47,7 +47,7 @@ def test_get_results_from_aws_local_simulator_job():
     app = set_up_env()
     # WHEN: create_and_run executed
     with app.app_context():
-        job_request_dto: JobRequestDto = test_utils.get_test_job("AWS")
+        job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
         test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.AWS, True)
         return_dto: SimpleJobDto = jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
         results: list[ResultDataclass] = job_db_service.get_job(return_dto.id).results
