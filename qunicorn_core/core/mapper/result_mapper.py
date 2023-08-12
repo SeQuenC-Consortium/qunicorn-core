@@ -13,7 +13,7 @@
 # limitations under the License.
 import traceback
 
-from braket.tasks import GateModelQuantumTaskResult
+from braket.tasks import GateModelQuantumTaskResult, AnnealingQuantumTaskResult, PhotonicModelQuantumTaskResult
 from qiskit.primitives import EstimatorResult, SamplerResult
 from qiskit.result import Result
 
@@ -74,7 +74,8 @@ def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto)
 
 
 def aws_local_simulator_result_to_db_results(
-    aws_results: list[GateModelQuantumTaskResult], job_dto: JobCoreDto
+    aws_results: list[GateModelQuantumTaskResult | AnnealingQuantumTaskResult | PhotonicModelQuantumTaskResult],
+    job_dto: JobCoreDto,
 ) -> list[ResultDataclass]:
     result_dtos: list[ResultDataclass] = [
         ResultDataclass(
