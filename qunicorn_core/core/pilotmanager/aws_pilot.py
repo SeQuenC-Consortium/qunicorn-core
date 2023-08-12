@@ -71,24 +71,6 @@ class AWSPilot(Pilot):
         device = LocalSimulator()
         circuits = self.transpile(job_core_dto)
 
-        print(type(eval(job_core_dto.deployment.programs[0].quantum_circuit)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        print(job_core_dto.deployment.programs[1].quantum_circuit)
-
         quantum_tasks: LocalQuantumTaskBatch = device.run_batch(circuits, shots=job_core_dto.shots)
         aws_simulator_results: list[GateModelQuantumTaskResult] = quantum_tasks.results()
         results: list[ResultDataclass] = result_mapper.aws_local_simulator_result_to_db_results(
