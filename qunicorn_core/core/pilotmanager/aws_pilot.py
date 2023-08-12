@@ -14,7 +14,7 @@
 
 from braket.devices import LocalSimulator
 from braket.ir.openqasm import Program as OpenQASMProgram
-from braket.tasks import GateModelQuantumTaskResult, AnnealingQuantumTaskResult, PhotonicModelQuantumTaskResult
+from braket.tasks import GateModelQuantumTaskResult
 from braket.tasks.local_quantum_task_batch import LocalQuantumTaskBatch
 
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
@@ -61,9 +61,7 @@ class AWSPilot(Pilot):
         device = LocalSimulator()
         circuits = self.transpile(job_core_dto)
         quantum_tasks: LocalQuantumTaskBatch = device.run_batch(circuits, shots=job_core_dto.shots)
-        aws_simulator_results: list[
-            GateModelQuantumTaskResult | AnnealingQuantumTaskResult | PhotonicModelQuantumTaskResult
-        ] = quantum_tasks.results()
+        aws_simulator_results: list[GateModelQuantumTaskResult] = quantum_tasks.results()
         results: list[ResultDataclass] = result_mapper.aws_local_simulator_result_to_db_results(
             aws_simulator_results, job_core_dto
         )
