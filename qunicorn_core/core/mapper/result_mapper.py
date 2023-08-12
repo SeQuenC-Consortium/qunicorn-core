@@ -74,7 +74,7 @@ def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto)
 
 
 def aws_local_simulator_result_to_db_results(
-    aws_result: GateModelQuantumTaskResult, job_dto: JobCoreDto
+    aws_results: list[GateModelQuantumTaskResult], job_dto: JobCoreDto
 ) -> list[ResultDataclass]:
     result_dtos: list[ResultDataclass] = [
         ResultDataclass(
@@ -87,6 +87,7 @@ def aws_local_simulator_result_to_db_results(
             meta_data="",
             result_type=ResultType.COUNTS,
         )
+        for aws_result in aws_results
     ]
     return result_dtos
 

@@ -14,7 +14,6 @@
 
 from braket.devices import LocalSimulator
 from braket.ir.openqasm import Program as OpenQASMProgram
-from braket.tasks.local_quantum_task import LocalQuantumTask
 
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.mapper import result_mapper
@@ -47,22 +46,21 @@ class AWSPilot(Pilot):
             raise exception
 
     @staticmethod
-    def transpile(job_core_dto: JobCoreDto):
+    def transpile(job_core_dto: JobCoreDto) -> list[OpenQASMProgram]:
         """Transpile job for an AWS backend"""
         logging.info("Transpile a quantum circuit for a specific AWS backend")
 
-        circuit = OpenQASMProgram(source=job_core_dto.deployment.programs[0].quantum_circuit)
-        return circuit
+        return [OpenQASMProgram(source=program.quantum_circuit) for program in job_core_dto.deployment.programs]
 
     def __local_simulation(self, job_core_dto: JobCoreDto):
         """Execute the job on a local simulator and saves results in the database"""
 
         job_db_service.update_attribute(job_core_dto.id, JobState.RUNNING, JobDataclass.state)
         device = LocalSimulator()
-        circuit = self.transpile(job_core_dto)
-        quantum_task: LocalQuantumTask = device.run(circuit, shots=job_core_dto.shots)
-        aws_simulator_result = quantum_task.result()
+        circuits = self.transpile(job_core_dto)
+        quantum_tasks = [device.run(circuit, shots=job_core_dto.shots) for circuit in circuits]
+        aws_simulator_results = [quantum_task.result() for quantum_task in quantum_tasks]
         results: list[ResultDataclass] = result_mapper.aws_local_simulator_result_to_db_results(
-            aws_simulator_result, job_core_dto
+            aws_simulator_results, job_core_dto
         )
         job_db_service.update_finished_job(job_core_dto.id, results)

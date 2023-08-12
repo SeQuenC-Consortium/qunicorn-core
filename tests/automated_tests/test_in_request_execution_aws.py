@@ -56,7 +56,8 @@ def test_get_results_from_aws_local_simulator_job():
 
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
-        assert check_aws_local_simulator_results(results[0].result_dict, job_request_dto.shots)
+        for result in results:
+            assert check_aws_local_simulator_results(result.result_dict, job_request_dto.shots)
 
 
 def check_aws_local_simulator_results(results_dict: dict, shots: int):
