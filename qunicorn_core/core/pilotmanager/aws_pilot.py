@@ -77,4 +77,5 @@ class AWSPilot(Pilot):
         results: list[ResultDataclass] = result_mapper.aws_local_simulator_result_to_db_results(
             aws_simulator_results, job_core_dto
         )
+
         job_db_service.update_finished_job(job_core_dto.id, results)

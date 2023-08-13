@@ -15,6 +15,8 @@ import os
 from typing import List
 
 import qiskit
+from braket.circuits import Circuit
+from braket.circuits.serialization import IRType
 from qiskit import QuantumCircuit, transpile
 from qiskit.primitives import SamplerResult, EstimatorResult
 from qiskit.providers import BackendV1
@@ -23,12 +25,15 @@ from qiskit.quantum_info import SparsePauliOp
 from qiskit_ibm_provider import IBMProvider
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
 
+from braket.annealing.problem import Problem
+
 from qunicorn_core.api.api_models import JobCoreDto
 from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
+from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.result_type import ResultType
@@ -42,7 +47,7 @@ class QiskitPilot(Pilot):
         """Execute a job on an IBM backend using the Qiskit Pilot"""
 
         if job_core_dto.type == JobType.RUNNER:
-            if job_core_dto.executed_on.device_name == "aer_simulator":
+            if job_core_dto.executed_on.device_name == "aer_simulatorx":
                 self.__execute_on_aer_simulator(job_core_dto)
             else:
                 self.__run(job_core_dto)
@@ -170,6 +175,15 @@ class QiskitPilot(Pilot):
 
     def transpile(self, provider: IBMProvider, job_dto: JobCoreDto):
         """Transpile job on an IBM backend"""
+
+        # TODO this can be used for the universal QASM translation for AWS and IBM - currently the resulting QSAM String
+        #  can be invalid
+        for program in job_dto.deployment.programs:
+            if program.assembler_language == AssemblerLanguage.BRAKET:
+                circuit: Circuit = eval(program.quantum_circuit).to_ir(IRType.OPENQASM).source
+                program.quantum_circuit = circuit
+                print("Converted String vom BRAKET to QASM for IBM:", program.quantum_circuit)
+        # ############################################################################################
 
         circuits: list[QuantumCircuit] = self.__get_circuits_as_QuantumCircuits(job_dto)
         backend = provider.get_backend(job_dto.executed_on.device_name)
