@@ -56,6 +56,7 @@ class AWSPilot(Pilot):
         logging.info("Transpile a quantum circuit for a specific AWS backend")
         transpiled_programs = []
 
+        # TODO add exception handing - if language does not match syntax
         for program in job_core_dto.deployment.programs:
             if program.assembler_language == AssemblerLanguage.QASM:
                 transpiled_programs.append(OpenQASMProgram(source=program.quantum_circuit))
