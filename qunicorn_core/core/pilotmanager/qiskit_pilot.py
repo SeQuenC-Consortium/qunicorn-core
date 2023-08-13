@@ -25,8 +25,6 @@ from qiskit.quantum_info import SparsePauliOp
 from qiskit_ibm_provider import IBMProvider
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
 
-from braket.annealing.problem import Problem
-
 from qunicorn_core.api.api_models import JobCoreDto
 from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot

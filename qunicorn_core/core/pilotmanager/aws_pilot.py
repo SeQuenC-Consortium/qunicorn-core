@@ -11,12 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from braket.annealing import Problem
-from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 from braket.ir.openqasm import Program as OpenQASMProgram
 from braket.tasks import GateModelQuantumTaskResult
-from braket.tasks.local_quantum_task import LocalQuantumTask
 from braket.tasks.local_quantum_task_batch import LocalQuantumTaskBatch
 
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
@@ -51,7 +48,7 @@ class AWSPilot(Pilot):
             raise exception
 
     @staticmethod
-    def transpile(job_core_dto: JobCoreDto) -> list[OpenQASMProgram]:
+    def transpile(job_core_dto: JobCoreDto):
         """Transpile job for an AWS backend"""
         logging.info("Transpile a quantum circuit for a specific AWS backend")
         transpiled_programs = []
