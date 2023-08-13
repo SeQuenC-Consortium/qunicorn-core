@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from braket.circuits import Circuit
 from braket.devices import LocalSimulator
 from braket.ir.openqasm import Program as OpenQASMProgram
 from braket.tasks import GateModelQuantumTaskResult
@@ -58,7 +59,8 @@ class AWSPilot(Pilot):
             if program.assembler_language == AssemblerLanguage.QASM:
                 transpiled_programs.append(OpenQASMProgram(source=program.quantum_circuit))
             elif program.assembler_language == AssemblerLanguage.BRAKET:
-                transpiled_programs.append(eval(program.quantum_circuit))
+                circuit: Circuit = eval(program.quantum_circuit)
+                transpiled_programs.append(circuit)
 
         return transpiled_programs
 

@@ -178,8 +178,8 @@ class QiskitPilot(Pilot):
         #  can be invalid
         for program in job_dto.deployment.programs:
             if program.assembler_language == AssemblerLanguage.BRAKET:
-                circuit: Circuit = eval(program.quantum_circuit).to_ir(IRType.OPENQASM).source
-                program.quantum_circuit = circuit
+                circuit: Circuit = eval(program.quantum_circuit)
+                program.quantum_circuit = circuit.to_ir(IRType.OPENQASM).source
                 print("Converted String vom BRAKET to QASM for IBM:", program.quantum_circuit)
         # ############################################################################################
 
