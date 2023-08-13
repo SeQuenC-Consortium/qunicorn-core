@@ -28,7 +28,7 @@ from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 
 from qunicorn_core.core.mapper import job_mapper, result_mapper
 
-from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
+from qunicorn_core.core.pilotmanager.ibm_pilot import QiskitPilot
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState

@@ -14,4 +14,4 @@
 
 from . import aws_pilot
 from . import base_pilot
-from . import qiskit_pilot
+from . import ibm_pilot

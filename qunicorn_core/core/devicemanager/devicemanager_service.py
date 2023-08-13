@@ -19,7 +19,7 @@ from qiskit_ibm_provider import IBMProvider, IBMBackend
 from qunicorn_core.api.api_models.device_dtos import DeviceRequest, SimpleDeviceDto, DeviceDto
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import device_mapper
-from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
+from qunicorn_core.core.pilotmanager.ibm_pilot import QiskitPilot
 from qunicorn_core.db.database_services import db_service, device_db_service
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
