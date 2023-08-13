@@ -13,13 +13,13 @@
 # limitations under the License.
 
 from qunicorn_core.api.api_models import UserDto
-from qunicorn_core.core.mapper.general_mapper import map_from_to
+from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.user import UserDataclass
 
 
-def dto_to_dataclass(user_dto: UserDto) -> UserDataclass:
-    return map_from_to(user_dto, UserDataclass)
+# originally from <https://github.com/buehlefs/flask-template/>
 
 
-def dataclass_to_dto(user: UserDataclass) -> UserDto:
-    return map_from_to(user, UserDto)
+def get_default_user() -> UserDataclass:
+    """Gets the Default User from the database"""
+    return db_service.get_database_object(UserDto.get_default_user().id, UserDataclass)

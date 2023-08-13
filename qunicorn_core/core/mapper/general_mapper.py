@@ -11,15 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import TypeVar, Type
 
-from qunicorn_core.api.api_models import UserDto
-from qunicorn_core.core.mapper.general_mapper import map_from_to
-from qunicorn_core.db.models.user import UserDataclass
+from automapper import mapper
 
-
-def dto_to_dataclass(user_dto: UserDto) -> UserDataclass:
-    return map_from_to(user_dto, UserDataclass)
+T = TypeVar("T")
 
 
-def dataclass_to_dto(user: UserDataclass) -> UserDto:
-    return map_from_to(user, UserDto)
+def map_from_to(from_object: object, to_type: Type[T], fields_mapping: dict | None = None) -> T | None:
+    if from_object is None:
+        return None
+    return mapper.to(to_type).map(from_object, fields_mapping=fields_mapping)

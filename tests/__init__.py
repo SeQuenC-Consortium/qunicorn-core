@@ -1,4 +1,4 @@
-# Copyright 2023 University of Stuttgart
+# Copyright 2023 University of Stuttgart.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from qunicorn_core.api.api_models import UserDto
-from qunicorn_core.core.mapper.general_mapper import map_from_to
-from qunicorn_core.db.models.user import UserDataclass
 
+"""Module containing all tests."""
 
-def dto_to_dataclass(user_dto: UserDto) -> UserDataclass:
-    return map_from_to(user_dto, UserDataclass)
-
-
-def dataclass_to_dto(user: UserDataclass) -> UserDto:
-    return map_from_to(user, UserDto)
+from . import manual_tests, automated_tests, conftest, test_utils

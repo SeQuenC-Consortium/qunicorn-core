@@ -33,7 +33,7 @@ class ResultDto:
     id: int
     circuit: str
     result_dict: dict
-    header: dict
+    meta_data: dict
     result_type: ResultType
 
 
@@ -42,4 +42,4 @@ class ResultDtoSchema(MaBaseSchema):
     circuit = ma.fields.String(required=True, dump_only=True)
     results = ma.fields.Dict(required=True, dump_only=True)
     result_type = ma.fields.Enum(enum=ResultType, required=True, dump_only=True)
-    header = ma.fields.Dict(required=True, dump_only=True)
+    meta_data = ma.fields.Dict(required=True, dump_only=True)

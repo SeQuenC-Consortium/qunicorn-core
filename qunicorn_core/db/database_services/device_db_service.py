@@ -15,6 +15,7 @@
 # originally from <https://github.com/buehlefs/flask-template/>
 
 from qunicorn_core.db.database_services import db_service
+from qunicorn_core.db.database_services.db_service import session
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.util import logging
 
@@ -39,3 +40,17 @@ def get_all_devices() -> list[DeviceDataclass]:
 def get_device(device_id: int) -> DeviceDataclass:
     """Get a device by id"""
     return db_service.get_database_object(device_id, DeviceDataclass)
+
+
+def save_device_by_name(device: DeviceDataclass):
+    """Updates device object in database if it exists and creates new entry if it doesn't exist"""
+    successful = (
+        session.query(DeviceDataclass)
+        .filter(DeviceDataclass.device_name == device.device_name)
+        .update(
+            {"num_qubits": device.num_qubits, "provider_id": device.provider_id, "is_simulator": device.is_simulator}
+        )
+    )
+    if not successful:
+        session.add(device)
+    session.commit()
