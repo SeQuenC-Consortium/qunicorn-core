@@ -41,8 +41,8 @@ def test_celery_run_job(mocker):
     run_result_mock.result.return_value = Mock()  # mocks the job_from_ibm.result() call
     backend_mock.run.return_value = run_result_mock  # mocks the backend.run(transpiled, shots=job_dto.shots) call
 
-    path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
-    mocker.patch(f"{path_to_pilot}._QiskitPilot__get_ibm_provider_login_and_update_job", return_value=backend_mock)
+    path_to_pilot: str = "qunicorn_core.core.pilotmanager.ibm_pilot.IBMPilot"
+    mocker.patch(f"{path_to_pilot}._IBMPilot__get_ibm_provider_login_and_update_job", return_value=backend_mock)
     mocker.patch(f"{path_to_pilot}.transpile", return_value=(backend_mock, None))
 
     results: list[ResultDataclass] = [ResultDataclass(result_dict={"00": 4000})]
@@ -74,8 +74,8 @@ def test_job_ibm_upload(mocker):
     mock = Mock()
     mock.upload_program.return_value = "test-id"
     mock.run.return_value = None
-    path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
-    mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
+    path_to_pilot: str = "qunicorn_core.core.pilotmanager.ibm_pilot.IBMPilot"
+    mocker.patch(f"{path_to_pilot}._IBMPilot__get_runtime_service", return_value=mock)
 
     app = set_up_env()
     job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
@@ -104,8 +104,8 @@ def test_job_ibm_runner(mocker):
     mock = Mock()
     mock.upload_program.return_value = "test-id"  # Returning an id value after uploading a file to IBM
     mock.run.side_effect = IBMRuntimeError
-    path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
-    mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
+    path_to_pilot: str = "qunicorn_core.core.pilotmanager.ibm_pilot.IBMPilot"
+    mocker.patch(f"{path_to_pilot}._IBMPilot__get_runtime_service", return_value=mock)
 
     app = set_up_env()
     job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
