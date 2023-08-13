@@ -47,7 +47,7 @@ class QiskitPilot(Pilot):
         """Execute a job on an IBM backend using the Qiskit Pilot"""
 
         if job_core_dto.type == JobType.RUNNER:
-            if job_core_dto.executed_on.device_name == "aer_simulatorx":
+            if job_core_dto.executed_on.device_name == "aer_simulator":
                 self.__execute_on_aer_simulator(job_core_dto)
             else:
                 self.__run(job_core_dto)
