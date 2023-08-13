@@ -49,10 +49,10 @@ class AWSPilot(Pilot):
             raise exception
 
     @staticmethod
-    def transpile(job_core_dto: JobCoreDto):
+    def transpile(job_core_dto: JobCoreDto) -> [OpenQASMProgram | Circuit]:
         """Transpile job for an AWS backend"""
         logging.info("Transpile a quantum circuit for a specific AWS backend")
-        transpiled_programs = []
+        transpiled_programs: list[OpenQASMProgram | Circuit] = []
 
         # TODO add exception handing - if language does not match syntax
         for program in job_core_dto.deployment.programs:
