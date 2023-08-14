@@ -17,7 +17,7 @@ from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
 
-class Pilot():
+class Pilot:
     """Base class for Pilots"""
 
     LANGUAGE: AssemblerLanguage = None

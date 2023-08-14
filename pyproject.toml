@@ -15,7 +15,7 @@ SQLAlchemy = "^2.0.4"
 flask = { extras = ["dotenv"], version = "^2.2.3" }
 flask-babel = "^3.0.0"
 flask-smorest = "^0.40.0"
-python = "^3.11.0"
+python = "~3.11.0"
 tomli = "^2.0.0"
 celery = "^5.2.7"
 redis = "^4.5.4"

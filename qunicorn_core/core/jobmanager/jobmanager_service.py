@@ -61,8 +61,9 @@ def run_job(job_core_dto_dict: dict):
             pilot = pilot_class(job_core_dto)
         except Exception as exception:
             logging.error(f"Pilot for Job {job_core_dto.id} could not be instanced")
-            job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception),
-                                               JobState.ERROR)
+            job_db_service.update_finished_job(
+                job_core_dto.id, result_mapper.get_error_results(exception), JobState.ERROR
+            )
             raise exception
 
     else:
@@ -76,16 +77,17 @@ def run_job(job_core_dto_dict: dict):
 
     try:
         job_db_service.update_attribute(job_core_dto.id, JobState.RUNNING, JobDataclass.state)
-        results = execute_in_environment(job_dto=job_core_dto,
-                                         pilot=pilot,
-                                         immediate_result_listener=immediate_result_listener)
+        results = execute_in_environment(
+            job_dto=job_core_dto, pilot=pilot, immediate_result_listener=immediate_result_listener
+        )
         logging.error(f"Finished Job {job_core_dto.id} with final results {results}")
-
-        job_db_service.update_finished_job(job_core_dto.id, results)
+        if results:
+            job_db_service.update_finished_job(job_core_dto.id, results)
     except Exception as exception:
         logging.error(f"Job {job_core_dto.id} could not be executed")
         results = result_mapper.get_error_results(exception)
         job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
+        raise exception
 
 
 def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = ASYNCHRONOUS) -> SimpleJobDto:

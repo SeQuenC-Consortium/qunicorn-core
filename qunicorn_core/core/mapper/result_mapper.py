@@ -17,7 +17,7 @@ from braket.tasks import GateModelQuantumTaskResult
 from qiskit.primitives import EstimatorResult, SamplerResult
 from qiskit.result import Result
 
-from qunicorn_core.api.api_models import JobCoreDto, ResultDto
+from qunicorn_core.api.api_models import ResultDto
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.result_type import ResultType
 
@@ -39,26 +39,32 @@ def runner_result_to_db_results(ibm_result: Result, circuit: str) -> list[Result
 
 
 def estimator_result_to_db_results(
-        ibm_result: EstimatorResult, circuits: [str], observer: str
+    ibm_result: EstimatorResult, circuits: [str], observer: str
 ) -> list[ResultDataclass]:
-    return [ResultDataclass(
-        circuit=circuit,
-        result_dict={"value": str(result_values), "variance": str(metadata["variance"])},
-        result_type=ResultType.VALUE_AND_VARIANCE,
-        meta_data={"observer": f"SparsePauliOp-{observer}"},
-    ) for result_values, metadata, circuit in zip(ibm_result.values, ibm_result.metadata, circuits)]
+    return [
+        ResultDataclass(
+            circuit=circuit,
+            result_dict={"value": str(result_values), "variance": str(metadata["variance"])},
+            result_type=ResultType.VALUE_AND_VARIANCE,
+            meta_data={"observer": f"SparsePauliOp-{observer}"},
+        )
+        for result_values, metadata, circuit in zip(ibm_result.values, ibm_result.metadata, circuits)
+    ]
 
 
 def sampler_result_to_db_results(ibm_result: SamplerResult, circuits: [str]) -> list[ResultDataclass]:
-    return [ResultDataclass(
-        circuit=circuit,
-        result_dict=quasi_dist,
-        result_type=ResultType.QUASI_DIST,
-    ) for quasi_dist, circuit in zip(ibm_result.quasi_dists, circuits)]
+    return [
+        ResultDataclass(
+            circuit=circuit,
+            result_dict=quasi_dist,
+            result_type=ResultType.QUASI_DIST,
+        )
+        for quasi_dist, circuit in zip(ibm_result.quasi_dists, circuits)
+    ]
 
 
 def aws_local_simulator_result_to_db_results(
-        aws_result: GateModelQuantumTaskResult, circuit: str
+    aws_result: GateModelQuantumTaskResult, circuit: str
 ) -> list[ResultDataclass]:
     result_dtos: list[ResultDataclass] = [
         ResultDataclass(

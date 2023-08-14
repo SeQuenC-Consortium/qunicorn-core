@@ -13,19 +13,12 @@
 # limitations under the License.
 
 from braket.devices import LocalSimulator
-from braket.ir.openqasm import Program as OpenQASMProgram
 from braket.tasks.local_quantum_task import LocalQuantumTask
 
-from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from qunicorn_core.db.database_services import job_db_service
-from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
-from qunicorn_core.static.enums.job_state import JobState
-from qunicorn_core.static.enums.job_type import JobType
-from qunicorn_core.util import logging
 
 
 class AWSPilot(Pilot):

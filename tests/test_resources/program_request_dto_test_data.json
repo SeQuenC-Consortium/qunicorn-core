@@ -7,5 +7,5 @@
   "python_file_options": {
     "backend": "ibmq_qasm_simulator"
   },
-  "assembler_language": "QASM"
+  "assembler_language": "QASM2"
 }

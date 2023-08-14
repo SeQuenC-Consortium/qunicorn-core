@@ -3,7 +3,7 @@
   "programs": [
     {
       "quantum_circuit": "",
-      "assembler_language": "QASM",
+      "assembler_language": "QASM2",
       "python_file_metadata": "test.py",
       "python_file_path": "test.py"
     }

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """"Test class to test the functionality of the job_api"""
-from unittest.mock import Mock
+from unittest.mock import Mock, PropertyMock
 
 import pytest
 import yaml
@@ -41,9 +41,9 @@ def test_celery_run_job(mocker):
     run_result_mock.result.return_value = Mock()  # mocks the job_from_ibm.result() call
     backend_mock.run.return_value = run_result_mock  # mocks the backend.run(transpiled, shots=job_dto.shots) call
 
-    path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
-    mocker.patch(f"{path_to_pilot}._QiskitPilot__get_ibm_provider_login_and_update_job", return_value=backend_mock)
-    mocker.patch(f"{path_to_pilot}.transpile", return_value=(backend_mock, None))
+    path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot"
+    mocker.patch(f"{path_to_pilot}.QiskitPilot.ibm_provider_backend", return_value=backend_mock)
+    mocker.patch(f"{path_to_pilot}.transpile", return_value=backend_mock)
 
     results: list[ResultDataclass] = [ResultDataclass(result_dict={"00": 4000})]
     mocker.patch("qunicorn_core.core.mapper.result_mapper.runner_result_to_db_results", return_value=results)
@@ -75,7 +75,7 @@ def test_job_ibm_upload(mocker):
     mock.upload_program.return_value = "test-id"
     mock.run.return_value = None
     path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
-    mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
+    mocker.patch(f"{path_to_pilot}.runtime_service", new_callable=PropertyMock, return_value=mock)
 
     app = set_up_env()
     job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
@@ -105,7 +105,7 @@ def test_job_ibm_runner(mocker):
     mock.upload_program.return_value = "test-id"  # Returning an id value after uploading a file to IBM
     mock.run.side_effect = IBMRuntimeError
     path_to_pilot: str = "qunicorn_core.core.pilotmanager.qiskit_pilot.QiskitPilot"
-    mocker.patch(f"{path_to_pilot}._QiskitPilot__get_runtime_service", return_value=mock)
+    mocker.patch(f"{path_to_pilot}.runtime_service", new_callable=PropertyMock, return_value=mock)
 
     app = set_up_env()
     job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
@@ -135,3 +135,4 @@ def test_job_ibm_runner(mocker):
     with app.app_context():
         new_job = job_db_service.get_job(job_core_dto.id)
         assert new_job.state == JobState.ERROR
+        assert "exception_message" in new_job.results[-1].result_dict
