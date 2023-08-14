@@ -14,7 +14,6 @@
 from qiskit.providers import QiskitBackendNotFoundError
 from qiskit_ibm_provider import IBMProvider, IBMBackend
 
-import qunicorn_core.db.database_services.device_db_service
 from qunicorn_core.api.api_models.device_dtos import DeviceRequest, SimpleDeviceDto, DeviceDto
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import device_mapper
