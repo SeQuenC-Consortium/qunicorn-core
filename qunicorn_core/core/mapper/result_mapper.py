@@ -87,7 +87,7 @@ def aws_runner_to_dataclass(
                 "probabilities": aws_result.measurement_probabilities,
             },
             job_id=job_dto.id,
-            circuit=job_dto.deployment.programs[0].quantum_circuit,
+            circuit=aws_result.additional_metadata.action.source,
             meta_data="",
             result_type=ResultType.COUNTS,
         )

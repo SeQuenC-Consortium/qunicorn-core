@@ -15,6 +15,8 @@ import os
 from typing import List
 
 import qiskit
+from braket.circuits import Circuit
+from braket.circuits.serialization import IRType
 from qiskit import QuantumCircuit, transpile
 from qiskit.primitives import SamplerResult, EstimatorResult
 from qiskit.providers import BackendV1
@@ -29,17 +31,18 @@ from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
+from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.util import logging
 
 
-class QiskitPilot(Pilot):
-    """The Qiskit Pilot"""
+class IBMPilot(Pilot):
+    """The IBM Pilot"""
 
     def execute(self, job_core_dto: JobCoreDto):
-        """Execute a job on an IBM backend using the Qiskit Pilot"""
+        """Execute a job on an IBM backend using the IBM Pilot"""
 
         if job_core_dto.type == JobType.RUNNER:
             if job_core_dto.executed_on.device_name == "aer_simulator":
@@ -78,7 +81,7 @@ class QiskitPilot(Pilot):
         logging.info(f"Run job with id {job_dto.id} locally on aer_simulator and get the result {results}")
 
     def __run(self, job_dto: JobCoreDto):
-        """Run a job on an IBM backend using the Qiskit Pilot"""
+        """Run a job on an IBM backend using the IBM Pilot"""
         provider = self.__get_ibm_provider_login_and_update_job(job_dto.token, job_dto.id)
         backend, transpiled = self.transpile(provider, job_dto)
         job_db_service.update_attribute(job_dto.id, JobState.RUNNING, JobDataclass.state)
@@ -92,7 +95,7 @@ class QiskitPilot(Pilot):
         )
 
     def __sample(self, job_dto: JobCoreDto):
-        """Uses the Sampler to execute a job on an IBM backend using the Qiskit Pilot"""
+        """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
         backend, circuits = self.__get_backend_circuits_and_id_for_qiskit_runtime(job_dto)
         sampler = Sampler(session=backend)
 
@@ -105,7 +108,7 @@ class QiskitPilot(Pilot):
         )
 
     def __estimate(self, job_dto: JobCoreDto):
-        """Uses the Estimator to execute a job on an IBM backend using the Qiskit Pilot"""
+        """Uses the Estimator to execute a job on an IBM backend using the IBM Pilot"""
         backend, circuits = self.__get_backend_circuits_and_id_for_qiskit_runtime(job_dto)
         estimator = Estimator(session=backend)
         estimator_observables: list[SparsePauliOp] = [SparsePauliOp("IY"), SparsePauliOp("IY")]
@@ -123,7 +126,7 @@ class QiskitPilot(Pilot):
         self.__get_ibm_provider_login_and_update_job(job_dto.token, job_dto.id)
         service: QiskitRuntimeService = QiskitRuntimeService()
         job_db_service.update_attribute(job_dto.id, JobState.RUNNING, JobDataclass.state)
-        circuits: List[QuantumCircuit] = QiskitPilot.__get_circuits_as_QuantumCircuits(job_dto)
+        circuits: List[QuantumCircuit] = IBMPilot.__get_circuits_as_QuantumCircuits(job_dto)
         backend: BackendV1 = service.get_backend(job_dto.executed_on.device_name)
         return backend, circuits
 
@@ -163,7 +166,7 @@ class QiskitPilot(Pilot):
     def __get_ibm_provider_login_and_update_job(token: str, job_dto_id: int) -> IBMProvider:
         """Save account credentials, get provider and update job_dto to job_state = Error, if it is not possible"""
         try:
-            return QiskitPilot.get_ibm_provider_and_login(token)
+            return IBMPilot.get_ibm_provider_and_login(token)
         except Exception as exception:
             job_db_service.update_finished_job(
                 job_dto_id, result_mapper.exception_to_error_results(exception), JobState.ERROR
@@ -172,6 +175,15 @@ class QiskitPilot(Pilot):
 
     def transpile(self, provider: IBMProvider, job_dto: JobCoreDto):
         """Transpile job on an IBM backend"""
+
+        # TODO this can be used for the universal QASM translation for AWS and IBM - currently the resulting QSAM String
+        #  can be invalid
+        for program in job_dto.deployment.programs:
+            if program.assembler_language == AssemblerLanguage.BRAKET:
+                circuit: Circuit = eval(program.quantum_circuit)
+                program.quantum_circuit = circuit.to_ir(IRType.OPENQASM).source
+                print("Converted String vom BRAKET to QASM for IBM:", program.quantum_circuit)
+        # ############################################################################################
 
         circuits: list[QuantumCircuit] = self.__get_circuits_as_QuantumCircuits(job_dto)
         backend = provider.get_backend(job_dto.executed_on.device_name)

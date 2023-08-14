@@ -18,7 +18,7 @@ import qunicorn_core.db.database_services.device_db_service
 from qunicorn_core.api.api_models.device_dtos import DeviceRequest, SimpleDeviceDto, DeviceDto
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import device_mapper
-from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
+from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
 from qunicorn_core.db.database_services import db_service, device_db_service
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
@@ -29,7 +29,7 @@ from qunicorn_core.util import logging
 @CELERY.task()
 def update_devices(device_request: DeviceRequest):
     """Update all backends for the IBM provider"""
-    ibm_provider: IBMProvider = QiskitPilot.get_ibm_provider_and_login(device_request.token)
+    ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(device_request.token)
     devices = ibm_provider.backends()
     all_devices: dict = get_device_dict(devices)
 
@@ -83,7 +83,7 @@ def check_if_device_available(device_id: int, token: str) -> dict:
     """Checks if the backend is running"""
     device: DeviceDto = get_device(device_id)
     if device.provider.name == ProviderName.IBM:
-        ibm_provider: IBMProvider = QiskitPilot.get_ibm_provider_and_login(token)
+        ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
         try:
             ibm_provider.get_backend(device.device_name)
             return {"backend": "Available"}
@@ -102,7 +102,7 @@ def get_device_from_provider(device_id: int, token: str) -> dict:
 
     # TODO add AWS Device and find common calibration data
     if device.provider.name == ProviderName.IBM:
-        ibm_provider: IBMProvider = QiskitPilot.get_ibm_provider_and_login(token)
+        ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
         backend = ibm_provider.get_backend(device.device_name)
         config_dict: dict = vars(backend.configuration())
         config_dict["u_channel_lo"] = None

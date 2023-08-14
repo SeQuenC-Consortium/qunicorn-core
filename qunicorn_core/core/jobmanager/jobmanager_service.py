@@ -25,7 +25,7 @@ from qunicorn_core.api.api_models.job_dtos import (
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import job_mapper, result_mapper
 from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
-from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
+from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
@@ -43,7 +43,7 @@ def run_job(job_core_dto_dict: dict):
     device = job_core_dto.executed_on
 
     if device.provider.name == ProviderName.IBM:
-        qiskit_pilot: QiskitPilot = QiskitPilot("QP")
+        qiskit_pilot: IBMPilot = IBMPilot("QP")
         qiskit_pilot.execute(job_core_dto)
     elif job_core_dto.executed_on.provider.name == ProviderName.AWS:
         aws_pilot: AWSPilot = AWSPilot("AP")
