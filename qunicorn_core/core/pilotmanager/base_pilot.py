@@ -22,7 +22,7 @@ from qunicorn_core.static.enums.job_type import JobType
 class Pilot:
     """Base class for Pilots"""
 
-    def __init__(self, name):
+    def __init__(self, name=None):
         self.name = name
 
     LANGUAGE: AssemblerLanguage = None

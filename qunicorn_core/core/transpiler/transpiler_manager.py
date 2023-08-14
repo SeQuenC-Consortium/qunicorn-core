@@ -1,16 +1,16 @@
 import dataclasses
 from functools import reduce
-from typing import Callable, Union
+from typing import Callable
 
 import qiskit.circuit
 import qrisp.circuit
 from braket.circuits import Circuit
 from braket.circuits.serialization import IRType
-from pydantic.fields import defaultdict
 from rustworkx import PyDiGraph, dijkstra_shortest_paths
 from braket.ir.openqasm import Program as OpenQASMProgram
 import qiskit.qasm2
 import qiskit.qasm3
+from os import path
 
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
@@ -76,6 +76,7 @@ class TranspileManager:
         return lambda circuit: \
             reduce(lambda immediate_circuit, step: step.transpile_method(immediate_circuit), steps, circuit)
 
+
 transpile_manager = TranspileManager()
 
 
@@ -88,21 +89,19 @@ def braket_to_qasm(source: Circuit) -> str:
 def qiskit_to_qasm2(circuit: qiskit.circuit.QuantumCircuit) -> str:
     qasm = circuit.qasm()
     # TODO
-    with open("C:/Users/Christoph Walcher/AppData/Local/Programs/Python/Python311/Lib/site-packages/qiskit/qasm/libs/qelib1.inc") as stdgates_file:
-        stdgates = stdgates_file.read()
-    qasm = qasm.replace('include "qelib1.inc";', "gate CX a,b { cnot a,b; }\n" + stdgates)
+    with open(path.join(path.dirname(qiskit.__file__), "qasm/libs/qelib1.inc")) as qelib1_file:
+        qelib1 = qelib1_file.read()
+        qasm = qasm.replace('include "qelib1.inc";', "gate CX a,b { cnot a,b; }\n" + qelib1)
     return qasm
-
 
 
 @transpile_manager.register_transpile_method(AssemblerLanguage.QISKIT, AssemblerLanguage.QASM3)
 def qiskit_to_qasm3(circuit: qiskit.circuit.QuantumCircuit) -> str:
-    print(circuit)
-    qasm = qiskit.qasm3.Exporter().dumps(circuit)
-
+    qasm = qiskit.qasm3.Exporter(allow_aliasing=False).dumps(circuit)
+    with open(path.join(path.dirname(qiskit.__file__), "qasm/libs/stdgates.inc")) as stdgates_file:
+        stdgates = stdgates_file.read()
+    qasm = qasm.replace('include "stdgates.inc";', stdgates)
     return qasm
-
-
 
 
 @transpile_manager.register_transpile_method(AssemblerLanguage.QASM2, AssemblerLanguage.QISKIT)
@@ -115,8 +114,8 @@ def qasm2_to_qiskit(source: str) -> qiskit.circuit.QuantumCircuit:
     return qiskit.qasm2.loads(source)
 
 
-@transpile_manager.register_transpile_method(AssemblerLanguage.QASM2, AssemblerLanguage.BRAKET)
-#@transpile_manager.register_transpile_method(AssemblerLanguage.QASM3, AssemblerLanguage.BRAKET)
+# @transpile_manager.register_transpile_method(AssemblerLanguage.QASM2, AssemblerLanguage.BRAKET)
+@transpile_manager.register_transpile_method(AssemblerLanguage.QASM3, AssemblerLanguage.BRAKET)
 def qasm_to_braket(source: str) -> OpenQASMProgram:
     return OpenQASMProgram(source=source)
 
