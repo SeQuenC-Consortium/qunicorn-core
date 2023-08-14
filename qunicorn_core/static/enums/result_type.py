@@ -33,6 +33,7 @@ class ResultType(StrEnum):
     VALUE_AND_VARIANCE = "VALUE_AND_VARIANCE"
     ERROR = "ERROR"
     UPLOAD_SUCCESSFUL = "UPLOAD_SUCCESSFUL"
+    SCRIPT_RETURN = "SCRIPT_RETURN"
 
     @staticmethod
     def get_result_type(job_type: JobType):

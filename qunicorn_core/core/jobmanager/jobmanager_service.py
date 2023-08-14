@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from os import environ
+from typing import Callable
 
 import yaml
 
@@ -27,22 +28,24 @@ from qunicorn_core.celery import CELERY
 from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 
 from qunicorn_core.core.mapper import job_mapper, result_mapper
+from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 
 from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
 from qunicorn_core.core.transpiler.execution_environment import execute_in_environment
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.util import logging
 
 ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
 
-
 PILOTS = {
-    ProviderName.IBM: QiskitPilot,
-    ProviderName.AWS: AWSPilot,
+    ProviderName.IBM.name: QiskitPilot,
+    ProviderName.AWS.name: AWSPilot,
 }
+
 
 @CELERY.task()
 def run_job(job_core_dto_dict: dict):
@@ -51,19 +54,37 @@ def run_job(job_core_dto_dict: dict):
     job_core_dto: JobCoreDto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
 
     device = job_core_dto.executed_on
-    pilot_class = PILOTS.get(device.provider.name)
+    pilot_class: Callable[[JobCoreDto], Pilot] = PILOTS.get(device.provider.name)
+
     if pilot_class:
-        pilot = pilot_class()
+        try:
+            pilot = pilot_class(job_core_dto)
+        except Exception as exception:
+            logging.error(f"Pilot for Job {job_core_dto.id} could not be instanced")
+            job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception),
+                                               JobState.ERROR)
+            raise exception
+
     else:
         exception: Exception = ValueError("No valid Target specified")
         job_db_service.update_finished_job(job_core_dto.id, result_mapper.get_error_results(exception), JobState.ERROR)
         raise exception
 
+    def immediate_result_listener(results: list[ResultDataclass]):
+        logging.error(f"Received immediate results {results} for Job {job_core_dto.id}")
+        job_db_service.append_results_to_job(job_core_dto.id, results)
+
     try:
-        execute_in_environment(job_dto=job_core_dto,
-                               pilot=pilot)
-    except Exception as e:
-        results = result_mapper.get_error_results(e)
+        job_db_service.update_attribute(job_core_dto.id, JobState.RUNNING, JobDataclass.state)
+        results = execute_in_environment(job_dto=job_core_dto,
+                                         pilot=pilot,
+                                         immediate_result_listener=immediate_result_listener)
+        logging.error(f"Finished Job {job_core_dto.id} with final results {results}")
+
+        job_db_service.update_finished_job(job_core_dto.id, results)
+    except Exception as exception:
+        logging.error(f"Job {job_core_dto.id} could not be executed")
+        results = result_mapper.get_error_results(exception)
         job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
 
 

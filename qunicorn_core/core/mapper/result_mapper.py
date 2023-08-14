@@ -22,12 +22,11 @@ from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.result_type import ResultType
 
 
-def runner_result_to_db_results(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
+def runner_result_to_db_results(ibm_result: Result, circuit: str) -> list[ResultDataclass]:
     result_dtos: list[ResultDataclass] = []
 
     for i in range(len(ibm_result.results)):
         counts: dict = ibm_result.results[i].data.counts
-        circuit: str = job_dto.deployment.programs[i].quantum_circuit
         result_dtos.append(
             ResultDataclass(
                 circuit=circuit,
@@ -40,41 +39,26 @@ def runner_result_to_db_results(ibm_result: Result, job_dto: JobCoreDto) -> list
 
 
 def estimator_result_to_db_results(
-    ibm_result: EstimatorResult, job: JobCoreDto, observer: str
+        ibm_result: EstimatorResult, circuits: [str], observer: str
 ) -> list[ResultDataclass]:
-    result_dtos: list[ResultDataclass] = []
-    for i in range(ibm_result.num_experiments):
-        value: float = ibm_result.values[i]
-        variance: float = ibm_result.metadata[i]["variance"]
-        circuit: str = job.deployment.programs[i].quantum_circuit
-        result_dtos.append(
-            ResultDataclass(
-                circuit=circuit,
-                result_dict={"value": str(value), "variance": str(variance)},
-                result_type=ResultType.VALUE_AND_VARIANCE,
-                meta_data={"observer": f"SparsePauliOp-{observer}"},
-            )
-        )
-    return result_dtos
+    return [ResultDataclass(
+        circuit=circuit,
+        result_dict={"value": str(result_values), "variance": str(metadata["variance"])},
+        result_type=ResultType.VALUE_AND_VARIANCE,
+        meta_data={"observer": f"SparsePauliOp-{observer}"},
+    ) for result_values, metadata, circuit in zip(ibm_result.values, ibm_result.metadata, circuits)]
 
 
-def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto) -> list[ResultDataclass]:
-    result_dtos: list[ResultDataclass] = []
-    for i in range(ibm_result.num_experiments):
-        quasi_dist: dict = ibm_result.quasi_dists[i]
-        circuit: str = job_dto.deployment.programs[i].quantum_circuit
-        result_dtos.append(
-            ResultDataclass(
-                circuit=circuit,
-                result_dict=quasi_dist,
-                result_type=ResultType.QUASI_DIST,
-            )
-        )
-    return result_dtos
+def sampler_result_to_db_results(ibm_result: SamplerResult, circuits: [str]) -> list[ResultDataclass]:
+    return [ResultDataclass(
+        circuit=circuit,
+        result_dict=quasi_dist,
+        result_type=ResultType.QUASI_DIST,
+    ) for quasi_dist, circuit in zip(ibm_result.quasi_dists, circuits)]
 
 
 def aws_local_simulator_result_to_db_results(
-    aws_result: GateModelQuantumTaskResult, job_dto: JobCoreDto
+        aws_result: GateModelQuantumTaskResult, circuit: str
 ) -> list[ResultDataclass]:
     result_dtos: list[ResultDataclass] = [
         ResultDataclass(
@@ -82,8 +66,7 @@ def aws_local_simulator_result_to_db_results(
                 "counts": dict(aws_result.measurement_counts.items()),
                 "probabilities": aws_result.measurement_probabilities,
             },
-            job_id=job_dto.id,
-            circuit=job_dto.deployment.programs[0].quantum_circuit,
+            circuit=circuit,
             meta_data="",
             result_type=ResultType.COUNTS,
         )

@@ -48,12 +48,17 @@ def update_attribute(job_id: int, attribute_value, attribute_name):
     db_service.get_session().commit()
 
 
-def update_finished_job(job_id: int, results: list[ResultDataclass], job_state: JobState = JobState.FINISHED):
+def append_results_to_job(job_id: int, results: list[ResultDataclass]):
+    job: JobDataclass = get_job(job_id)
+    job.results.append(results)
+    db_service.save_database_object(job)
+
+def update_finished_job(job_id: int, results: list[ResultDataclass] = [], job_state: JobState = JobState.FINISHED):
     """Updates the attributes state and results of the job with the id job_id"""
     job: JobDataclass = get_job(job_id)
     job.finished_at = datetime.datetime.now()
     job.progress = 100
-    job.results = results
+    job.results.append(results)
     job.state = job_state
     db_service.save_database_object(job)
 

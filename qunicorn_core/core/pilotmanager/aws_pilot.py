@@ -33,32 +33,22 @@ class AWSPilot(Pilot):
 
     LANGUAGE = AssemblerLanguage.BRAKET
 
-    def run(self, job_core_dto: JobCoreDto, circuit):
+    def run(self, circuit, shots: int) -> list[ResultDataclass]:
         """Run a job with AWS Pilot and saves results in the database"""
 
-        if job_core_dto.executed_on.device_name == "local_simulator":
-            self.__local_simulation(job_core_dto, circuit)
+        if self.device_name == "local_simulator":
+            return self.__local_simulation(circuit, shots)
         else:
             exception: Exception = ValueError("No valid device specified")
             raise exception
 
-    @staticmethod
-    def transpile(job_core_dto: JobCoreDto):
-        """Transpile job for an AWS backend"""
-        logging.info("Transpile a quantum circuit for a specific AWS backend")
-
-        circuit = OpenQASMProgram(source=job_core_dto.deployment.programs[0].quantum_circuit)
-        return circuit
-
-    def __local_simulation(self, job_core_dto: JobCoreDto, circuit):
+    def __local_simulation(self, circuit, shots: int):
         """Execute the job on a local simulator and saves results in the database"""
 
-        #job_db_service.update_attribute(job_core_dto.id, JobState.RUNNING, JobDataclass.state)
         device = LocalSimulator()
-        quantum_task: LocalQuantumTask = device.run(circuit, shots=job_core_dto.shots)
+        quantum_task: LocalQuantumTask = device.run(circuit, shots=shots)
         aws_simulator_result = quantum_task.result()
         results: list[ResultDataclass] = result_mapper.aws_local_simulator_result_to_db_results(
-            aws_simulator_result, job_core_dto
+            aws_simulator_result, str(circuit)
         )
-        #job_db_service.update_finished_job(job_core_dto.id, results)
-        print(results)
+        return results
