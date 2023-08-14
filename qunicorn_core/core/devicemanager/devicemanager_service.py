@@ -47,9 +47,9 @@ def update_devices_in_db(all_devices: dict):
             device_name=device["name"],
             url=device["url"],
             is_simulator=device["is_simulator"],
-            provider=db_service.get_database_object(1, ProviderDataclass),
+            provider=db_service.get_database_object_by_id(1, ProviderDataclass),
         )
-        qunicorn_core.db.database_services.device_db_service.save_device_by_name(final_device)
+        device_db_service.save_device_by_name(final_device)
 
 
 def get_device_dict(devices: [IBMBackend]) -> dict:

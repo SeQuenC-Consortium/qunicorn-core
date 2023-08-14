@@ -22,4 +22,4 @@ from qunicorn_core.db.models.user import UserDataclass
 
 def get_default_user() -> UserDataclass:
     """Gets the Default User from the database"""
-    return db_service.get_database_object(UserDto.get_default_user().id, UserDataclass)
+    return db_service.get_database_object_by_id(UserDto.get_default_user().id, UserDataclass)

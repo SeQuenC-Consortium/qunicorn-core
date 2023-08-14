@@ -37,7 +37,7 @@ def remove_database_object_by_id(db_object: Type[DbModel], id: int):
     session.commit()
 
 
-def get_database_object(db_object_id: int, database_object_class: Type[DbModel]) -> DbModelType:
+def get_database_object_by_id(db_object_id: int, database_object_class: Type[DbModel]) -> DbModelType:
     """Gets a database object
 
     Arguments:

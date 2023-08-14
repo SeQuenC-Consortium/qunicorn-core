@@ -61,7 +61,6 @@ def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = ASYN
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
-    job_mapper.core_to_response(job_core_dto)
     serialized_job_core_dto = yaml.dump(job_core_dto)
     job_core_dto_dict = {"data": serialized_job_core_dto}
     run_job.delay(job_core_dto_dict) if asynchronous else run_job(job_core_dto_dict)

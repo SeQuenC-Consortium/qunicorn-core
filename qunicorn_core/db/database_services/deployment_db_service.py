@@ -39,4 +39,4 @@ def delete(id: int):
 
 def get_deployment(deployment_id: int) -> DeploymentDataclass:
     """Gets the Deployment with the deployment_id from the database"""
-    return db_service.get_database_object(deployment_id, DeploymentDataclass)
+    return db_service.get_database_object_by_id(deployment_id, DeploymentDataclass)

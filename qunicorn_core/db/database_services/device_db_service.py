@@ -39,7 +39,7 @@ def get_all_devices() -> list[DeviceDataclass]:
 
 def get_device(device_id: int) -> DeviceDataclass:
     """Get a device by id"""
-    return db_service.get_database_object(device_id, DeviceDataclass)
+    return db_service.get_database_object_by_id(device_id, DeviceDataclass)
 
 
 def save_device_by_name(device: DeviceDataclass):
