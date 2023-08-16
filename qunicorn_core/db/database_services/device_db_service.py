@@ -37,7 +37,7 @@ def get_all_devices() -> list[DeviceDataclass]:
     return db_service.get_all_database_objects(DeviceDataclass)
 
 
-def get_device(device_id: int) -> DeviceDataclass:
+def get_device_by_id(device_id: int) -> DeviceDataclass:
     """Get a device by id"""
     return db_service.get_database_object_by_id(device_id, DeviceDataclass)
 

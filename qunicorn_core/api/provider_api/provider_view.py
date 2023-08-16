@@ -42,4 +42,4 @@ class ProviderIDView(MethodView):
     @PROVIDER_API.response(HTTPStatus.OK, ProviderDtoSchema())
     def get(self, provider_id):
         """Get information about a single provider."""
-        return providermanager_service.get_provider(provider_id)
+        return providermanager_service.get_provider_by_id(provider_id)

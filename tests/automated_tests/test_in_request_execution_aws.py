@@ -53,7 +53,7 @@ def test_get_results_from_aws_local_simulator_job():
         job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
         test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.AWS)
         return_dto: SimpleJobDto = jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
-        results: list[ResultDataclass] = job_db_service.get_job(return_dto.id).results
+        results: list[ResultDataclass] = job_db_service.get_job_by_id(return_dto.id).results
 
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():

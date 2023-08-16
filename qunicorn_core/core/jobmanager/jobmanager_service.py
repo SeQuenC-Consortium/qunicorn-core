@@ -69,7 +69,7 @@ def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = ASYN
 
 def re_run_job_by_id(job_id: int, token: str) -> SimpleJobDto:
     """Get job from DB, Save it as new job and run it with the new id"""
-    job: JobDataclass = job_db_service.get_job(job_id)
+    job: JobDataclass = job_db_service.get_job_by_id(job_id)
     job_request: JobRequestDto = job_mapper.dataclass_to_request(job)
     job_request.token = token
     return create_and_run_job(job_request)
@@ -77,7 +77,7 @@ def re_run_job_by_id(job_id: int, token: str) -> SimpleJobDto:
 
 def run_job_by_id(job_id: int, job_exec_dto: JobExecutePythonFileDto, asyn: bool = ASYNCHRONOUS) -> SimpleJobDto:
     """Get uploaded job from DB, and run it on a provider"""
-    job: JobDataclass = job_db_service.get_job(job_id)
+    job: JobDataclass = job_db_service.get_job_by_id(job_id)
     job_core_dto: JobCoreDto = job_mapper.dataclass_to_core(job)
     job_core_dto.ibm_file_inputs = job_exec_dto.python_file_inputs
     job_core_dto.ibm_file_options = job_exec_dto.python_file_options
@@ -90,15 +90,15 @@ def run_job_by_id(job_id: int, job_exec_dto: JobExecutePythonFileDto, asyn: bool
     return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.RUNNING)
 
 
-def get_job(job_id: int) -> JobResponseDto:
+def get_job_by_id(job_id: int) -> JobResponseDto:
     """Gets the job from the database service with its id"""
-    db_job: JobDataclass = job_db_service.get_job(job_id)
+    db_job: JobDataclass = job_db_service.get_job_by_id(job_id)
     return job_mapper.dataclass_to_response(db_job)
 
 
 def delete_job_data_by_id(job_id) -> JobResponseDto:
     """delete job data from db"""
-    job = get_job(job_id)
+    job = get_job_by_id(job_id)
     job_db_service.delete(job_id)
     return job
 

@@ -52,7 +52,7 @@ class DeploymentDetailView(MethodView):
     def get(self, deployment_id: int):
         """Get detailed information for single deployed job-definition."""
         logging.info("Request: get deployment by id")
-        return deployment_service.get_deployment(deployment_id)
+        return deployment_service.get_deployment_by_id(deployment_id)
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     def delete(self, deployment_id: int):

@@ -38,6 +38,6 @@ def test_create_deployments():
 
     # THEN: Test if the name and number of programs is correct
     with app.app_context():
-        deployment: DeploymentDataclass = deployment_db_service.get_deployment(depl_id)
+        deployment: DeploymentDataclass = deployment_db_service.get_deployment_by_id(depl_id)
         assert deployment.name == DEPLOYMENT_NAME
         assert len(deployment.programs) == PROGRAM_NUMBER

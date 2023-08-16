@@ -47,7 +47,7 @@ def test_create_and_run_runner():
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
         check_simple_job_dto(return_dto)
-        job: JobDataclass = job_db_service.get_job(return_dto.id)
+        job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
         check_if_job_finished(job)
         check_if_job_runner_result_correct(job)
 
@@ -68,7 +68,7 @@ def test_create_and_run_sampler():
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
         check_simple_job_dto(return_dto)
-        job: JobDataclass = job_db_service.get_job(return_dto.id)
+        job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
         check_if_job_finished(job)
         check_if_job_sample_result_correct(job)
 
@@ -89,7 +89,7 @@ def test_create_and_run_estimator():
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
         check_simple_job_dto(return_dto)
-        job: JobDataclass = job_db_service.get_job(return_dto.id)
+        job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
         check_if_job_finished(job)
         check_if_job_estimator_result_correct(job)
 

@@ -23,6 +23,6 @@ def get_all_providers() -> list[ProviderDataclass]:
     return db_service.get_all_database_objects(ProviderDataclass)
 
 
-def get_provider(provider_id: int) -> ProviderDataclass:
+def get_provider_by_id(provider_id: int) -> ProviderDataclass:
     """Get a provider by id"""
     return db_service.get_database_object_by_id(provider_id, ProviderDataclass)

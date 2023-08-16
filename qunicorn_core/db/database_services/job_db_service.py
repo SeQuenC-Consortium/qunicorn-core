@@ -32,7 +32,7 @@ def create_database_job(job_core: JobCoreDto):
     db_job.state = JobState.RUNNING
     db_job.progress = 0
     db_job.executed_by = default_user
-    db_job.deployment = deployment_db_service.get_deployment(job_core.deployment.id)
+    db_job.deployment = deployment_db_service.get_deployment_by_id(job_core.deployment.id)
     db_job.executed_on = device_db_service.get_device_with_name(job_core.executed_on.device_name)
     return db_service.save_database_object(db_job)
 
@@ -47,7 +47,7 @@ def update_attribute(job_id: int, attribute_value, attribute_name):
 
 def update_finished_job(job_id: int, results: list[ResultDataclass], job_state: JobState = JobState.FINISHED):
     """Updates the attributes state and results of the job with the id job_id"""
-    job: JobDataclass = get_job(job_id)
+    job: JobDataclass = get_job_by_id(job_id)
     job.finished_at = datetime.datetime.now()
     job.progress = 100
     job.results = results
@@ -55,7 +55,7 @@ def update_finished_job(job_id: int, results: list[ResultDataclass], job_state: 
     db_service.save_database_object(job)
 
 
-def get_job(job_id: int) -> JobDataclass:
+def get_job_by_id(job_id: int) -> JobDataclass:
     """Gets the job with the job_id from the database"""
     return db_service.get_database_object_by_id(job_id, JobDataclass)
 

@@ -32,7 +32,7 @@ from qunicorn_core.static.enums.job_state import JobState
 def request_to_core(job: JobRequestDto):
     # Get the objects from the database by its ids
     device: DeviceDataclass = device_db_service.get_device_with_name(job.device_name)
-    deployment: DeploymentDataclass = deployment_db_service.get_deployment(job.deployment_id)
+    deployment: DeploymentDataclass = deployment_db_service.get_deployment_by_id(job.deployment_id)
 
     return map_from_to(
         from_object=job,

@@ -18,10 +18,10 @@ from qunicorn_core.db.database_services import user_db_service
 
 
 def get_all_users() -> list[UserDto]:
-    """Gets all Devices from the DB and maps them"""
+    """Gets all Users from the DB and maps them"""
     return [user_mapper.dataclass_to_dto(user) for user in user_db_service.get_all_users()]
 
 
-def get_user(user_id: int) -> UserDto:
-    """Gets all Devices from the DB and maps them"""
-    return user_mapper.dataclass_to_dto(user_db_service.get_user(user_id))
+def get_user_by_id(user_id: int) -> UserDto:
+    """Gets a User from the DB by its ID and maps it"""
+    return user_mapper.dataclass_to_dto(user_db_service.get_user_by_id(user_id))

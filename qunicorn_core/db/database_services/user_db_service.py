@@ -20,12 +20,12 @@ from qunicorn_core.api.api_models import UserDto
 
 
 def get_all_users() -> list[UserDataclass]:
-    """Gets all Providers from the DB"""
+    """Gets all Users from the DB"""
     return db_service.get_all_database_objects(UserDataclass)
 
 
-def get_user(user_id: int) -> UserDataclass:
-    """Get a provider by id"""
+def get_user_by_id(user_id: int) -> UserDataclass:
+    """Get a user by id"""
     return db_service.get_database_object_by_id(user_id, UserDataclass)
 
 

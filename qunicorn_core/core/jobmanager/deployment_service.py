@@ -24,15 +24,15 @@ def get_all_deployments() -> list[DeploymentDto]:
     return deployment_db_service.get_all_deployments()
 
 
-def get_deployment(id: int) -> DeploymentDataclass:
+def get_deployment_by_id(id: int) -> DeploymentDataclass:
     """Gets one deployment"""
-    return deployment_db_service.get_deployment(id)
+    return deployment_db_service.get_deployment_by_id(id)
 
 
 def update_deployment(deployment_dto: DeploymentRequestDto, deployment_id: int) -> DeploymentDto:
     """Updates one deployment"""
     try:
-        db_deployment = get_deployment(deployment_id)
+        db_deployment = get_deployment_by_id(deployment_id)
         db_deployment.deployed_by = user_db_service.get_default_user()
         db_deployment.deployed_at = datetime.now()
         db_deployment.name = deployment_dto.name
@@ -46,7 +46,7 @@ def update_deployment(deployment_dto: DeploymentRequestDto, deployment_id: int) 
 
 def delete_deployment(id: int) -> DeploymentDto:
     """Remove one deployment by id"""
-    db_deployment = deployment_mapper.deployment_to_deployment_dto(deployment_db_service.get_deployment(id))
+    db_deployment = deployment_mapper.deployment_to_deployment_dto(deployment_db_service.get_deployment_by_id(id))
     if len(job_db_service.get_jobs_by_deployment_id(db_deployment.id)) > 0:
         raise ValueError("Deployment is in use by a job")
     deployment_db_service.delete(id)
