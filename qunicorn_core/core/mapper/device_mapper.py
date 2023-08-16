@@ -23,7 +23,7 @@ def device_dto_to_device(device: DeviceDto) -> DeviceDataclass:
         id=device.id,
         num_qubits=device.num_qubits,
         is_simulator=device.is_simulator,
-        provider=provider_mapper.provider_dto_to_provider(device.provider),
+        provider=provider_mapper.dto_to_dataclass(device.provider),
         device_name=device.device_name,
         url=device.url,
     )
@@ -33,7 +33,7 @@ def device_dto_to_device_without_id(device: DeviceDto) -> DeviceDataclass:
     return DeviceDataclass(
         num_qubits=device.num_qubits,
         is_simulator=device.is_simulator,
-        provider=provider_mapper.provider_dto_to_provider(device.provider),
+        provider=provider_mapper.dto_to_dataclass(device.provider),
         device_name=device.device_name,
         url=device.url,
     )
@@ -44,7 +44,7 @@ def device_to_device_dto(device: DeviceDataclass) -> DeviceDto:
         id=device.id,
         num_qubits=device.num_qubits,
         is_simulator=device.is_simulator,
-        provider=provider_mapper.provider_to_provider_dto(device.provider),
+        provider=provider_mapper.dataclass_to_dto(device.provider),
         device_name=device.device_name,
         url=device.url,
     )

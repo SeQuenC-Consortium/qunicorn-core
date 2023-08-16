@@ -89,20 +89,24 @@ def load_db_function(app: Flask):
     qc2 = QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(2))
     qasm3_str: str = "OPENQASM 3; \nqubit[3] q;\nbit[3] c;\nh q[0];\ncnot q[0], q[1];\ncnot q[1], q[2];\nc = measure q;"
     qasm3_program = QuantumProgramDataclass(quantum_circuit=qasm3_str)
+    braket_str: str = "Circuit().h(0).cnot(0, 1)"
+    braket_program = QuantumProgramDataclass(quantum_circuit=braket_str)
 
-    deployment_ibm = DeploymentDataclass(
-        deployed_by=user, programs=[qc, qc2], deployed_at=datetime.datetime.now(), name="DeploymentIBMName"
+    deployment_ibm_qasm2 = DeploymentDataclass(
+        deployed_by=user, programs=[qc, qc2], deployed_at=datetime.datetime.now(), name="DeploymentIBMQasmName"
     )
-    deployment_aws = DeploymentDataclass(
-        deployed_by=user, programs=[qasm3_program], deployed_at=datetime.datetime.now(), name="DeploymentAWSName"
+    deployment_aws_qasm3 = DeploymentDataclass(
+        deployed_by=user, programs=[qasm3_program], deployed_at=datetime.datetime.now(), name="DeploymentAWSQasmName"
     )
-
+    deployment_aws_braket = DeploymentDataclass(
+        deployed_by=user, programs=[braket_program], deployed_at=datetime.datetime.now(), name="DeploymentAWSBraketName"
+    )
     device_aws, device_ibm = add_devices_and_get_defaults()
 
     ibm_default_job = JobDataclass(
         executed_by=user,
         executed_on=device_ibm,
-        deployment=deployment_ibm,
+        deployment=deployment_ibm_qasm2,
         progress=0,
         state=JobState.READY,
         shots=4000,
@@ -115,7 +119,7 @@ def load_db_function(app: Flask):
     aws_default_job = JobDataclass(
         executed_by=user,
         executed_on=device_aws,
-        deployment=deployment_aws,
+        deployment=deployment_aws_qasm3,
         progress=0,
         state=JobState.READY,
         shots=4000,
@@ -129,6 +133,7 @@ def load_db_function(app: Flask):
         ],
     )
 
+    DB.session.add(deployment_aws_braket)
     DB.session.add(ibm_default_job)
     DB.session.add(aws_default_job)
     DB.session.commit()

@@ -11,7 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import TypeVar, Type
 
-from . import aws_pilot
-from . import base_pilot
-from . import ibm_pilot
+from automapper import mapper
+
+T = TypeVar("T")
+
+
+def map_from_to(from_object: object, to_type: Type[T], fields_mapping: dict | None = None) -> T | None:
+    if from_object is None:
+        return None
+    return mapper.to(to_type).map(from_object, fields_mapping=fields_mapping)

@@ -22,7 +22,8 @@ from qiskit_ibm_provider.api.exceptions import RequestsApiError
 from qunicorn_core.api.api_models import JobRequestDto, DeploymentRequestDto
 from qunicorn_core.core.jobmanager import jobmanager_service
 from qunicorn_core.core.mapper import deployment_mapper
-from qunicorn_core.db.database_services import job_db_service, db_service
+from qunicorn_core.db.database_services import job_db_service, db_service, user_db_service
+from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
@@ -64,7 +65,9 @@ def test_invalid_circuit():
 
     # WHEN: Executing create and run
     with app.app_context():
-        depl_id: int = db_service.save_database_object(deployment_mapper.request_dto_to_deployment(deployment_dto)).id
+        deployment: DeploymentDataclass = deployment_mapper.request_dto_to_deployment(deployment_dto)
+        deployment.deployed_by = user_db_service.get_default_user()
+        depl_id: int = db_service.save_database_object(deployment).id
         job_request_dto.deployment_id = depl_id
         with pytest.raises(Exception) as exception:
             jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)

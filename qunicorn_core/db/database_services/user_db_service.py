@@ -16,7 +16,7 @@
 
 from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.user import UserDataclass
-from qunicorn_core.util import logging
+from qunicorn_core.api.api_models import UserDto
 
 
 def get_all_users() -> list[UserDataclass]:
@@ -27,3 +27,8 @@ def get_all_users() -> list[UserDataclass]:
 def get_user(user_id: int) -> UserDataclass:
     """Get a provider by id"""
     return db_service.get_database_object(user_id, UserDataclass)
+
+
+def get_default_user() -> UserDataclass:
+    """Gets the Default User from the database"""
+    return db_service.get_database_object_by_id(UserDto.get_default_user().id, UserDataclass)

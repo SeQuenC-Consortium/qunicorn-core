@@ -1683,6 +1683,17 @@ files = [
 ]
 
 [[package]]
+name = "py-automapper"
+version = "1.2.3"
+description = "Library for automatically mapping one object to another"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "py-automapper-1.2.3.tar.gz", hash = "sha256:ae1f6f270c3bb42cd52bfc124630841019b278258c001a8ed3032cffa03327b4"},
+    {file = "py_automapper-1.2.3-py3-none-any.whl", hash = "sha256:bcc5236fa0caeffa10416e31dd379fb6ddd15f18e6c2d7a1d49fb3d341f07653"},
+]
+
+[[package]]
 name = "pycodestyle"
 version = "2.11.0"
 description = "Python style guide checker"
@@ -3001,4 +3012,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11.0"
-content-hash = "0a8eccadf43df39eff32631975a539e9ceb52d4789fb81c853e05e9452ef0eed"
+content-hash = "897741e4cc9292031a980d9b5fd1411da4771f98472a7888604dddc80695432b"

@@ -13,31 +13,13 @@
 # limitations under the License.
 
 from qunicorn_core.api.api_models import ProviderDto
+from qunicorn_core.core.mapper.general_mapper import map_from_to
 from qunicorn_core.db.models.provider import ProviderDataclass
 
 
-def provider_dto_to_provider(provider_dto: ProviderDto) -> ProviderDataclass:
-    return ProviderDataclass(
-        id=provider_dto.id,
-        with_token=provider_dto.with_token,
-        supported_language=provider_dto.supported_language,
-        name=provider_dto.name,
-    )
+def dto_to_dataclass(provider_dto: ProviderDto) -> ProviderDataclass:
+    return map_from_to(provider_dto, ProviderDataclass)
 
 
-def provider_dto_to_provider_without_id(provider_dto: ProviderDto) -> ProviderDataclass:
-    return ProviderDataclass(
-        id=0,
-        with_token=provider_dto.with_token,
-        supported_language=provider_dto.supported_language,
-        name=provider_dto.name,
-    )
-
-
-def provider_to_provider_dto(provider: ProviderDataclass) -> ProviderDto:
-    return ProviderDto(
-        id=provider.id,
-        with_token=provider.with_token,
-        supported_language=provider.supported_language,
-        name=provider.name,
-    )
+def dataclass_to_dto(provider: ProviderDataclass) -> ProviderDto:
+    return map_from_to(provider, ProviderDto)
