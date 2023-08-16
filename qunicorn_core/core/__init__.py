@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from . import (
-    jobmanager,
     pilotmanager,
     deployment_service,
     jobmanager_service,
