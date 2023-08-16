@@ -21,7 +21,7 @@ import marshmallow as ma
 
 from .deployment_dtos import DeploymentDto
 from .device_dtos import DeviceDto, DeviceDtoSchema
-from .result_dtos import ResultDto
+from .result_dtos import ResultDto, ResultDtoSchema
 from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
@@ -138,7 +138,7 @@ class JobResponseDtoSchema(MaBaseSchema):
     started_at = ma.fields.String(required=True, dump_only=True)
     finished_at = ma.fields.String(required=True, dump_only=True)
     data = ma.fields.String(required=True, dump_only=True)
-    results = ma.fields.List(ma.fields.Dict(), required=True, dump_only=True)
+    results = ma.fields.Nested(ResultDtoSchema(), many=True, required=True, dump_only=True)
     parameters = ma.fields.String(required=True, dump_only=True)
 
 

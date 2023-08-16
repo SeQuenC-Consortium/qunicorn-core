@@ -117,20 +117,3 @@ class JobPauseView(MethodView):
         """TBD: Pause a job via id."""
         logging.info("Request: pause job")
         return jsonify(jobmanager_service.pause_job_by_id(job_id))
-
-
-@JOBMANAGER_API.route("/<string:deployment_id>/")
-class JobsByDeploymentView(MethodView):
-    """API endpoint for jobs of a specific deployment."""
-
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))
-    def get(self, deployment_id: str):
-        """Get the details of all jobs with a specific deployment id."""
-        logging.info("Request: get jobs with deployment id")
-        return jsonify(jobmanager_service.get_jobs_by_deployment_id(deployment_id))
-
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))
-    def delete(self, deployment_id: str):
-        """Delete all jobs with a specific deployment id."""
-        logging.info("Request: delete jobs with deployment id")
-        return jsonify(jobmanager_service.delete_jobs_by_deployment_id(deployment_id))
