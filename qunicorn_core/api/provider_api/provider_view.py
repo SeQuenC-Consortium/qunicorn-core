@@ -16,18 +16,31 @@
 """Module containing the routes of the Taskmanager API."""
 from http import HTTPStatus
 
+from flask import jsonify
 from flask.views import MethodView
 
 from .root import PROVIDER_API
 from ..api_models.provider_dtos import ProviderDtoSchema
 
 
-@PROVIDER_API.route("/<string:provider_id>/")
+from ...core.providermanager import providermanager_service
+
+
+@PROVIDER_API.route("/")
 class ProviderView(MethodView):
+    """Root endpoint of the provider api, to list all available provider_apis."""
+
+    @PROVIDER_API.response(HTTPStatus.OK, ProviderDtoSchema(many=True))
+    def get(self):
+        """Get all providers from the database"""
+        return providermanager_service.get_all_providers()
+
+
+@PROVIDER_API.route("/<string:provider_id>/")
+class ProviderIDView(MethodView):
     """Provider Endpoint to get properties of a specific provider."""
 
     @PROVIDER_API.response(HTTPStatus.OK, ProviderDtoSchema())
     def get(self, provider_id):
         """Get information about a single provider."""
-
-        pass
+        return providermanager_service.get_provider(provider_id)

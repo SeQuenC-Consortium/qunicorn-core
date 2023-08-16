@@ -12,26 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-"""Module containing the root endpoint of the DEVICES API."""
-
-from dataclasses import dataclass
-from http import HTTPStatus
-
-from flask.helpers import url_for
-from flask.views import MethodView
-
-from ..api_models import RootSchema
-from ..flask_api_utils import SecurityBlueprint as SmorestBlueprint
-
-PROVIDER_API = SmorestBlueprint(
-    "provider-api",
-    "PROVIDER API",
-    description="Provider API to list available resources.",
-    url_prefix="/provider/",
-)
-
-
-@dataclass()
-class RootData:
-    root: str
+from . import usermanager_service

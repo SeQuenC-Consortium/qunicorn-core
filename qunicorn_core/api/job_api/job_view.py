@@ -107,18 +107,6 @@ class JobCancelView(MethodView):
         return jsonify(jobmanager_service.cancel_job_by_id(job_id))
 
 
-@JOBMANAGER_API.route("/pause/<string:job_id>/")
-class JobPauseView(MethodView):
-    """Jobs endpoint for a single job."""
-
-    @JOBMANAGER_API.arguments(TokenSchema(), location="json")
-    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
-    def post(self, body, job_id: str):
-        """TBD: Pause a job via id."""
-        logging.info("Request: pause job")
-        return jsonify(jobmanager_service.pause_job_by_id(job_id))
-
-
 @JOBMANAGER_API.route("/<string:deployment_id>/")
 class JobsByDeploymentView(MethodView):
     """API endpoint for jobs of a specific deployment."""

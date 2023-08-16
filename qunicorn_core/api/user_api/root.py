@@ -36,12 +36,3 @@ USER_API = SmorestBlueprint(
 class RootData:
     root: str
 
-
-@USER_API.route("/")
-class RootView(MethodView):
-    """Root endpoint of the provider_api api, to list all available provider_api."""
-
-    @USER_API.response(HTTPStatus.OK, RootSchema())
-    def get(self):
-        """Get the urls of the next endpoints of the users api to call."""
-        return RootData(root=url_for("user-api.UserView", user_id=1, _external=True))  # users_id=1 only a dummy value

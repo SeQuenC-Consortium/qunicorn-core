@@ -125,13 +125,10 @@ def send_job_to_pilot():
     raise NotImplementedError
 
 
-def pause_job_by_id(job_id):
-    """pause job execution"""
-    raise NotImplementedError
-
-
 def cancel_job_by_id(job_id):
     """cancel job execution"""
+    job: JobDataclass = job_db_service.get_job(job_id)
+    job_core_dto: JobCoreDto = job_mapper.job_to_job_core_dto(job)
     raise NotImplementedError
 
 
