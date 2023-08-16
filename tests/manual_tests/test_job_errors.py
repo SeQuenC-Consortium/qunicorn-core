@@ -20,7 +20,7 @@ from qiskit_ibm_provider.accounts import InvalidAccountError
 from qiskit_ibm_provider.api.exceptions import RequestsApiError
 
 from qunicorn_core.api.api_models import JobRequestDto, DeploymentRequestDto
-from qunicorn_core.core.jobmanager import jobmanager_service
+from qunicorn_core.core import jobmanager_service
 from qunicorn_core.core.mapper import deployment_mapper
 from qunicorn_core.db.database_services import job_db_service, db_service, user_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass

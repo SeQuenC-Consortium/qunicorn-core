@@ -12,5 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import jobmanager
-from . import pilotmanager
+from . import (
+    jobmanager,
+    pilotmanager,
+    deployment_service,
+    jobmanager_service,
+    devicemanager_service,
+    providermanager_service,
+    usermanager_service,
+)

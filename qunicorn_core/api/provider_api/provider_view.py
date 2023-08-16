@@ -21,8 +21,7 @@ from flask.views import MethodView
 from .root import PROVIDER_API
 from ..api_models.provider_dtos import ProviderDtoSchema
 
-
-from ...core.providermanager import providermanager_service
+from ...core import providermanager_service
 
 
 @PROVIDER_API.route("/")

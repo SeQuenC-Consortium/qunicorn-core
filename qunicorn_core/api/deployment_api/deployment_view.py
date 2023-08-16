@@ -21,7 +21,7 @@ from flask.views import MethodView
 
 from .root import DEPLOYMENT_API
 from ..api_models.deployment_dtos import DeploymentDtoSchema, DeploymentRequestDtoSchema, DeploymentRequestDto
-from ...core.jobmanager import deployment_service
+from ...core import deployment_service
 from ...util import logging
 
 

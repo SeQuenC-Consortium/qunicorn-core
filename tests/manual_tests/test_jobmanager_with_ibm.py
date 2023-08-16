@@ -15,7 +15,7 @@
 """"Test class to test the functionality of the job_api"""
 
 from qunicorn_core.api.api_models import JobRequestDto, SimpleJobDto
-from qunicorn_core.core.jobmanager.jobmanager_service import create_and_run_job
+from qunicorn_core.core.jobmanager_service import create_and_run_job
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass

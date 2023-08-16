@@ -22,7 +22,7 @@ from flask.views import MethodView
 from .root import USER_API
 from ..api_models.user_dtos import UserDtoSchema
 
-from ...core.usermanager import usermanager_service
+from ...core import usermanager_service
 
 
 @USER_API.route("/")

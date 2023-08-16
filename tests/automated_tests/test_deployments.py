@@ -15,7 +15,7 @@
 """"Test class to test the functionality of the job_api"""
 
 from qunicorn_core.api.api_models import DeploymentRequestDto
-from qunicorn_core.core.jobmanager import deployment_service
+from qunicorn_core.core import deployment_service
 from qunicorn_core.db.database_services import deployment_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.static.enums.provider_name import ProviderName

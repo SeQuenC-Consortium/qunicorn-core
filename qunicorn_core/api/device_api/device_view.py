@@ -27,7 +27,7 @@ from ..api_models.device_dtos import (
     DeviceRequest,
     SimpleDeviceDtoSchema,
 )
-from ...core.devicemanager import devicemanager_service
+from ...core import devicemanager_service
 
 
 @DEVICES_API.route("/")

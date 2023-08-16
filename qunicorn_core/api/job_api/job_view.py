@@ -31,7 +31,7 @@ from ..api_models.job_dtos import (
     JobExecutePythonFileDto,
     SimpleJobDto,
 )
-from ...core.jobmanager import jobmanager_service
+from ...core import jobmanager_service
 from ...util import logging
 
 

@@ -19,7 +19,7 @@ from tests import test_utils
 from tests.conftest import set_up_env
 
 from qunicorn_core.api.api_models.job_dtos import SimpleJobDto, JobRequestDto
-from qunicorn_core.core.jobmanager import jobmanager_service
+from qunicorn_core.core import jobmanager_service
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
