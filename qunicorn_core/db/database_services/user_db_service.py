@@ -26,7 +26,7 @@ def get_all_users() -> list[UserDataclass]:
 
 def get_user(user_id: int) -> UserDataclass:
     """Get a provider by id"""
-    return db_service.get_database_object(user_id, UserDataclass)
+    return db_service.get_database_object_by_id(user_id, UserDataclass)
 
 
 def get_default_user() -> UserDataclass:

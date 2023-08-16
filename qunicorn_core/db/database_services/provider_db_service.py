@@ -25,4 +25,4 @@ def get_all_providers() -> list[ProviderDataclass]:
 
 def get_provider(provider_id: int) -> ProviderDataclass:
     """Get a provider by id"""
-    return db_service.get_database_object(provider_id, ProviderDataclass)
+    return db_service.get_database_object_by_id(provider_id, ProviderDataclass)

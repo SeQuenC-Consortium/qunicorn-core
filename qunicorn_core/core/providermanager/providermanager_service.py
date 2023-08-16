@@ -19,9 +19,9 @@ from qunicorn_core.db.database_services import provider_db_service
 
 def get_all_providers() -> list[ProviderDto]:
     """Gets all Devices from the DB and maps them"""
-    return [provider_mapper.provider_to_provider_dto(provider) for provider in provider_db_service.get_all_providers()]
+    return [provider_mapper.dataclass_to_dto(provider) for provider in provider_db_service.get_all_providers()]
 
 
 def get_provider(provider_id: int) -> ProviderDto:
     """Gets all Devices from the DB and maps them"""
-    return provider_mapper.provider_to_provider_dto(provider_db_service.get_provider(provider_id))
+    return provider_mapper.dataclass_to_dto(provider_db_service.get_provider(provider_id))
