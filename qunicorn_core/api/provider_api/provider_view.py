@@ -16,7 +16,6 @@
 """Module containing the routes of the Taskmanager API."""
 from http import HTTPStatus
 
-from flask import jsonify
 from flask.views import MethodView
 
 from .root import PROVIDER_API

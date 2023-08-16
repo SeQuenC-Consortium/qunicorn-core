@@ -14,10 +14,7 @@
 
 from qunicorn_core.core.mapper import user_mapper
 from qunicorn_core.api.api_models.user_dtos import UserDto
-from qunicorn_core.celery import CELERY
-from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
-from qunicorn_core.db.database_services import db_service, user_db_service
-from qunicorn_core.db.models.user import UserDataclass
+from qunicorn_core.db.database_services import user_db_service
 
 
 def get_all_users() -> list[UserDto]:

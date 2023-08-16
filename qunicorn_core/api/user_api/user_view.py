@@ -42,5 +42,4 @@ class UserIdView(MethodView):
     @USER_API.response(HTTPStatus.OK, UserDtoSchema())
     def get(self, user_id):
         """Get information about a single user."""
-        user_response_dto: UserDtoSchema
         return usermanager_service.get_user(user_id), 200

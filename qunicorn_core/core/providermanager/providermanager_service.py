@@ -14,12 +14,7 @@
 
 from qunicorn_core.core.mapper import provider_mapper
 from qunicorn_core.api.api_models.provider_dtos import ProviderDto
-from qunicorn_core.celery import CELERY
-from qunicorn_core.core.pilotmanager.qiskit_pilot import QiskitPilot
-from qunicorn_core.db.database_services import db_service, provider_db_service
-from qunicorn_core.db.models.device import DeviceDataclass
-from qunicorn_core.db.models.provider import ProviderDataclass
-from qunicorn_core.static.enums.provider_name import ProviderName
+from qunicorn_core.db.database_services import provider_db_service
 
 
 def get_all_providers() -> list[ProviderDto]:

@@ -16,12 +16,6 @@
 """Module containing the root endpoint of the DEVICES API."""
 
 from dataclasses import dataclass
-from http import HTTPStatus
-
-from flask.helpers import url_for
-from flask.views import MethodView
-
-from ..api_models import RootSchema
 from ..flask_api_utils import SecurityBlueprint as SmorestBlueprint
 
 PROVIDER_API = SmorestBlueprint(

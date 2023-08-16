@@ -16,7 +16,6 @@
 
 from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.provider import ProviderDataclass
-from qunicorn_core.util import logging
 
 
 def get_all_providers() -> list[ProviderDataclass]:
