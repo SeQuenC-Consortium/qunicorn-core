@@ -133,9 +133,10 @@ def load_db_function(app: Flask):
         ],
     )
 
-    DB.session.add(deployment_aws_braket)
     DB.session.add(ibm_default_job)
     DB.session.add(aws_default_job)
+    DB.session.add(deployment_aws_braket)
+
     DB.session.commit()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
 
