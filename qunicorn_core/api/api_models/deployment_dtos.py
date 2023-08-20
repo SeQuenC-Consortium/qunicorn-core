@@ -67,6 +67,5 @@ class DeploymentRequestDtoSchema(MaBaseSchema):
     programs = ma.fields.Nested(QuantumProgramRequestDtoSchema(many=True))
     name = ma.fields.String(
         required=True,
-        example="DeploymentName",
-        metadata={"description": "An optional Name for the deployment_api."},
+        metadata={"example": "DeploymentName", "description": "An optional Name for the deployment_api."},
     )

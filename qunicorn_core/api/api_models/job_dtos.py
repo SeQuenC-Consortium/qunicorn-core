@@ -113,19 +113,18 @@ class JobExecutePythonFileDto:
 
 
 class JobRequestDtoSchema(MaBaseSchema):
-    name = ma.fields.String(required=True, example="JobName")
-    provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
-    device_name = ma.fields.String(required=True, example="aer_simulator")
+    name = ma.fields.String(required=True, metadata={"example": "JobName"})
+    provider_name = ma.fields.Enum(required=True, metadata={"example": ProviderName.IBM}, enum=ProviderName)
+    device_name = ma.fields.String(required=True, metadata={"example": "aer_simulator"})
     shots = ma.fields.Int(
         required=False,
         allow_none=True,
-        metadata={"label": "Shots", "description": "Number of shots", "input_type": "number"},
-        example=4000,
+        metadata={"example": 4000, "label": "Shots", "description": "Number of shots", "input_type": "number"},
     )
     parameters = ma.fields.List(ma.fields.Float(), required=False)
-    token = ma.fields.String(required=True, example="")
-    type = ma.fields.Enum(required=True, example=JobType.RUNNER, enum=JobType)
-    deployment_id = ma.fields.Integer(required=False, allow_none=True, example=1)
+    token = ma.fields.String(required=True, metadata={"example": ""})
+    type = ma.fields.Enum(required=True, metadata={"example": JobType.RUNNER}, enum=JobType)
+    deployment_id = ma.fields.Integer(required=False, allow_none=True, metadata={"example": 1})
 
 
 class JobResponseDtoSchema(MaBaseSchema):
@@ -149,10 +148,10 @@ class SimpleJobDtoSchema(MaBaseSchema):
 
 
 class TokenSchema(MaBaseSchema):
-    token = ma.fields.String(required=True, example="")
+    token = ma.fields.String(required=True, metadata={"example": ""})
 
 
 class JobExecutionDtoSchema(MaBaseSchema):
-    token = ma.fields.String(required=True, example="")
-    python_file_options = ma.fields.Dict(required=True, example={"backend": "ibmq_qasm_simulator"})
+    token = ma.fields.String(required=True, metadata={"example": ""})
+    python_file_options = ma.fields.Dict(required=True, metadata={"example": {"backend": "ibmq_qasm_simulator"}})
     python_file_inputs = ma.fields.Dict(required=True)
