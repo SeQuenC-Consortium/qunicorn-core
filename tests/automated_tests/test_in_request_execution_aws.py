@@ -15,14 +15,15 @@
 """test in-request execution for aws"""
 from collections import Counter
 
+from tests import test_utils
+from tests.conftest import set_up_env
+
 from qunicorn_core.api.api_models.job_dtos import SimpleJobDto, JobRequestDto
-from qunicorn_core.core.jobmanager import jobmanager_service
+from qunicorn_core.core import jobmanager_service
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.provider_name import ProviderName
-from tests import test_utils
-from tests.conftest import set_up_env
 
 IS_ASYNCHRONOUS: bool = False
 
@@ -39,7 +40,7 @@ def test_create_and_run_aws_local_simulator():
         return_dto: SimpleJobDto = jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
         # THEN: Check if the correct job with its result is saved in the db
-        assert return_dto.job_state == JobState.RUNNING
+        assert return_dto.state == JobState.RUNNING
 
 
 def test_get_results_from_aws_local_simulator_job():
@@ -52,7 +53,7 @@ def test_get_results_from_aws_local_simulator_job():
         job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
         test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.AWS)
         return_dto: SimpleJobDto = jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
-        results: list[ResultDataclass] = job_db_service.get_job(return_dto.id).results
+        results: list[ResultDataclass] = job_db_service.get_job_by_id(return_dto.id).results
 
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():

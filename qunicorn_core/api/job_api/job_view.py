@@ -31,7 +31,7 @@ from ..api_models.job_dtos import (
     JobExecutePythonFileDto,
     SimpleJobDto,
 )
-from ...core.jobmanager import jobmanager_service
+from ...core import jobmanager_service
 from ...util import logging
 
 
@@ -61,7 +61,7 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema())
     def get(self, job_id: str):
         """Get the details/results of a job."""
-        job_response_dto: JobResponseDto = jobmanager_service.get_job(int(job_id))
+        job_response_dto: JobResponseDto = jobmanager_service.get_job_by_id(int(job_id))
         return jsonify(job_response_dto), 200
 
     @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema())
@@ -105,32 +105,3 @@ class JobCancelView(MethodView):
         """TBD: Cancel a job execution via id."""
         logging.info("Request: cancel job")
         return jsonify(jobmanager_service.cancel_job_by_id(job_id))
-
-
-@JOBMANAGER_API.route("/pause/<string:job_id>/")
-class JobPauseView(MethodView):
-    """Jobs endpoint for a single job."""
-
-    @JOBMANAGER_API.arguments(TokenSchema(), location="json")
-    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
-    def post(self, body, job_id: str):
-        """TBD: Pause a job via id."""
-        logging.info("Request: pause job")
-        return jsonify(jobmanager_service.pause_job_by_id(job_id))
-
-
-@JOBMANAGER_API.route("/<string:deployment_id>/")
-class JobsByDeploymentView(MethodView):
-    """API endpoint for jobs of a specific deployment."""
-
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))
-    def get(self, deployment_id: str):
-        """Get the details of all jobs with a specific deployment id."""
-        logging.info("Request: get jobs with deployment id")
-        return jsonify(jobmanager_service.get_jobs_by_deployment_id(deployment_id))
-
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))
-    def delete(self, deployment_id: str):
-        """Delete all jobs with a specific deployment id."""
-        logging.info("Request: delete jobs with deployment id")
-        return jsonify(jobmanager_service.delete_jobs_by_deployment_id(deployment_id))

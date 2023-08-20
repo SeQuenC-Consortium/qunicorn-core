@@ -20,7 +20,7 @@ import yaml
 from qiskit_ibm_runtime import IBMRuntimeError
 
 from qunicorn_core.api.api_models import JobRequestDto, JobCoreDto
-from qunicorn_core.core.jobmanager.jobmanager_service import run_job
+from qunicorn_core.core.jobmanager_service import run_job
 from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
@@ -46,7 +46,7 @@ def test_celery_run_job(mocker):
     mocker.patch(f"{path_to_pilot}.transpile", return_value=(backend_mock, None))
 
     results: list[ResultDataclass] = [ResultDataclass(result_dict={"00": 4000})]
-    mocker.patch("qunicorn_core.core.mapper.result_mapper.runner_result_to_db_results", return_value=results)
+    mocker.patch("qunicorn_core.core.mapper.result_mapper.ibm_runner_to_dataclass", return_value=results)
 
     app = set_up_env()
     job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
@@ -64,7 +64,7 @@ def test_celery_run_job(mocker):
 
     # THEN: Test Assertion
     with app.app_context():
-        new_job = job_db_service.get_job(job_core_dto.id)
+        new_job = job_db_service.get_job_by_id(job_core_dto.id)
         assert new_job.state == JobState.FINISHED
 
 
@@ -94,12 +94,12 @@ def test_job_ibm_upload(mocker):
 
     # THEN: Test Assertion
     with app.app_context():
-        new_job = job_db_service.get_job(job_core_dto.id)
+        new_job = job_db_service.get_job_by_id(job_core_dto.id)
         assert new_job.state == JobState.READY
 
 
 def test_job_ibm_runner(mocker):
-    """Testing the synchronous call of the exeuction of an upload file to IBM"""
+    """Testing the synchronous call of the execution of an upload file to IBM"""
     # GIVEN: Setting up Mocks and Environment
     mock = Mock()
     mock.upload_program.return_value = "test-id"  # Returning an id value after uploading a file to IBM
@@ -123,8 +123,8 @@ def test_job_ibm_runner(mocker):
 
     # WHEN: Executing method to be tested
     with app.app_context():
-        job: JobDataclass = job_db_service.get_job(job_core_dto.id)
-        job_core: JobCoreDto = job_mapper.job_to_job_core_dto(job)
+        job: JobDataclass = job_db_service.get_job_by_id(job_core_dto.id)
+        job_core: JobCoreDto = job_mapper.dataclass_to_core(job)
         job_core.ibm_file_options = {"backend": "ibmq_qasm_simulator"}
         job_core.ibm_file_inputs = {"my_obj": "MyCustomClass(my foo, my bar)"}
         serialized_job_core_dto = yaml.dump(job_core)
@@ -133,5 +133,5 @@ def test_job_ibm_runner(mocker):
 
     # THEN: Test Assertion
     with app.app_context():
-        new_job = job_db_service.get_job(job_core_dto.id)
+        new_job = job_db_service.get_job_by_id(job_core_dto.id)
         assert new_job.state == JobState.ERROR

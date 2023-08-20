@@ -21,7 +21,7 @@ import marshmallow as ma
 
 from .deployment_dtos import DeploymentDto
 from .device_dtos import DeviceDto, DeviceDtoSchema
-from .result_dtos import ResultDto
+from .result_dtos import ResultDto, ResultDtoSchema
 from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
@@ -61,20 +61,20 @@ class JobRequestDto:
 class JobCoreDto:
     """JobDto that is used for all internal job handling"""
 
-    id: int | None
     executed_by: UserDto
     executed_on: DeviceDto
     deployment: DeploymentDto
-    progress: str
+    progress: int
     state: JobState
     shots: int
     type: JobType
     started_at: datetime
-    finished_at: datetime
     name: str
-    data: str
     results: list[ResultDto]
-    parameters: str
+    id: int | None = None
+    parameters: str | None = None
+    data: str | None = None
+    finished_at: datetime | None = None
     ibm_file_options: dict | None = None
     ibm_file_inputs: dict | None = None
     token: str | None = None
@@ -87,7 +87,7 @@ class JobResponseDto:
     id: int
     executed_by: UserDto
     executed_on: DeviceDto
-    progress: str
+    progress: int
     state: str
     type: JobType
     started_at: datetime
@@ -102,7 +102,7 @@ class JobResponseDto:
 class SimpleJobDto:
     id: int
     name: str
-    job_state: JobState = JobState.RUNNING
+    state: JobState = JobState.RUNNING
 
 
 @dataclass
@@ -137,7 +137,7 @@ class JobResponseDtoSchema(MaBaseSchema):
     started_at = ma.fields.String(required=True, dump_only=True)
     finished_at = ma.fields.String(required=True, dump_only=True)
     data = ma.fields.String(required=True, dump_only=True)
-    results = ma.fields.List(ma.fields.Dict(), required=True, dump_only=True)
+    results = ma.fields.Nested(ResultDtoSchema(), many=True, required=True, dump_only=True)
     parameters = ma.fields.String(required=True, dump_only=True)
 
 

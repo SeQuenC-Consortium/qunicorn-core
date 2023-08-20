@@ -1,4 +1,4 @@
-# Copyright 2023 University of Stuttgart
+# Copyright 2023 University of Stuttgart.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import (
-    pilotmanager,
-    deployment_service,
-    jobmanager_service,
-    devicemanager_service,
-    providermanager_service,
-    usermanager_service,
-)
+"""Module containing all automated tests."""
+
+from . import test_deployments, test_dummy, test_in_request_execution_aws, test_jobmanager

@@ -18,11 +18,16 @@ from qiskit.primitives import EstimatorResult, SamplerResult
 from qiskit.result import Result
 
 from qunicorn_core.api.api_models import JobCoreDto, ResultDto
+from qunicorn_core.core.mapper.general_mapper import map_from_to
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.result_type import ResultType
 
 
-def runner_result_to_db_results(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
+def dataclass_to_dto(result: ResultDataclass) -> ResultDto:
+    return map_from_to(result, ResultDto)
+
+
+def ibm_runner_to_dataclass(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
     result_dtos: list[ResultDataclass] = []
 
     for i in range(len(ibm_result.results)):
@@ -39,9 +44,7 @@ def runner_result_to_db_results(ibm_result: Result, job_dto: JobCoreDto) -> list
     return result_dtos
 
 
-def estimator_result_to_db_results(
-    ibm_result: EstimatorResult, job: JobCoreDto, observer: str
-) -> list[ResultDataclass]:
+def ibm_estimator_to_dataclass(ibm_result: EstimatorResult, job: JobCoreDto, observer: str) -> list[ResultDataclass]:
     result_dtos: list[ResultDataclass] = []
     for i in range(ibm_result.num_experiments):
         value: float = ibm_result.values[i]
@@ -58,7 +61,7 @@ def estimator_result_to_db_results(
     return result_dtos
 
 
-def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto) -> list[ResultDataclass]:
+def ibm_sampler_to_dataclass(ibm_result: SamplerResult, job_dto: JobCoreDto) -> list[ResultDataclass]:
     result_dtos: list[ResultDataclass] = []
     for i in range(ibm_result.num_experiments):
         quasi_dist: dict = ibm_result.quasi_dists[i]
@@ -73,7 +76,7 @@ def sampler_result_to_db_results(ibm_result: SamplerResult, job_dto: JobCoreDto)
     return result_dtos
 
 
-def aws_local_simulator_result_to_db_results(
+def aws_runner_to_dataclass(
     aws_results: list[GateModelQuantumTaskResult],
     job_dto: JobCoreDto,
 ) -> list[ResultDataclass]:
@@ -93,17 +96,7 @@ def aws_local_simulator_result_to_db_results(
     return result_dtos
 
 
-def result_to_result_dto(result: ResultDataclass) -> ResultDto:
-    return ResultDto(
-        id=result.id,
-        circuit=result.circuit,
-        result_dict=result.result_dict,
-        header=result.meta_data,
-        result_type=result.result_type,
-    )
-
-
-def get_error_results(exception: Exception, circuit: str | None = None) -> list[ResultDataclass]:
+def exception_to_error_results(exception: Exception, circuit: str | None = None) -> list[ResultDataclass]:
     exception_message: str = str(exception)
     stack_trace: str = traceback.format_exc()
     return [

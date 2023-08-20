@@ -28,6 +28,7 @@ gunicorn = "^21.2.0"
 psycopg2 = "^2.9.6"
 amazon-braket-sdk = "^1.53.4"
 invoke = "^2.0.0"
+py-automapper = "^1.2.3"
 
 [tool.poetry.dev-dependencies]
 Sphinx = "^5.0.0"

@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from qunicorn_core.util import logging
-
 from qiskit.providers import QiskitBackendNotFoundError
 from qiskit_ibm_provider import IBMProvider, IBMBackend
 
@@ -24,6 +22,7 @@ from qunicorn_core.db.database_services import db_service, device_db_service
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.static.enums.provider_name import ProviderName
+from qunicorn_core.util import logging
 
 
 @CELERY.task()
@@ -47,9 +46,9 @@ def update_devices_in_db(all_devices: dict):
             device_name=device["name"],
             url=device["url"],
             is_simulator=device["is_simulator"],
-            provider=db_service.get_database_object(1, ProviderDataclass),
+            provider=db_service.get_database_object_by_id(1, ProviderDataclass),
         )
-        db_service.save_device_by_name(final_device)
+        device_db_service.save_device_by_name(final_device)
 
 
 def get_device_dict(devices: [IBMBackend]) -> dict:
@@ -74,14 +73,14 @@ def get_all_devices() -> list[SimpleDeviceDto]:
     return [device_mapper.device_to_simple_device(device) for device in device_db_service.get_all_devices()]
 
 
-def get_device(device_id: int) -> DeviceDto:
-    """Gets all Devices from the DB and maps them"""
-    return device_mapper.device_to_device_dto(device_db_service.get_device(device_id))
+def get_device_by_id(device_id: int) -> DeviceDto:
+    """Gets a Device from the DB by its ID and maps it"""
+    return device_mapper.device_to_device_dto(device_db_service.get_device_by_id(device_id))
 
 
 def check_if_device_available(device_id: int, token: str) -> dict:
     """Checks if the backend is running"""
-    device: DeviceDto = get_device(device_id)
+    device: DeviceDto = get_device_by_id(device_id)
     if device.provider.name == ProviderName.IBM:
         ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
         try:
@@ -98,7 +97,7 @@ def check_if_device_available(device_id: int, token: str) -> dict:
 
 def get_device_from_provider(device_id: int, token: str) -> dict:
     """Get the device from the provider and return the configuration as dict"""
-    device: DeviceDto = get_device(device_id)
+    device: DeviceDto = get_device_by_id(device_id)
 
     # TODO add AWS Device and find common calibration data
     if device.provider.name == ProviderName.IBM:

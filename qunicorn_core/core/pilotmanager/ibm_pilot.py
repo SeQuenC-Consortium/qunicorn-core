@@ -59,7 +59,7 @@ class IBMPilot(Pilot):
             self.__upload_program(job_core_dto)
         else:
             exception: Exception = ValueError("No valid Job Type specified")
-            results = result_mapper.get_error_results(exception)
+            results = result_mapper.exception_to_error_results(exception)
             job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
             raise exception
 
@@ -72,7 +72,7 @@ class IBMPilot(Pilot):
         backend = qiskit.Aer.get_backend("qasm_simulator")
         result = qiskit.execute(circuits, backend=backend, shots=job_dto.shots).result()
 
-        results: list[ResultDataclass] = result_mapper.runner_result_to_db_results(result, job_dto)
+        results: list[ResultDataclass] = result_mapper.ibm_runner_to_dataclass(result, job_dto)
         # AerCircuit is not serializable and needs to be removed
         for res in results:
             if res is not None and "circuit" in res.meta_data:
@@ -88,7 +88,7 @@ class IBMPilot(Pilot):
 
         job_from_ibm = backend.run(transpiled, shots=job_dto.shots)
         ibm_result = job_from_ibm.result()
-        results: list[ResultDataclass] = result_mapper.runner_result_to_db_results(ibm_result, job_dto)
+        results: list[ResultDataclass] = result_mapper.ibm_runner_to_dataclass(ibm_result, job_dto)
         job_db_service.update_finished_job(job_dto.id, results)
         logging.info(
             f"Run job with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}"
@@ -101,7 +101,7 @@ class IBMPilot(Pilot):
 
         job_from_ibm: RuntimeJob = sampler.run(circuits)
         ibm_result: SamplerResult = job_from_ibm.result()
-        results: list[ResultDataclass] = result_mapper.sampler_result_to_db_results(ibm_result, job_dto)
+        results: list[ResultDataclass] = result_mapper.ibm_sampler_to_dataclass(ibm_result, job_dto)
         job_db_service.update_finished_job(job_dto.id, results)
         logging.info(
             f"Run job with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}"
@@ -115,7 +115,7 @@ class IBMPilot(Pilot):
 
         job_from_ibm = estimator.run(circuits, observables=estimator_observables)
         ibm_result: EstimatorResult = job_from_ibm.result()
-        results: list[ResultDataclass] = result_mapper.estimator_result_to_db_results(ibm_result, job_dto, "IY")
+        results: list[ResultDataclass] = result_mapper.ibm_estimator_to_dataclass(ibm_result, job_dto, "IY")
         job_db_service.update_finished_job(job_dto.id, results)
         logging.info(
             f"Run job with id {job_dto.id} on {job_dto.executed_on.provider.name} and get the result {results}"
@@ -141,7 +141,7 @@ class IBMPilot(Pilot):
             try:
                 circuits.append(QuantumCircuit().from_qasm_str(program.quantum_circuit))
             except QasmError as exception:
-                error_results.extend(result_mapper.get_error_results(exception, program.quantum_circuit))
+                error_results.extend(result_mapper.exception_to_error_results(exception, program.quantum_circuit))
 
         # If an error was caught -> Update the job and raise it again
         if len(error_results) > 0:
@@ -168,7 +168,9 @@ class IBMPilot(Pilot):
         try:
             return IBMPilot.get_ibm_provider_and_login(token)
         except Exception as exception:
-            job_db_service.update_finished_job(job_dto_id, result_mapper.get_error_results(exception), JobState.ERROR)
+            job_db_service.update_finished_job(
+                job_dto_id, result_mapper.exception_to_error_results(exception), JobState.ERROR
+            )
             raise exception
 
     def transpile(self, provider: IBMProvider, job_dto: JobCoreDto):
@@ -218,7 +220,7 @@ class IBMPilot(Pilot):
         try:
             ibm_job_id = job_core_dto.results[0].result_dict["ibm_job_id"]
             result = service.run(ibm_job_id, inputs=input_dict, options=options_dict).result()
-            ibm_results.extend(result_mapper.runner_result_to_db_results(result, job_core_dto))
+            ibm_results.extend(result_mapper.ibm_runner_to_dataclass(result, job_core_dto))
         except IBMRuntimeError as exception:
             logging.info("Error when accessing IBM, 403 Client Error")
             ibm_results.append(

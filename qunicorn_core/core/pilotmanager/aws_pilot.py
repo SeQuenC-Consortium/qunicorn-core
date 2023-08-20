@@ -44,7 +44,7 @@ class AWSPilot(Pilot):
                 raise exception
         else:
             exception: Exception = ValueError("No valid Job Type specified")
-            results = result_mapper.get_error_results(exception)
+            results = result_mapper.exception_to_error_results(exception)
             job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
             raise exception
 
@@ -73,8 +73,5 @@ class AWSPilot(Pilot):
 
         quantum_tasks: LocalQuantumTaskBatch = device.run_batch(circuits, shots=job_core_dto.shots)
         aws_simulator_results: list[GateModelQuantumTaskResult] = quantum_tasks.results()
-        results: list[ResultDataclass] = result_mapper.aws_local_simulator_result_to_db_results(
-            aws_simulator_results, job_core_dto
-        )
-
+        results: list[ResultDataclass] = result_mapper.aws_runner_to_dataclass(aws_simulator_results, job_core_dto)
         job_db_service.update_finished_job(job_core_dto.id, results)

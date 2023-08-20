@@ -27,7 +27,7 @@ from ..api_models.device_dtos import (
     DeviceRequest,
     SimpleDeviceDtoSchema,
 )
-from ...core.devicemanager import devicemanager_service
+from ...core import devicemanager_service
 
 
 @DEVICES_API.route("/")
@@ -56,7 +56,7 @@ class DeviceIdView(MethodView):
     def get(self, device_id):
         """Get information about a specific device."""
 
-        return devicemanager_service.get_device(device_id)
+        return devicemanager_service.get_device_by_id(device_id)
 
 
 @DEVICES_API.route("/<string:device_id>/status")
