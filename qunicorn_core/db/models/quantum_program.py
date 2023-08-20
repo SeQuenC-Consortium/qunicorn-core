@@ -30,6 +30,7 @@ class QuantumProgramDataclass(DbModel):
         deployment_id (int): The deployment where a list of quantum program is used
     """
 
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
     quantum_circuit: Mapped[str] = mapped_column(sql.String(500), default=None)
     assembler_language: Mapped[str] = mapped_column(sql.Enum(AssemblerLanguage), default=AssemblerLanguage.QASM)
     deployment_id: Mapped[int] = mapped_column(

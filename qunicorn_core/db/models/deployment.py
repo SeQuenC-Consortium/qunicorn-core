@@ -35,6 +35,7 @@ class DeploymentDataclass(DbModel):
         deployed_at (Date): Date of the creation of a deployment_api
     """
 
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
     deployed_by_id: Mapped[int] = mapped_column(
         ForeignKey(UserDataclass.__tablename__ + ".id"), default=None, nullable=True
     )

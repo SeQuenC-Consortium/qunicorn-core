@@ -48,6 +48,7 @@ class JobDataclass(DbModel):
             checked before starting the task.
     """
 
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
     results: Mapped[Optional[List[ResultDataclass.__name__]]] = relationship(
         ResultDataclass.__name__, default_factory=list
     )
