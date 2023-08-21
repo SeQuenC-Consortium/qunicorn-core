@@ -62,7 +62,7 @@ Installation / Starting Minikube (tested for windows)
 
     kubectl apply -f minikube
 
-10. Expose qunicorn through minikube
+10. Expose qunicorn through minikube (start in another terminal)
 
 .. code-block:: bash
     number-lines:
@@ -74,7 +74,7 @@ Installation / Starting Minikube (tested for windows)
 .. code-block:: bash
     number-lines:
 
-    kubectl get cvc
+    kubectl get svc
 
 12. Get existing pos and fill database with data
 
