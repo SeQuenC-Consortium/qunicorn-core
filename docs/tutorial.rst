@@ -34,49 +34,50 @@ Installation / Starting Minikube (tested for windows)
 
     kompose convert -f docker-compose.yaml --out minikube
 
-6. Start minikube
+6. Start Docker
+7. Start minikube
 
 .. code-block:: bash
     number-lines:
 
     minikube start
 
-7. Set minikube as docker env
+8. Set minikube as docker env
 
 .. code-block:: bash
     number-lines:
 
     minikube docker-env | Invoke-Expression
 
-8. Build qunicorn image
+9. Build qunicorn image
 
 .. code-block:: bash
     number-lines:
 
     docker build -t qunicorn:local .
 
-9. Start services and pods with configuration
+10. Start services and pods with configuration
 
 .. code-block:: bash
     number-lines:
 
     kubectl apply -f minikube
 
-10. Expose qunicorn through minikube (start in another terminal)
+11. Expose qunicorn through minikube (start in another terminal)
 
 .. code-block:: bash
     number-lines:
 
     minikube tunnel
 
-11. List service information using
+12. List service information using
 
 .. code-block:: bash
     number-lines:
 
     kubectl get svc
 
-12. Get existing pos and fill database with data
+13. Get existing pos and fill database with data
 
 .. code-block:: bash
     number-lines:
@@ -85,7 +86,7 @@ Installation / Starting Minikube (tested for windows)
 
     kubectl exec {name of server pod}  -- python -m flask create-and-load-db
 
-13. Now you can access qunicorn using [EXTERNAL-IP]:8080/swagger-ui of the server service
+14. Now you can access qunicorn using [EXTERNAL-IP]:8080/swagger-ui of the server service
 
 
 Other useful commands
