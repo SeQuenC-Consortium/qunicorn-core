@@ -15,7 +15,7 @@
 """"Test class to test the functionality of the job_api"""
 
 from qunicorn_core.api.api_models import JobRequestDto, SimpleJobDto
-from qunicorn_core.core.jobmanager.jobmanager_service import create_and_run_job
+from qunicorn_core.core.jobmanager_service import create_and_run_job
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
@@ -47,7 +47,7 @@ def test_create_and_run_runner():
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
         check_simple_job_dto(return_dto)
-        job: JobDataclass = job_db_service.get_job(return_dto.id)
+        job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
         check_if_job_finished(job)
         check_if_job_runner_result_correct(job)
 
@@ -68,7 +68,7 @@ def test_create_and_run_sampler():
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
         check_simple_job_dto(return_dto)
-        job: JobDataclass = job_db_service.get_job(return_dto.id)
+        job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
         check_if_job_finished(job)
         check_if_job_sample_result_correct(job)
 
@@ -89,7 +89,7 @@ def test_create_and_run_estimator():
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
         check_simple_job_dto(return_dto)
-        job: JobDataclass = job_db_service.get_job(return_dto.id)
+        job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
         check_if_job_finished(job)
         check_if_job_estimator_result_correct(job)
 
@@ -103,7 +103,7 @@ def check_if_job_finished(job: JobDataclass):
 def check_simple_job_dto(return_dto: SimpleJobDto):
     assert return_dto.id == EXPECTED_ID
     assert return_dto.name == STANDARD_JOB_NAME
-    assert return_dto.job_state == JobState.RUNNING
+    assert return_dto.state == JobState.RUNNING
 
 
 def check_if_job_sample_result_correct(job: JobDataclass):

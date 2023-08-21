@@ -75,8 +75,10 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
         # load Redis URLs from env vars
         if "BROKER_URL" in environ:
             celery_conf = config.get("CELERY", {})
-            celery_conf["broker_url"] = environ["BROKER_URL"]
+            celery_conf["broker_url"] = celery_conf["result_backend"] = environ["BROKER_URL"]
             config["CELERY"] = celery_conf
+        if "DB_URL" in environ:
+            config["SQLALCHEMY_DATABASE_URI"] = environ["DB_URL"]
 
     else:
         # load the test config if passed in

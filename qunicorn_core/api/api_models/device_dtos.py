@@ -57,7 +57,7 @@ class DeviceDtoSchema(MaBaseSchema):
 
 
 class DeviceRequestSchema(MaBaseSchema):
-    token = ma.fields.String(required=True, example="")
+    token = ma.fields.String(required=True, metadata={"example": ""})
 
 
 @dataclass

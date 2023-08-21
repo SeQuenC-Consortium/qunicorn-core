@@ -1,7 +1,7 @@
 .. Qunicorn_Core documentation master file, created by
-   sphinx-quickstart on Tue Oct 27 00:16:08 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+sphinx-quickstart on Tue Oct 27 00:16:08 2020.
+You can adapt this file completely to your liking, but it should at least
+contain the root `toctree` directive.
 
 Welcome to Qunicorn_Core's documentation!
 =========================================
@@ -18,6 +18,8 @@ Welcome to Qunicorn_Core's documentation!
    models/projectstructuremodels
    apidocumentation
    architecture
+   tutorial
+
   
 
 Indices and tables

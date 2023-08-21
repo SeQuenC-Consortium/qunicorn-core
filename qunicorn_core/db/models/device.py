@@ -30,6 +30,7 @@ class DeviceDataclass(DbModel):
         provider: The provider of the cloud_service with the needed configurations
     """
 
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
     provider_id: Mapped[int] = mapped_column(
         ForeignKey(ProviderDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None
     )

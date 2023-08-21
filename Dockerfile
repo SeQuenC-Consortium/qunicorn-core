@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.11
 
 # install git and remove caches again in same layer
 ARG DEBIAN_FRONTEND=noninteractive
@@ -23,12 +23,7 @@ ENV CELERY_WORKER_POOL=threads
 RUN mkdir --parents /app/instance \
     && chown --recursive gunicorn /app && chmod --recursive u+rw /app/instance
 
-# Wait for database
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
-RUN chmod +x /wait
-
-
-RUN python -m pip install poetry gunicorn invoke
+RUN python -m pip install poetry
 
 COPY --chown=gunicorn . /app
 

@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from sqlalchemy.orm import Mapped, mapped_column, declared_attr
-from sqlalchemy.sql import sqltypes as sql
+from sqlalchemy.orm import declared_attr
 
 
 class DbModel:
@@ -25,5 +24,3 @@ class DbModel:
     @declared_attr
     def __tablename__(self):
         return self.__name__.replace("Dataclass", "")
-
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)

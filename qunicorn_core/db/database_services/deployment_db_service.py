@@ -13,9 +13,8 @@
 # limitations under the License.
 from datetime import datetime
 
-from qunicorn_core.db.database_services import db_service
+from qunicorn_core.db.database_services import db_service, user_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
-from qunicorn_core.db.models.user import UserDataclass
 
 
 # originally from <https://github.com/buehlefs/flask-template/>
@@ -23,9 +22,7 @@ from qunicorn_core.db.models.user import UserDataclass
 
 def create(deployment: DeploymentDataclass) -> DeploymentDataclass:
     """Creates a database job with the given circuit and saves it in the database"""
-
-    default_user: UserDataclass = db_service.get_database_object(1, UserDataclass)
-    deployment.deployed_by = default_user
+    deployment.deployed_by = user_db_service.get_default_user()
     deployment.deployed_at = datetime.now()
     return db_service.save_database_object(deployment)
 
@@ -37,9 +34,9 @@ def get_all_deployments() -> list[DeploymentDataclass]:
 
 def delete(id: int):
     """Removes one deployment"""
-    db_service.delete_database_object_by_id(DeploymentDataclass, id)
+    db_service.remove_database_object_by_id(DeploymentDataclass, id)
 
 
-def get_deployment(deployment_id: int) -> DeploymentDataclass:
+def get_deployment_by_id(deployment_id: int) -> DeploymentDataclass:
     """Gets the Deployment with the deployment_id from the database"""
-    return db_service.get_database_object(deployment_id, DeploymentDataclass)
+    return db_service.get_database_object_by_id(deployment_id, DeploymentDataclass)

@@ -17,7 +17,7 @@ import json
 import os
 
 from qunicorn_core.api.api_models import DeploymentRequestDto, JobRequestDto, DeploymentDto
-from qunicorn_core.core.jobmanager import deployment_service
+from qunicorn_core.core import deployment_service
 from qunicorn_core.static.enums.provider_name import ProviderName
 
 JOB_JSON_IBM = "job_request_dto_test_data_IBM.json"

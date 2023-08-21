@@ -12,5 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# originally from <https://github.com/buehlefs/flask-template/>
 
-from . import jobmanager_service, deployment_service
+from qunicorn_core.db.database_services import db_service
+from qunicorn_core.db.models.provider import ProviderDataclass
+
+
+def get_all_providers() -> list[ProviderDataclass]:
+    """Gets all Providers from the DB"""
+    return db_service.get_all_database_objects(ProviderDataclass)
+
+
+def get_provider_by_id(provider_id: int) -> ProviderDataclass:
+    """Get a provider by id"""
+    return db_service.get_database_object_by_id(provider_id, ProviderDataclass)
