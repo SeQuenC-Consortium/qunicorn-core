@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe --file docker-compose.yaml convert --out minikube
+    kompose.service.expose: "true"
+    kompose.service.type: nodeport
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: server
+  name: server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: server
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe --file docker-compose.yaml convert --out minikube
+        kompose.service.expose: "true"
+        kompose.service.type: loadbalancer
+        kompose.version: 1.30.0 (9d8dcb518)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/qunicorn-core-qunicorn: "true"
+        io.kompose.service: server
+    spec:
+      containers:
+        - env:
+            - name: BROKER_URL
+              value: redis://broker:6379
+            - name: CONTAINER_MODE
+              value: server
+            - name: DB_URL
+              value: postgresql://postgres:passwd@postgres/qunicorn
+            - name: SERVER_PORT
+              value: "8080"
+          image: qunicorn:local
+          name: server
+          ports:
+            - containerPort: 8080
+              hostPort: 8080
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}

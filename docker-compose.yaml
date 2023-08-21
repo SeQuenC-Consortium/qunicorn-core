@@ -2,6 +2,7 @@ version: "3"
 services:
   server:
     build: .
+    image: qunicorn:local
     networks:
       - qunicorn
     environment:
@@ -14,9 +15,13 @@ services:
       - broker
     ports:
       - "8080:8080"
+    labels:
+      kompose.service.expose: "true"
+      kompose.service.type: "loadbalancer"
 
   worker:
     build: .
+    image: qunicorn:local
     networks:
       - qunicorn
     environment:
@@ -26,11 +31,15 @@ services:
     depends_on:
       - postgres
       - broker
+    ports:
+      - "6379"
 
   broker:
     image: redis:7.0.12
     networks:
       - qunicorn
+    ports:
+      - "6379:6379"
 
   postgres:
     image: postgres:15.3
@@ -42,6 +51,8 @@ services:
       POSTGRES_DB: qunicorn
     volumes:
       - pgdata:/var/lib/postgresql/data \
+    ports:
+      - "5432:5432"
 
 
 networks:
