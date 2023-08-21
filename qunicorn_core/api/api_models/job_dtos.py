@@ -119,7 +119,7 @@ class JobRequestDtoSchema(MaBaseSchema):
     shots = ma.fields.Int(
         required=False,
         allow_none=True,
-        metadata={"example": 4000, "label": "Shots", "description": "Number of shots", "input_type": "number"},
+        metadata={"example": 4000, "label": "shots", "description": "number of shots", "input_type": "number"},
     )
     parameters = ma.fields.List(ma.fields.Float(), required=False)
     token = ma.fields.String(required=True, metadata={"example": ""})

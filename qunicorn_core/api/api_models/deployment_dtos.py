@@ -56,10 +56,10 @@ class DeploymentDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=False, metadata={"description": "UID for the deployment_api"})
     deployed_by = ma.fields.Nested(UserDtoSchema())
     programs = ma.fields.Nested(QuantumProgramDtoSchema(many=True))
-    deployed_at = ma.fields.Date(required=False, metadata={"description": "Time of Deployment"})
+    deployed_at = ma.fields.Date(required=False, metadata={"description": "time of deployment"})
     name = ma.fields.String(
         required=False,
-        metadata={"description": "An optional Name for the deployment_api."},
+        metadata={"description": "an optional name for the deployment_api."},
     )
 
 
@@ -67,5 +67,5 @@ class DeploymentRequestDtoSchema(MaBaseSchema):
     programs = ma.fields.Nested(QuantumProgramRequestDtoSchema(many=True))
     name = ma.fields.String(
         required=True,
-        metadata={"example": "DeploymentName", "description": "An optional Name for the deployment_api."},
+        metadata={"example": "DeploymentName", "description": "an optional name for the deployment_api."},
     )
