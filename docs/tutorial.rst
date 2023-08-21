@@ -9,28 +9,24 @@ Installation / Starting Minikube (tested for windows)
 2. Install Minikube Welcome!
 
 .. code-block:: bash
-    number-lines:
 
     choco install minikube
 
 3. Install kubectl  Getting started
 
 .. code-block:: bash
-    number-lines:
 
     choco install kubernetes-cli
 
 4. Install kubernetes-kompose
 
 .. code-block:: bash
-    number-lines:
 
     choco install kubernetes-kompose
 
 5. (If kubernetes files not existing): Create Kubernetes Configuration Files
 
 .. code-block:: bash
-    number-lines:
 
     kompose convert -f docker-compose.yaml --out minikube
 
@@ -38,49 +34,42 @@ Installation / Starting Minikube (tested for windows)
 7. Start minikube
 
 .. code-block:: bash
-    number-lines:
 
     minikube start
 
 8. Set minikube as docker env
 
 .. code-block:: bash
-    number-lines:
 
     minikube docker-env | Invoke-Expression
 
 9. Build qunicorn image
 
 .. code-block:: bash
-    number-lines:
 
     docker build -t qunicorn:local .
 
 10. Start services and pods with configuration
 
 .. code-block:: bash
-    number-lines:
 
     kubectl apply -f minikube
 
 11. Expose qunicorn through minikube (start in another terminal)
 
 .. code-block:: bash
-    number-lines:
 
     minikube tunnel
 
 12. List service information using
 
 .. code-block:: bash
-    number-lines:
 
     kubectl get svc
 
 13. Get existing pos and fill database with data
 
 .. code-block:: bash
-    number-lines:
 
     kubectl get po --selector=io.kompose.service=server
 
@@ -95,13 +84,11 @@ Other useful commands
 * Clear all kubectl pods and services
 
 .. code-block:: bash
-    number-lines:
 
     kubectl delete daemonsets,replicasets,services,deployments,pods,rc,ingress --all --all-namespaces
 
 * Expose service and create Tunnel
 
 .. code-block:: bash
-    number-lines:
 
     minikube service {service}
