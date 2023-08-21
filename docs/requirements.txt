@@ -1,4 +1,4 @@
-poetalabaster==0.7.13
+alabaster==0.7.13
 alembic==1.11.1
 amqp==5.1.1
 apispec==6.3.0
