@@ -72,13 +72,13 @@ test = ["black", "flake8", "flake8-rst-docstrings", "isort", "jsonschema (==3.2.
 
 [[package]]
 name = "amazon-braket-sdk"
-version = "1.54.0"
+version = "1.54.1"
 description = "An open source library for interacting with quantum computing devices on Amazon Braket"
 optional = false
 python-versions = ">= 3.8.2"
 files = [
-    {file = "amazon-braket-sdk-1.54.0.tar.gz", hash = "sha256:1c9ac5ce3930d334c173b2e2d91817994db7a1b4f7947730da4257a4c914eba6"},
-    {file = "amazon_braket_sdk-1.54.0-py3-none-any.whl", hash = "sha256:d97f4051ccfbb1a8cee62455950b1d62aececf40162a327da114af13d2d38b33"},
+    {file = "amazon-braket-sdk-1.54.1.tar.gz", hash = "sha256:7f9b7f13729eebc8a74b52bf9c4ae99c451d8884c09f3b0bc83985c54c462c47"},
+    {file = "amazon_braket_sdk-1.54.1-py3-none-any.whl", hash = "sha256:087780f24778819c2b7d54cc1a9446764cc629d2181e2f6fa2cf02dfd83ef890"},
 ]
 
 [package.dependencies]
@@ -277,17 +277,17 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.28.31"
+version = "1.28.32"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.28.31-py3-none-any.whl", hash = "sha256:2761f3249fe25c3ec1a8cd6b95fca2317747503e6f1d127daf6a3d2cdeb25680"},
-    {file = "boto3-1.28.31.tar.gz", hash = "sha256:dc6d72470f6d8926b8cdc10ee7708d7ccdd36d6313c7aa298bc1cf6bedb8921e"},
+    {file = "boto3-1.28.32-py3-none-any.whl", hash = "sha256:ed787f250ce2562c7744395bdf32b5a7bc9184126ef50a75e97bcb66043dccf3"},
+    {file = "boto3-1.28.32.tar.gz", hash = "sha256:b505faa126db84e226f6f8d242a798fae30a725f0cac8a76c6aca9ace4e8eb28"},
 ]
 
 [package.dependencies]
-botocore = ">=1.31.31,<1.32.0"
+botocore = ">=1.31.32,<1.32.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -296,13 +296,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.31.31"
+version = "1.31.32"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.31.31-py3-none-any.whl", hash = "sha256:1eef14ae98e8662e43f7cf6d993c732793def02644e2d489c5171d3b9269e900"},
-    {file = "botocore-1.31.31.tar.gz", hash = "sha256:950a49c5286fe1f6d72cfbe2910b9ddbdfbb907975ddc41cf38ac9709b4d1291"},
+    {file = "botocore-1.31.32-py3-none-any.whl", hash = "sha256:8992ac186988c4b4cc168e8e479e9472da1442b193c1bf7c9dcd1877ec62d23c"},
+    {file = "botocore-1.31.32.tar.gz", hash = "sha256:7a07d8dc8cc47bf23af39409ada81f388eb78233e1bb2cde0c415756da753664"},
 ]
 
 [package.dependencies]
@@ -734,13 +734,13 @@ pydocstyle = ">=2.1"
 
 [[package]]
 name = "flask"
-version = "2.3.2"
+version = "2.3.3"
 description = "A simple framework for building complex web applications."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Flask-2.3.2-py3-none-any.whl", hash = "sha256:77fd4e1249d8c9923de34907236b747ced06e5467ecac1a7bb7115ae0e9670b0"},
-    {file = "Flask-2.3.2.tar.gz", hash = "sha256:8c2f9abd47a9e8df7f0c3f091ce9497d011dc3b31effcf4c85a6e2b50f4114ef"},
+    {file = "flask-2.3.3-py3-none-any.whl", hash = "sha256:f69fcd559dc907ed196ab9df0e48471709175e696d6e698dd4dbe940f96ce66b"},
+    {file = "flask-2.3.3.tar.gz", hash = "sha256:09c347a92aa7ff4a8e7f3206795f30d826654baf38b873d0744cd571ca609efc"},
 ]
 
 [package.dependencies]
@@ -749,7 +749,7 @@ click = ">=8.1.3"
 itsdangerous = ">=2.1.2"
 Jinja2 = ">=3.1.2"
 python-dotenv = {version = "*", optional = true, markers = "extra == \"dotenv\""}
-Werkzeug = ">=2.3.3"
+Werkzeug = ">=2.3.7"
 
 [package.extras]
 async = ["asgiref (>=3.2)"]
@@ -971,12 +971,12 @@ urllib3 = ">=1.26.0,<2.0.0"
 
 [[package]]
 name = "ibm-platform-services"
-version = "0.39.0"
+version = "0.40.0"
 description = "Python client library for IBM Cloud Platform Services"
 optional = false
 python-versions = "*"
 files = [
-    {file = "ibm-platform-services-0.39.0.tar.gz", hash = "sha256:258fcd061c3dfb59d117cede766180d80bdf3e75f6644bf4c3e1f884cb25d6a5"},
+    {file = "ibm-platform-services-0.40.0.tar.gz", hash = "sha256:79c3e15d8b91682e0719972859aa831cea5deb2f7a38d6fb5e24cbf08c20714e"},
 ]
 
 [package.dependencies]
@@ -2947,17 +2947,17 @@ tests = ["Django (>=2.2.0)", "Flask (>=0.12.5)", "aiohttp (>=3.0.8)", "bottle (>
 
 [[package]]
 name = "websocket-client"
-version = "1.6.1"
+version = "1.6.2"
 description = "WebSocket client for Python with low level API options"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "websocket-client-1.6.1.tar.gz", hash = "sha256:c951af98631d24f8df89ab1019fc365f2227c0892f12fd150e935607c79dd0dd"},
-    {file = "websocket_client-1.6.1-py3-none-any.whl", hash = "sha256:f1f9f2ad5291f0225a49efad77abf9e700b6fef553900623060dad6e26503b9d"},
+    {file = "websocket-client-1.6.2.tar.gz", hash = "sha256:53e95c826bf800c4c465f50093a8c4ff091c7327023b10bfaff40cf1ef170eaa"},
+    {file = "websocket_client-1.6.2-py3-none-any.whl", hash = "sha256:ce54f419dfae71f4bdba69ebe65bf7f0a93fe71bc009ad3a010aacc3eebad537"},
 ]
 
 [package.extras]
-docs = ["Sphinx (>=3.4)", "sphinx-rtd-theme (>=0.5)"]
+docs = ["Sphinx (>=6.0)", "sphinx-rtd-theme (>=1.1.0)"]
 optional = ["python-socks", "wsaccel"]
 test = ["websockets"]
 
@@ -3060,4 +3060,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11.0"
-content-hash = "966dc46a888929cf325771e97090325de59e2999ee69ecf195071ee47ec1ed95"
+content-hash = "66bffd5c804faa2c3e13d18a9aa7691c1141e12aad88d82dfa743e1c33f10d57"
