@@ -1,8 +1,8 @@
 Database Models
-=====
+=========================================
 
 Deployments
--------
+----------------------
 
 Attributes of Deployment Data
 
@@ -41,7 +41,7 @@ Attributes of Deployment Data
 =====
 
 Jobs
--------
+----------------------
 
 Attributes of Job Data
 

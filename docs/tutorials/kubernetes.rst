@@ -4,7 +4,7 @@ Minikube | Kubernetes
 Installation / Starting Minikube (tested for windows)
 ----------------------
 
-1. Install ChocolateyInstalling Chocolatey
+1. Install Chocolatey
 
 2. Install Minikube Welcome!
 
