@@ -28,11 +28,17 @@ from qunicorn_core.util import logging
 @CELERY.task()
 def update_devices(device_request: DeviceRequest):
     """Update all backends for the IBM provider"""
-    ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(device_request.token)
-    devices = ibm_provider.backends()
-    all_devices: dict = get_device_dict(devices)
+    all_devices: dict = {}
+    if device_request.provider == "IBM":
+        ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(device_request.token)
+        devices = ibm_provider.backends()
+        all_devices = get_device_dict(devices)
 
-    update_devices_in_db(all_devices=all_devices)
+        update_devices_in_db(all_devices=all_devices)
+        # hier muss noch neue DB Abfrage rein, dass ALLE Einträge aus der DB raus kommen (?)
+
+    elif device_request.provider == "AWS":
+        all_devices = {"provider": "AWS"}
 
     return all_devices
 
@@ -44,7 +50,6 @@ def update_devices_in_db(all_devices: dict):
             provider_id=device["provider_id"],
             num_qubits=device["num_qubits"],
             device_name=device["name"],
-            url=device["url"],
             is_simulator=device["is_simulator"],
             provider=db_service.get_database_object_by_id(1, ProviderDataclass),
         )
@@ -58,7 +63,6 @@ def get_device_dict(devices: [IBMBackend]) -> dict:
         device_dict = {
             "name": device.name,
             "num_qubits": -1 if device.name.__contains__("stabilizer") else device.num_qubits,
-            "url": "",
             "is_simulator": 1 if device.name.__contains__("simulator") else 0,
             "provider_id": 1,
             "provider": None,

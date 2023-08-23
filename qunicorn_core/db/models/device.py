@@ -37,6 +37,5 @@ class DeviceDataclass(DbModel):
     num_qubits: Mapped[int] = mapped_column(sql.INTEGER, default=-1)
     device_name: Mapped[str] = mapped_column(sql.String, default="")
     is_simulator: Mapped[bool] = mapped_column(sql.BOOLEAN, default=False)
-    url: Mapped[str] = mapped_column(sql.String(50), default=None)
 
     provider: Mapped[ProviderDataclass.__name__] = relationship(ProviderDataclass.__name__, default=None)

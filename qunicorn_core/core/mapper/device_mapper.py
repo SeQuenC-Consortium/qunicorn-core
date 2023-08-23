@@ -25,7 +25,6 @@ def device_dto_to_device(device: DeviceDto) -> DeviceDataclass:
         is_simulator=device.is_simulator,
         provider=provider_mapper.dto_to_dataclass(device.provider),
         device_name=device.device_name,
-        url=device.url,
     )
 
 
@@ -35,7 +34,6 @@ def device_dto_to_device_without_id(device: DeviceDto) -> DeviceDataclass:
         is_simulator=device.is_simulator,
         provider=provider_mapper.dto_to_dataclass(device.provider),
         device_name=device.device_name,
-        url=device.url,
     )
 
 
@@ -46,7 +44,6 @@ def device_to_device_dto(device: DeviceDataclass) -> DeviceDto:
         is_simulator=device.is_simulator,
         provider=provider_mapper.dataclass_to_dto(device.provider),
         device_name=device.device_name,
-        url=device.url,
     )
 
 
