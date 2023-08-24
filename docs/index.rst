@@ -9,12 +9,11 @@ Welcome to Qunicorn_Core's documentation!
    project_introduction/main_introduction
    tutorials/main_tutorials
    contribution_guidelines_documentation/main_contribution_guidelines
-   database_documentation/main_database
-   api_documentation/main_apidocumentation
    architecture_documentation/main_architecture
+   pilot_documentation/main_pilot_documentation
    others/cli
-   others/changelog
    others/glossary
+   others/changelog
    others/disclaimer
 
   

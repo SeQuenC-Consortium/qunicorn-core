@@ -1,6 +1,22 @@
 Development Guidelines
 ======================
 
+Contribution Process
+----------------------
+1. Issues are moved from the Product Backlog to the Sprint Backlog if:
+    * The issue is well defined (Definition of Ready)
+    * it is sprint planing
+    * no other issues are in the sprint backlog and no other developer requires support.
+2. The developer moves the issue to "In Progress" and starts working on it.
+    * Developer assigns ticket to themself
+3. Document important information during development within the issue
+4. After completion of development (check DoD) issue is moved to "Ready for Review" and developer is unassigned
+5. Pull Request: Before creating the pull request branch should be up to date with the master. Developer is assigned to PR.
+6. After review by another developer, issue is moved to "Done". The reviewer unassigns themself.
+    * In the case of feedback, notify developer and leave the feedback in the PR
+7. Merge Pull Request
+8. Supervisors review issue when they are in "Ready for Release"
+
 Definition of Done
 --------------------
 

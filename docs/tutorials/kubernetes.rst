@@ -4,15 +4,15 @@ Minikube | Kubernetes
 Installation / Starting Minikube (tested for windows)
 ----------------------
 
-1. Install Chocolatey
+1. Install`Chocolatey <https://chocolatey.org/install#individual>`_
 
-2. Install Minikube Welcome!
+2. Install Minikube `Minikube <https://minikube.sigs.k8s.io/docs/>`_
 
 .. code-block:: bash
 
     choco install minikube
 
-3. Install kubectl  Getting started
+3. Install kubectl `kubectl <https://kubernetes.io/docs/setup/>`_
 
 .. code-block:: bash
 
@@ -24,13 +24,15 @@ Installation / Starting Minikube (tested for windows)
 
     choco install kubernetes-kompose
 
-5. (If kubernetes files not existing): Create Kubernetes Configuration Files
+5. (If kubernetes files not existing): Create Kubernetes Configuration Files.
+    This will generate a folder called minikube with all the kubernetes configuration files based on the cocker-compose.
+    However this might overwrite custom changes made to the files, if already existing. Proceed with caution.
 
 .. code-block:: bash
 
     kompose convert -f docker-compose.yaml --out minikube
 
-6. Start Docker
+6. Start Docker (e.g. Docker Desktop)
 7. Start minikube
 
 .. code-block:: bash
@@ -38,6 +40,8 @@ Installation / Starting Minikube (tested for windows)
     minikube start
 
 8. Set minikube as docker env
+    Minkube needs to be set as docker environment to be able to build images for minikube. Otherwise Minikube would not
+    be able to find the images. This needs to be done every time a new terminal is opened.
 
 .. code-block:: bash
 
@@ -56,6 +60,7 @@ Installation / Starting Minikube (tested for windows)
     kubectl apply -f minikube
 
 11. Expose qunicorn through minikube (start in another terminal)
+    Exposes the qunicorn service to the internet. This is needed to be able to access the service from outside the cluster.
 
 .. code-block:: bash
 

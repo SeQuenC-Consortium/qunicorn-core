@@ -6,6 +6,6 @@ Architecture Documentation
    :caption: Contents:
 
    architecture
-   domain_model
-   sequence_diagram
+   api_documentation/main_apidocumentation
+   database_documentation/main_database
    architectural_decision_records/index
