@@ -130,6 +130,8 @@ class IBMPilot(Pilot):
         backend: BackendV1 = service.get_backend(job_dto.executed_on.device_name)
         return backend, circuits
 
+    qc = None
+
     @staticmethod
     def __get_circuits_as_QuantumCircuits(job_dto: JobCoreDto) -> list[QuantumCircuit]:
         """Transforms the circuit string into IBM QuantumCircuit objects"""
@@ -139,7 +141,13 @@ class IBMPilot(Pilot):
         # transform each circuit into a QuantumCircuit-Object
         for program in job_dto.deployment.programs:
             try:
-                circuits.append(QuantumCircuit().from_qasm_str(program.quantum_circuit))
+                if program.assembler_language == AssemblerLanguage.QASM:
+                    circuits.append(QuantumCircuit().from_qasm_str(program.quantum_circuit))
+                elif program.assembler_language == AssemblerLanguage.QISKIT:
+                    _locals = locals()
+                    exec(program.quantum_circuit, globals(), _locals)
+                    circuit: QuantumCircuit = qc
+                    circuits.append(circuit)
             except QasmError as exception:
                 error_results.extend(result_mapper.exception_to_error_results(exception, program.quantum_circuit))
 
@@ -186,8 +194,10 @@ class IBMPilot(Pilot):
         # ############################################################################################
 
         circuits: list[QuantumCircuit] = self.__get_circuits_as_QuantumCircuits(job_dto)
+
         backend = provider.get_backend(job_dto.executed_on.device_name)
         transpiled = transpile(circuits, backend=backend)
+
         logging.info("Transpiled quantum circuit(s) for a specific IBM backend")
         return backend, transpiled
 
