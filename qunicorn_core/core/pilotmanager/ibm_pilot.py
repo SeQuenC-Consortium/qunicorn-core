@@ -135,6 +135,7 @@ class IBMPilot(Pilot):
     @staticmethod
     def __get_circuits_as_QuantumCircuits(job_dto: JobCoreDto) -> list[QuantumCircuit]:
         """Transforms the circuit string into IBM QuantumCircuit objects"""
+        global qc
         circuits: list[QuantumCircuit] = []
         error_results: list[ResultDataclass] = []
 
