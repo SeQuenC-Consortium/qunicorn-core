@@ -106,7 +106,11 @@ containing the application and creates all required containers including the dat
 
 ```bash
 docker-compose up -d
-docker-compose exec server python -m flask create-and-load-db
+```
+
+To load some test data run
+```bash
+docker-compose exec server python -m flask load-test-data
 ```
 
 ![Architecture](docker-compose-architecture.svg)
