@@ -131,7 +131,6 @@ class IBMPilot(Pilot):
         backend: BackendV1 = service.get_backend(job_dto.executed_on.device_name)
         return backend, circuits
 
-
     @staticmethod
     def __get_circuits_as_QuantumCircuits(job_dto: JobCoreDto) -> list[QuantumCircuit]:
         """Transforms the circuit string into IBM QuantumCircuit objects"""
