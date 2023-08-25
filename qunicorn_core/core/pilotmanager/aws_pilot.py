@@ -61,7 +61,7 @@ class AWSPilot(Pilot):
             elif program.assembler_language == AssemblerLanguage.BRAKET:
                 circuit: Circuit = eval(program.quantum_circuit)
                 transpiled_programs.append(circuit)
-        'print("hallo"'
+
         return transpiled_programs
 
     def __local_simulation(self, job_core_dto: JobCoreDto):

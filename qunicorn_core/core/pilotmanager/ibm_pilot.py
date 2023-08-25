@@ -40,6 +40,7 @@ from qunicorn_core.util import logging
 
 class IBMPilot(Pilot):
     """The IBM Pilot"""
+    qc = None
 
     def execute(self, job_core_dto: JobCoreDto):
         """Execute a job on an IBM backend using the IBM Pilot"""
@@ -130,7 +131,6 @@ class IBMPilot(Pilot):
         backend: BackendV1 = service.get_backend(job_dto.executed_on.device_name)
         return backend, circuits
 
-    qc = None
 
     @staticmethod
     def __get_circuits_as_QuantumCircuits(job_dto: JobCoreDto) -> list[QuantumCircuit]:
