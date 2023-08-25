@@ -40,6 +40,7 @@ from qunicorn_core.util import logging
 
 class IBMPilot(Pilot):
     """The IBM Pilot"""
+
     qc = None
 
     def execute(self, job_core_dto: JobCoreDto):
