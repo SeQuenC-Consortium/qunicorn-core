@@ -57,8 +57,7 @@ class AWSPilot(Pilot):
 
         for program in job_core_dto.deployment.programs:
             transpiler = transpile_manager.get_transpiler(
-                src_language=program.assembler_language,
-                dest_language=AssemblerLanguage.BRAKET
+                src_language=program.assembler_language, dest_language=AssemblerLanguage.BRAKET
             )
             transpiled_programs.append(transpiler(program.quantum_circuit))
 

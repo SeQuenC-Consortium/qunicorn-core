@@ -142,17 +142,14 @@ class IBMPilot(Pilot):
         for program in job_dto.deployment.programs:
             try:
                 if program.assembler_language == AssemblerLanguage.QISKIT:
-                    circuit_globals = {
-                        "QuantumCircuit": QuantumCircuit
-                    }
+                    circuit_globals = {"QuantumCircuit": QuantumCircuit}
                     # since the qiskit circuit modifies the circuit object instead of simple returning the object (it
                     # returns the instruction set) the 'qiskit_circuit' is modified from the exec
                     exec(program.quantum_circuit, circuit_globals)
                     qiskit_circuit = circuit_globals["qiskit_circuit"]
                 else:
                     transpiler = transpile_manager.get_transpiler(
-                        src_language=program.assembler_language,
-                        dest_language=AssemblerLanguage.QISKIT
+                        src_language=program.assembler_language, dest_language=AssemblerLanguage.QISKIT
                     )
                     qiskit_circuit = transpiler(program.quantum_circuit)
                 circuits.append(qiskit_circuit)
