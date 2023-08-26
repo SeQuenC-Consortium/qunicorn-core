@@ -34,6 +34,7 @@ from .models.provider import ProviderDataclass
 from .models.quantum_program import QuantumProgramDataclass
 from .models.result import ResultDataclass
 from .models.user import UserDataclass
+from ..static.enums.assembler_languages import AssemblerLanguage
 from ..static.enums.job_state import JobState
 from ..static.enums.job_type import JobType
 from ..static.enums.programming_language import ProgrammingLanguage
@@ -85,12 +86,22 @@ def get_quasm_string() -> str:
 
 def load_db_function(app: Flask):
     user = UserDataclass(name="DefaultUser")
-    qc = QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(1))
-    qc2 = QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(2))
+    qc = QuantumProgramDataclass(
+        quantum_circuit=utils.get_default_qasm_string(1), assembler_language=AssemblerLanguage.QASM3
+    )
+    qc2 = QuantumProgramDataclass(
+        quantum_circuit=utils.get_default_qasm_string(2), assembler_language=AssemblerLanguage.QASM3
+    )
     qasm3_str: str = "OPENQASM 3; \nqubit[3] q;\nbit[3] c;\nh q[0];\ncnot q[0], q[1];\ncnot q[1], q[2];\nc = measure q;"
-    qasm3_program = QuantumProgramDataclass(quantum_circuit=qasm3_str)
+    qasm3_program = QuantumProgramDataclass(quantum_circuit=qasm3_str, assembler_language=AssemblerLanguage.QASM3)
     braket_str: str = "Circuit().h(0).cnot(0, 1)"
-    braket_program = QuantumProgramDataclass(quantum_circuit=braket_str)
+    braket_program = QuantumProgramDataclass(quantum_circuit=braket_str, assembler_language=AssemblerLanguage.BRAKET)
+
+    qiskit_str: str = (
+        "qiskit_circuit = QuantumCircuit(2, 2);qiskit_circuit.h(0);"
+        "qiskit_circuit.cx(0, 1);qiskit_circuit.measure(0, 0);qiskit_circuit.measure(1, 1)"
+    )
+    qiskit_program = QuantumProgramDataclass(quantum_circuit=qiskit_str, assembler_language=AssemblerLanguage.QISKIT)
 
     deployment_ibm_qasm2 = DeploymentDataclass(
         deployed_by=user, programs=[qc, qc2], deployed_at=datetime.datetime.now(), name="DeploymentIBMQasmName"
@@ -101,6 +112,10 @@ def load_db_function(app: Flask):
     deployment_aws_braket = DeploymentDataclass(
         deployed_by=user, programs=[braket_program], deployed_at=datetime.datetime.now(), name="DeploymentAWSBraketName"
     )
+    deployment_ibm_qiskit = DeploymentDataclass(
+        deployed_by=user, programs=[qiskit_program], deployed_at=datetime.datetime.now(), name="DeploymentIBMQiskitName"
+    )
+
     device_aws, device_ibm = add_devices_and_get_defaults()
 
     ibm_default_job = JobDataclass(
@@ -136,6 +151,7 @@ def load_db_function(app: Flask):
     DB.session.add(ibm_default_job)
     DB.session.add(aws_default_job)
     DB.session.add(deployment_aws_braket)
+    DB.session.add(deployment_ibm_qiskit)
 
     DB.session.commit()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
