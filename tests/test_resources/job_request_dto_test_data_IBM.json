@@ -2,7 +2,7 @@
   "name": "JobName",
   "provider_name": "IBM",
   "type": "RUNNER",
-  "token": "1043b9cc731435a45e5c1c0db93634bb8e327513236ef0dffe5c38c95e478bc1633b4abeb33695c391b9f52b304c2031c163dfcaddf6532a2018a46612ce09a7",
+  "token": "",
   "parameters": [
     0
   ],
