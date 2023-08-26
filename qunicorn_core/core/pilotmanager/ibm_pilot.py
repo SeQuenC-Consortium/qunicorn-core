@@ -149,8 +149,7 @@ class IBMPilot(Pilot):
                 elif program.assembler_language == AssemblerLanguage.QISKIT:
                     # since the qiskit circuit modifies the circuit object instead of simple returning the object (it
                     # returns the instruction set) the 'qiskit_circuit' is modified from the exec
-                    _locals = locals()
-                    exec(program.quantum_circuit, globals(), _locals)
+                    exec(program.quantum_circuit)
                     circuit: QuantumCircuit = qiskit_circuit
                     circuits.append(circuit)
             except QasmError as exception:
