@@ -97,7 +97,7 @@ def load_db_function(app: Flask):
     braket_str: str = "Circuit().h(0).cnot(0, 1)"
     braket_program = QuantumProgramDataclass(quantum_circuit=braket_str, assembler_language=AssemblerLanguage.BRAKET)
 
-    qiskit_str: str = "global qc; qc = QuantumCircuit(2, 2);qc.h(0);qc.cx(0, 1);qc.measure(0, 0);qc.measure(1, 1)"
+    qiskit_str: str = "global qiskit_circuit; qiskit_circuit = QuantumCircuit(2, 2);qiskit_circuit.h(0);qiskit_circuit.cx(0, 1);qiskit_circuit.measure(0, 0);qiskit_circuit.measure(1, 1)"
     qiskit_program = QuantumProgramDataclass(quantum_circuit=qiskit_str, assembler_language=AssemblerLanguage.QISKIT)
 
     deployment_ibm_qasm2 = DeploymentDataclass(
