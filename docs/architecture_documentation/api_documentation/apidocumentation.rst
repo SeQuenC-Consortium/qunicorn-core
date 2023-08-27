@@ -11,7 +11,7 @@ Below you can find a generated Documentation of the API.
 =====
 
 Available Endpoints
-------------------
+--------------------
 
 Available endpoints are:
 

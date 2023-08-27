@@ -27,7 +27,7 @@ Development
 Run `poetry install` to install dependencies.
 
 Environment variables
-################
+#########################
 
 The flask dev server loads environment variables from `.flaskenv` and `.env`.
 To override any variable create a `.env` file.
@@ -39,7 +39,7 @@ Set the `EXECUTE_CELERY_TASK_ASYNCHRONOUS` in your .env file to False, if you do
 celery worker and execute all tasks synchronously.
 
 Run the Development Server
-################
+###########################
 
 Run the development server with
 
@@ -72,7 +72,7 @@ Userful Links
 #####################
 
 Trying out the Template
-**********************
+************************
 
 For a list of all dependencies with their license open http://localhost:5005/licenses.
 The Port for qunicorn_core is set to 5005 to not interfere with other flask default apps.

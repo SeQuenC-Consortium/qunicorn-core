@@ -9,10 +9,6 @@ This log lists the architectural decisions for the qunicorn Project.
     :numbered:
     :glob:
 
-    Template <template>
-    *
-
-
 For new ADRs, please use :doc:`template.md <template>` as basis.
 
 .. note::
