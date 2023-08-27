@@ -5,21 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [release] - 2023-06-15
+## Changelog:
 
-### Added
+### [release] - 2023-06-15
+
+#### Added
 
 * include qunicorn logo in rtd
 
-## [release] - 2023-06-19
+### [release] - 2023-06-19
 
-### Added
+#### Added
 
 * initial project documentation
 
-## [release] - 2023-07-01
+### [release] - 2023-07-01
 
-### Added
+#### Added
 
 * domain model classes
 * GitHub test workflows
@@ -32,9 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * asynchronous ibmq execution
 * testing framework
 
-## [release] - 2023-07-18
+### [release] - 2023-07-18
 
-### Added
+#### Added
 
 * add ibm backends to database
 * logging and error handling
@@ -42,16 +44,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * document status codes
 * document in request execution
 
-## [release] - 2023-07-21
+### [release] - 2023-07-21
 
-### Added
+#### Added
 
 * integrating deployments
 * receiving and uploading of python files
 
-## [release] - 2023-08-06
+### [release] - 2023-08-06
 
-### Added
+#### Added
 
 * complete deyploment api
 * complete device api
