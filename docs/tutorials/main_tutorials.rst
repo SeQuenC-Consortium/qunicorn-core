@@ -8,3 +8,4 @@ Tutorials
    getting_started
    docker
    kubernetes
+   pilot_tutorial

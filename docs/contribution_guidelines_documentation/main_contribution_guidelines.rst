@@ -9,7 +9,7 @@ Thank you for investing your time in contributing to our project!
 New contributor guide
 **************************
 
-To get an overview of qunicorn, read our **[README](README.md)** or check our **[readTheDocs](https://qunicorn-core.readthedocs.io/en/latest/#)**.
+The following pages give an overview of the contribution process and steps.
 
 
 .. toctree::

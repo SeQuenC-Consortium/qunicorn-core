@@ -1,4 +1,4 @@
-Minikube | Kubernetes
+Run using kubernetes / minikube
 =========================================
 
 Installation / Starting Minikube (tested for windows)
