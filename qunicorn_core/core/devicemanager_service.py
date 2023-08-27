@@ -34,16 +34,23 @@ def update_devices(device_request: DeviceRequest):
         devices = ibm_provider.backends()
         all_devices = get_device_dict(devices)
 
-        update_devices_in_db(all_devices=all_devices)
-        # hier muss noch neue DB Abfrage rein, dass ALLE Einträge aus der DB raus kommen (?)
+        update_ibm_devices_in_db(all_devices=all_devices)
 
     elif device_request.provider == "AWS":
-        all_devices = {"provider": "AWS"}
+        aws_device: DeviceDataclass = DeviceDataclass(
+            provider_id=2,
+            num_qubits=-1,
+            device_name="local_simulator",
+            is_simulator=1,
+            provider="AWS",
+        )
+        device_db_service.save_device_by_name(aws_device)
 
+    logging.info(f"Update all available devices for {device_request.provider} in database.")
     return all_devices
 
 
-def update_devices_in_db(all_devices: dict):
+def update_ibm_devices_in_db(all_devices: dict):
     """Preformatting the device data and update/create device data in the database"""
     for device in all_devices["all_devices"]:
         final_device: DeviceDataclass = DeviceDataclass(

@@ -35,10 +35,16 @@ IS_ASYNCHRONOUS: bool = False
 
 def test_create_and_run_runner():
     """Tests the create and run job method for synchronous execution of a runner"""
+    create_and_run_runner("ibm_qasm_simulator")
+
+
+def create_and_run_runner(device: str):
+    """Util for automated and manual create and run job tests"""
+    # ToDo: restructure all tests and create ibm utils to call from automated and manual test methods
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
     job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
-    job_request_dto.device_name = "ibmq_qasm_simulator"
+    job_request_dto.device_name = device
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():

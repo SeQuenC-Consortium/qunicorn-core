@@ -29,7 +29,7 @@ from tests.test_utils import get_object_from_json
 
 #  Write tests for device request and update in database
 def test_get_devices_invalid_token():
-    """Testing the device request """
+    """Testing the device request for get request from IBM"""
     app = set_up_env()
     device_request_dto: DeviceRequest = DeviceRequest(provider="IBM", token="abcde")
 
@@ -42,7 +42,7 @@ def test_get_devices_invalid_token():
 
 
 def test_get_devices_empty_token():
-    """Testing the device request """
+    """Testing the device request for get request from IBM"""
     app = set_up_env()
     device_request_dto: DeviceRequest = DeviceRequest(provider="IBM", token="")
 
