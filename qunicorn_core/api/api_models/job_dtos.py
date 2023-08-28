@@ -82,7 +82,6 @@ class JobCoreDto:
     transpiled_circuits: Optional[list] = None
 
 
-
 @dataclass
 class JobResponseDto:
     """JobDto that is sent to the user as a response"""

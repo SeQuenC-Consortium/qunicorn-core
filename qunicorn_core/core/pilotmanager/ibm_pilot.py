@@ -14,11 +14,12 @@
 import os
 
 import qiskit
-from qiskit.primitives import SamplerResult, EstimatorResult
 from qiskit.providers import BackendV1
 from qiskit.quantum_info import SparsePauliOp
 from qiskit_ibm_provider import IBMProvider
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
+from qiskit.primitives import EstimatorResult, SamplerResult
+from qiskit.result import Result
 
 from qunicorn_core.api.api_models import JobCoreDto
 from qunicorn_core.core.mapper import result_mapper
@@ -71,7 +72,7 @@ class IBMPilot(Pilot):
         """Execute a job on the air_simulator using the qasm_simulator backend"""
         backend = qiskit.Aer.get_backend("qasm_simulator")
         result = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots).result()
-        results: list[ResultDataclass] = result_mapper.ibm_runner_to_dataclass(result, job_dto)
+        results: list[ResultDataclass] = IBMPilot.__ibm_runner_to_dataclass(result, job_dto)
 
         # AerCircuit is not serializable and needs to be removed
         for res in results:
@@ -87,7 +88,7 @@ class IBMPilot(Pilot):
         transpiled = qiskit.transpile(job_dto.transpiled_circuits, backend=backend)
         job_from_ibm = backend.run(transpiled, shots=job_dto.shots)
         ibm_result = job_from_ibm.result()
-        return result_mapper.ibm_runner_to_dataclass(ibm_result, job_dto)
+        return IBMPilot.__ibm_runner_to_dataclass(ibm_result, job_dto)
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
@@ -95,7 +96,7 @@ class IBMPilot(Pilot):
         sampler = Sampler(session=backend)
         job_from_ibm: RuntimeJob = sampler.run(circuits)
         ibm_result: SamplerResult = job_from_ibm.result()
-        return result_mapper.ibm_sampler_to_dataclass(ibm_result, job_dto)
+        return IBMPilot.__ibm_sampler_to_dataclass(ibm_result, job_dto)
 
     def __estimate(self, job_dto: JobCoreDto):
         """Uses the Estimator to execute a job on an IBM backend using the IBM Pilot"""
@@ -103,7 +104,7 @@ class IBMPilot(Pilot):
         estimator = Estimator(session=backend)
         job_from_ibm = estimator.run(circuits, observables=[SparsePauliOp("IY"), SparsePauliOp("IY")])
         ibm_result: EstimatorResult = job_from_ibm.result()
-        return result_mapper.ibm_estimator_to_dataclass(ibm_result, job_dto, "IY")
+        return IBMPilot.__ibm_estimator_to_dataclass(ibm_result, job_dto, "IY")
 
     def __get_backend_and_circuits_for_qiskit_runtime(self, job_dto):
         """Instantiate all important configurations and updates the job_state"""
@@ -164,7 +165,7 @@ class IBMPilot(Pilot):
         try:
             ibm_job_id = job_core_dto.results[0].result_dict["ibm_job_id"]
             result = service.run(ibm_job_id, inputs=input_dict, options=options_dict).result()
-            ibm_results.extend(result_mapper.ibm_runner_to_dataclass(result, job_core_dto))
+            ibm_results.extend(IBMPilot.ibm_runner_to_dataclass(result, job_core_dto))
         except IBMRuntimeError as exception:
             logging.info("Error when accessing IBM, 403 Client Error")
             ibm_results.append(
@@ -182,3 +183,54 @@ class IBMPilot(Pilot):
         service = QiskitRuntimeService(token=None, channel=None, filename=None, name=None)
         service.save_account(token=job_core_dto.token, channel="ibm_quantum", overwrite=True)
         return service
+
+    @staticmethod
+    def __ibm_runner_to_dataclass(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
+        result_dtos: list[ResultDataclass] = []
+
+        for i in range(len(ibm_result.results)):
+            counts: dict = ibm_result.results[i].data.counts
+            circuit: str = job_dto.deployment.programs[i].quantum_circuit
+            result_dtos.append(
+                ResultDataclass(
+                    circuit=circuit,
+                    result_dict=counts,
+                    result_type=ResultType.COUNTS,
+                    meta_data=ibm_result.results[i].to_dict(),
+                )
+            )
+        return result_dtos
+
+    @staticmethod
+    def __ibm_estimator_to_dataclass(
+        ibm_result: EstimatorResult, job: JobCoreDto, observer: str
+    ) -> list[ResultDataclass]:
+        result_dtos: list[ResultDataclass] = []
+        for i in range(ibm_result.num_experiments):
+            value: float = ibm_result.values[i]
+            variance: float = ibm_result.metadata[i]["variance"]
+            circuit: str = job.deployment.programs[i].quantum_circuit
+            result_dtos.append(
+                ResultDataclass(
+                    circuit=circuit,
+                    result_dict={"value": str(value), "variance": str(variance)},
+                    result_type=ResultType.VALUE_AND_VARIANCE,
+                    meta_data={"observer": f"SparsePauliOp-{observer}"},
+                )
+            )
+        return result_dtos
+
+    @staticmethod
+    def __ibm_sampler_to_dataclass(ibm_result: SamplerResult, job_dto: JobCoreDto) -> list[ResultDataclass]:
+        result_dtos: list[ResultDataclass] = []
+        for i in range(ibm_result.num_experiments):
+            quasi_dist: dict = ibm_result.quasi_dists[i]
+            circuit: str = job_dto.deployment.programs[i].quantum_circuit
+            result_dtos.append(
+                ResultDataclass(
+                    circuit=circuit,
+                    result_dict=quasi_dist,
+                    result_type=ResultType.QUASI_DIST,
+                )
+            )
+        return result_dtos

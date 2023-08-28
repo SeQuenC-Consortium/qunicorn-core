@@ -104,7 +104,10 @@ def load_db_function(app: Flask):
     qiskit_program = QuantumProgramDataclass(quantum_circuit=qiskit_str, assembler_language=AssemblerLanguage.QISKIT)
 
     deployment_ibm_qasm2 = DeploymentDataclass(
-        deployed_by=user, programs=[qasm2_program, qasm2_program_2], deployed_at=datetime.datetime.now(), name="DeploymentIBMQasmName"
+        deployed_by=user,
+        programs=[qasm2_program, qasm2_program_2],
+        deployed_at=datetime.datetime.now(),
+        name="DeploymentIBMQasmName",
     )
     deployment_aws_qasm3 = DeploymentDataclass(
         deployed_by=user, programs=[qasm3_program], deployed_at=datetime.datetime.now(), name="DeploymentAWSQasmName"

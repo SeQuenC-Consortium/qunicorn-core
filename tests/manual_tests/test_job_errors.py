@@ -15,7 +15,6 @@
 """"Test class to test the functionality of the job_api"""
 
 import pytest
-from qiskit.qasm2 import QASM2ParseError
 from qiskit_ibm_provider.accounts import InvalidAccountError
 from qiskit_ibm_provider.api.exceptions import RequestsApiError
 
@@ -74,7 +73,7 @@ def test_invalid_circuit():
 
     # THEN: Test if QasmError was thrown and job is saved in db with error
     with app.app_context():
-        assert 'TranspileError' in str(exception)
+        assert "TranspileError" in str(exception)
         assert job_finished_with_error()
 
 

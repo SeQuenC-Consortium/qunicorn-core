@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from os import environ
-from typing import Optional
 
 import yaml
-from qiskit import QuantumCircuit
 
 from qunicorn_core.api.api_models.job_dtos import (
     JobRequestDto,
@@ -24,20 +22,11 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobResponseDto,
     JobExecutePythonFileDto,
 )
-from qunicorn_core.celery import CELERY
 from qunicorn_core.core import job_manager_service
-from qunicorn_core.core.mapper import job_mapper, result_mapper
-from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
-from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
-from qunicorn_core.core.transpiler.transpiler_manager import transpile_manager, TranspileManager
+from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.result import ResultDataclass
-from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
-from qunicorn_core.static.enums.provider_name import ProviderName
-from qunicorn_core.util import logging
 
 ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
 

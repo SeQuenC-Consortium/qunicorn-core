@@ -85,8 +85,7 @@ def __transpile_circuits(job_dto: JobCoreDto, pilot: Pilot):
                 transpiled_circuit = get_circuit_when_qiskit_on_ibm(program)
             else:
                 transpiler = transpile_manager.get_transpiler(
-                    src_language=program.assembler_language,
-                    dest_language=pilot.supported_language
+                    src_language=program.assembler_language, dest_language=pilot.supported_language
                 )
                 transpiled_circuit = transpiler(program.quantum_circuit)
             job_dto.transpiled_circuits.append(transpiled_circuit)
@@ -101,9 +100,9 @@ def __transpile_circuits(job_dto: JobCoreDto, pilot: Pilot):
 
 def get_circuit_when_qiskit_on_ibm(program):
     """
-        TODO ARNE pack ded mole in den Transpile manager somehow
-        since the qiskit circuit modifies the circuit object instead of simple returning the object (it
-        returns the instruction set) the 'qiskit_circuit' is modified from the exec
+    TODO ARNE pack ded mole in den Transpile manager somehow
+    since the qiskit circuit modifies the circuit object instead of simple returning the object (it
+    returns the instruction set) the 'qiskit_circuit' is modified from the exec
     """
     circuit_globals = {"QuantumCircuit": QuantumCircuit}
     exec(program.quantum_circuit, circuit_globals)
