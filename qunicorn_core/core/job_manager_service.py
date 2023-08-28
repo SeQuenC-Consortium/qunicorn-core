@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from os import environ
+from typing import Optional
 
 import yaml
+from qiskit import QuantumCircuit
 
 from qunicorn_core.api.api_models.job_dtos import (
     JobRequestDto,
@@ -25,13 +27,19 @@ from qunicorn_core.api.api_models.job_dtos import (
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import job_mapper, result_mapper
 from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
+from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
+from qunicorn_core.core.transpiler.transpiler_manager import transpile_manager
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.result import ResultDataclass
+from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
-from qunicorn_core.static.enums.provider_name import ProviderName
+from qunicorn_core.util import logging
 
 ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
+
+PILOTS: list[Pilot] = [IBMPilot("IBM"), AWSPilot("AWS")]
 
 
 @CELERY.task()
@@ -41,19 +49,65 @@ def run_job(job_core_dto_dict: dict):
     job_core_dto: JobCoreDto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
 
     device = job_core_dto.executed_on
+    job_db_service.update_attribute(job_core_dto.id, JobState.RUNNING, JobDataclass.state)
+    results: Optional[list[ResultDataclass]] = None
 
-    if device.provider.name == ProviderName.IBM:
-        qiskit_pilot: IBMPilot = IBMPilot("QP")
-        qiskit_pilot.execute(job_core_dto)
-    elif job_core_dto.executed_on.provider.name == ProviderName.AWS:
-        aws_pilot: AWSPilot = AWSPilot("AP")
-        aws_pilot.execute(job_core_dto)
-    else:
+    for pilot in PILOTS:
+        if pilot.is_my_provider(device.provider.name):
+            __transpile_circuits(job_core_dto, pilot)
+            logging.info(f"Run job with id {job_core_dto.id} on {pilot.__class__}")
+            results = pilot.execute(job_core_dto)
+            print(results)
+            break
+
+    if results is None:
         exception: Exception = ValueError("No valid Target specified")
         job_db_service.update_finished_job(
             job_core_dto.id, result_mapper.exception_to_error_results(exception), JobState.ERROR
         )
         raise exception
+
+    job_db_service.update_finished_job(job_core_dto.id, results)
+    logging.info(f"Run job with id {job_core_dto.id} and get the result {results}")
+
+
+def __transpile_circuits(job_dto: JobCoreDto, pilot: Pilot):
+    """Transforms the circuit string into IBM QuantumCircuit objects"""
+    logging.info(f"Transpile all circuits of job with id{job_dto.id}")
+    error_results: list[ResultDataclass] = []
+    job_dto.transpiled_circuits = []
+
+    # transform each circuit into a QuantumCircuit-Object
+    for program in job_dto.deployment.programs:
+        try:
+            special_language = AssemblerLanguage.QISKIT
+            if pilot.supported_language == special_language and program.assembler_language == special_language:
+                transpiled_circuit = get_circuit_when_qiskit_on_ibm(program)
+            else:
+                transpiler = transpile_manager.get_transpiler(
+                    src_language=program.assembler_language,
+                    dest_language=pilot.supported_language
+                )
+                transpiled_circuit = transpiler(program.quantum_circuit)
+            job_dto.transpiled_circuits.append(transpiled_circuit)
+        except Exception as exception:
+            error_results.extend(result_mapper.exception_to_error_results(exception, program.quantum_circuit))
+
+    # If an error was caught -> Update the job and raise it again
+    if len(error_results) > 0:
+        job_db_service.update_finished_job(job_dto.id, error_results, JobState.ERROR)
+        raise Exception("TranspileError")
+
+
+def get_circuit_when_qiskit_on_ibm(program):
+    """
+        TODO ARNE pack ded mole in den Transpile manager somehow
+        since the qiskit circuit modifies the circuit object instead of simple returning the object (it
+        returns the instruction set) the 'qiskit_circuit' is modified from the exec
+    """
+    circuit_globals = {"QuantumCircuit": QuantumCircuit}
+    exec(program.quantum_circuit, circuit_globals)
+    return circuit_globals["qiskit_circuit"]
 
 
 def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = ASYNCHRONOUS) -> SimpleJobDto:

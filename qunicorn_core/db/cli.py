@@ -86,11 +86,11 @@ def get_quasm_string() -> str:
 
 def load_db_function(app: Flask):
     user = UserDataclass(name="DefaultUser")
-    qc = QuantumProgramDataclass(
-        quantum_circuit=utils.get_default_qasm_string(1), assembler_language=AssemblerLanguage.QASM3
+    qasm2_program = QuantumProgramDataclass(
+        quantum_circuit=utils.get_default_qasm_string(1), assembler_language=AssemblerLanguage.QASM2
     )
-    qc2 = QuantumProgramDataclass(
-        quantum_circuit=utils.get_default_qasm_string(2), assembler_language=AssemblerLanguage.QASM3
+    qasm2_program_2 = QuantumProgramDataclass(
+        quantum_circuit=utils.get_default_qasm_string(2), assembler_language=AssemblerLanguage.QASM2
     )
     qasm3_str: str = "OPENQASM 3; \nqubit[3] q;\nbit[3] c;\nh q[0];\ncnot q[0], q[1];\ncnot q[1], q[2];\nc = measure q;"
     qasm3_program = QuantumProgramDataclass(quantum_circuit=qasm3_str, assembler_language=AssemblerLanguage.QASM3)
@@ -104,7 +104,7 @@ def load_db_function(app: Flask):
     qiskit_program = QuantumProgramDataclass(quantum_circuit=qiskit_str, assembler_language=AssemblerLanguage.QISKIT)
 
     deployment_ibm_qasm2 = DeploymentDataclass(
-        deployed_by=user, programs=[qc, qc2], deployed_at=datetime.datetime.now(), name="DeploymentIBMQasmName"
+        deployed_by=user, programs=[qasm2_program, qasm2_program_2], deployed_at=datetime.datetime.now(), name="DeploymentIBMQasmName"
     )
     deployment_aws_qasm3 = DeploymentDataclass(
         deployed_by=user, programs=[qasm3_program], deployed_at=datetime.datetime.now(), name="DeploymentAWSQasmName"

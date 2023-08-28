@@ -20,7 +20,7 @@ import yaml
 from qiskit_ibm_runtime import IBMRuntimeError
 
 from qunicorn_core.api.api_models import JobRequestDto, JobCoreDto
-from qunicorn_core.core.jobmanager_service import run_job
+from qunicorn_core.core.job_manager_service import run_job
 from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass

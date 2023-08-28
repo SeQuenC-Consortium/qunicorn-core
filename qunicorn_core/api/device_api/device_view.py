@@ -27,7 +27,7 @@ from ..api_models.device_dtos import (
     DeviceRequest,
     SimpleDeviceDtoSchema,
 )
-from ...core import devicemanager_service
+from ...core import device_service
 
 
 @DEVICES_API.route("/")
@@ -39,13 +39,13 @@ class DeviceView(MethodView):
     def put(self, device_request_data):
         """Update the devices and get the device information."""
         device_request: DeviceRequest = DeviceRequest(**device_request_data)
-        all_devices = devicemanager_service.update_devices(device_request)
+        all_devices = device_service.update_devices(device_request)
         return jsonify(all_devices), 200
 
     @DEVICES_API.response(HTTPStatus.OK, SimpleDeviceDtoSchema(many=True))
     def get(self):
         """Get all devices from the database, for more details get the device by id."""
-        return devicemanager_service.get_all_devices()
+        return device_service.get_all_devices()
 
 
 @DEVICES_API.route("/<string:device_id>/")
@@ -56,7 +56,7 @@ class DeviceIdView(MethodView):
     def get(self, device_id):
         """Get information about a specific device."""
 
-        return devicemanager_service.get_device_by_id(device_id)
+        return device_service.get_device_by_id(device_id)
 
 
 @DEVICES_API.route("/<string:device_id>/status")
@@ -68,7 +68,7 @@ class DevicesStatusStatus(MethodView):
     def post(self, device_request_data, device_id):
         """To check if a specific device is available."""
         device_request: DeviceRequest = DeviceRequest(**device_request_data)
-        return devicemanager_service.check_if_device_available(device_id, device_request.token)
+        return device_service.check_if_device_available(device_id, device_request.token)
 
 
 @DEVICES_API.route("/<string:device_id>/calibration")
@@ -81,6 +81,6 @@ class DevicesCalibrationView(MethodView):
         """Get configuration data for a specific device in a uniform way."""
 
         device_request: DeviceRequest = DeviceRequest(**device_request_data)
-        device = devicemanager_service.get_device_from_provider(device_id, device_request.token)
+        device = device_service.get_device_from_provider(device_id, device_request.token)
 
         return jsonify(device)

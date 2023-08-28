@@ -20,7 +20,7 @@ from qiskit_ibm_provider.accounts import InvalidAccountError
 from qiskit_ibm_provider.api.exceptions import RequestsApiError
 
 from qunicorn_core.api.api_models import JobRequestDto, DeploymentRequestDto
-from qunicorn_core.core import jobmanager_service
+from qunicorn_core.core import job_manager_service
 from qunicorn_core.core.mapper import deployment_mapper
 from qunicorn_core.db.database_services import job_db_service, db_service, user_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
@@ -46,7 +46,7 @@ def test_invalid_token():
     # WHEN: Executing create and run
     with app.app_context():
         with pytest.raises(Exception) as exception:
-            jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+            job_manager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Test if correct Error was thrown and job is saved in db with error
     with app.app_context():
@@ -70,11 +70,11 @@ def test_invalid_circuit():
         depl_id: int = db_service.save_database_object(deployment).id
         job_request_dto.deployment_id = depl_id
         with pytest.raises(Exception) as exception:
-            jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+            job_manager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Test if QasmError was thrown and job is saved in db with error
     with app.app_context():
-        assert QASM2ParseError.__name__ in str(exception)
+        assert 'TranspileError' in str(exception)
         assert job_finished_with_error()
 
 
@@ -90,7 +90,7 @@ def test_invalid_token_for_sampler():
     # WHEN: Executing create and run
     with app.app_context():
         with pytest.raises(Exception) as exception:
-            jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+            job_manager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Test if correct Error was thrown and job is saved in db with error
     with app.app_context():
