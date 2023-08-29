@@ -58,10 +58,10 @@ class AWSPilot(Pilot):
             job_core_dto.transpiled_circuits, shots=job_core_dto.shots
         )
         aws_simulator_results: list[GateModelQuantumTaskResult] = quantum_tasks.results()
-        return AWSPilot.__aws_runner_to_dataclass(aws_simulator_results, job_core_dto)
+        return AWSPilot.__map_simulator_results_to_dataclass(aws_simulator_results, job_core_dto)
 
     @staticmethod
-    def __aws_runner_to_dataclass(
+    def __map_simulator_results_to_dataclass(
         aws_results: list[GateModelQuantumTaskResult],
         job_dto: JobCoreDto,
     ) -> list[ResultDataclass]:

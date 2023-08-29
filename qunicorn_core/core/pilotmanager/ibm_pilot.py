@@ -38,9 +38,6 @@ from qunicorn_core.util import logging
 class IBMPilot(Pilot):
     """The IBM Pilot"""
 
-    """object to be used to build the qiskit circuit from external location"""
-    qiskit_circuit = None
-
     provider_name: ProviderName = ProviderName.IBM
 
     supported_language: AssemblerLanguage = AssemblerLanguage.QISKIT
@@ -58,7 +55,7 @@ class IBMPilot(Pilot):
         elif job_core_dto.type == JobType.SAMPLER:
             return self.__sample(job_core_dto)
         elif job_core_dto.type == JobType.IBM_RUN:
-            self.__run_ibm_program(job_core_dto)
+            self.__run_program(job_core_dto)
         elif job_core_dto.type == JobType.IBM_UPLOAD:
             self.__upload_program(job_core_dto)
         else:
@@ -72,7 +69,7 @@ class IBMPilot(Pilot):
         """Execute a job on the air_simulator using the qasm_simulator backend"""
         backend = qiskit.Aer.get_backend("qasm_simulator")
         result = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots).result()
-        results: list[ResultDataclass] = IBMPilot.__ibm_runner_to_dataclass(result, job_dto)
+        results: list[ResultDataclass] = IBMPilot.__map_runner_results_to_dataclass(result, job_dto)
 
         # AerCircuit is not serializable and needs to be removed
         for res in results:
@@ -83,12 +80,12 @@ class IBMPilot(Pilot):
 
     def __run(self, job_dto: JobCoreDto):
         """Run a job on an IBM backend using the IBM Pilot"""
-        provider = self.__get_ibm_provider_login_and_update_job(job_dto.token, job_dto.id)
+        provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
         backend = provider.get_backend(job_dto.executed_on.device_name)
         transpiled = qiskit.transpile(job_dto.transpiled_circuits, backend=backend)
         job_from_ibm = backend.run(transpiled, shots=job_dto.shots)
         ibm_result = job_from_ibm.result()
-        return IBMPilot.__ibm_runner_to_dataclass(ibm_result, job_dto)
+        return IBMPilot.__map_runner_results_to_dataclass(ibm_result, job_dto)
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
@@ -96,7 +93,7 @@ class IBMPilot(Pilot):
         sampler = Sampler(session=backend)
         job_from_ibm: RuntimeJob = sampler.run(circuits)
         ibm_result: SamplerResult = job_from_ibm.result()
-        return IBMPilot.__ibm_sampler_to_dataclass(ibm_result, job_dto)
+        return IBMPilot._map_sampler_results_to_dataclass(ibm_result, job_dto)
 
     def __estimate(self, job_dto: JobCoreDto):
         """Uses the Estimator to execute a job on an IBM backend using the IBM Pilot"""
@@ -104,11 +101,11 @@ class IBMPilot(Pilot):
         estimator = Estimator(session=backend)
         job_from_ibm = estimator.run(circuits, observables=[SparsePauliOp("IY"), SparsePauliOp("IY")])
         ibm_result: EstimatorResult = job_from_ibm.result()
-        return IBMPilot.__ibm_estimator_to_dataclass(ibm_result, job_dto, "IY")
+        return IBMPilot._map_estimator_results_to_dataclass(ibm_result, job_dto, "IY")
 
     def __get_backend_and_circuits_for_qiskit_runtime(self, job_dto):
         """Instantiate all important configurations and updates the job_state"""
-        self.__get_ibm_provider_login_and_update_job(job_dto.token, job_dto.id)
+        self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
         service: QiskitRuntimeService = QiskitRuntimeService()
         backend: BackendV1 = service.get_backend(job_dto.executed_on.device_name)
         return backend, job_dto.transpiled_circuits
@@ -126,7 +123,7 @@ class IBMPilot(Pilot):
         return IBMProvider()
 
     @staticmethod
-    def __get_ibm_provider_login_and_update_job(token: str, job_dto_id: int) -> IBMProvider:
+    def __get_provider_login_and_update_job(token: str, job_dto_id: int) -> IBMProvider:
         """Save account credentials, get provider and update job_dto to job_state = Error, if it is not possible"""
         try:
             return IBMPilot.get_ibm_provider_and_login(token)
@@ -156,7 +153,7 @@ class IBMPilot(Pilot):
         ]
         job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.READY)
 
-    def __run_ibm_program(self, job_core_dto: JobCoreDto):
+    def __run_program(self, job_core_dto: JobCoreDto):
         service = self.__get_runtime_service(job_core_dto)
         ibm_results = []
         options_dict: dict = job_core_dto.ibm_file_options
@@ -165,7 +162,7 @@ class IBMPilot(Pilot):
         try:
             ibm_job_id = job_core_dto.results[0].result_dict["ibm_job_id"]
             result = service.run(ibm_job_id, inputs=input_dict, options=options_dict).result()
-            ibm_results.extend(IBMPilot.ibm_runner_to_dataclass(result, job_core_dto))
+            ibm_results.extend(IBMPilot.__map_runner_results_to_dataclass(result, job_core_dto))
         except IBMRuntimeError as exception:
             logging.info("Error when accessing IBM, 403 Client Error")
             ibm_results.append(
@@ -185,7 +182,7 @@ class IBMPilot(Pilot):
         return service
 
     @staticmethod
-    def __ibm_runner_to_dataclass(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
+    def __map_runner_results_to_dataclass(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
         result_dtos: list[ResultDataclass] = []
 
         for i in range(len(ibm_result.results)):
@@ -202,7 +199,7 @@ class IBMPilot(Pilot):
         return result_dtos
 
     @staticmethod
-    def __ibm_estimator_to_dataclass(
+    def _map_estimator_results_to_dataclass(
         ibm_result: EstimatorResult, job: JobCoreDto, observer: str
     ) -> list[ResultDataclass]:
         result_dtos: list[ResultDataclass] = []
@@ -221,7 +218,7 @@ class IBMPilot(Pilot):
         return result_dtos
 
     @staticmethod
-    def __ibm_sampler_to_dataclass(ibm_result: SamplerResult, job_dto: JobCoreDto) -> list[ResultDataclass]:
+    def _map_sampler_results_to_dataclass(ibm_result: SamplerResult, job_dto: JobCoreDto) -> list[ResultDataclass]:
         result_dtos: list[ResultDataclass] = []
         for i in range(ibm_result.num_experiments):
             quasi_dist: dict = ibm_result.quasi_dists[i]
