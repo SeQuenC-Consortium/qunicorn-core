@@ -20,6 +20,7 @@ from qunicorn_core.static.enums.provider_name import ProviderName
 class Pilot:
     """Base class for Pilots"""
 
+    name: str
     provider_name: ProviderName
     supported_language: AssemblerLanguage
 

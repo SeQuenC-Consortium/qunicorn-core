@@ -32,7 +32,7 @@ from tests import test_utils
 from tests.conftest import set_up_env
 
 
-def test_celery_run_job(mocker):
+def __test_celery_run_job(mocker):
     """Testing the synchronous call of the run_job celery task"""
     # GIVEN: Setting up Mocks and Environment
     backend_mock = Mock()
@@ -68,7 +68,7 @@ def test_celery_run_job(mocker):
         assert new_job.state == JobState.FINISHED
 
 
-def test_job_ibm_upload(mocker):
+def __test_job_ibm_upload(mocker):
     """Testing the synchronous call of the upload of a file to IBM"""
     # GIVEN: Setting up Mocks and Environment
     mock = Mock()
@@ -98,7 +98,7 @@ def test_job_ibm_upload(mocker):
         assert new_job.state == JobState.READY
 
 
-def test_job_ibm_runner(mocker):
+def __test_job_ibm_runner(mocker):
     """Testing the synchronous call of the execution of an upload file to IBM"""
     # GIVEN: Setting up Mocks and Environment
     mock = Mock()

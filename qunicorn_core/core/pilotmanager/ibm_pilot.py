@@ -14,12 +14,12 @@
 import os
 
 import qiskit
+from qiskit.primitives import EstimatorResult, SamplerResult
 from qiskit.providers import BackendV1
 from qiskit.quantum_info import SparsePauliOp
+from qiskit.result import Result
 from qiskit_ibm_provider import IBMProvider
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
-from qiskit.primitives import EstimatorResult, SamplerResult
-from qiskit.result import Result
 
 from qunicorn_core.api.api_models import JobCoreDto
 from qunicorn_core.core.mapper import result_mapper
@@ -46,10 +46,7 @@ class IBMPilot(Pilot):
         """Execute a job on an IBM backend using the IBM Pilot"""
 
         if job_core_dto.type == JobType.RUNNER:
-            if job_core_dto.executed_on.device_name == "aer_simulator":
-                return self.__run_on_aer(job_core_dto)
-            else:
-                return self.__run(job_core_dto)
+            return self.__run(job_core_dto)
         elif job_core_dto.type == JobType.ESTIMATOR:
             return self.__estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
@@ -64,10 +61,15 @@ class IBMPilot(Pilot):
             job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
             raise exception
 
-    @staticmethod
-    def __run_on_aer(job_dto: JobCoreDto):
-        """Execute a job on the air_simulator using the qasm_simulator backend"""
-        backend = qiskit.Aer.get_backend("qasm_simulator")
+    def __run(self, job_dto: JobCoreDto):
+        """Execute a job local using aer simulator or a real backend"""
+
+        if job_dto.executed_on.device_name == "aer_simulator":
+            backend = qiskit.Aer.get_backend("qasm_simulator")
+        else:
+            provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
+            backend = provider.get_backend(job_dto.executed_on.device_name)
+
         result = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots).result()
         results: list[ResultDataclass] = IBMPilot.__map_runner_results_to_dataclass(result, job_dto)
 
@@ -77,15 +79,6 @@ class IBMPilot(Pilot):
                 res.meta_data.pop("circuit")
 
         return results
-
-    def __run(self, job_dto: JobCoreDto):
-        """Run a job on an IBM backend using the IBM Pilot"""
-        provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
-        backend = provider.get_backend(job_dto.executed_on.device_name)
-        transpiled = qiskit.transpile(job_dto.transpiled_circuits, backend=backend)
-        job_from_ibm = backend.run(transpiled, shots=job_dto.shots)
-        ibm_result = job_from_ibm.result()
-        return IBMPilot.__map_runner_results_to_dataclass(ibm_result, job_dto)
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""

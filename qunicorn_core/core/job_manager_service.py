@@ -18,14 +18,10 @@ import yaml
 from qiskit import QuantumCircuit
 
 from qunicorn_core.api.api_models.job_dtos import (
-    JobRequestDto,
     JobCoreDto,
-    SimpleJobDto,
-    JobResponseDto,
-    JobExecutePythonFileDto,
 )
 from qunicorn_core.celery import CELERY
-from qunicorn_core.core.mapper import job_mapper, result_mapper
+from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
@@ -57,7 +53,6 @@ def run_job(job_core_dto_dict: dict):
             __transpile_circuits(job_core_dto, pilot.supported_language)
             logging.info(f"Run job with id {job_core_dto.id} on {pilot.__class__}")
             results = pilot.execute(job_core_dto)
-            print(results)
             break
 
     if results is None:
