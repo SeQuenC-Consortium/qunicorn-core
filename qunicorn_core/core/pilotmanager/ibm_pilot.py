@@ -42,26 +42,24 @@ class IBMPilot(Pilot):
 
     supported_language: AssemblerLanguage = AssemblerLanguage.QISKIT
 
-    def execute(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
-        """Execute a job on an IBM backend using the IBM Pilot"""
+    def execute_provider_specific(self, job_core_dto: JobCoreDto):
+        """Execute a job of a provider specific type on a backend using a Pilot"""
 
-        if job_core_dto.type == JobType.RUNNER:
-            return self.__run(job_core_dto)
-        elif job_core_dto.type == JobType.ESTIMATOR:
-            return self.__estimate(job_core_dto)
+        if job_core_dto.type == JobType.ESTIMATOR:
+            return self.estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
-            return self.__sample(job_core_dto)
-        elif job_core_dto.type == JobType.IBM_RUN:
-            self.__run_program(job_core_dto)
-        elif job_core_dto.type == JobType.IBM_UPLOAD:
-            self.__upload_program(job_core_dto)
+            return self.sample(job_core_dto)
+        elif job_core_dto.type == JobType.FILE_RUNNER:
+            return self.run_file_program(job_core_dto)
+        elif job_core_dto.type == JobType.FILE_UPLOAD:
+            return self.upload_program(job_core_dto)
         else:
             exception: Exception = ValueError("No valid Job Type specified")
             results = result_mapper.exception_to_error_results(exception)
             job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
             raise exception
 
-    def __run(self, job_dto: JobCoreDto):
+    def run(self, job_dto: JobCoreDto):
         """Execute a job local using aer simulator or a real backend"""
 
         job_id = job_dto.id
@@ -82,16 +80,18 @@ class IBMPilot(Pilot):
 
         return results
 
-    def __sample(self, job_dto: JobCoreDto):
+    def sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
+
         backend, circuits = self.__get_backend_and_circuits_for_qiskit_runtime(job_dto)
         sampler = Sampler(session=backend)
         job_from_ibm: RuntimeJob = sampler.run(circuits)
         ibm_result: SamplerResult = job_from_ibm.result()
         return IBMPilot._map_sampler_results_to_dataclass(ibm_result, job_dto)
 
-    def __estimate(self, job_dto: JobCoreDto):
+    def estimate(self, job_dto: JobCoreDto):
         """Uses the Estimator to execute a job on an IBM backend using the IBM Pilot"""
+
         backend, circuits = self.__get_backend_and_circuits_for_qiskit_runtime(job_dto)
         estimator = Estimator(session=backend)
         job_from_ibm = estimator.run(circuits, observables=[SparsePauliOp("IY"), SparsePauliOp("IY")])
@@ -100,6 +100,7 @@ class IBMPilot(Pilot):
 
     def __get_backend_and_circuits_for_qiskit_runtime(self, job_dto):
         """Instantiate all important configurations and updates the job_state"""
+
         self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
         service: QiskitRuntimeService = QiskitRuntimeService()
         backend: BackendV1 = service.get_backend(job_dto.executed_on.device_name)
@@ -120,6 +121,7 @@ class IBMPilot(Pilot):
     @staticmethod
     def __get_provider_login_and_update_job(token: str, job_dto_id: int) -> IBMProvider:
         """Save account credentials, get provider and update job_dto to job_state = Error, if it is not possible"""
+
         try:
             return IBMPilot.get_ibm_provider_and_login(token)
         except Exception as exception:
@@ -135,6 +137,7 @@ class IBMPilot(Pilot):
 
     def __upload_program(self, job_core_dto: JobCoreDto):
         """Upload and then run a quantum program on the QiskitRuntimeService"""
+
         service = self.__get_runtime_service(job_core_dto)
         ibm_program_ids = []
         for program in job_core_dto.deployment.programs:
@@ -148,7 +151,7 @@ class IBMPilot(Pilot):
         ]
         job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.READY)
 
-    def __run_program(self, job_core_dto: JobCoreDto):
+    def run_program(self, job_core_dto: JobCoreDto):
         service = self.__get_runtime_service(job_core_dto)
         ibm_results = []
         options_dict: dict = job_core_dto.ibm_file_options
@@ -168,7 +171,7 @@ class IBMPilot(Pilot):
         job_db_service.update_finished_job(job_core_dto.id, ibm_results)
 
     @staticmethod
-    def __get_runtime_service(job_core_dto) -> QiskitRuntimeService:
+    def get_runtime_service(job_core_dto) -> QiskitRuntimeService:
         if job_core_dto.token == "" and os.getenv("IBM_TOKEN") is not None:
             job_core_dto.token = os.getenv("IBM_TOKEN")
 

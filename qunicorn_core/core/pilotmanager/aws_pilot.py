@@ -16,16 +16,11 @@ from braket.tasks import GateModelQuantumTaskResult
 from braket.tasks.local_quantum_task_batch import LocalQuantumTaskBatch
 
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
-from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
-from qunicorn_core.static.enums.job_state import JobState
-from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
-from qunicorn_core.util import logging
 
 
 class AWSPilot(Pilot):
@@ -35,9 +30,8 @@ class AWSPilot(Pilot):
 
     supported_language: AssemblerLanguage = AssemblerLanguage.BRAKET
 
-    def __run(self, job_core_dto):
+    def run(self, job_core_dto):
         """Execute the job on a local simulator and saves results in the database"""
-
         device = LocalSimulator()
         quantum_tasks: LocalQuantumTaskBatch = device.run_batch(
             job_core_dto.transpiled_circuits, shots=job_core_dto.shots
