@@ -62,8 +62,6 @@ class IBMPilot(Pilot):
     def run(self, job_dto: JobCoreDto):
         """Execute a job local using aer simulator or a real backend"""
 
-        job_id = job_dto.id
-
         if job_dto.executed_on.device_name == "aer_simulator":
             backend = qiskit.Aer.get_backend("qasm_simulator")
         else:
@@ -171,7 +169,7 @@ class IBMPilot(Pilot):
         job_db_service.update_finished_job(job_core_dto.id, ibm_results)
 
     @staticmethod
-    def get_runtime_service(job_core_dto) -> QiskitRuntimeService:
+    def __get_runtime_service(job_core_dto) -> QiskitRuntimeService:
         if job_core_dto.token == "" and os.getenv("IBM_TOKEN") is not None:
             job_core_dto.token = os.getenv("IBM_TOKEN")
 
