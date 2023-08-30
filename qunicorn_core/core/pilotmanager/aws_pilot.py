@@ -16,9 +16,12 @@ from braket.tasks import GateModelQuantumTaskResult
 from braket.tasks.local_quantum_task_batch import LocalQuantumTaskBatch
 
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
+from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
+from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
+from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 
@@ -38,6 +41,14 @@ class AWSPilot(Pilot):
         )
         aws_simulator_results: list[GateModelQuantumTaskResult] = quantum_tasks.results()
         return AWSPilot.__map_simulator_results_to_dataclass(aws_simulator_results, job_core_dto)
+
+    def execute_provider_specific(self, job_core_dto: JobCoreDto):
+        """Execute a job of a provider specific type on a backend using a Pilot"""
+
+        exception: Exception = ValueError("No valid Job Type specified")
+        results = result_mapper.exception_to_error_results(exception)
+        job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
+        raise exception
 
     @staticmethod
     def __map_simulator_results_to_dataclass(
