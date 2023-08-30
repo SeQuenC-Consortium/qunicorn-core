@@ -25,6 +25,7 @@ from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
+from qunicorn_core.util import logging
 
 
 class AWSPilot(Pilot):
@@ -34,23 +35,7 @@ class AWSPilot(Pilot):
 
     supported_language: AssemblerLanguage = AssemblerLanguage.BRAKET
 
-    def execute(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
-        """Execute a job with AWS Pilot and saves results in the database"""
-
-        if job_core_dto.type == JobType.RUNNER:
-            if job_core_dto.executed_on.device_name == "local_simulator":
-                return self.__local_simulation(job_core_dto)
-            else:
-                exception: Exception = ValueError("No valid device specified")
-                raise exception
-        else:
-            exception: Exception = ValueError("No valid Job Type specified")
-            results = result_mapper.exception_to_error_results(exception)
-            job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
-            raise exception
-
-    @staticmethod
-    def __local_simulation(job_core_dto: JobCoreDto) -> list[ResultDataclass]:
+    def __run(self, job_core_dto):
         """Execute the job on a local simulator and saves results in the database"""
 
         device = LocalSimulator()

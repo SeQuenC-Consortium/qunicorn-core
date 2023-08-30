@@ -64,6 +64,8 @@ class IBMPilot(Pilot):
     def __run(self, job_dto: JobCoreDto):
         """Execute a job local using aer simulator or a real backend"""
 
+        job_id = job_dto.id
+
         if job_dto.executed_on.device_name == "aer_simulator":
             backend = qiskit.Aer.get_backend("qasm_simulator")
         else:
@@ -139,7 +141,7 @@ class IBMPilot(Pilot):
             python_file_path = self.__get_file_path_to_resources(program.python_file_path)
             python_file_metadata_path = self.__get_file_path_to_resources(program.python_file_metadata)
             ibm_program_ids.append(service.upload_program(python_file_path, python_file_metadata_path))
-        job_db_service.update_attribute(job_core_dto.id, JobType.IBM_RUN, JobDataclass.type)
+        job_db_service.update_attribute(job_core_dto.id, JobType.FILE_RUNNER, JobDataclass.type)
         job_db_service.update_attribute(job_core_dto.id, JobState.READY, JobDataclass.state)
         ibm_results = [
             ResultDataclass(result_dict={"ibm_job_id": ibm_program_ids[0]}, result_type=ResultType.UPLOAD_SUCCESSFUL)
