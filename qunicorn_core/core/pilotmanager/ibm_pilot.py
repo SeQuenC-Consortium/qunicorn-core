@@ -46,9 +46,9 @@ class IBMPilot(Pilot):
         """Execute a job of a provider specific type on a backend using a Pilot"""
 
         if job_core_dto.type == JobType.ESTIMATOR:
-            return self.estimate(job_core_dto)
+            return self.__estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
-            return self.sample(job_core_dto)
+            return self.__sample(job_core_dto)
         elif job_core_dto.type == JobType.FILE_RUNNER:
             return self.__run_program(job_core_dto)
         elif job_core_dto.type == JobType.FILE_UPLOAD:
@@ -78,7 +78,7 @@ class IBMPilot(Pilot):
 
         return results
 
-    def sample(self, job_dto: JobCoreDto):
+    def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
 
         backend, circuits = self.__get_backend_and_circuits_for_qiskit_runtime(job_dto)
@@ -87,7 +87,7 @@ class IBMPilot(Pilot):
         ibm_result: SamplerResult = job_from_ibm.result()
         return IBMPilot._map_sampler_results_to_dataclass(ibm_result, job_dto)
 
-    def estimate(self, job_dto: JobCoreDto):
+    def __estimate(self, job_dto: JobCoreDto):
         """Uses the Estimator to execute a job on an IBM backend using the IBM Pilot"""
 
         backend, circuits = self.__get_backend_and_circuits_for_qiskit_runtime(job_dto)

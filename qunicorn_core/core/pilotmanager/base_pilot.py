@@ -21,14 +21,10 @@ from qunicorn_core.static.enums.provider_name import ProviderName
 class Pilot:
     """Base class for Pilots"""
 
-    name: str
     provider_name: ProviderName
     supported_language: AssemblerLanguage
 
-    def __init__(self, name):
-        self.name = name
-
-    def execute(self, job_core_dto: JobCoreDto):
+    def execute(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute a job on a backend using a Pilot"""
 
         if job_core_dto.type == JobType.RUNNER:
@@ -41,7 +37,7 @@ class Pilot:
 
         raise NotImplementedError()
 
-    def execute_provider_specific(self, job_core_dto: JobCoreDto):
+    def execute_provider_specific(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute a job of a provider specific type on a backend using a Pilot"""
 
         raise NotImplementedError()

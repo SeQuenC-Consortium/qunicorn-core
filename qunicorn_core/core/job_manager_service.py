@@ -35,7 +35,7 @@ from qunicorn_core.util import logging
 
 ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
 
-PILOTS: list[Pilot] = [IBMPilot("IBM"), AWSPilot("AWS")]
+PILOTS: list[Pilot] = [IBMPilot(), AWSPilot()]
 
 
 @CELERY.task()
