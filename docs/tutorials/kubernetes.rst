@@ -4,7 +4,7 @@ Run using kubernetes / minikube
 Installation / Starting Minikube (tested for windows)
 ----------------------
 
-1. Install`Chocolatey <https://chocolatey.org/install#individual>`_
+1. Install `Chocolatey <https://chocolatey.org/install#individual>`_
 
 2. Install Minikube `Minikube <https://minikube.sigs.k8s.io/docs/>`_
 
