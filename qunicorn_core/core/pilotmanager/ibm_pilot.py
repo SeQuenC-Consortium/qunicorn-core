@@ -50,9 +50,9 @@ class IBMPilot(Pilot):
         elif job_core_dto.type == JobType.SAMPLER:
             return self.sample(job_core_dto)
         elif job_core_dto.type == JobType.FILE_RUNNER:
-            return self.run_file_program(job_core_dto)
+            return self.__run_program(job_core_dto)
         elif job_core_dto.type == JobType.FILE_UPLOAD:
-            return self.upload_program(job_core_dto)
+            return self.__upload_program(job_core_dto)
         else:
             exception: Exception = ValueError("No valid Job Type specified")
             results = result_mapper.exception_to_error_results(exception)
@@ -149,7 +149,7 @@ class IBMPilot(Pilot):
         ]
         job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.READY)
 
-    def run_program(self, job_core_dto: JobCoreDto):
+    def __run_program(self, job_core_dto: JobCoreDto):
         service = self.__get_runtime_service(job_core_dto)
         ibm_results = []
         options_dict: dict = job_core_dto.ibm_file_options
