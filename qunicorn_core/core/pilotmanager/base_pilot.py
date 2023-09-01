@@ -22,7 +22,7 @@ class Pilot:
     """Base class for Pilots"""
 
     provider_name: ProviderName
-    supported_language: AssemblerLanguage
+    supported_language: list[AssemblerLanguage]
 
     def execute(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute a job on a backend using a Pilot"""

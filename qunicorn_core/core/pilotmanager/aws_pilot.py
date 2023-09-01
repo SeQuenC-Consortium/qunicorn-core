@@ -31,7 +31,7 @@ class AWSPilot(Pilot):
 
     provider_name: ProviderName = ProviderName.AWS
 
-    supported_language: AssemblerLanguage = AssemblerLanguage.BRAKET
+    supported_language: list[AssemblerLanguage] = list[AssemblerLanguage.BRAKET, AssemblerLanguage.QASM3]
 
     def run(self, job_core_dto):
         """Execute the job on a local simulator and saves results in the database"""

@@ -15,6 +15,7 @@ from os import environ
 from typing import Optional
 
 import yaml
+from braket.circuits import Circuit
 from qiskit import QuantumCircuit
 
 from qunicorn_core.api.api_models.job_dtos import (
@@ -50,7 +51,11 @@ def run_job(job_core_dto_dict: dict):
 
     for pilot in PILOTS:
         if pilot.is_my_provider(device.provider.name):
-            __transpile_circuits(job_core_dto, pilot.supported_language)
+            """
+            TODO when multiple languages are supported maybe pick a specific instead of default since for example qasm3
+            can be directly used for aws instead of transpiling it manually to braket
+            """
+            __transpile_circuits(job_core_dto, pilot.supported_language[0])
             logging.info(f"Run job with id {job_core_dto.id} on {pilot.__class__}")
             results = pilot.execute(job_core_dto)
             break
@@ -76,8 +81,15 @@ def __transpile_circuits(job_dto: JobCoreDto, destination_language: AssemblerLan
     for program in job_dto.deployment.programs:
         try:
             qiskit = AssemblerLanguage.QISKIT
+            braket = AssemblerLanguage.BRAKET
+            qasm3 = AssemblerLanguage.QASM3
             if destination_language == qiskit and program.assembler_language == qiskit:
                 transpiled_circuit = get_circuit_when_qiskit_on_ibm(program)
+            elif destination_language == braket and program.assembler_language == braket:
+                transpiled_circuit = get_circuit_when_braket_on_aws(program)
+            elif destination_language == qasm3 and program.assembler_language == qasm3:
+                # get_circuit_when_qasm3_on_aws as a method used because of analog step for braket/qiskit
+                transpiled_circuit = get_circuit_when_qasm3_on_aws(program)
             else:
                 transpiler = transpile_manager.get_transpiler(
                     src_language=program.assembler_language, dest_language=destination_language
@@ -102,3 +114,22 @@ def get_circuit_when_qiskit_on_ibm(program):
     circuit_globals = {"QuantumCircuit": QuantumCircuit}
     exec(program.quantum_circuit, circuit_globals)
     return circuit_globals["qiskit_circuit"]
+
+
+def get_circuit_when_braket_on_aws(program):
+    """
+    TODO should be in the transpile manager
+    Method to remove switching away from braket to qasm and back to braket
+    """
+    # braket.Circuit needs to be included here as an import here so eval works with the type
+    circuit: Circuit = eval(program.quantum_circuit)
+    return circuit
+
+
+def get_circuit_when_qasm3_on_aws(program):
+    """
+    TODO should be in the transpile manager
+    Method to remove switching away from qasm to braket since aws works with qasm already
+    method used because of analog step for braket/qiskit
+    """
+    return program.quantum_circuit

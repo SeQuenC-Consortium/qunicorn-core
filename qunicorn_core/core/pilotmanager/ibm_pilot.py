@@ -40,7 +40,7 @@ class IBMPilot(Pilot):
 
     provider_name: ProviderName = ProviderName.IBM
 
-    supported_language: AssemblerLanguage = AssemblerLanguage.QISKIT
+    supported_language: list[AssemblerLanguage] = list[AssemblerLanguage.QISKIT]
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
