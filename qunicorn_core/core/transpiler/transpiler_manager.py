@@ -78,15 +78,11 @@ transpile_manager = TranspileManager()
 
 @transpile_manager.register_transpile_method(AssemblerLanguage.BRAKET, AssemblerLanguage.QASM3)
 def braket_to_qasm(source: Circuit) -> str:
-    print("braket_to_qasm§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§")
-
     return source.to_ir(IRType.OPENQASM).source
 
 
 @transpile_manager.register_transpile_method(AssemblerLanguage.QISKIT, AssemblerLanguage.QASM2)
 def qiskit_to_qasm2(circuit: qiskit.circuit.QuantumCircuit) -> str:
-    print("qiskit_to_qasm2§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§")
-
     qasm = circuit.qasm()
     # XXX replace gate references standard gate library an add 'CX' to 'cnot' mapping
     with open(path.join(path.dirname(qiskit.__file__), "qasm/libs/qelib1.inc")) as qelib1_file:
@@ -97,8 +93,6 @@ def qiskit_to_qasm2(circuit: qiskit.circuit.QuantumCircuit) -> str:
 
 @transpile_manager.register_transpile_method(AssemblerLanguage.QISKIT, AssemblerLanguage.QASM3)
 def qiskit_to_qasm3(circuit: qiskit.circuit.QuantumCircuit) -> str:
-    print("qiskit_to_qasm3§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§")
-
     qasm = qiskit.qasm3.Exporter(allow_aliasing=False).dumps(circuit)
     # XXX replace gate references standard gate library
     with open(path.join(path.dirname(qiskit.__file__), "qasm/libs/stdgates.inc")) as stdgates_file:
@@ -109,21 +103,15 @@ def qiskit_to_qasm3(circuit: qiskit.circuit.QuantumCircuit) -> str:
 
 @transpile_manager.register_transpile_method(AssemblerLanguage.QASM3, AssemblerLanguage.QISKIT)
 def qasm3_to_qiskit(source: str) -> qiskit.circuit.QuantumCircuit:
-    print("qasm3_to_qiskit§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§")
-
     return qiskit.qasm3.loads(source)
 
 
 @transpile_manager.register_transpile_method(AssemblerLanguage.QASM2, AssemblerLanguage.QISKIT)
 def qasm2_to_qiskit(source: str) -> qiskit.circuit.QuantumCircuit:
-    print("qasm2_to_qiskit§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§")
-
     return qiskit.qasm2.loads(source)
 
 
 # @transpile_manager.register_transpile_method(AssemblerLanguage.QASM2, AssemblerLanguage.BRAKET)
 @transpile_manager.register_transpile_method(AssemblerLanguage.QASM3, AssemblerLanguage.BRAKET)
 def qasm_to_braket(source: str) -> OpenQASMProgram:
-    print("qasm_to_braket§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§")
-    print(source)
     return OpenQASMProgram(source=source)
