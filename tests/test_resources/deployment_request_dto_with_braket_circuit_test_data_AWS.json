@@ -8,13 +8,13 @@
       "python_file_path": ""
     },
     {
-      "quantum_circuit": "Circuit().h(0).h(0).cnot(0, 1)",
+      "quantum_circuit": "Circuit().h(0).cnot(0, 1)",
       "assembler_language": "BRAKET",
       "python_file_metadata": "",
       "python_file_path": ""
     },
     {
-      "quantum_circuit": "Circuit().h(0).h(0).h(0).cnot(0, 1)",
+      "quantum_circuit": "Circuit().h(0).cnot(0, 1)",
       "assembler_language": "BRAKET",
       "python_file_metadata": "",
       "python_file_path": ""

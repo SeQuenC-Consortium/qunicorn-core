@@ -36,14 +36,14 @@ def test_create_and_run_aws_local_simulator():
     # WHEN: create_and_run executed
     with app.app_context():
         job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.AWS, AssemblerLanguage.BRAKET)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.AWS, AssemblerLanguage.QASM3)
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
         # THEN: Check if the correct job with its result is saved in the db
         assert return_dto.state == JobState.RUNNING
 
 
-def test_get_results_from_aws_local_simulator_job():
+def test_get_results_from_aws_local_simulator_qasm3_job():
     """creates a new job again and tests the result of the aws local simulator in the db with a qasm3 circuit"""
     # GIVEN: Database Setup - AWS added as a provider
     app = set_up_env()
@@ -58,6 +58,26 @@ def test_get_results_from_aws_local_simulator_job():
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
         for result in results:
+            print(result.circuit)
+            assert check_aws_local_simulator_results(result.result_dict, job_request_dto.shots)
+
+
+def test_get_results_from_aws_local_simulator_braket_job():
+    """creates a new job again and tests the result of the aws local simulator in the db with a braket circuit"""
+    # GIVEN: Database Setup - AWS added as a provider
+    app = set_up_env()
+
+    # WHEN: create_and_run executed
+    with app.app_context():
+        job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.AWS, AssemblerLanguage.BRAKET)
+        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+        results: list[ResultDataclass] = job_db_service.get_job_by_id(return_dto.id).results
+
+    # THEN: Check if the correct job with its result is saved in the db
+    with app.app_context():
+        for result in results:
+            print(result.circuit)
             assert check_aws_local_simulator_results(result.result_dict, job_request_dto.shots)
 
 
@@ -66,10 +86,22 @@ def check_aws_local_simulator_results(results_dict: dict, shots: int):
     counts: Counter = results_dict.get("counts")
     probabilities: dict = results_dict.get("probabilities")
     tolerance: int = 100
-    condition1 = shots / 2 - tolerance < counts.get("000") < shots / 2 + tolerance
-    condition2 = shots / 2 - tolerance < counts.get("111") < shots / 2 + tolerance
+    if counts.get("000") is not None and counts.get("111") is not None:
+        counts0 = counts.get("000")
+        probabilities0 = probabilities.get("000")
+        counts1 = counts.get("111")
+        probabilities1 = probabilities.get("111")
+    elif counts.get("00") is not None and counts.get("11") is not None:
+        counts0 = counts.get("00")
+        probabilities0 = probabilities.get("00")
+        counts1 = counts.get("11")
+        probabilities1 = probabilities.get("11")
+    else:
+        assert False
+    condition1 = shots / 2 - tolerance < counts0 < shots / 2 + tolerance
+    condition2 = shots / 2 - tolerance < counts1 < shots / 2 + tolerance
     if not (condition1 and condition2):
         is_check_successful = False
-    elif not (0.48 < probabilities.get("000") < 0.52 and 0.48 < probabilities.get("111") < 0.52):
+    elif not (0.48 < probabilities0 < 0.52 and 0.48 < probabilities1 < 0.52):
         is_check_successful = False
     return is_check_successful
