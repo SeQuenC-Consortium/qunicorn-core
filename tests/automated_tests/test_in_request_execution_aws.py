@@ -97,7 +97,7 @@ def check_aws_local_simulator_results(results_dict: dict, shots: int):
         counts1 = counts.get("11")
         probabilities1 = probabilities.get("11")
     else:
-        assert False
+        raise AssertionError
     condition1 = shots / 2 - tolerance < counts0 < shots / 2 + tolerance
     condition2 = shots / 2 - tolerance < counts1 < shots / 2 + tolerance
     if not (condition1 and condition2):
