@@ -137,6 +137,7 @@ def test_job_ibm_runner(mocker):
         new_job = job_db_service.get_job_by_id(job_core_dto.id)
         assert new_job.state == JobState.ERROR
 
+
 def test_create_and_run_job_on_aer_simulator():
     """Tests the create and run job method for synchronous execution of a runner on aer simulator"""
     create_and_run_runner("aer_simulator")

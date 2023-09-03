@@ -27,6 +27,7 @@ from tests.conftest import set_up_env
 from tests.manual_tests.test_jobmanager_with_ibm import EXPECTED_ID, JOB_FINISHED_PROGRESS, IS_ASYNCHRONOUS
 from tests.test_utils import get_object_from_json
 
+
 #  Write tests for device request and update in database
 def test_get_devices_invalid_token():
     """Testing the device request for get request from IBM"""
