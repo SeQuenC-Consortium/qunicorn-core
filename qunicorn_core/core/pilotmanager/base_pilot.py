@@ -21,3 +21,6 @@ class Pilot:
 
     def execute(self, job):
         raise NotImplementedError()
+    
+    def cancel(self, job):
+        raise NotImplementedError()

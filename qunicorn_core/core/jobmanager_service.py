@@ -125,8 +125,20 @@ def send_job_to_pilot():
 
 def cancel_job_by_id(job_id):
     """cancel job execution"""
-    # TODO: Implement Cancel
-    raise NotImplementedError
+    job: JobDataclass = job_db_service.get_job_by_id(job_id)
+    job_request: JobRequestDto = job_mapper.dataclass_to_request(job)
+    job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request)
+    device = job_core_dto.executed_on
+
+    # TODO: check if job is executed. If not, remove it from the celery queue
+    # else:
+    if device.provider.name == ProviderName.IBM:
+        qiskit_pilot: IBMPilot = IBMPilot("QP")
+        qiskit_pilot.cancel(job_core_dto)
+    elif job_core_dto.executed_on.provider.name == ProviderName.AWS:
+        # cancel aws job not supported yet
+        raise NotImplementedError
+    
 
 
 def get_jobs_by_deployment_id(deployment_id) -> list[JobResponseDto]:

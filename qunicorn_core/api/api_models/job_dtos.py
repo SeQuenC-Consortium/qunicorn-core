@@ -79,6 +79,9 @@ class JobCoreDto:
     ibm_file_inputs: dict | None = None
     token: str | None = None
 
+    # TODO: check if datatype is accuarte
+    provider_specific_id: str | None = None
+
 
 @dataclass
 class JobResponseDto:

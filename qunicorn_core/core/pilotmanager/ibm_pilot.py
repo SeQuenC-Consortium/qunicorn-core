@@ -89,12 +89,25 @@ class IBMPilot(Pilot):
         job_db_service.update_attribute(job_dto.id, JobState.RUNNING, JobDataclass.state)
 
         job_from_ibm = backend.run(transpiled, shots=job_dto.shots)
+        job_db_service.update_attribute(job_dto.id, job_from_ibm.job_id(), JobDataclass.provider_specific_id)
         ibm_result = job_from_ibm.result()
         results: list[ResultDataclass] = result_mapper.ibm_runner_to_dataclass(ibm_result, job_dto)
         job_db_service.update_finished_job(job_dto.id, results)
         logging.info(
             f"Run job with id {job_dto.id} on {job_dto.executed_on.provider.name}  and get the result {results}"
         )
+
+    def cancel(self, job_dto: JobCoreDto):
+        """Cancel a job on an IBM backend using the IBM Pilot"""
+        provider = self.__get_ibm_provider_login_and_update_job(job_dto.token, job_dto.id)
+        backend = provider.get_backend(job_dto.executed_on.device_name)
+        if(backend.retrieve_job(job_dto.provider_specific_id).cancel()):
+            # TODO: Perhaps better way to log that the job has been canceled?
+            job_db_service.delete(job_dto.id)
+            logging.info(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} successful.")
+        else:
+            # TODO: use this? job_db_service.update_attribute(job_dto.id, JobState.ERROR, JobDataclass.state)
+            logging.warn(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} failed.")
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
