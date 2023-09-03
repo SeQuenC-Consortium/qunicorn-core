@@ -182,7 +182,6 @@ def add_devices_and_get_defaults() -> [DeviceDataclass, DeviceDataclass]:
             provider_id=provider.id,
             num_qubits=device["num_qubits"],
             device_name=device["name"],
-            url="",
             is_simulator=device["is_simulator"],
             provider=provider,
         )

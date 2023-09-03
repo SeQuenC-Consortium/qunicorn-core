@@ -40,24 +40,24 @@ class DeviceDto:
     num_qubits: int
     is_simulator: bool
     provider: ProviderDto | None = None
-    url: str | None = None
 
 
 @dataclass
 class DeviceRequest:
-    token: str
+    provider: str
+    token: str | None = None
 
 
 class DeviceDtoSchema(MaBaseSchema):
     device_id = ma.fields.Integer(required=True, allow_none=False, metadata={"description": "The unique deviceID."})
     num_qubits = ma.fields.Integer(required=True, allow_none=False)
     is_simulator = ma.fields.Boolean(required=True, allow_none=False)
-    address_url = ma.fields.String(required=True, allow_none=False, metadata={"description": "URL of a device."})
     provider = ma.fields.Nested(ProviderDtoSchema())
 
 
 class DeviceRequestSchema(MaBaseSchema):
-    token = ma.fields.String(required=True, metadata={"example": ""})
+    provider = ma.fields.String(required=True, example="IBM")
+    token = ma.fields.String(required=False, example="")
 
 
 @dataclass
