@@ -563,12 +563,6 @@ def install_plugin_dependencies(c):
 
 
 @task
-def await_db(c):
-    """Docker specific task. Do not call."""
-    c.run("/wait", echo=True, warn=False)
-
-
-@task
 def upgrade_db(c):
     """Upgrade the database to the newest migration."""
     c.run(join(["python", "-m", "flask", "db", "upgrade"]), echo=True, warn=True)

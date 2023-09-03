@@ -1,0 +1,63 @@
+version: "3"
+services:
+  server:
+    build: .
+    image: qunicorn:local
+    networks:
+      - qunicorn
+    environment:
+      CONTAINER_MODE: server
+      SERVER_PORT: 8080
+      BROKER_URL: "redis://broker:6379"
+      DB_URL: "postgresql://postgres:passwd@postgres/qunicorn"
+    depends_on:
+      - postgres
+      - broker
+    ports:
+      - "8080:8080"
+    labels:
+      kompose.service.expose: "true"
+      kompose.service.type: "loadbalancer"
+
+  worker:
+    build: .
+    image: qunicorn:local
+    networks:
+      - qunicorn
+    environment:
+      CONTAINER_MODE: worker
+      BROKER_URL: "redis://broker:6379"
+      DB_URL: "postgresql://postgres:passwd@postgres/qunicorn"
+    depends_on:
+      - postgres
+      - broker
+    ports:
+      - "6379"
+
+  broker:
+    image: redis:7.0.12
+    networks:
+      - qunicorn
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:15.3
+    networks:
+      - qunicorn
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD: passwd
+      POSTGRES_DB: qunicorn
+    volumes:
+      - pgdata:/var/lib/postgresql/data \
+    ports:
+      - "5432:5432"
+
+
+networks:
+  qunicorn:
+
+volumes:
+  pgdata:
+

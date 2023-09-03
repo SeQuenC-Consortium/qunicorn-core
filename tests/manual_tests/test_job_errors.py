@@ -15,14 +15,15 @@
 """"Test class to test the functionality of the job_api"""
 
 import pytest
-from qiskit.qasm import QasmError
+from qiskit.qasm2 import QASM2ParseError
 from qiskit_ibm_provider.accounts import InvalidAccountError
 from qiskit_ibm_provider.api.exceptions import RequestsApiError
 
 from qunicorn_core.api.api_models import JobRequestDto, DeploymentRequestDto
-from qunicorn_core.core.jobmanager import jobmanager_service
+from qunicorn_core.core import jobmanager_service
 from qunicorn_core.core.mapper import deployment_mapper
-from qunicorn_core.db.database_services import job_db_service, db_service
+from qunicorn_core.db.database_services import job_db_service, db_service, user_db_service
+from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
@@ -64,14 +65,16 @@ def test_invalid_circuit():
 
     # WHEN: Executing create and run
     with app.app_context():
-        depl_id: int = db_service.save_database_object(deployment_mapper.request_dto_to_deployment(deployment_dto)).id
+        deployment: DeploymentDataclass = deployment_mapper.request_dto_to_deployment(deployment_dto)
+        deployment.deployed_by = user_db_service.get_default_user()
+        depl_id: int = db_service.save_database_object(deployment).id
         job_request_dto.deployment_id = depl_id
         with pytest.raises(Exception) as exception:
             jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Test if QasmError was thrown and job is saved in db with error
     with app.app_context():
-        assert QasmError.__name__ in str(exception)
+        assert QASM2ParseError.__name__ in str(exception)
         assert job_finished_with_error()
 
 
@@ -96,7 +99,7 @@ def test_invalid_token_for_sampler():
 
 
 def job_finished_with_error() -> bool:
-    job: JobDataclass = job_db_service.get_job(EXPECTED_ID)
+    job: JobDataclass = job_db_service.get_job_by_id(EXPECTED_ID)
     is_job_state_error: bool = job.state == JobState.ERROR
     is_result_type_error: bool = job.results[0].result_type == ResultType.ERROR
     is_progress_hundred: bool = job.progress == JOB_FINISHED_PROGRESS

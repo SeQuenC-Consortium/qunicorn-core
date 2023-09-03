@@ -30,7 +30,7 @@ class UserDto:
 
     @staticmethod
     def get_default_user() -> "UserDto":
-        return UserDto(id=0, name="default")
+        return UserDto(id=1, name="default")
 
 
 class UserDtoSchema(MaBaseSchema):

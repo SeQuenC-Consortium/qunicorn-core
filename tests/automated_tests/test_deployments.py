@@ -15,8 +15,8 @@
 """"Test class to test the functionality of the job_api"""
 
 from qunicorn_core.api.api_models import DeploymentRequestDto
-from qunicorn_core.core.jobmanager import deployment_service
-from qunicorn_core.db.database_services import db_service
+from qunicorn_core.core import deployment_service
+from qunicorn_core.db.database_services import deployment_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.static.enums.provider_name import ProviderName
 from tests import test_utils
@@ -27,7 +27,7 @@ PROGRAM_NUMBER = 2
 
 
 def test_create_deployments():
-    """Testing the if the creation of deployments works"""
+    """Testing if the creation of deployments works"""
     # GIVEN: Get Deployments from JSON
     app = set_up_env()
     deployment: DeploymentRequestDto = test_utils.get_test_deployment_request(ProviderName.IBM)
@@ -38,6 +38,6 @@ def test_create_deployments():
 
     # THEN: Test if the name and number of programs is correct
     with app.app_context():
-        deployment: DeploymentDataclass = db_service.get_database_object(depl_id, DeploymentDataclass)
+        deployment: DeploymentDataclass = deployment_db_service.get_deployment_by_id(depl_id)
         assert deployment.name == DEPLOYMENT_NAME
         assert len(deployment.programs) == PROGRAM_NUMBER

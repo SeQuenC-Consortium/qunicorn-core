@@ -15,8 +15,7 @@ import datetime
 
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.mapper import job_mapper
-from qunicorn_core.db.database_services import db_service, device_db_service
-from qunicorn_core.db.models.deployment import DeploymentDataclass
+from qunicorn_core.db.database_services import db_service, device_db_service, deployment_db_service, user_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.db.models.user import UserDataclass
@@ -28,15 +27,13 @@ from qunicorn_core.static.enums.job_state import JobState
 
 def create_database_job(job_core: JobCoreDto):
     """Creates a database job with the given circuit and saves it in the database"""
-    default_user: UserDataclass = db_service.get_database_object(1, UserDataclass)
-    deployment: DeploymentDataclass = db_service.get_database_object(job_core.deployment.id, DeploymentDataclass)
-    db_job: JobDataclass = job_mapper.job_core_dto_to_job_without_id(job_core)
+    default_user: UserDataclass = user_db_service.get_default_user()
+    db_job: JobDataclass = job_mapper.core_to_dataclass(job_core)
     db_job.state = JobState.RUNNING
     db_job.progress = 0
     db_job.executed_by = default_user
+    db_job.deployment = deployment_db_service.get_deployment_by_id(job_core.deployment.id)
     db_job.executed_on = device_db_service.get_device_with_name(job_core.executed_on.device_name)
-    db_job.deployment.deployed_by = default_user
-    db_job.deployment = deployment
     return db_service.save_database_object(db_job)
 
 
@@ -50,7 +47,7 @@ def update_attribute(job_id: int, attribute_value, attribute_name):
 
 def update_finished_job(job_id: int, results: list[ResultDataclass], job_state: JobState = JobState.FINISHED):
     """Updates the attributes state and results of the job with the id job_id"""
-    job: JobDataclass = get_job(job_id)
+    job: JobDataclass = get_job_by_id(job_id)
     job.finished_at = datetime.datetime.now()
     job.progress = 100
     job.results = results
@@ -58,14 +55,14 @@ def update_finished_job(job_id: int, results: list[ResultDataclass], job_state: 
     db_service.save_database_object(job)
 
 
-def get_job(job_id: int) -> JobDataclass:
+def get_job_by_id(job_id: int) -> JobDataclass:
     """Gets the job with the job_id from the database"""
-    return db_service.get_database_object(job_id, JobDataclass)
+    return db_service.get_database_object_by_id(job_id, JobDataclass)
 
 
 def delete(id: int):
     """Removes one job"""
-    db_service.delete_database_object_by_id(JobDataclass, id)
+    db_service.remove_database_object_by_id(JobDataclass, id)
 
 
 def get_all() -> list[JobDataclass]:

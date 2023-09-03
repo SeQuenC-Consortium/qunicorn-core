@@ -19,11 +19,15 @@ class AssemblerLanguage(StrEnum):
     """Enum to save the different assembler languages
 
     Values:
-        QASM: Standard assembler format from IBM
+        QASM: Standard assembler format
         BRAKET: Assembler format from AWS
+        QISKIT: Assembler format form IBM
         PYTHON: Python language for IBM File Upload
     """
 
-    QASM = "QASM"
+    QASM2 = "QASM2"
+    QASM3 = "QASM3"
+    QRISP = "QRISP"
     BRAKET = "BRAKET"
+    QISKIT = "QISKIT"
     PYTHON = "PYTHON"

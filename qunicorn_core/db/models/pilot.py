@@ -33,6 +33,7 @@ class PilotDataclass(DbModel):
         state (PilotState): Represents progress and current state of pilot.
     """
 
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
     job_id: Mapped[int] = mapped_column(
         ForeignKey(JobDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None
     )
