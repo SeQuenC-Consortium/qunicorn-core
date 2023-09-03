@@ -39,6 +39,7 @@ class DeviceDto:
     device_name: str
     num_qubits: int
     is_simulator: bool
+    is_local: bool
     provider: ProviderDto | None = None
 
 
@@ -52,6 +53,7 @@ class DeviceDtoSchema(MaBaseSchema):
     device_id = ma.fields.Integer(required=True, allow_none=False, metadata={"description": "The unique deviceID."})
     num_qubits = ma.fields.Integer(required=True, allow_none=False)
     is_simulator = ma.fields.Boolean(required=True, allow_none=False)
+    is_local = ma.fields.Boolean(required=True, allow_none=False)
     provider = ma.fields.Nested(ProviderDtoSchema())
 
 

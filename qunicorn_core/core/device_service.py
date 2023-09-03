@@ -41,7 +41,8 @@ def update_devices(device_request: DeviceRequest):
             provider_id=2,
             num_qubits=-1,
             device_name="local_simulator",
-            is_simulator=1,
+            is_simulator=True,
+            is_local=True,
             provider="AWS",
         )
         device_db_service.save_device_by_name(aws_device)
@@ -58,6 +59,7 @@ def update_ibm_devices_in_db(all_devices: dict):
             num_qubits=device["num_qubits"],
             device_name=device["name"],
             is_simulator=device["is_simulator"],
+            is_local=False,
             provider=db_service.get_database_object_by_id(1, ProviderDataclass),
         )
         device_db_service.save_device_by_name(final_device)
@@ -71,6 +73,7 @@ def get_device_dict(devices: [IBMBackend]) -> dict:
             "name": device.name,
             "num_qubits": -1 if device.name.__contains__("stabilizer") else device.num_qubits,
             "is_simulator": 1 if device.name.__contains__("simulator") else 0,
+            "is_local": True,
             "provider_id": 1,
             "provider": None,
         }
@@ -81,12 +84,12 @@ def get_device_dict(devices: [IBMBackend]) -> dict:
 
 def get_all_devices() -> list[SimpleDeviceDto]:
     """Gets all Devices from the DB and maps them"""
-    return [device_mapper.device_to_simple_device(device) for device in device_db_service.get_all_devices()]
+    return [device_mapper.dataclass_to_simple(device) for device in device_db_service.get_all_devices()]
 
 
 def get_device_by_id(device_id: int) -> DeviceDto:
     """Gets a Device from the DB by its ID and maps it"""
-    return device_mapper.device_to_device_dto(device_db_service.get_device_by_id(device_id))
+    return device_mapper.dataclass_to_dto(device_db_service.get_device_by_id(device_id))
 
 
 def check_if_device_available(device_id: int, token: str) -> dict:
