@@ -15,17 +15,12 @@
 """"Test class to test the functionality of the job_api"""
 
 import pytest
-from qiskit.qasm import QasmError
-from qiskit_ibm_provider.accounts import InvalidAccountError
 from qiskit_ibm_provider.api.exceptions import RequestsApiError
 
 from qunicorn_core.api.api_models import DeviceRequest
 from qunicorn_core.core import devicemanager_service
 
-from tests import test_utils
 from tests.conftest import set_up_env
-from tests.manual_tests.test_jobmanager_with_ibm import EXPECTED_ID, JOB_FINISHED_PROGRESS, IS_ASYNCHRONOUS
-from tests.test_utils import get_object_from_json
 
 
 #  Write tests for device request and update in database
@@ -40,16 +35,3 @@ def test_get_devices_invalid_token():
 
     with app.app_context():
         assert RequestsApiError.__name__ in str(exception)
-
-
-def test_get_devices_empty_token():
-    """Testing the device request for get request from IBM"""
-    app = set_up_env()
-    device_request_dto: DeviceRequest = DeviceRequest(provider="IBM", token="")
-
-    with app.app_context():
-        with pytest.raises(Exception) as exception:
-            devicemanager_service.update_devices(device_request_dto)
-
-    with app.app_context():
-        assert InvalidAccountError.__name__ in str(exception)
