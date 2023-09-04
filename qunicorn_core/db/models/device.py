@@ -35,7 +35,7 @@ class DeviceDataclass(DbModel):
         ForeignKey(ProviderDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None
     )
     num_qubits: Mapped[int] = mapped_column(sql.INTEGER, default=-1)
-    device_name: Mapped[str] = mapped_column(sql.String, default="")
+    name: Mapped[str] = mapped_column(sql.String, default="")
     is_simulator: Mapped[bool] = mapped_column(sql.BOOLEAN, default=False)
     is_local: Mapped[bool] = mapped_column(sql.BOOLEAN, default=False)
     provider: Mapped[ProviderDataclass.__name__] = relationship(ProviderDataclass.__name__, default=None)

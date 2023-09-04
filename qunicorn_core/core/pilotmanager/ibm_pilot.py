@@ -64,7 +64,7 @@ class IBMPilot(Pilot):
             backend = qiskit.Aer.get_backend("qasm_simulator")
         else:
             provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
-            backend = provider.get_backend(job_dto.executed_on.device_name)
+            backend = provider.get_backend(job_dto.executed_on.name)
 
         result = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots).result()
         results: list[ResultDataclass] = IBMPilot.__map_runner_results_to_dataclass(result, job_dto)
@@ -99,7 +99,7 @@ class IBMPilot(Pilot):
 
         self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
         service: QiskitRuntimeService = QiskitRuntimeService()
-        backend: BackendV1 = service.get_backend(job_dto.executed_on.device_name)
+        backend: BackendV1 = service.get_backend(job_dto.executed_on.name)
         return backend, job_dto.transpiled_circuits
 
     @staticmethod

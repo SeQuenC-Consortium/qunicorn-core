@@ -40,4 +40,12 @@ def dataclass_to_dto(device: DeviceDataclass) -> DeviceDto:
 
 
 def dataclass_to_simple(device: DeviceDataclass) -> SimpleDeviceDto:
-    return map_from_to(device, SimpleDeviceDto)
+    return map_from_to(
+        from_object=device,
+        to_type=SimpleDeviceDto,
+        fields_mapping={
+            "device_id": device.id,
+            "device_name": device.name,
+            "provider_name": device.provider.name,
+        },
+    )

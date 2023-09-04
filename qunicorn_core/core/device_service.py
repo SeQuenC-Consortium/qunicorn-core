@@ -40,7 +40,7 @@ def update_devices(device_request: DeviceRequest):
         aws_device: DeviceDataclass = DeviceDataclass(
             provider_id=2,
             num_qubits=-1,
-            device_name="local_simulator",
+            name="local_simulator",
             is_simulator=True,
             is_local=True,
             provider="AWS",
@@ -57,7 +57,7 @@ def update_ibm_devices_in_db(all_devices: dict):
         final_device: DeviceDataclass = DeviceDataclass(
             provider_id=device["provider_id"],
             num_qubits=device["num_qubits"],
-            device_name=device["name"],
+            name=device["name"],
             is_simulator=device["is_simulator"],
             is_local=False,
             provider=db_service.get_database_object_by_id(1, ProviderDataclass),
@@ -98,7 +98,7 @@ def check_if_device_available(device_id: int, token: str) -> dict:
     if device.provider.name == ProviderName.IBM:
         ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
         try:
-            ibm_provider.get_backend(device.device_name)
+            ibm_provider.get_backend(device.name)
             return {"backend": "Available"}
         except QiskitBackendNotFoundError:
             return {"backend": "Not Found"}
@@ -116,7 +116,7 @@ def get_device_from_provider(device_id: int, token: str) -> dict:
     # TODO add AWS Device and find common calibration data
     if device.provider.name == ProviderName.IBM:
         ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
-        backend = ibm_provider.get_backend(device.device_name)
+        backend = ibm_provider.get_backend(device.name)
         config_dict: dict = vars(backend.configuration())
         config_dict["u_channel_lo"] = None
         config_dict["_qubit_channel_map"] = None
