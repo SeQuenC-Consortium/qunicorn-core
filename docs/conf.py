@@ -283,7 +283,6 @@ if PATCH_SPHINX_CLICK:
 
     old_run = ClickDirective.run
 
-
     @wraps(old_run)
     def new_run(self: ClickDirective):
         section_title: str = self.options.get("section-title")
@@ -295,6 +294,5 @@ if PATCH_SPHINX_CLICK:
             title = sections[0][0]  # title node
             title.replace_self(nodes.title(text=section_title))
         return sections
-
 
     ClickDirective.run = new_run
