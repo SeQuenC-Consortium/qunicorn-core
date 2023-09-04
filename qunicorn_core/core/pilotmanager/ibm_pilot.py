@@ -22,7 +22,6 @@ from qiskit_ibm_provider import IBMProvider
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
 
 from qunicorn_core.api.api_models import JobCoreDto
-from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
@@ -54,19 +53,18 @@ class IBMPilot(Pilot):
         elif job_core_dto.type == JobType.FILE_UPLOAD:
             return self.__upload_program(job_core_dto)
         else:
-            exception: Exception = ValueError("No valid Job Type specified")
-            results = result_mapper.exception_to_error_results(exception)
-            job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
-            raise exception
+            raise job_db_service.return_exception_and_update_job(
+                job_core_dto.id, ValueError("No valid Job Type specified")
+            )
 
     def run(self, job_dto: JobCoreDto):
         """Execute a job local using aer simulator or a real backend"""
 
-        if job_dto.executed_on.device_name == "aer_simulator":
+        if job_dto.executed_on.is_local:
             backend = qiskit.Aer.get_backend("qasm_simulator")
         else:
             provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
-            backend = provider.get_backend(job_dto.executed_on.device_name)
+            backend = provider.get_backend(job_dto.executed_on.name)
 
         result = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots).result()
         results: list[ResultDataclass] = IBMPilot.__map_runner_results_to_dataclass(result, job_dto)
@@ -101,7 +99,7 @@ class IBMPilot(Pilot):
 
         self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
         service: QiskitRuntimeService = QiskitRuntimeService()
-        backend: BackendV1 = service.get_backend(job_dto.executed_on.device_name)
+        backend: BackendV1 = service.get_backend(job_dto.executed_on.name)
         return backend, job_dto.transpiled_circuits
 
     @staticmethod
@@ -123,10 +121,7 @@ class IBMPilot(Pilot):
         try:
             return IBMPilot.get_ibm_provider_and_login(token)
         except Exception as exception:
-            job_db_service.update_finished_job(
-                job_dto_id, result_mapper.exception_to_error_results(exception), JobState.ERROR
-            )
-            raise exception
+            raise job_db_service.return_exception_and_update_job(job_dto_id, exception)
 
     @staticmethod
     def __get_file_path_to_resources(file_name):
