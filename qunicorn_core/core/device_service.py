@@ -72,8 +72,8 @@ def get_device_dict(devices: [IBMBackend]) -> dict:
         device_dict = {
             "name": device.name,
             "num_qubits": -1 if device.name.__contains__("stabilizer") else device.num_qubits,
-            "is_simulator": 1 if device.name.__contains__("simulator") else 0,
-            "is_local": True,
+            "is_simulator": device.name.__contains__("simulator"),
+            "is_local": False,
             "provider_id": 1,
             "provider": None,
         }
