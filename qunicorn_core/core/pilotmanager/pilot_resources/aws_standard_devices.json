@@ -4,8 +4,7 @@
       "name": "local_simulator",
       "num_qubits": -1,
       "is_simulator": true,
-      "provider": "AWS",
-      "is_default": true
+      "is_local": true
     }
   ]
 }
