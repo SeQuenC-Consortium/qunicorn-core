@@ -19,11 +19,13 @@ from braket.tasks.local_quantum_task_batch import LocalQuantumTaskBatch
 
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
+from qunicorn_core.db.database_services import device_db_service, provider_db_service
+from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
-from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
@@ -108,3 +110,15 @@ class AWSPilot(Pilot):
             for aws_result in aws_results
         ]
         return result_dtos
+
+    def save_devices_from_provider(self, device_request):
+        provider: ProviderDataclass = provider_db_service.get_provider_by_name(self.provider_name)
+        aws_device: DeviceDataclass = DeviceDataclass(
+            provider_id=provider.id,
+            num_qubits=-1,
+            name="local_simulator",
+            is_simulator=True,
+            is_local=True,
+            provider=provider,
+        )
+        device_db_service.save_device_by_name(aws_device)

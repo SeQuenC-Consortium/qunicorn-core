@@ -14,6 +14,7 @@
 
 from . import (
     pilotmanager,
+    mapper,
     deployment_service,
     job_manager_service,
     job_service,

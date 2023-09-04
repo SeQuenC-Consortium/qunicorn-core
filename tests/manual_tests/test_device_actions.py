@@ -17,7 +17,7 @@
 import pytest
 from qiskit_ibm_provider.api.exceptions import RequestsApiError
 
-from qunicorn_core.api.api_models import DeviceRequest
+from qunicorn_core.api.api_models import DeviceRequestDto
 from qunicorn_core.core import device_service
 from tests.conftest import set_up_env
 
@@ -26,7 +26,7 @@ from tests.conftest import set_up_env
 def test_get_devices_invalid_token():
     """Testing the device request for get request from IBM"""
     app = set_up_env()
-    device_request_dto: DeviceRequest = DeviceRequest(provider="IBM", token="abcde")
+    device_request_dto: DeviceRequestDto = DeviceRequestDto(provider="IBM", token="abcde")
 
     with app.app_context():
         with pytest.raises(Exception) as exception:

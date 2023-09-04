@@ -24,7 +24,7 @@ from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, Runtime
 
 from qunicorn_core.api.api_models import JobCoreDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from qunicorn_core.db.database_services import job_db_service
+from qunicorn_core.db.database_services import job_db_service, device_db_service, provider_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
@@ -262,3 +262,28 @@ class IBMPilot(Pilot):
             name="IMBJob",
             results=[ResultDataclass(result_dict={"0x": "550", "1x": "450"})],
         )
+
+    def save_devices_from_provider(self, device_request):
+        ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(device_request.token)
+        all_devices = ibm_provider.backends()
+        provider: ProviderDataclass = provider_db_service.get_provider_by_name(self.provider_name)
+        for ibm_device in all_devices:
+            device: DeviceDataclass = DeviceDataclass(
+                name=ibm_device.name,
+                num_qubits=-1 if ibm_device.name.__contains__("stabilizer") else ibm_device.num_qubits,
+                is_simulator=ibm_device.name.__contains__("simulator"),
+                is_local=False,
+                provider_id=provider.id,
+                provider=provider,
+            )
+            device_db_service.save_device_by_name(device)
+
+        device: DeviceDataclass = DeviceDataclass(
+            name="aer_simulator",
+            num_qubits=-1,
+            is_simulator=True,
+            is_local=True,
+            provider_id=provider.id,
+            provider=provider,
+        )
+        device_db_service.save_device_by_name(device)

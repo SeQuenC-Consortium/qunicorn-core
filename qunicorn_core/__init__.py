@@ -28,7 +28,7 @@ from flask.logging import default_handler
 from flask_cors import CORS
 from tomli import load as load_toml
 
-from . import api, celery, db, licenses
+from . import api, celery, db, licenses, core, util
 from .api import jwt
 from .util import logging
 from .util.config import ProductionConfig, DebugConfig

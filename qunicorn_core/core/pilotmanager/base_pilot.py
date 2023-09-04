@@ -14,7 +14,7 @@
 import json
 import os
 
-from qunicorn_core.api.api_models import JobCoreDto
+from qunicorn_core.api.api_models import JobCoreDto, DeviceRequestDto
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
@@ -31,6 +31,26 @@ class Pilot:
     provider_name: ProviderName
     supported_language: list[AssemblerLanguage]
 
+    def run(self, job: JobCoreDto) -> list[ResultDataclass]:
+        """Run a job of type RUNNER on a backend using a Pilot"""
+        raise NotImplementedError()
+
+    def execute_provider_specific(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
+        """Execute a job of a provider specific type on a backend using a Pilot"""
+        raise NotImplementedError()
+
+    def get_standard_provider(self) -> ProviderDataclass:
+        """Create the standard ProviderDataclass Object for the pilot and return it"""
+        raise NotImplementedError()
+
+    def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
+        """Create the standard ProviderDataclass Object for the pilot and return it"""
+        raise NotImplementedError()
+
+    def save_devices_from_provider(self, device_request: DeviceRequestDto):
+        """Create the standard ProviderDataclass Object for the pilot and return it"""
+        raise NotImplementedError()
+
     def execute(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute a job on a backend using a Pilot"""
 
@@ -38,24 +58,6 @@ class Pilot:
             return self.run(job_core_dto)
         else:
             return self.execute_provider_specific(job_core_dto)
-
-    def run(self, job: JobCoreDto) -> list[ResultDataclass]:
-        """Run a job of type RUNNER on a backend using a Pilot"""
-
-        raise NotImplementedError()
-
-    def execute_provider_specific(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
-        """Execute a job of a provider specific type on a backend using a Pilot"""
-
-        raise NotImplementedError()
-
-    def get_standard_provider(self) -> ProviderDataclass:
-        """Create the standard ProviderDataclass Object for the pilot and return it"""
-
-        raise NotImplementedError()
-
-    def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
-        """Create the standard ProviderDataclass Object for the pilot and return it"""
 
     def is_my_provider(self, provider_name):
         return self.provider_name == provider_name

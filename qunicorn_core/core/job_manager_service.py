@@ -18,11 +18,12 @@ import yaml
 from braket.circuits import Circuit
 from qiskit import QuantumCircuit
 
+from qunicorn_core.api.api_models import DeviceRequestDto, SimpleDeviceDto
 from qunicorn_core.api.api_models.job_dtos import (
     JobCoreDto,
 )
 from qunicorn_core.celery import CELERY
-from qunicorn_core.core.mapper import result_mapper
+from qunicorn_core.core.mapper import result_mapper, device_mapper
 from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
@@ -146,3 +147,10 @@ def save_default_jobs_and_devices_from_provider():
         db_service.get_session().add(job)
         db_service.get_session().add_all(device_list_without_default)
         db_service.get_session().commit()
+
+
+def save_and_get_devices_from_provider(device_request: DeviceRequestDto) -> list[SimpleDeviceDto]:
+    for pilot in PILOTS:
+        if pilot.is_my_provider(device_request):
+            pilot.save_devices_from_provider(device_request)
+    return [device_mapper.dataclass_to_simple(device) for device in device_db_service.get_all_devices()]

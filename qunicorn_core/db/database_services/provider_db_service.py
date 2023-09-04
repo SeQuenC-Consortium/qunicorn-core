@@ -16,6 +16,7 @@
 
 from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.util import logging
 
 
 def get_all_providers() -> list[ProviderDataclass]:
@@ -26,3 +27,15 @@ def get_all_providers() -> list[ProviderDataclass]:
 def get_provider_by_id(provider_id: int) -> ProviderDataclass:
     """Get a provider by id"""
     return db_service.get_database_object_by_id(provider_id, ProviderDataclass)
+
+
+def get_provider_by_name(provider_name: str) -> ProviderDataclass:
+    """Returns the provider with the name provider_name"""
+    devices: list[ProviderDataclass] = (
+        db_service.get_session().query(ProviderDataclass).filter(ProviderDataclass.name == provider_name).all()
+    )
+
+    if len(devices) != 1:
+        logging.warn(f"There exists multiple or zero provider with the same name {provider_name}")
+
+    return devices[0]
