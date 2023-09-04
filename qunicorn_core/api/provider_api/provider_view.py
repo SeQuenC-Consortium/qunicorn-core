@@ -21,7 +21,7 @@ from flask.views import MethodView
 from .root import PROVIDER_API
 from ..api_models.provider_dtos import ProviderDtoSchema
 
-from ...core import providermanager_service
+from ...core import provider_service
 
 
 @PROVIDER_API.route("/")
@@ -31,7 +31,7 @@ class ProviderView(MethodView):
     @PROVIDER_API.response(HTTPStatus.OK, ProviderDtoSchema(many=True))
     def get(self):
         """Get all providers from the database"""
-        return providermanager_service.get_all_providers()
+        return provider_service.get_all_providers()
 
 
 @PROVIDER_API.route("/<string:provider_id>/")
@@ -41,4 +41,4 @@ class ProviderIDView(MethodView):
     @PROVIDER_API.response(HTTPStatus.OK, ProviderDtoSchema())
     def get(self, provider_id):
         """Get information about a single provider."""
-        return providermanager_service.get_provider_by_id(provider_id)
+        return provider_service.get_provider_by_id(provider_id)

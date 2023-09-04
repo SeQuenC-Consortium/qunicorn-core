@@ -15,7 +15,7 @@
 """"Test class to test the functionality of the job_api"""
 
 from qunicorn_core.api.api_models import JobRequestDto, SimpleJobDto
-from qunicorn_core.core.jobmanager_service import create_and_run_job
+from qunicorn_core.core import job_service
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
@@ -48,8 +48,8 @@ def create_and_run_runner(device: str):
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM)
-        return_dto: SimpleJobDto = create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QASM2)
+        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
@@ -69,8 +69,8 @@ def test_create_and_run_sampler():
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM)
-        return_dto: SimpleJobDto = create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QASM2)
+        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
@@ -90,8 +90,8 @@ def test_create_and_run_estimator():
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM)
-        return_dto: SimpleJobDto = create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QASM2)
+        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
@@ -110,10 +110,8 @@ def test_run_qiskit_input_on_runner():
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(
-            job_request_dto, ProviderName.IBM, assembler_language=AssemblerLanguage.QISKIT
-        )
-        return_dto: SimpleJobDto = create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QISKIT)
+        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():

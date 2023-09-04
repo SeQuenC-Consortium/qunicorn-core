@@ -16,6 +16,7 @@
 """Module containing all Dtos and their Schemas for tasks in the Jobmanager API."""
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 import marshmallow as ma
 
@@ -78,6 +79,7 @@ class JobCoreDto:
     ibm_file_options: dict | None = None
     ibm_file_inputs: dict | None = None
     token: str | None = None
+    transpiled_circuits: Optional[list] = None
 
     # TODO: check if datatype is accuarte
     provider_specific_id: str | None = None

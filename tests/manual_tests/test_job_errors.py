@@ -15,16 +15,16 @@
 """"Test class to test the functionality of the job_api"""
 
 import pytest
-from qiskit.qasm2 import QASM2ParseError
 from qiskit_ibm_provider.accounts import InvalidAccountError
 from qiskit_ibm_provider.api.exceptions import RequestsApiError
 
 from qunicorn_core.api.api_models import JobRequestDto, DeploymentRequestDto
-from qunicorn_core.core import jobmanager_service
+from qunicorn_core.core import job_service
 from qunicorn_core.core.mapper import deployment_mapper
 from qunicorn_core.db.database_services import job_db_service, db_service, user_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
@@ -46,7 +46,7 @@ def test_invalid_token():
     # WHEN: Executing create and run
     with app.app_context():
         with pytest.raises(Exception) as exception:
-            jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+            job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Test if correct Error was thrown and job is saved in db with error
     with app.app_context():
@@ -60,7 +60,9 @@ def test_invalid_circuit():
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data_IBM.json"))
     job_request_dto.device_name = "ibmq_qasm_simulator"
-    deployment_dto: DeploymentRequestDto = test_utils.get_test_deployment_request(ProviderName.IBM)
+    deployment_dto: DeploymentRequestDto = test_utils.get_test_deployment_request(
+        ProviderName.IBM, AssemblerLanguage.QISKIT
+    )
     deployment_dto.programs[0].quantum_circuit = "invalid circuit"
 
     # WHEN: Executing create and run
@@ -70,11 +72,11 @@ def test_invalid_circuit():
         depl_id: int = db_service.save_database_object(deployment).id
         job_request_dto.deployment_id = depl_id
         with pytest.raises(Exception) as exception:
-            jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+            job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Test if QasmError was thrown and job is saved in db with error
     with app.app_context():
-        assert QASM2ParseError.__name__ in str(exception)
+        assert "TranspileError" in str(exception)
         assert job_finished_with_error()
 
 
@@ -90,7 +92,7 @@ def test_invalid_token_for_sampler():
     # WHEN: Executing create and run
     with app.app_context():
         with pytest.raises(Exception) as exception:
-            jobmanager_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+            job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Test if correct Error was thrown and job is saved in db with error
     with app.app_context():

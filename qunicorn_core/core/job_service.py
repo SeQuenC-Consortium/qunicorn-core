@@ -22,38 +22,13 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobResponseDto,
     JobExecutePythonFileDto,
 )
-from qunicorn_core.celery import CELERY
-from qunicorn_core.core.mapper import job_mapper, result_mapper
-from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
-from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
+from qunicorn_core.core import job_manager_service
+from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
-from qunicorn_core.static.enums.provider_name import ProviderName
 
 ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
-
-
-@CELERY.task()
-def run_job(job_core_dto_dict: dict):
-    """Assign the job to the target pilot which executes the job"""
-
-    job_core_dto: JobCoreDto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
-
-    device = job_core_dto.executed_on
-
-    if device.provider.name == ProviderName.IBM:
-        qiskit_pilot: IBMPilot = IBMPilot("QP")
-        qiskit_pilot.execute(job_core_dto)
-    elif job_core_dto.executed_on.provider.name == ProviderName.AWS:
-        aws_pilot: AWSPilot = AWSPilot("AP")
-        aws_pilot.execute(job_core_dto)
-    else:
-        exception: Exception = ValueError("No valid Target specified")
-        job_db_service.update_finished_job(
-            job_core_dto.id, result_mapper.exception_to_error_results(exception), JobState.ERROR
-        )
-        raise exception
 
 
 def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = ASYNCHRONOUS) -> SimpleJobDto:
@@ -61,10 +36,17 @@ def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = ASYN
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
+    run_job_with_celery(job_core_dto, asynchronous)
+    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.RUNNING)
+
+
+def run_job_with_celery(job_core_dto: JobCoreDto, asynchronous: bool):
     serialized_job_core_dto = yaml.dump(job_core_dto)
     job_core_dto_dict = {"data": serialized_job_core_dto}
-    run_job.delay(job_core_dto_dict) if asynchronous else run_job(job_core_dto_dict)
-    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.RUNNING)
+    if asynchronous:
+        job_manager_service.run_job.delay(job_core_dto_dict)
+    else:
+        job_manager_service.run_job(job_core_dto_dict)
 
 
 def re_run_job_by_id(job_id: int, token: str) -> SimpleJobDto:
@@ -82,11 +64,7 @@ def run_job_by_id(job_id: int, job_exec_dto: JobExecutePythonFileDto, asyn: bool
     job_core_dto.ibm_file_inputs = job_exec_dto.python_file_inputs
     job_core_dto.ibm_file_options = job_exec_dto.python_file_options
     job_core_dto.token = job_exec_dto.token
-
-    serialized_job_core_dto = yaml.dump(job_core_dto)
-    job_core_dto_dict = {"data": serialized_job_core_dto}
-    run_job.delay(job_core_dto_dict) if asyn else run_job(job_core_dto_dict)
-
+    run_job_with_celery(job_core_dto, asyn)
     return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.RUNNING)
 
 

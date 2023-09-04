@@ -15,8 +15,9 @@
 from . import (
     pilotmanager,
     deployment_service,
-    jobmanager_service,
-    devicemanager_service,
-    providermanager_service,
-    usermanager_service,
+    job_manager_service,
+    job_service,
+    device_service,
+    provider_service,
+    user_service,
 )
