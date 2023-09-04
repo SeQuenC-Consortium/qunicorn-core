@@ -27,6 +27,7 @@ from .db import DB
 from .models.deployment import DeploymentDataclass
 from .models.quantum_program import QuantumProgramDataclass
 from .models.user import UserDataclass
+from ..core import job_manager_service
 from ..static.enums.assembler_languages import AssemblerLanguage
 from ..util.logging import get_logger
 
@@ -53,7 +54,7 @@ def create_db():
 
 
 def create_db_function(app: Flask):
-    DB.session.create_all()
+    DB.create_all()
     get_logger(app, DB_COMMAND_LOGGER).info("Database created.")
 
 
@@ -69,7 +70,7 @@ def load_db_function(app: Flask):
     DB.session.add(create_default_braket_deployment(user))
     DB.session.add(create_default_qiskit_deployment(user))
     DB.session.commit()
-    # job_manager_service.save_default_jobs_and_devices_from_provider()
+    job_manager_service.save_default_jobs_and_devices_from_provider()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
 
 
