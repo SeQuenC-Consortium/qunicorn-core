@@ -97,13 +97,6 @@
       "is_simulator": true,
       "provider": "IBM",
       "is_default": true
-    },
-    {
-      "name": "local_simulator",
-      "num_qubits": -1,
-      "is_simulator": true,
-      "provider": "AWS",
-      "is_default": true
     }
   ]
 }

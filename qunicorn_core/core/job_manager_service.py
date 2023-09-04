@@ -27,9 +27,10 @@ from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
 from qunicorn_core.core.transpiler.transpiler_manager import transpile_manager
-from qunicorn_core.db.database_services import job_db_service
+from qunicorn_core.db.database_services import job_db_service, device_db_service, user_db_service, db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
+from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.util import logging
@@ -56,6 +57,7 @@ def run_job(job_core_dto_dict: dict):
             can be directly used for aws instead of transpiling it manually to braket
             """
             __transpile_circuits(job_core_dto, pilot.supported_language[0])
+            pilot.get_standard_devices()
             logging.info(f"Run job with id {job_core_dto.id} on {pilot.__class__}")
             results = pilot.execute(job_core_dto)
             break
@@ -133,3 +135,14 @@ def get_circuit_when_qasm3_on_aws(program):
     method used because of analog step for braket/qiskit
     """
     return program.quantum_circuit
+
+
+def save_default_jobs_and_devices_from_provider():
+    user: UserDataclass = user_db_service.get_default_user()
+    for pilot in PILOTS:
+        device_list_without_default, default_device = pilot.get_standard_devices()
+        saved_device = device_db_service.save_device_by_name(default_device)
+        job: JobDataclass = pilot.get_standard_job_with_deployment(user, saved_device)
+        db_service.get_session().add(job)
+        db_service.get_session().add_all(device_list_without_default)
+        db_service.get_session().commit()
