@@ -44,7 +44,7 @@ def test_create_and_run_aws_local_simulator():
 
 
 def test_get_results_from_aws_local_simulator_qasm3_job():
-    """creates a new job again and tests the result of the aws local simulator in the db with a qasm3 circuit"""
+    """creates a new job and tests the result of the aws local simulator in the db with a qasm3 circuit"""
     # GIVEN: Database Setup - AWS added as a provider
     app = set_up_env()
 
@@ -63,7 +63,7 @@ def test_get_results_from_aws_local_simulator_qasm3_job():
 
 
 def test_get_results_from_aws_local_simulator_braket_job():
-    """creates a new job again and tests the result of the aws local simulator in the db with a braket circuit"""
+    """creates a new job and tests the result of the aws local simulator in the db with a braket circuit"""
     # GIVEN: Database Setup - AWS added as a provider
     app = set_up_env()
 

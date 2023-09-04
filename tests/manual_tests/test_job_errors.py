@@ -67,7 +67,7 @@ def test_invalid_circuit():
 
     # WHEN: Executing create and run
     with app.app_context():
-        deployment: DeploymentDataclass = deployment_mapper.request_dto_to_deployment(deployment_dto)
+        deployment: DeploymentDataclass = deployment_mapper.request_to_dataclass(deployment_dto)
         deployment.deployed_by = user_db_service.get_default_user()
         depl_id: int = db_service.save_database_object(deployment).id
         job_request_dto.deployment_id = depl_id

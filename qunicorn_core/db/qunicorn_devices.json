@@ -4,6 +4,7 @@
       "name": "ibm_perth",
       "num_qubits": 7,
       "is_simulator": false,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -11,6 +12,7 @@
       "name": "ibm_lagos",
       "num_qubits": 7,
       "is_simulator": false,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -18,6 +20,7 @@
       "name": "ibm_nairobi",
       "num_qubits": 7,
       "is_simulator": false,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -25,6 +28,7 @@
       "name": "ibmq_jakarta",
       "num_qubits": 7,
       "is_simulator": false,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -32,6 +36,7 @@
       "name": "ibmq_manila",
       "num_qubits": 5,
       "is_simulator": false,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -39,6 +44,7 @@
       "name": "ibmq_quito",
       "num_qubits": 5,
       "is_simulator": false,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -46,6 +52,7 @@
       "name": "ibmq_belem",
       "num_qubits": 5,
       "is_simulator": false,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -53,6 +60,7 @@
       "name": "ibmq_lima",
       "num_qubits": 5,
       "is_simulator": false,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -60,6 +68,7 @@
       "name": "simulator_stabilizer",
       "num_qubits": 5000,
       "is_simulator": true,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -67,6 +76,7 @@
       "name": "simulator_mps",
       "num_qubits": 100,
       "is_simulator": true,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -74,6 +84,7 @@
       "name": "simulator_extended_stabilizer",
       "num_qubits": 63,
       "is_simulator": true,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -81,6 +92,7 @@
       "name": "ibmq_qasm_simulator",
       "num_qubits": 32,
       "is_simulator": true,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -88,6 +100,7 @@
       "name": "simulator_statevector",
       "num_qubits": 32,
       "is_simulator": true,
+      "is_local": false,
       "provider": "IBM",
       "is_default": false
     },
@@ -95,6 +108,7 @@
       "name": "aer_simulator",
       "num_qubits": -1,
       "is_simulator": true,
+      "is_local": true,
       "provider": "IBM",
       "is_default": true
     },
@@ -102,6 +116,7 @@
       "name": "local_simulator",
       "num_qubits": -1,
       "is_simulator": true,
+      "is_local": true,
       "provider": "AWS",
       "is_default": true
     }

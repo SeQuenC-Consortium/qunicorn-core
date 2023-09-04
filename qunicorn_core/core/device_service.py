@@ -40,8 +40,9 @@ def update_devices(device_request: DeviceRequest):
         aws_device: DeviceDataclass = DeviceDataclass(
             provider_id=2,
             num_qubits=-1,
-            device_name="local_simulator",
-            is_simulator=1,
+            name="local_simulator",
+            is_simulator=True,
+            is_local=True,
             provider="AWS",
         )
         device_db_service.save_device_by_name(aws_device)
@@ -56,8 +57,9 @@ def update_ibm_devices_in_db(all_devices: dict):
         final_device: DeviceDataclass = DeviceDataclass(
             provider_id=device["provider_id"],
             num_qubits=device["num_qubits"],
-            device_name=device["name"],
+            name=device["name"],
             is_simulator=device["is_simulator"],
+            is_local=False,
             provider=db_service.get_database_object_by_id(1, ProviderDataclass),
         )
         device_db_service.save_device_by_name(final_device)
@@ -70,7 +72,8 @@ def get_device_dict(devices: [IBMBackend]) -> dict:
         device_dict = {
             "name": device.name,
             "num_qubits": -1 if device.name.__contains__("stabilizer") else device.num_qubits,
-            "is_simulator": 1 if device.name.__contains__("simulator") else 0,
+            "is_simulator": device.name.__contains__("simulator"),
+            "is_local": False,
             "provider_id": 1,
             "provider": None,
         }
@@ -81,12 +84,12 @@ def get_device_dict(devices: [IBMBackend]) -> dict:
 
 def get_all_devices() -> list[SimpleDeviceDto]:
     """Gets all Devices from the DB and maps them"""
-    return [device_mapper.device_to_simple_device(device) for device in device_db_service.get_all_devices()]
+    return [device_mapper.dataclass_to_simple(device) for device in device_db_service.get_all_devices()]
 
 
 def get_device_by_id(device_id: int) -> DeviceDto:
     """Gets a Device from the DB by its ID and maps it"""
-    return device_mapper.device_to_device_dto(device_db_service.get_device_by_id(device_id))
+    return device_mapper.dataclass_to_dto(device_db_service.get_device_by_id(device_id))
 
 
 def check_if_device_available(device_id: int, token: str) -> dict:
@@ -95,7 +98,7 @@ def check_if_device_available(device_id: int, token: str) -> dict:
     if device.provider.name == ProviderName.IBM:
         ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
         try:
-            ibm_provider.get_backend(device.device_name)
+            ibm_provider.get_backend(device.name)
             return {"backend": "Available"}
         except QiskitBackendNotFoundError:
             return {"backend": "Not Found"}
@@ -113,7 +116,7 @@ def get_device_from_provider(device_id: int, token: str) -> dict:
     # TODO add AWS Device and find common calibration data
     if device.provider.name == ProviderName.IBM:
         ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
-        backend = ibm_provider.get_backend(device.device_name)
+        backend = ibm_provider.get_backend(device.name)
         config_dict: dict = vars(backend.configuration())
         config_dict["u_channel_lo"] = None
         config_dict["_qubit_channel_map"] = None
