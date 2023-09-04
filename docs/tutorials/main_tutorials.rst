@@ -9,3 +9,7 @@ Tutorials
    docker
    kubernetes
    pilot_tutorial
+   rtd_setup_testing.rst
+   testing.rst
+   linting_formatting.rst
+   useful_commands.rst

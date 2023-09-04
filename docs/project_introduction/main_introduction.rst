@@ -9,5 +9,4 @@ This will give a short overview over the functionality of the project and how to
    :caption: Contents:
 
    project_description
-   project_structure
    functionality_workflows
