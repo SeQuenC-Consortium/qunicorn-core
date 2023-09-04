@@ -23,7 +23,7 @@ from qunicorn_core.util import logging
 def get_device_by_name(device_name: str) -> DeviceDataclass:
     """Returns the default device of the provider with the name provider_name"""
     devices: list[DeviceDataclass] = (
-        db_service.get_session().query(DeviceDataclass).filter(DeviceDataclass.device_name == device_name).all()
+        db_service.get_session().query(DeviceDataclass).filter(DeviceDataclass.name == device_name).all()
     )
 
     if len(devices) != 1:
@@ -46,7 +46,7 @@ def save_device_by_name(device: DeviceDataclass) -> DeviceDataclass:
     """Updates device object in database if it exists and creates new entry if it doesn't exist"""
     device_exists_and_is_updated = (
         session.query(DeviceDataclass)
-        .filter(DeviceDataclass.device_name == device.device_name)
+        .filter(DeviceDataclass.name == device.name)
         .update(
             {"num_qubits": device.num_qubits, "provider_id": device.provider_id, "is_simulator": device.is_simulator}
         )

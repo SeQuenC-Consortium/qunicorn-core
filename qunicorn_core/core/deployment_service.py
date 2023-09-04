@@ -46,7 +46,7 @@ def update_deployment(deployment_dto: DeploymentRequestDto, deployment_id: int) 
 
 def delete_deployment(id: int) -> DeploymentDto:
     """Remove one deployment by id"""
-    db_deployment = deployment_mapper.deployment_to_deployment_dto(deployment_db_service.get_deployment_by_id(id))
+    db_deployment = deployment_mapper.dataclass_to_dto(deployment_db_service.get_deployment_by_id(id))
     if len(job_db_service.get_jobs_by_deployment_id(db_deployment.id)) > 0:
         raise ValueError("Deployment is in use by a job")
     deployment_db_service.delete(id)
@@ -55,6 +55,6 @@ def delete_deployment(id: int) -> DeploymentDto:
 
 def create_deployment(deployment_dto: DeploymentRequestDto) -> DeploymentDto:
     """Create a deployment and save it in the database"""
-    deployment: DeploymentDataclass = deployment_mapper.request_dto_to_deployment(deployment_dto)
+    deployment: DeploymentDataclass = deployment_mapper.request_to_dataclass(deployment_dto)
     deployment = deployment_db_service.create(deployment)
-    return deployment_mapper.deployment_to_deployment_dto(deployment)
+    return deployment_mapper.dataclass_to_dto(deployment)

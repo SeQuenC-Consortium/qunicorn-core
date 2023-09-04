@@ -18,13 +18,12 @@ from braket.tasks import GateModelQuantumTaskResult
 from braket.tasks.local_quantum_task_batch import LocalQuantumTaskBatch
 
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
-from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
+from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
@@ -41,8 +40,11 @@ class AWSPilot(Pilot):
 
     supported_language: list[AssemblerLanguage] = [AssemblerLanguage.BRAKET, AssemblerLanguage.QASM3]
 
-    def run(self, job_core_dto):
+    def run(self, job_core_dto: JobCoreDto):
         """Execute the job on a local simulator and saves results in the database"""
+        if not job_core_dto.executed_on.is_local:
+            raise return_exception_and_update_job(job_core_dto.id, ValueError("Device need to be local for AWS"))
+
         device = LocalSimulator()
         quantum_tasks: LocalQuantumTaskBatch = device.run_batch(
             job_core_dto.transpiled_circuits, shots=job_core_dto.shots
@@ -53,10 +55,7 @@ class AWSPilot(Pilot):
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
 
-        exception: Exception = ValueError("No valid Job Type specified")
-        results = result_mapper.exception_to_error_results(exception)
-        job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
-        raise exception
+        raise return_exception_and_update_job(job_core_dto.id, ValueError("No valid Job Type specified"))
 
     def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
         language: AssemblerLanguage = AssemblerLanguage.QASM3
