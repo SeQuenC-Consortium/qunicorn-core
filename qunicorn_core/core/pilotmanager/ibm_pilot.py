@@ -283,7 +283,7 @@ class IBMPilot(Pilot):
         )
         device_db_service.save_device_by_name(device)
 
-    def check_if_device_available(self, device: DeviceDto, token: str) -> bool:
+    def is_device_available(self, device: DeviceDto, token: str) -> bool:
         ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
         try:
             ibm_provider.get_backend(device.name)

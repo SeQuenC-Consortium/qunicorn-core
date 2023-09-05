@@ -48,10 +48,6 @@ def run_job(job_core_dto_dict: dict):
 
     for pilot in PILOTS:
         if pilot.has_same_provider(device.provider.name):
-            """
-            TODO when multiple languages are supported maybe pick a specific instead of default since for example qasm3
-            can be directly used for aws instead of transpiling it manually to braket
-            """
             __transpile_circuits(job_core_dto, pilot.supported_language)
             logging.info(f"Run job with id {job_core_dto.id} on {pilot.__class__}")
             results = pilot.execute(job_core_dto)

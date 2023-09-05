@@ -48,7 +48,7 @@ def update_and_get_devices_from_provider(device_request: DeviceRequestDto) -> li
 def check_if_device_available_from_provider(device, token) -> bool:
     for pilot in PILOTS:
         if pilot.has_same_provider(device.provider.name):
-            return pilot.check_if_device_available(device, token)
+            return pilot.is_device_available(device, token)
     return False
 
 

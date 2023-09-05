@@ -51,7 +51,7 @@ class Pilot:
         """Create the standard ProviderDataclass Object for the pilot and return it"""
         raise NotImplementedError()
 
-    def check_if_device_available(self, device: DeviceDto, token: str) -> bool:
+    def is_device_available(self, device: DeviceDto, token: str) -> bool:
         """Check if a device is available for a user"""
         raise NotImplementedError()
 

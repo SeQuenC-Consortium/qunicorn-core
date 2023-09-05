@@ -128,6 +128,6 @@ class AWSPilot(Pilot):
     def get_standard_provider(self):
         return ProviderDataclass(with_token=False, supported_language=self.supported_language, name=self.provider_name)
 
-    def check_if_device_available(self, device: DeviceDto, token: str) -> bool:
+    def is_device_available(self, device: DeviceDto, token: str) -> bool:
         logging.info("AWS local simulator is always available")
         return True
