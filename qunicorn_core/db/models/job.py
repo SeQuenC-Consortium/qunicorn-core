@@ -81,7 +81,5 @@ class JobDataclass(DbModel):
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     data: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     parameters: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-    
-    # TODO check if the chosen datatype is accurate
     provider_specific_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     celery_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)

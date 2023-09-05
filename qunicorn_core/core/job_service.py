@@ -118,7 +118,7 @@ def cancel_job_by_id(job_id, token):
     device = job_core_dto.executed_on
 
     for pilot in PILOTS:
-        if pilot.is_my_provider(device.provider.name):
+        if pilot.has_same_provider(device.provider.name):
             return pilot.cancel(job_core_dto)
     
 
