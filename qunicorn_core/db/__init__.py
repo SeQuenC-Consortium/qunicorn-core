@@ -22,6 +22,7 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
 from . import db, database_services, models, cli
+from .db import DB, MIGRATE
 
 
 def register_db(app: Flask):
@@ -29,12 +30,12 @@ def register_db(app: Flask):
     if not app.config.get("SQLALCHEMY_DATABASE_URI"):
         app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{app.instance_path}/{app.import_name}.db"
 
-    db.DB.init_app(app)
+    DB.init_app(app)
     app.logger.info(f'Connected to db "{app.config["SQLALCHEMY_DATABASE_URI"]}".')
 
     cli.register_cli_blueprint(app)
 
-    db.MIGRATE.init_app(app, db.DB)
+    MIGRATE.init_app(app, DB)
 
     # Apply additional config for Sqlite databases
     if app.config.get("SQLALCHEMY_DATABASE_URI", "").startswith("sqlite://"):
