@@ -80,9 +80,8 @@ class IBMPilot(Pilot):
 
     def cancel_provider_specific(self, job_dto: JobCoreDto):
         """Cancel a job on an IBM backend using the IBM Pilot"""
-        provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
-        backend = provider.get_backend(job_dto.executed_on.name)
-        if backend.retrieve_job(job_dto.provider_specific_id).cancel():
+        job = self.__get_qiskit_job_from_qiskit_runtime(job_dto)
+        if job.cancel():
             job_db_service.update_attribute(job_dto.id, JobState.CANCELED, JobDataclass.state)
             logging.info(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} successful.")
             return True
@@ -116,6 +115,13 @@ class IBMPilot(Pilot):
         service: QiskitRuntimeService = QiskitRuntimeService()
         backend: BackendV1 = service.get_backend(job_dto.executed_on.name)
         return backend, job_dto.transpiled_circuits
+
+    def __get_qiskit_job_from_qiskit_runtime(self, job_dto: JobCoreDto):
+        """Returns the job of the provider specific ID created on the given account"""
+
+        self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
+        service: QiskitRuntimeService = QiskitRuntimeService()
+        return service.job(job_dto.provider_specific_id)
 
     @staticmethod
     def get_ibm_provider_and_login(token: str) -> IBMProvider:

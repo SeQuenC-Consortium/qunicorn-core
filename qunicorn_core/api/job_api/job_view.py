@@ -104,4 +104,4 @@ class JobCancelView(MethodView):
     def post(self, body, job_id: str):
         """TBD: Cancel a job execution via id."""
         logging.info("Request: cancel job")
-        return jsonify(job_service.cancel_job_by_id(job_id))
+        return jsonify(job_service.cancel_job_by_id(job_id, body["token"]))

@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import celery.result
 from celery.contrib.abortable import AbortableAsyncResult
+from celery.states import PENDING
 
 from qunicorn_core.api.api_models import JobCoreDto
 from qunicorn_core.celery import CELERY
@@ -39,17 +41,17 @@ class Pilot:
             return self.execute_provider_specific(job_core_dto)
 
     def cancel(self, job: JobCoreDto):
-        print(job)
         if job.state == JobState.CREATED and not JobCoreDto.celery_id == "synchronous":
-            print("aborting")
             res = CELERY.AsyncResult(job.celery_id)
-            res.revoke()
-            job_db_service.update_attribute(job.id, JobState.CANCELED, JobDataclass.state)
-            return True
+            if res.status == PENDING:
+                res.revoke()
+                job_db_service.update_attribute(job.id, JobState.CANCELED, JobDataclass.state)
+                return True
+            else:
+                return False
         elif job.state == JobState.RUNNING:
             return self.cancel_provider_specific(job)
         else:
-            print("skipping")
             return False
 
     def run(self, job: JobCoreDto) -> list[ResultDataclass]:

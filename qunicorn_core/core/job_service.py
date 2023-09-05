@@ -46,11 +46,9 @@ def run_job_with_celery(job_core_dto: JobCoreDto, asynchronous: bool):
     serialized_job_core_dto = yaml.dump(job_core_dto)
     job_core_dto_dict = {"data": serialized_job_core_dto}
     if asynchronous:
-        print("Going Asynch")
-        task = job_manager_service.run_job.apply_async(args=[job_core_dto_dict], countdown=30)
+        task = job_manager_service.run_job.delay(job_core_dto_dict)
         job_db_service.update_attribute(job_core_dto.id, task.id, JobDataclass.celery_id)
     else:
-        print("Going Synch")
         job_manager_service.run_job(job_core_dto_dict)
         job_db_service.update_attribute(job_core_dto.id, "synchronous", JobDataclass.celery_id)
 
@@ -108,7 +106,7 @@ def send_job_to_pilot():
     raise NotImplementedError
 
 
-def cancel_job_by_id(job_id):
+def cancel_job_by_id(job_id, token):
     """cancel job execution"""
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
     job_request: JobRequestDto = job_mapper.dataclass_to_request(job)
@@ -116,6 +114,7 @@ def cancel_job_by_id(job_id):
     job_core_dto.celery_id = job.celery_id
     job_core_dto.provider_specific_id = job.provider_specific_id
     job_core_dto.state = job.state
+    job_core_dto.token = token
     device = job_core_dto.executed_on
 
     for pilot in PILOTS:
