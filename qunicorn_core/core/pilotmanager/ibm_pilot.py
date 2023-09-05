@@ -66,7 +66,9 @@ class IBMPilot(Pilot):
             provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
             backend = provider.get_backend(job_dto.executed_on.name)
 
-        result = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots).result()
+        job = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots)
+        job_db_service.update_attribute(job_dto.id, job.job_id(), JobDataclass.celery_id)
+        result = job.result()
         results: list[ResultDataclass] = IBMPilot.__map_runner_results_to_dataclass(result, job_dto)
 
         # AerCircuit is not serializable and needs to be removed
@@ -76,17 +78,18 @@ class IBMPilot(Pilot):
 
         return results
 
-    def cancel(self, job_dto: JobCoreDto):
+    def cancel_provider_specific(self, job_dto: JobCoreDto):
         """Cancel a job on an IBM backend using the IBM Pilot"""
-        provider = self.__get_ibm_provider_login_and_update_job(job_dto.token, job_dto.id)
-        backend = provider.get_backend(job_dto.executed_on.device_name)
-        if(backend.retrieve_job(job_dto.provider_specific_id).cancel()):
-            # TODO: Perhaps better way to log that the job has been canceled?
-            job_db_service.delete(job_dto.id)
+        provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
+        backend = provider.get_backend(job_dto.executed_on.name)
+        if backend.retrieve_job(job_dto.provider_specific_id).cancel():
+            job_db_service.update_attribute(job_dto.id, JobState.CANCELED, JobDataclass.state)
             logging.info(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} successful.")
+            return True
         else:
-            # TODO: use this? job_db_service.update_attribute(job_dto.id, JobState.ERROR, JobDataclass.state)
+            job_db_service.update_attribute(job_dto.id, JobState.ERROR, JobDataclass.state)
             logging.warn(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} failed.")
+            return False
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""

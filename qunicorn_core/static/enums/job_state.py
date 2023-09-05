@@ -31,3 +31,5 @@ class JobState(StrEnum):
     FINISHED = "FINISHED"
     BLOCKED = "BLOCKED"
     ERROR = "ERROR"
+    CANCELED = "CANCELED"
+    CREATED = "CREATED"

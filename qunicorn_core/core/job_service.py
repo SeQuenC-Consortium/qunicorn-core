@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 from os import environ
 
 import yaml
@@ -23,6 +24,7 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobExecutePythonFileDto,
 )
 from qunicorn_core.core import job_manager_service
+from qunicorn_core.core.job_manager_service import PILOTS
 from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
@@ -37,16 +39,21 @@ def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = ASYN
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
     run_job_with_celery(job_core_dto, asynchronous)
-    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.RUNNING)
+    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.CREATED)
 
 
 def run_job_with_celery(job_core_dto: JobCoreDto, asynchronous: bool):
     serialized_job_core_dto = yaml.dump(job_core_dto)
     job_core_dto_dict = {"data": serialized_job_core_dto}
     if asynchronous:
-        job_manager_service.run_job.delay(job_core_dto_dict)
+        print("Going Asynch")
+        task = job_manager_service.run_job.apply_async(args=[job_core_dto_dict], countdown=30)
+        job_db_service.update_attribute(job_core_dto.id, task.id, JobDataclass.celery_id)
     else:
+        print("Going Synch")
         job_manager_service.run_job(job_core_dto_dict)
+        job_db_service.update_attribute(job_core_dto.id, "synchronous", JobDataclass.celery_id)
+
 
 
 def re_run_job_by_id(job_id: int, token: str) -> SimpleJobDto:
@@ -106,16 +113,14 @@ def cancel_job_by_id(job_id):
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
     job_request: JobRequestDto = job_mapper.dataclass_to_request(job)
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request)
+    job_core_dto.celery_id = job.celery_id
+    job_core_dto.provider_specific_id = job.provider_specific_id
+    job_core_dto.state = job.state
     device = job_core_dto.executed_on
 
-    # TODO: check if job is executed. If not, remove it from the celery queue
-    # else:
-    if device.provider.name == ProviderName.IBM:
-        qiskit_pilot: IBMPilot = IBMPilot("QP")
-        qiskit_pilot.cancel(job_core_dto)
-    elif job_core_dto.executed_on.provider.name == ProviderName.AWS:
-        # cancel aws job not supported yet
-        raise NotImplementedError
+    for pilot in PILOTS:
+        if pilot.is_my_provider(device.provider.name):
+            return pilot.cancel(job_core_dto)
     
 
 

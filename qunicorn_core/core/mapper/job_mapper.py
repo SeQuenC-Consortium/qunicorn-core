@@ -99,7 +99,7 @@ def dataclass_to_request(job: JobDataclass) -> JobRequestDto:
             "provider_name": job.executed_on.provider.name,
             "token": "",
             "deployment_id": job.deployment.id,
-            "device_name": job.executed_on.device_name,
+            "device_name": job.executed_on.name,
         },
     )
 

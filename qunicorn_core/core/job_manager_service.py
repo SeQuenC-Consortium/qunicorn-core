@@ -11,12 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import time
 from os import environ
 from typing import Optional
 
 import yaml
 from braket.circuits import Circuit
 from qiskit import QuantumCircuit
+
+from celery.contrib.abortable import AbortableTask
 
 from qunicorn_core.api.api_models.job_dtos import (
     JobCoreDto,
@@ -42,7 +45,6 @@ PILOTS: list[Pilot] = [IBMPilot(), AWSPilot()]
 @CELERY.task()
 def run_job(job_core_dto_dict: dict):
     """Assign the job to the target pilot which executes the job"""
-
     job_core_dto: JobCoreDto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
 
     device = job_core_dto.executed_on

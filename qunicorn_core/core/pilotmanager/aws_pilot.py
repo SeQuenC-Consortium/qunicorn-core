@@ -22,6 +22,7 @@ from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
+from qunicorn_core.util import logging
 
 
 class AWSPilot(Pilot):
@@ -48,6 +49,10 @@ class AWSPilot(Pilot):
 
         raise return_exception_and_update_job(job_core_dto.id, ValueError("No valid Job Type specified"))
 
+    def cancel_provider_specific(self, job_dto):
+        logging.warn(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} failed."
+                     f"Canceling while in execution not supported for AWS Jobs")
+        return False
     @staticmethod
     def __map_simulator_results_to_dataclass(
         aws_results: list[GateModelQuantumTaskResult],

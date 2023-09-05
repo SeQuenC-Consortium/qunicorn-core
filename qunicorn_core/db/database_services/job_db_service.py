@@ -29,7 +29,7 @@ def create_database_job(job_core: JobCoreDto):
     """Creates a database job with the given circuit and saves it in the database"""
     default_user: UserDataclass = user_db_service.get_default_user()
     db_job: JobDataclass = job_mapper.core_to_dataclass(job_core)
-    db_job.state = JobState.RUNNING
+    db_job.state = JobState.CREATED
     db_job.progress = 0
     db_job.executed_by = default_user
     db_job.deployment = deployment_db_service.get_deployment_by_id(job_core.deployment.id)

@@ -83,6 +83,7 @@ class JobCoreDto:
 
     # TODO: check if datatype is accuarte
     provider_specific_id: str | None = None
+    celery_id: str | None = None
 
 
 @dataclass
