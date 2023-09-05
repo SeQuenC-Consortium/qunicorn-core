@@ -29,7 +29,7 @@ class Pilot:
     """Base class for Pilots"""
 
     provider_name: ProviderName
-    supported_language: list[AssemblerLanguage]
+    supported_language: AssemblerLanguage
 
     def run(self, job: JobCoreDto) -> list[ResultDataclass]:
         """Run a job of type RUNNER on a backend using a Pilot"""
@@ -59,27 +59,30 @@ class Pilot:
         else:
             return self.execute_provider_specific(job_core_dto)
 
-    def is_my_provider(self, provider_name):
+    def has_same_provider(self, provider_name: ProviderName) -> bool:
+        """Check if the provider name is the same as the pilot provider name"""
         return self.provider_name == provider_name
 
     def get_standard_devices(self) -> (list[DeviceDataclass], DeviceDataclass):
         """Get all devices from the provider"""
-        provider_name_lower_case = self.provider_name.lower()
 
         root_dir = os.path.dirname(os.path.abspath(__file__))
-        file_name = "{}{}".format(provider_name_lower_case, "_standard_devices.json")
+        file_name = "{}{}".format(self.provider_name.lower(), "_standard_devices.json")
         path_dir = "{}{}{}{}{}".format(root_dir, os.sep, "pilot_resources", os.sep, file_name)
         with open(path_dir, "r", encoding="utf-8") as f:
             all_devices = json.load(f)
 
         provider: ProviderDataclass = self.get_standard_provider()
         devices_without_default: list[DeviceDataclass] = []
-        default_device: DeviceDataclass
+        default_device: DeviceDataclass | None = None
         for device_json in all_devices["all_devices"]:
             device: DeviceDataclass = DeviceDataclass(provider=provider, provider_id=provider.id, **device_json)
             if device.is_local:
                 default_device = device
             else:
                 devices_without_default.append(device)
+
+        if default_device is None:
+            raise ValueError("No default device found for provider {}".format(self.provider_name))
 
         return devices_without_default, default_device

@@ -15,8 +15,6 @@ from os import environ
 from typing import Optional
 
 import yaml
-from braket.circuits import Circuit
-from qiskit import QuantumCircuit
 
 from qunicorn_core.api.api_models import DeviceRequestDto, SimpleDeviceDto
 from qunicorn_core.api.api_models.job_dtos import (
@@ -27,6 +25,7 @@ from qunicorn_core.core.mapper import result_mapper, device_mapper
 from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
+from qunicorn_core.core.transpiler.pre_processing_manager import preprocessing_manager
 from qunicorn_core.core.transpiler.transpiler_manager import transpile_manager
 from qunicorn_core.db.database_services import job_db_service, device_db_service, user_db_service, db_service
 from qunicorn_core.db.models.job import JobDataclass
@@ -52,13 +51,12 @@ def run_job(job_core_dto_dict: dict):
     results: Optional[list[ResultDataclass]] = None
 
     for pilot in PILOTS:
-        if pilot.is_my_provider(device.provider.name):
+        if pilot.has_same_provider(device.provider.name):
             """
             TODO when multiple languages are supported maybe pick a specific instead of default since for example qasm3
             can be directly used for aws instead of transpiling it manually to braket
             """
-            __transpile_circuits(job_core_dto, pilot.supported_language[0])
-            pilot.get_standard_devices()
+            __transpile_circuits(job_core_dto, pilot.supported_language)
             logging.info(f"Run job with id {job_core_dto.id} on {pilot.__class__}")
             results = pilot.execute(job_core_dto)
             break
@@ -74,7 +72,7 @@ def run_job(job_core_dto_dict: dict):
     logging.info(f"Run job with id {job_core_dto.id} and get the result {results}")
 
 
-def __transpile_circuits(job_dto: JobCoreDto, destination_language: AssemblerLanguage):
+def __transpile_circuits(job_dto: JobCoreDto, dest_language: AssemblerLanguage):
     """Transforms the circuit string into IBM QuantumCircuit objects"""
     logging.info(f"Transpile all circuits of job with id{job_dto.id}")
     error_results: list[ResultDataclass] = []
@@ -82,19 +80,20 @@ def __transpile_circuits(job_dto: JobCoreDto, destination_language: AssemblerLan
 
     # Transform each circuit into a transpiled circuit for the necessary language
     for program in job_dto.deployment.programs:
+        src_language: AssemblerLanguage = program.assembler_language
         try:
-            if program.assembler_language == AssemblerLanguage.QISKIT:
-                quantum_circuit = get_circuit_when_qiskit_on_ibm(program)
-            elif program.assembler_language == AssemblerLanguage.BRAKET:
-                quantum_circuit = get_circuit_when_braket_on_aws(program)
-            else:
-                quantum_circuit = program.quantum_circuit
+            # Preprocess a string to a cricuit object if necessary
+            preprocessor = preprocessing_manager.get_preprocessor(src_language)
+            circuit = preprocessor(program.quantum_circuit)
 
-            transpiler = transpile_manager.get_transpiler(
-                src_language=program.assembler_language, dest_language=destination_language
-            )
-            transpiled_circuit = transpiler(quantum_circuit)
-            job_dto.transpiled_circuits.append(transpiled_circuit)
+            # We only need to transpile, when the source language is not the destination language
+            if src_language == dest_language:
+                job_dto.transpiled_circuits.append(circuit)
+                continue
+
+            # Transpile the circuit to the destination language
+            transpiler = transpile_manager.get_transpiler(src_language, dest_language)
+            job_dto.transpiled_circuits.append(transpiler(circuit))
         except Exception as exception:
             error_results.extend(result_mapper.exception_to_error_results(exception, program.quantum_circuit))
 
@@ -104,26 +103,8 @@ def __transpile_circuits(job_dto: JobCoreDto, destination_language: AssemblerLan
         raise Exception("TranspileError")
 
 
-def get_circuit_when_qiskit_on_ibm(program):
-    """
-    since the qiskit circuit modifies the circuit object instead of simple returning the object (it
-    returns the instruction set) the 'qiskit_circuit' is modified from the exec
-    """
-    circuit_globals = {"QuantumCircuit": QuantumCircuit}
-    exec(program.quantum_circuit, circuit_globals)
-    return circuit_globals["qiskit_circuit"]
-
-
-def get_circuit_when_braket_on_aws(program):
-    """
-    Method to remove switching away from braket to qasm and back to braket
-    """
-    # braket.Circuit needs to be included here as an import here so eval works with the type
-    circuit: Circuit = eval(program.quantum_circuit)
-    return circuit
-
-
 def save_default_jobs_and_devices_from_provider():
+    """Get all default data from the pilots and save them to the database"""
     user: UserDataclass = user_db_service.get_default_user()
     for pilot in PILOTS:
         device_list_without_default, default_device = pilot.get_standard_devices()
@@ -134,8 +115,9 @@ def save_default_jobs_and_devices_from_provider():
         db_service.get_session().commit()
 
 
-def save_and_get_devices_from_provider(device_request: DeviceRequestDto) -> list[SimpleDeviceDto]:
+def update_and_get_devices_from_provider(device_request: DeviceRequestDto) -> list[SimpleDeviceDto]:
+    """Update the devices from the provider and return all devices from the database"""
     for pilot in PILOTS:
-        if pilot.is_my_provider(device_request):
+        if pilot.has_same_provider(device_request.provider_name):
             pilot.save_devices_from_provider(device_request)
     return [device_mapper.dataclass_to_simple(device) for device in device_db_service.get_all_devices()]

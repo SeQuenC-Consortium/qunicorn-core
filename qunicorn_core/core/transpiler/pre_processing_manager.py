@@ -7,9 +7,10 @@ from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
 PreProcessor = Callable[[str], any]
 
+"""This Class handles all preprocessing that is needed to transform a circuit string into a circuit object"""
+
 
 class PreProcessingManager:
-
     def __init__(self):
         self._pre_processing_methods: dict[AssemblerLanguage, PreProcessor] = {}
         self._language_nodes = dict()
@@ -22,9 +23,16 @@ class PreProcessingManager:
         return decorator
 
     def get_preprocessor(self, language: AssemblerLanguage) -> PreProcessor:
+        """Either returns the registered preprocessing method or a method that returns the input"""
+
         preprocessor = self._pre_processing_methods.get(language)
+
+        def return_input(circuit: any) -> any:
+            return circuit
+
         if preprocessor is None:
-            preprocessor = lambda circuit: circuit
+            preprocessor = return_input
+
         return preprocessor
 
 
@@ -34,8 +42,8 @@ preprocessing_manager = PreProcessingManager()
 @preprocessing_manager.register(AssemblerLanguage.QISKIT)
 def pre_process_qiskit(program: str) -> QuantumCircuit:
     """
-    since the qiskit circuit modifies the circuit object instead of simple returning the object (it
-    returns the instruction set) the 'qiskit_circuit' is modified from the exec
+    since the qiskit circuit modifies the circuit object instead of simple returning the object
+    (it returns the QiskitCircuit from the instruction set) the 'qiskit_circuit' is modified from the exec
     """
     circuit_globals = {"QuantumCircuit": QuantumCircuit}
     exec(program, circuit_globals)
@@ -44,9 +52,6 @@ def pre_process_qiskit(program: str) -> QuantumCircuit:
 
 @preprocessing_manager.register(AssemblerLanguage.BRAKET)
 def pre_process_braket(program: str) -> Circuit:
-    """
-        braket.Circuit needs to be included here as an import here so eval works with the type
-    """
+    """braket.Circuit needs to be included here as an import here so eval works with the type"""
     circuit_globals = {"Circuit": Circuit}
-    circuit: Circuit = eval(program, circuit_globals)
-    return circuit
+    return eval(program, circuit_globals)

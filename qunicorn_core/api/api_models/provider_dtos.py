@@ -22,20 +22,22 @@ from ..flask_api_utils import MaBaseSchema
 
 __all__ = ["ProviderDtoSchema", "ProviderIDSchema", "ProviderDto"]
 
+from ...static.enums.provider_name import ProviderName
+
 
 @dataclass
 class ProviderDto:
     id: int
     with_token: bool
     supported_language: str
-    name: str
+    name: ProviderName
 
 
 class ProviderDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=True, allow_none=False)
     with_token = ma.fields.Boolean(required=False, allow_none=True)
     supported_language = ma.fields.String(required=False, allow_none=True)
-    name = ma.fields.String(required=True, allow_none=False)
+    name = ma.fields.Enum(required=True, allow_none=False, enum=ProviderName)
 
 
 class ProviderIDSchema(MaBaseSchema):

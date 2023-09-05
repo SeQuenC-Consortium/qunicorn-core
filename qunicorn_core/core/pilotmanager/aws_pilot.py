@@ -31,7 +31,6 @@ from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
-from qunicorn_core.static.enums.programming_language import ProgrammingLanguage
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 
@@ -41,7 +40,7 @@ class AWSPilot(Pilot):
 
     provider_name: ProviderName = ProviderName.AWS
 
-    supported_language: list[AssemblerLanguage] = [AssemblerLanguage.BRAKET, AssemblerLanguage.QASM3]
+    supported_language: AssemblerLanguage = AssemblerLanguage.BRAKET
 
     def run(self, job_core_dto: JobCoreDto):
         """Execute the job on a local simulator and saves results in the database"""
@@ -59,6 +58,26 @@ class AWSPilot(Pilot):
         """Execute a job of a provider specific type on a backend using a Pilot"""
 
         raise return_exception_and_update_job(job_core_dto.id, ValueError("No valid Job Type specified"))
+
+    @staticmethod
+    def __map_simulator_results_to_dataclass(
+        aws_results: list[GateModelQuantumTaskResult],
+        job_dto: JobCoreDto,
+    ) -> list[ResultDataclass]:
+        result_dtos: list[ResultDataclass] = [
+            ResultDataclass(
+                result_dict={
+                    "counts": dict(aws_result.measurement_counts.items()),
+                    "probabilities": aws_result.measurement_probabilities,
+                },
+                job_id=job_dto.id,
+                circuit=aws_result.additional_metadata.action.source,
+                meta_data="",
+                result_type=ResultType.COUNTS,
+            )
+            for aws_result in aws_results
+        ]
+        return result_dtos
 
     def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
         language: AssemblerLanguage = AssemblerLanguage.QASM3
@@ -92,26 +111,6 @@ class AWSPilot(Pilot):
             ],
         )
 
-    @staticmethod
-    def __map_simulator_results_to_dataclass(
-        aws_results: list[GateModelQuantumTaskResult],
-        job_dto: JobCoreDto,
-    ) -> list[ResultDataclass]:
-        result_dtos: list[ResultDataclass] = [
-            ResultDataclass(
-                result_dict={
-                    "counts": dict(aws_result.measurement_counts.items()),
-                    "probabilities": aws_result.measurement_probabilities,
-                },
-                job_id=job_dto.id,
-                circuit=aws_result.additional_metadata.action.source,
-                meta_data="",
-                result_type=ResultType.COUNTS,
-            )
-            for aws_result in aws_results
-        ]
-        return result_dtos
-
     def save_devices_from_provider(self, device_request):
         provider: ProviderDataclass = provider_db_service.get_provider_by_name(self.provider_name)
         aws_device: DeviceDataclass = DeviceDataclass(
@@ -125,8 +124,4 @@ class AWSPilot(Pilot):
         device_db_service.save_device_by_name(aws_device)
 
     def get_standard_provider(self):
-        return ProviderDataclass(
-            with_token=False,
-            supported_language=ProgrammingLanguage.BRAKET,
-            name=self.provider_name,
-        )
+        return ProviderDataclass(with_token=False, supported_language=self.supported_language, name=self.provider_name)

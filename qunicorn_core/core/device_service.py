@@ -25,8 +25,8 @@ from qunicorn_core.util import logging
 
 def update_devices(device_request: DeviceRequestDto):
     """Update all backends for the provider from device_request"""
-    logging.info(f"Update all available devices for {device_request.provider} in database.")
-    return job_manager_service.save_and_get_devices_from_provider(device_request)
+    logging.info(f"Update all available devices for {device_request.provider_name} in database.")
+    return job_manager_service.update_and_get_devices_from_provider(device_request)
 
 
 def get_all_devices() -> list[SimpleDeviceDto]:

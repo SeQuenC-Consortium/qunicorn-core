@@ -13,6 +13,8 @@ from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
 
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
+"""Class that handles all transpiling between different assembler languages"""
+
 
 @dataclasses.dataclass
 class TranspileStrategyStep:
@@ -45,7 +47,7 @@ class TranspileManager:
         return language_node
 
     def _find_transpile_strategy(
-        self, src_language: AssemblerLanguage, dest_language: AssemblerLanguage
+            self, src_language: AssemblerLanguage, dest_language: AssemblerLanguage
     ) -> list[TranspileStrategyStep]:
         dest_node = self._language_nodes[dest_language]
         paths = digraph_dijkstra_shortest_paths(

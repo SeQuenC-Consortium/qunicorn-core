@@ -45,7 +45,7 @@ class DeviceDto:
 
 @dataclass
 class DeviceRequestDto:
-    provider: str
+    provider_name: ProviderName
     token: str | None = None
 
 
@@ -58,7 +58,7 @@ class DeviceDtoSchema(MaBaseSchema):
 
 
 class DeviceRequestDtoSchema(MaBaseSchema):
-    provider = ma.fields.String(required=True, example="IBM")
+    provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     token = ma.fields.String(required=False, example="")
 
 
