@@ -44,9 +44,7 @@ def test_invalid_token():
     job_request_dto.token = "Invalid Token"
 
     # WHEN: Executing create and run
-    with app.app_context():
-        with pytest.raises(Exception) as exception:
-            job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+    exception = create_deployment_run_job_return_exception(app, job_request_dto)
 
     # THEN: Test if correct Error was thrown and job is saved in db with error
     with app.app_context():
@@ -90,14 +88,20 @@ def test_invalid_token_for_sampler():
     job_request_dto.type = JobType.SAMPLER
 
     # WHEN: Executing create and run
-    with app.app_context():
-        with pytest.raises(Exception) as exception:
-            job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+    exception = create_deployment_run_job_return_exception(app, job_request_dto)
 
     # THEN: Test if correct Error was thrown and job is saved in db with error
     with app.app_context():
         assert RequestsApiError.__name__ in str(exception) or InvalidAccountError.__name__ in str(exception)
         assert job_finished_with_error()
+
+
+def create_deployment_run_job_return_exception(app, job_request_dto):
+    with app.app_context():
+        with pytest.raises(Exception) as exception:
+            test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QASM2)
+            job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+    return exception
 
 
 def job_finished_with_error() -> bool:

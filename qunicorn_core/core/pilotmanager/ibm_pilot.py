@@ -12,26 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+from datetime import datetime
 
 import qiskit
 from qiskit.primitives import EstimatorResult, SamplerResult
-from qiskit.providers import BackendV1
+from qiskit.providers import BackendV1, QiskitBackendNotFoundError
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.result import Result
 from qiskit_ibm_provider import IBMProvider
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
 
-from qunicorn_core.api.api_models import JobCoreDto
+from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from qunicorn_core.db.database_services import job_db_service
+from qunicorn_core.db.database_services import job_db_service, device_db_service, provider_db_service
+from qunicorn_core.db.models.deployment import DeploymentDataclass
+from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
+from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
-from qunicorn_core.util import logging
+from qunicorn_core.util import logging, utils
 
 
 class IBMPilot(Pilot):
@@ -39,7 +45,7 @@ class IBMPilot(Pilot):
 
     provider_name: ProviderName = ProviderName.IBM
 
-    supported_language: list[AssemblerLanguage] = [AssemblerLanguage.QISKIT]
+    supported_language: AssemblerLanguage = AssemblerLanguage.QISKIT
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
@@ -243,3 +249,77 @@ class IBMPilot(Pilot):
                 )
             )
         return result_dtos
+
+    def get_standard_provider(self):
+        return ProviderDataclass(with_token=True, supported_language=self.supported_language, name=self.provider_name)
+
+    def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
+        language: AssemblerLanguage = AssemblerLanguage.QASM2
+        programs: list[QuantumProgramDataclass] = [
+            QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(1), assembler_language=language),
+            QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(2), assembler_language=language),
+        ]
+        deployment = DeploymentDataclass(
+            deployed_by=user,
+            programs=programs,
+            deployed_at=datetime.now(),
+            name="DeploymentIBMQasmName",
+        )
+
+        return JobDataclass(
+            executed_by=user,
+            executed_on=device,
+            deployment=deployment,
+            progress=0,
+            state=JobState.READY,
+            shots=4000,
+            type=JobType.RUNNER,
+            started_at=datetime.now(),
+            name="IMBJob",
+            results=[ResultDataclass(result_dict={"0x": "550", "1x": "450"})],
+        )
+
+    def save_devices_from_provider(self, device_request):
+        ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(device_request.token)
+        all_devices = ibm_provider.backends()
+        provider: ProviderDataclass = provider_db_service.get_provider_by_name(self.provider_name)
+        for ibm_device in all_devices:
+            device: DeviceDataclass = DeviceDataclass(
+                name=ibm_device.name,
+                num_qubits=-1 if ibm_device.name.__contains__("stabilizer") else ibm_device.num_qubits,
+                is_simulator=ibm_device.name.__contains__("simulator"),
+                is_local=False,
+                provider_id=provider.id,
+                provider=provider,
+            )
+            device_db_service.save_device_by_name(device)
+
+        device: DeviceDataclass = DeviceDataclass(
+            name="aer_simulator",
+            num_qubits=-1,
+            is_simulator=True,
+            is_local=True,
+            provider_id=provider.id,
+            provider=provider,
+        )
+        device_db_service.save_device_by_name(device)
+
+    def is_device_available(self, device: DeviceDto, token: str) -> bool:
+        ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
+        try:
+            ibm_provider.get_backend(device.name)
+            return True
+        except QiskitBackendNotFoundError:
+            return False
+
+    def get_device_data_from_provider(self, device: DeviceDto, token: str) -> dict:
+        ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
+        backend = ibm_provider.get_backend(device.name)
+        config_dict: dict = vars(backend.configuration())
+        # Remove some not serializable fields
+        config_dict["u_channel_lo"] = None
+        config_dict["_qubit_channel_map"] = None
+        config_dict["_channel_qubit_map"] = None
+        config_dict["_control_channels"] = None
+        config_dict["gates"] = None
+        return config_dict

@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from qunicorn_core.core.mapper import provider_mapper
 from qunicorn_core.api.api_models.provider_dtos import ProviderDto
+from qunicorn_core.core.mapper import provider_mapper
 from qunicorn_core.db.database_services import provider_db_service
 
 

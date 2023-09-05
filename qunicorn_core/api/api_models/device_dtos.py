@@ -26,8 +26,8 @@ __all__ = [
     "SimpleDeviceDtoSchema",
     "SimpleDeviceDto",
     "DeviceDto",
-    "DeviceRequest",
-    "DeviceRequestSchema",
+    "DeviceRequestDto",
+    "DeviceRequestDtoSchema",
 ]
 
 from ...static.enums.provider_name import ProviderName
@@ -44,8 +44,8 @@ class DeviceDto:
 
 
 @dataclass
-class DeviceRequest:
-    provider: str
+class DeviceRequestDto:
+    provider_name: ProviderName
     token: str | None = None
 
 
@@ -57,8 +57,8 @@ class DeviceDtoSchema(MaBaseSchema):
     provider = ma.fields.Nested(ProviderDtoSchema())
 
 
-class DeviceRequestSchema(MaBaseSchema):
-    provider = ma.fields.String(required=True, example="IBM")
+class DeviceRequestDtoSchema(MaBaseSchema):
+    provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
     token = ma.fields.String(required=False, example="")
 
 
