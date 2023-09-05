@@ -80,6 +80,6 @@ class DevicesCalibrationView(MethodView):
         """Get configuration data for a specific device in a uniform way."""
 
         device_request: DeviceRequestDto = DeviceRequestDto(**device_request_data)
-        device = device_service.get_device_from_provider(device_id, device_request.token)
+        device = device_service.get_device_data_from_provider(device_id, device_request.token)
 
         return jsonify(device)

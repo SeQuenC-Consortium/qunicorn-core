@@ -17,6 +17,7 @@ from braket.devices import LocalSimulator
 from braket.tasks import GateModelQuantumTaskResult
 from braket.tasks.local_quantum_task_batch import LocalQuantumTaskBatch
 
+from qunicorn_core.api.api_models import DeviceDto
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.db.database_services import device_db_service, provider_db_service
@@ -33,6 +34,7 @@ from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
+from qunicorn_core.util import logging
 
 
 class AWSPilot(Pilot):
@@ -125,3 +127,7 @@ class AWSPilot(Pilot):
 
     def get_standard_provider(self):
         return ProviderDataclass(with_token=False, supported_language=self.supported_language, name=self.provider_name)
+
+    def check_if_device_available(self, device: DeviceDto, token: str) -> bool:
+        logging.info("AWS local simulator is always available")
+        return True

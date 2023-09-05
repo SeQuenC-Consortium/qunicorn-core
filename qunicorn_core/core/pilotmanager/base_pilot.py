@@ -14,7 +14,7 @@
 import json
 import os
 
-from qunicorn_core.api.api_models import JobCoreDto, DeviceRequestDto
+from qunicorn_core.api.api_models import JobCoreDto, DeviceRequestDto, DeviceDto
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
@@ -49,6 +49,14 @@ class Pilot:
 
     def save_devices_from_provider(self, device_request: DeviceRequestDto):
         """Create the standard ProviderDataclass Object for the pilot and return it"""
+        raise NotImplementedError()
+
+    def check_if_device_available(self, device: DeviceDto, token: str) -> bool:
+        """Check if a device is available for a user"""
+        raise NotImplementedError()
+
+    def get_device_data_from_provider(self, device: DeviceDto, token: str) -> dict:
+        """Get device data for a specific device from the provider"""
         raise NotImplementedError()
 
     def execute(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:

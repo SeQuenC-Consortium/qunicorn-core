@@ -21,13 +21,14 @@ import datetime
 import click
 from flask import Flask, Blueprint, current_app
 
+import qunicorn_core.core.pilotmanager.pilot_manager
+
 # make sure all models are imported for CLI to work properly
 from . import models  # noqa
 from .db import DB
 from .models.deployment import DeploymentDataclass
 from .models.quantum_program import QuantumProgramDataclass
 from .models.user import UserDataclass
-from ..core import job_manager_service
 from ..static.enums.assembler_languages import AssemblerLanguage
 from ..util.logging import get_logger
 
@@ -70,7 +71,7 @@ def load_db_function(app: Flask):
     DB.session.add(create_default_braket_deployment(user))
     DB.session.add(create_default_qiskit_deployment(user))
     DB.session.commit()
-    job_manager_service.save_default_jobs_and_devices_from_provider()
+    qunicorn_core.core.pilotmanager.pilot_manager.save_default_jobs_and_devices_from_provider()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
 
 

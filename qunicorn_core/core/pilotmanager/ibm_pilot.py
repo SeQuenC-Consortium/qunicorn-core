@@ -16,13 +16,13 @@ from datetime import datetime
 
 import qiskit
 from qiskit.primitives import EstimatorResult, SamplerResult
-from qiskit.providers import BackendV1
+from qiskit.providers import BackendV1, QiskitBackendNotFoundError
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.result import Result
 from qiskit_ibm_provider import IBMProvider
 from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
 
-from qunicorn_core.api.api_models import JobCoreDto
+from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.db.database_services import job_db_service, device_db_service, provider_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
@@ -282,3 +282,23 @@ class IBMPilot(Pilot):
             provider=provider,
         )
         device_db_service.save_device_by_name(device)
+
+    def check_if_device_available(self, device: DeviceDto, token: str) -> bool:
+        ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
+        try:
+            ibm_provider.get_backend(device.name)
+            return True
+        except QiskitBackendNotFoundError:
+            return False
+
+    def get_device_data_from_provider(self, device: DeviceDto, token: str) -> dict:
+        ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
+        backend = ibm_provider.get_backend(device.name)
+        config_dict: dict = vars(backend.configuration())
+        # Remove some not serializable fields
+        config_dict["u_channel_lo"] = None
+        config_dict["_qubit_channel_map"] = None
+        config_dict["_channel_qubit_map"] = None
+        config_dict["_control_channels"] = None
+        config_dict["gates"] = None
+        return config_dict

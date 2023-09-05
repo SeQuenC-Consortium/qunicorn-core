@@ -16,28 +16,24 @@ from typing import Optional
 
 import yaml
 
-from qunicorn_core.api.api_models import DeviceRequestDto, SimpleDeviceDto
 from qunicorn_core.api.api_models.job_dtos import (
     JobCoreDto,
 )
 from qunicorn_core.celery import CELERY
-from qunicorn_core.core.mapper import result_mapper, device_mapper
-from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
-from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
+from qunicorn_core.core.mapper import result_mapper
+from qunicorn_core.core.pilotmanager.pilot_manager import PILOTS
 from qunicorn_core.core.transpiler.pre_processing_manager import preprocessing_manager
 from qunicorn_core.core.transpiler.transpiler_manager import transpile_manager
-from qunicorn_core.db.database_services import job_db_service, device_db_service, user_db_service, db_service
+from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
-from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.util import logging
 
-ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
+"""This Class is responsible for running a job on a pilot and scheduling them with celery"""
 
-PILOTS: list[Pilot] = [IBMPilot(), AWSPilot()]
+ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
 
 
 @CELERY.task()
@@ -101,23 +97,3 @@ def __transpile_circuits(job_dto: JobCoreDto, dest_language: AssemblerLanguage):
     if len(error_results) > 0:
         job_db_service.update_finished_job(job_dto.id, error_results, JobState.ERROR)
         raise Exception("TranspileError")
-
-
-def save_default_jobs_and_devices_from_provider():
-    """Get all default data from the pilots and save them to the database"""
-    user: UserDataclass = user_db_service.get_default_user()
-    for pilot in PILOTS:
-        device_list_without_default, default_device = pilot.get_standard_devices()
-        saved_device = device_db_service.save_device_by_name(default_device)
-        job: JobDataclass = pilot.get_standard_job_with_deployment(user, saved_device)
-        db_service.get_session().add(job)
-        db_service.get_session().add_all(device_list_without_default)
-        db_service.get_session().commit()
-
-
-def update_and_get_devices_from_provider(device_request: DeviceRequestDto) -> list[SimpleDeviceDto]:
-    """Update the devices from the provider and return all devices from the database"""
-    for pilot in PILOTS:
-        if pilot.has_same_provider(device_request.provider_name):
-            pilot.save_devices_from_provider(device_request)
-    return [device_mapper.dataclass_to_simple(device) for device in device_db_service.get_all_devices()]
