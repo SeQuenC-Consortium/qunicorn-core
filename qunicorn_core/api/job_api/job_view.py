@@ -102,6 +102,6 @@ class JobCancelView(MethodView):
     @JOBMANAGER_API.arguments(TokenSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     def post(self, body, job_id: str):
-        """TBD: Cancel a job execution via id."""
+        """Cancel a job execution via id."""
         logging.info("Request: cancel job")
         return jsonify(job_service.cancel_job_by_id(job_id, body["token"]))
