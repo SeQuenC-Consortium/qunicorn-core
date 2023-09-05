@@ -54,4 +54,4 @@ def save_device_by_name(device: DeviceDataclass) -> DeviceDataclass:
     if not device_exists_and_is_updated:
         session.add(device)
     session.commit()
-    return get_device_by_name(device.device_name)
+    return get_device_by_name(device.name)

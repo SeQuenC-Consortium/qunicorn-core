@@ -234,7 +234,7 @@ class IBMPilot(Pilot):
         return ProviderDataclass(
             with_token=True,
             supported_language=ProgrammingLanguage.QISKIT,
-            name=ProviderName.IBM,
+            name=self.provider_name,
         )
 
     def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:

@@ -31,6 +31,7 @@ from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
+from qunicorn_core.static.enums.programming_language import ProgrammingLanguage
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 
@@ -122,3 +123,10 @@ class AWSPilot(Pilot):
             provider=provider,
         )
         device_db_service.save_device_by_name(aws_device)
+
+    def get_standard_provider(self):
+        return ProviderDataclass(
+            with_token=False,
+            supported_language=ProgrammingLanguage.BRAKET,
+            name=self.provider_name,
+        )

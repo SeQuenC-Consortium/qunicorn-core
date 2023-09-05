@@ -1,85 +1,85 @@
 {
   "all_devices": [
     {
-      "device_name": "ibm_perth",
+      "name": "ibm_perth",
       "num_qubits": 7,
       "is_simulator": false,
       "is_local": false
     },
     {
-      "device_name": "ibm_lagos",
+      "name": "ibm_lagos",
       "num_qubits": 7,
       "is_simulator": false,
       "is_local": false
     },
     {
-      "device_name": "ibm_nairobi",
+      "name": "ibm_nairobi",
       "num_qubits": 7,
       "is_simulator": false,
       "is_local": false
     },
     {
-      "device_name": "ibmq_jakarta",
+      "name": "ibmq_jakarta",
       "num_qubits": 7,
       "is_simulator": false,
       "is_local": false
     },
     {
-      "device_name": "ibmq_manila",
+      "name": "ibmq_manila",
       "num_qubits": 5,
       "is_simulator": false,
       "is_local": false
     },
     {
-      "device_name": "ibmq_quito",
+      "name": "ibmq_quito",
       "num_qubits": 5,
       "is_simulator": false,
       "is_local": false
     },
     {
-      "device_name": "ibmq_belem",
+      "name": "ibmq_belem",
       "num_qubits": 5,
       "is_simulator": false,
       "is_local": false
     },
     {
-      "device_name": "ibmq_lima",
+      "name": "ibmq_lima",
       "num_qubits": 5,
       "is_simulator": false,
       "is_local": false
     },
     {
-      "device_name": "simulator_stabilizer",
+      "name": "simulator_stabilizer",
       "num_qubits": 5000,
       "is_simulator": true,
       "is_local": false
     },
     {
-      "device_name": "simulator_mps",
+      "name": "simulator_mps",
       "num_qubits": 100,
       "is_simulator": true,
       "is_local": false
     },
     {
-      "device_name": "simulator_extended_stabilizer",
+      "name": "simulator_extended_stabilizer",
       "num_qubits": 63,
       "is_simulator": true,
       "is_local": false
     },
     {
-      "device_name": "ibmq_qasm_simulator",
+      "name": "ibmq_qasm_simulator",
       "num_qubits": 32,
       "is_simulator": true,
       "is_local": false
     },
     {
-      "device_name": "simulator_statevector",
+      "name": "simulator_statevector",
       "num_qubits": 32,
       "is_simulator": true,
       "is_local": false
     },
     {
-      "device_name": "aer_simulator",
+      "name": "aer_simulator",
       "num_qubits": -1,
       "is_simulator": true,
       "is_local": true

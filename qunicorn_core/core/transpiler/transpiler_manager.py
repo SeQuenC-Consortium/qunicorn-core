@@ -1,15 +1,15 @@
 import dataclasses
 from functools import reduce
+from os import path
 from typing import Callable
 
 import qiskit.circuit
-from braket.circuits import Circuit
-from braket.circuits.serialization import IRType
-from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
-from braket.ir.openqasm import Program as OpenQASMProgram
 import qiskit.qasm2
 import qiskit.qasm3
-from os import path
+from braket.circuits import Circuit
+from braket.circuits.serialization import IRType
+from braket.ir.openqasm import Program as OpenQASMProgram
+from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
 
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 

@@ -83,21 +83,17 @@ def __transpile_circuits(job_dto: JobCoreDto, destination_language: AssemblerLan
     # Transform each circuit into a transpiled circuit for the necessary language
     for program in job_dto.deployment.programs:
         try:
-            qiskit = AssemblerLanguage.QISKIT
-            braket = AssemblerLanguage.BRAKET
-            qasm3 = AssemblerLanguage.QASM3
-            if destination_language == qiskit and program.assembler_language == qiskit:
-                transpiled_circuit = get_circuit_when_qiskit_on_ibm(program)
-            elif destination_language == braket and program.assembler_language == braket:
-                transpiled_circuit = get_circuit_when_braket_on_aws(program)
-            elif destination_language == qasm3 and program.assembler_language == qasm3:
-                # get_circuit_when_qasm3_on_aws as a method used because of analog step for braket/qiskit
-                transpiled_circuit = get_circuit_when_qasm3_on_aws(program)
+            if program.assembler_language == AssemblerLanguage.QISKIT:
+                quantum_circuit = get_circuit_when_qiskit_on_ibm(program)
+            elif program.assembler_language == AssemblerLanguage.BRAKET:
+                quantum_circuit = get_circuit_when_braket_on_aws(program)
             else:
-                transpiler = transpile_manager.get_transpiler(
-                    src_language=program.assembler_language, dest_language=destination_language
-                )
-                transpiled_circuit = transpiler(program.quantum_circuit)
+                quantum_circuit = program.quantum_circuit
+
+            transpiler = transpile_manager.get_transpiler(
+                src_language=program.assembler_language, dest_language=destination_language
+            )
+            transpiled_circuit = transpiler(quantum_circuit)
             job_dto.transpiled_circuits.append(transpiled_circuit)
         except Exception as exception:
             error_results.extend(result_mapper.exception_to_error_results(exception, program.quantum_circuit))
@@ -110,7 +106,6 @@ def __transpile_circuits(job_dto: JobCoreDto, destination_language: AssemblerLan
 
 def get_circuit_when_qiskit_on_ibm(program):
     """
-    TODO should be in the transpile manager
     since the qiskit circuit modifies the circuit object instead of simple returning the object (it
     returns the instruction set) the 'qiskit_circuit' is modified from the exec
     """
@@ -121,21 +116,11 @@ def get_circuit_when_qiskit_on_ibm(program):
 
 def get_circuit_when_braket_on_aws(program):
     """
-    TODO should be in the transpile manager
     Method to remove switching away from braket to qasm and back to braket
     """
     # braket.Circuit needs to be included here as an import here so eval works with the type
     circuit: Circuit = eval(program.quantum_circuit)
     return circuit
-
-
-def get_circuit_when_qasm3_on_aws(program):
-    """
-    TODO should be in the transpile manager
-    Method to remove switching away from qasm to braket since aws works with qasm already
-    method used because of analog step for braket/qiskit
-    """
-    return program.quantum_circuit
 
 
 def save_default_jobs_and_devices_from_provider():
