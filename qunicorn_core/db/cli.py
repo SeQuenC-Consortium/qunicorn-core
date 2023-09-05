@@ -47,9 +47,9 @@ DB_CLI = DB_CLI_BLP.cli  # expose as attribute for autodoc generation
 DB_COMMAND_LOGGER = "db"
 
 
-@DB_CLI.command("create-and-load-db")
-def create_load_db():
-    """Create all db tables."""
+@DB_CLI.command("recreate-and-load-db")
+def recreate_load_db():
+    """(Re-)create all db tables."""
     drop_db_function(current_app)
     create_db_function(current_app)
     load_db_function(current_app)
@@ -58,8 +58,9 @@ def create_load_db():
 
 @DB_CLI.command("create-db")
 def create_db():
-    """Create all db tables."""
+    """Create all db tables and load testdata."""
     create_db_function(current_app)
+    load_db_function(current_app)
     click.echo("Database created.")
 
 
@@ -71,7 +72,7 @@ def create_db_function(app: Flask):
 @DB_CLI.command("load-test-data")
 def load_test_data():
     """Load database test data"""
-    load_db_function(current_app)
+    load_db_function(current_app, if_not_exists=False)
     click.echo("Test Data Loaded.")
 
 
@@ -83,7 +84,10 @@ def get_quasm_string() -> str:
     return qc.qasm()
 
 
-def load_db_function(app: Flask):
+def load_db_function(app: Flask, if_not_exists=True):
+    if if_not_exists and DB.session.query(JobDataclass).first():
+        return
+
     user = UserDataclass(name="DefaultUser")
     qc = QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(1))
     qc2 = QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(2))
