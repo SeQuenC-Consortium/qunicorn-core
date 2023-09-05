@@ -17,7 +17,7 @@
 
 """Module containing database cli and api_models."""
 
-from flask import Flask, Blueprint
+from flask import Flask
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
@@ -32,10 +32,7 @@ def register_db(app: Flask):
     db.DB.init_app(app)
     app.logger.info(f'Connected to db "{app.config["SQLALCHEMY_DATABASE_URI"]}".')
 
-    """register the DB CLI blueprint."""
-    app.register_blueprint(Blueprint("db_cli", __name__, cli_group=None)
-                           )
-    app.logger.info("Registered blueprint.")
+    cli.register_cli_blueprint(app)
 
     db.MIGRATE.init_app(app, db.DB)
 

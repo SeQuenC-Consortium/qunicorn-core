@@ -102,3 +102,9 @@ def drop_db():
 def drop_db_function(app: Flask):
     db.DB.session.drop_all()
     get_logger(app, DB_COMMAND_LOGGER).info("Dropped Database.")
+
+
+def register_cli_blueprint(app: Flask):
+    """Method to register the DB CLI blueprint."""
+    app.register_blueprint(DB_CLI_BLP)
+    app.logger.info("Registered blueprint.")
