@@ -63,9 +63,9 @@ class AWSPilot(Pilot):
 
     @staticmethod
     def __map_simulator_results_to_dataclass(
-        aws_results: list[GateModelQuantumTaskResult],
-        job_dto: JobCoreDto,
+        aws_results: list[GateModelQuantumTaskResult], job_dto: JobCoreDto
     ) -> list[ResultDataclass]:
+        """Map the results from the aws simulator to a result dataclass object"""
         result_dtos: list[ResultDataclass] = [
             ResultDataclass(
                 result_dict={
@@ -82,6 +82,7 @@ class AWSPilot(Pilot):
         return result_dtos
 
     def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
+        """Get the standard job including its deployment for a certain user and device"""
         language: AssemblerLanguage = AssemblerLanguage.QASM3
         qasm3_str: str = (
             "OPENQASM 3; \nqubit[3] q;\nbit[3] c;\nh q[0];\ncnot q[0], q[1];\ncnot q[1], q[2];\nc = " "measure q;"
@@ -114,6 +115,10 @@ class AWSPilot(Pilot):
         )
 
     def save_devices_from_provider(self, device_request):
+        """
+        Save the available aws device into the database.
+        Since there is currently only a local simulator in use, the device_request parameter is unused.
+        """
         provider: ProviderDataclass = provider_db_service.get_provider_by_name(self.provider_name)
         aws_device: DeviceDataclass = DeviceDataclass(
             provider_id=provider.id,
