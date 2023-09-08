@@ -14,4 +14,4 @@
 
 """Module containing all automated tests."""
 
-from . import test_deployments, test_dummy, test_in_request_execution_aws, test_jobmanager
+from . import test_deployments, test_in_request_execution_aws, test_jobmanager_ibm

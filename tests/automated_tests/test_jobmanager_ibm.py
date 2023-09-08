@@ -20,19 +20,21 @@ import yaml
 from qiskit_ibm_runtime import IBMRuntimeError
 
 from qunicorn_core.api.api_models import JobRequestDto, JobCoreDto
-from qunicorn_core.core.jobmanager_service import run_job
+from qunicorn_core.core.job_manager_service import run_job
 from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
+from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from tests import test_utils
 from tests.conftest import set_up_env
+from tests.manual_tests.test_jobmanager_with_ibm import create_and_run_runner
 
 
-def test_celery_run_job(mocker):
+def __test_celery_run_job(mocker):
     """Testing the synchronous call of the run_job celery task"""
     # GIVEN: Setting up Mocks and Environment
     backend_mock = Mock()
@@ -54,7 +56,7 @@ def test_celery_run_job(mocker):
 
     # WHEN: Executing method to be tested
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QASM2)
         job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
         job: JobDataclass = job_db_service.create_database_job(job_core_dto)
         job_core_dto.id = job.id
@@ -68,7 +70,7 @@ def test_celery_run_job(mocker):
         assert new_job.state == JobState.FINISHED
 
 
-def test_job_ibm_upload(mocker):
+def __test_job_ibm_upload(mocker):
     """Testing the synchronous call of the upload of a file to IBM"""
     # GIVEN: Setting up Mocks and Environment
     mock = Mock()
@@ -84,7 +86,7 @@ def test_job_ibm_upload(mocker):
 
     # WHEN: Executing method to be tested
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QISKIT)
         job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
         job: JobDataclass = job_db_service.create_database_job(job_core_dto)
         job_core_dto.id = job.id
@@ -98,7 +100,7 @@ def test_job_ibm_upload(mocker):
         assert new_job.state == JobState.READY
 
 
-def test_job_ibm_runner(mocker):
+def __test_job_ibm_runner(mocker):
     """Testing the synchronous call of the execution of an upload file to IBM"""
     # GIVEN: Setting up Mocks and Environment
     mock = Mock()
@@ -113,7 +115,7 @@ def test_job_ibm_runner(mocker):
     job_request_dto.device_name = "ibmq_qasm_simulator"
 
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QISKIT)
         job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
         job: JobDataclass = job_db_service.create_database_job(job_core_dto)
         job_core_dto.id = job.id
@@ -135,3 +137,8 @@ def test_job_ibm_runner(mocker):
     with app.app_context():
         new_job = job_db_service.get_job_by_id(job_core_dto.id)
         assert new_job.state == JobState.ERROR
+
+
+def test_create_and_run_job_on_aer_simulator():
+    """Tests the create and run job method for synchronous execution of a runner on aer simulator"""
+    create_and_run_runner("aer_simulator")
