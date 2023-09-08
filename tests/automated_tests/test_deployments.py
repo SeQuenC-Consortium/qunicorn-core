@@ -19,7 +19,6 @@ from qunicorn_core.core import deployment_service
 from qunicorn_core.db.database_services import deployment_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
-from qunicorn_core.static.enums.provider_name import ProviderName
 from tests import test_utils
 from tests.conftest import set_up_env
 

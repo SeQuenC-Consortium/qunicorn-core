@@ -27,7 +27,6 @@ from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
-from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from tests import test_utils
 from tests.conftest import set_up_env
