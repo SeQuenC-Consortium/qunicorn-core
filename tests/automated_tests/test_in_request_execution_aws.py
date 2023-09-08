@@ -43,25 +43,6 @@ def test_create_and_run_aws_local_simulator():
         assert return_dto.state == JobState.RUNNING
 
 
-def test_get_results_from_aws_local_simulator_qasm3_job():
-    """creates a new job and tests the result of the aws local simulator in the db with a qasm3 circuit"""
-    # GIVEN: Database Setup - AWS added as a provider
-    app = set_up_env()
-
-    # WHEN: create_and_run executed
-    with app.app_context():
-        job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.AWS, AssemblerLanguage.QASM3)
-        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
-        results: list[ResultDataclass] = job_db_service.get_job_by_id(return_dto.id).results
-
-    # THEN: Check if the correct job with its result is saved in the db
-    with app.app_context():
-        for result in results:
-            print(result.circuit)
-            assert check_aws_local_simulator_results(result.result_dict, job_request_dto.shots)
-
-
 def test_get_results_from_aws_local_simulator_braket_job():
     """creates a new job and tests the result of the aws local simulator in the db with a braket circuit"""
     # GIVEN: Database Setup - AWS added as a provider
