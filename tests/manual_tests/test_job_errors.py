@@ -58,9 +58,7 @@ def test_invalid_circuit():
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data_IBM.json"))
     job_request_dto.device_name = "ibmq_qasm_simulator"
-    deployment_dto: DeploymentRequestDto = test_utils.get_test_deployment_request(
-        ProviderName.IBM, AssemblerLanguage.QISKIT
-    )
+    deployment_dto: DeploymentRequestDto = test_utils.get_test_deployment_request(AssemblerLanguage.QISKIT)
     deployment_dto.programs[0].quantum_circuit = "invalid circuit"
 
     # WHEN: Executing create and run
@@ -100,7 +98,7 @@ def create_deployment_run_job_return_exception(app, job_request_dto):
     """Creating an exception for the job errors"""
     with app.app_context():
         with pytest.raises(Exception) as exception:
-            test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QASM2)
+            test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QASM2)
             job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
     return exception
 
