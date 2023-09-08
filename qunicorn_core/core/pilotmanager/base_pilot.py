@@ -14,19 +14,6 @@
 import json
 import os
 
-from qunicorn_core.api.api_models import JobCoreDto, DeviceRequestDto, DeviceDto
-from qunicorn_core.db.models.device import DeviceDataclass
-from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.provider import ProviderDataclass
-from qunicorn_core.db.models.result import ResultDataclass
-from qunicorn_core.db.models.user import UserDataclass
-from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
-from qunicorn_core.static.enums.job_type import JobType
-from qunicorn_core.static.enums.provider_name import ProviderName
-
-import json
-import os
-
 
 from celery.states import PENDING
 
