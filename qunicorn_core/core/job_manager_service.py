@@ -22,7 +22,7 @@ from qunicorn_core.api.api_models.job_dtos import (
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.pilot_manager import PILOTS
-from qunicorn_core.core.transpiler.pre_processing_manager import preprocessing_manager
+from qunicorn_core.core.transpiler.preprocessing_manager import preprocessing_manager
 from qunicorn_core.core.transpiler.transpiler_manager import transpile_manager
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
@@ -64,7 +64,7 @@ def run_job(job_core_dto_dict: dict):
 
 
 def __transpile_circuits(job_dto: JobCoreDto, dest_language: AssemblerLanguage):
-    """Transforms the circuit string into IBM QuantumCircuit objects"""
+    """Transforms all circuits of the deployment into the circuits in the destination language"""
     logging.info(f"Transpile all circuits of job with id{job_dto.id}")
     error_results: list[ResultDataclass] = []
     job_dto.transpiled_circuits = []

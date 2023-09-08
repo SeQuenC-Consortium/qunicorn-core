@@ -22,7 +22,7 @@ from qunicorn_core.db.models.user import UserDataclass
 
 PILOTS: list[Pilot] = [IBMPilot(), AWSPilot()]
 
-""""This Class is responsible for managing the pilots and their data"""
+""""This Class is responsible for managing the pilots and their data, all pilots are saved in the PILOTS list"""
 
 
 def save_default_jobs_and_devices_from_provider():

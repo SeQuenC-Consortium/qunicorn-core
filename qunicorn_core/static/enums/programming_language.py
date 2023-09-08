@@ -23,13 +23,9 @@ class ProgrammingLanguage(StrEnum):
         PYQUIL: The programming language is PYQUIL
         QMWARE: The programming language is QMWARE
         BRAKET: The programming language is BRAKET
-        QRISP: Assembler format from Fraunhofer
-        BASIQ: Assembler format from QMWARE
     """
 
     QISKIT = "QISKIT"
     PYQUIL = "PYQUIL"
     QMWARE = "QMWARE"
-    QRISP = "QRISP"
-    BASIQ = "BASIQ"
     BRAKET = "BRAKET"

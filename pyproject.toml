@@ -56,6 +56,9 @@ pip-licenses = "^4.0.3"
 [tool.poetry.scripts]
 #flask = 'flask.cli:main'
 
+[tool.poetry.group.dev.dependencies]
+pydot = "^1.4.2"
+
 [tool.black]
 include = '\.pyi?$'
 line-length = 120

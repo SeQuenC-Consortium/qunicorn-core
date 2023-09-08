@@ -23,6 +23,8 @@ class AssemblerLanguage(StrEnum):
         BRAKET: Assembler format from AWS
         QISKIT: Assembler format form IBM
         PYTHON: Python language for IBM File Upload
+        QRISP: Assembler format from Fraunhofer
+        BASIQ: Assembler format from QMWARE
     """
 
     QASM2 = "QASM2"
@@ -31,3 +33,4 @@ class AssemblerLanguage(StrEnum):
     BRAKET = "BRAKET"
     QISKIT = "QISKIT"
     PYTHON = "PYTHON"
+    BASIQ = "BASIQ"

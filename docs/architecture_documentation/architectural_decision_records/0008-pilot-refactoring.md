@@ -1,6 +1,6 @@
-# [short title of solved problem and solution]
+# Pilot refactoring
 
-* Status: [proposed | rejected | accepted | deprecated | … | superseded by [ADR-0005](0005-example.md)] <!-- optional -->
+* Status: [proposed | rejected | accepted | deprecated | … | superseded by [ADR-0005]] <!-- optional -->
 * Deciders: [list everyone involved in the decision] <!-- optional -->
 * Date: [YYYY-MM-DD when the decision was last updated] <!-- optional -->
 
@@ -25,7 +25,8 @@ Technical Story: [description | ticket/issue URL] <!-- optional -->
 
 ## Decision Outcome
 
-Chosen option: "[option 1]", because [justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force force | … | comes out best (see below)].
+Chosen option: "[option 1]",
+because [justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force force | … | comes out best (see below)].
 
 ### Positive Consequences <!-- optional -->
 

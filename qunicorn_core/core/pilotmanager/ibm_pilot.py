@@ -73,7 +73,7 @@ class IBMPilot(Pilot):
             backend = provider.get_backend(job_dto.executed_on.name)
 
         job = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots)
-        job_db_service.update_attribute(job_dto.id, job.job_id(), JobDataclass.celery_id)
+        job_db_service.update_attribute(job_dto.id, job.job_id(), JobDataclass.provider_specific_id)
         result = job.result()
         results: list[ResultDataclass] = IBMPilot.__map_runner_results_to_dataclass(result, job_dto)
 
