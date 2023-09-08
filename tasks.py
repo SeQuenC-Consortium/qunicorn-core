@@ -689,7 +689,11 @@ def doc_index(c, filter_=""):
             hide="stdout",
         )
         print(
-            "".join(l for l in output.stdout.splitlines(True) if (l and not l[0].isspace()) or (not filter_) or (filter_ in l.lower())),
+            "".join(
+                l
+                for l in output.stdout.splitlines(True)
+                if (l and not l[0].isspace()) or (not filter_) or (filter_ in l.lower())
+            ),
         )
 
 

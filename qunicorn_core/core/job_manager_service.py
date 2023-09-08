@@ -11,13 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import time
 from os import environ
 from typing import Optional
 
 import yaml
-
-from celery.contrib.abortable import AbortableTask
 
 from qunicorn_core.api.api_models.job_dtos import (
     JobCoreDto,

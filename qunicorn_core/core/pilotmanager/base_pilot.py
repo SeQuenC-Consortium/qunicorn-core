@@ -88,7 +88,7 @@ class Pilot:
             return self.cancel_provider_specific(job)
         else:
             return False
-    
+
     def cancel_provider_specific(self, job):
         raise NotImplementedError()
 

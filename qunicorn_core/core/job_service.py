@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import logging
 from os import environ
 
 import yaml
@@ -51,7 +50,6 @@ def run_job_with_celery(job_core_dto: JobCoreDto, asynchronous: bool):
     else:
         job_manager_service.run_job(job_core_dto_dict)
         job_db_service.update_attribute(job_core_dto.id, "synchronous", JobDataclass.celery_id)
-
 
 
 def re_run_job_by_id(job_id: int, token: str) -> SimpleJobDto:
@@ -120,7 +118,6 @@ def cancel_job_by_id(job_id, token):
     for pilot in PILOTS:
         if pilot.has_same_provider(device.provider.name):
             return pilot.cancel(job_core_dto)
-    
 
 
 def get_jobs_by_deployment_id(deployment_id) -> list[JobResponseDto]:
