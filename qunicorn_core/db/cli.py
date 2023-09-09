@@ -48,7 +48,7 @@ DB_COMMAND_LOGGER = "db"
 
 
 @DB_CLI.command("recreate-and-load-db")
-def recreate_load_db():
+def recreate_and_load_db():
     """(Re-)create all db tables."""
     drop_db_function(current_app)
     create_db_function(current_app)
@@ -56,8 +56,8 @@ def recreate_load_db():
     click.echo("Database created and loaded.")
 
 
-@DB_CLI.command("create-db")
-def create_db():
+@DB_CLI.command("create-and-db")
+def create_and_load_db():
     """Create all db tables and load testdata."""
     create_db_function(current_app)
     load_db_function(current_app)
@@ -85,7 +85,8 @@ def get_quasm_string() -> str:
 
 
 def load_db_function(app: Flask, if_not_exists=True):
-    if if_not_exists and DB.session.query(JobDataclass).first():
+    db_is_empty = DB.session.query(JobDataclass).first() is None
+    if if_not_exists and not db_is_empty:
         return
 
     user = UserDataclass(name="DefaultUser")
