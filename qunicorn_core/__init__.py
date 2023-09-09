@@ -130,7 +130,6 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
 
     db.register_db(app)
 
-    jwt.register_jwt(app)
     api.register_root_api(app)
 
     # allow cors requests everywhere (CONFIGURE THIS TO YOUR PROJECTS NEEDS!)
