@@ -26,8 +26,8 @@ __all__ = [
     "SimpleDeviceDtoSchema",
     "SimpleDeviceDto",
     "DeviceDto",
-    "DeviceRequest",
-    "DeviceRequestSchema",
+    "DeviceRequestDto",
+    "DeviceRequestDtoSchema",
 ]
 
 from ...static.enums.provider_name import ProviderName
@@ -36,28 +36,30 @@ from ...static.enums.provider_name import ProviderName
 @dataclass
 class DeviceDto:
     id: int
-    device_name: str
+    name: str
     num_qubits: int
     is_simulator: bool
+    is_local: bool
     provider: ProviderDto | None = None
-    url: str | None = None
 
 
 @dataclass
-class DeviceRequest:
-    token: str
+class DeviceRequestDto:
+    provider_name: ProviderName
+    token: str | None = None
 
 
 class DeviceDtoSchema(MaBaseSchema):
-    device_id = ma.fields.Integer(required=True, allow_none=False, metadata={"description": "The unique deviceID."})
+    id = ma.fields.Integer(required=True, allow_none=False, metadata={"description": "The unique deviceID."})
     num_qubits = ma.fields.Integer(required=True, allow_none=False)
     is_simulator = ma.fields.Boolean(required=True, allow_none=False)
-    address_url = ma.fields.String(required=True, allow_none=False, metadata={"description": "URL of a device."})
+    is_local = ma.fields.Boolean(required=True, allow_none=False)
     provider = ma.fields.Nested(ProviderDtoSchema())
 
 
-class DeviceRequestSchema(MaBaseSchema):
-    token = ma.fields.String(required=True, example="")
+class DeviceRequestDtoSchema(MaBaseSchema):
+    provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
+    token = ma.fields.String(required=False, example="")
 
 
 @dataclass

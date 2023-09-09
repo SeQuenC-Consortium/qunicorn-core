@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe --file docker-compose.yaml convert --out minikube
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: worker
+  name: worker
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: worker
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe --file docker-compose.yaml convert --out minikube
+        kompose.version: 1.30.0 (9d8dcb518)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/qunicorn-core-qunicorn: "true"
+        io.kompose.service: worker
+    spec:
+      containers:
+        - env:
+            - name: BROKER_URL
+              value: redis://broker:6379
+            - name: CONTAINER_MODE
+              value: worker
+            - name: DB_URL
+              value: postgresql://postgres:passwd@postgres/qunicorn
+          image: qunicorn:local
+          name: worker
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}

@@ -31,7 +31,7 @@ from ..api_models.job_dtos import (
     JobExecutePythonFileDto,
     SimpleJobDto,
 )
-from ...core.jobmanager import jobmanager_service
+from ...core import job_service
 from ...util import logging
 
 
@@ -43,14 +43,14 @@ class JobIDView(MethodView):
     def get(self):
         """Get all created jobs."""
 
-        return jsonify(jobmanager_service.get_all_jobs())
+        return jsonify(job_service.get_all_jobs())
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.CREATED, SimpleJobDtoSchema())
     def post(self, body):
         """Create/Register and run new job."""
         job_dto: JobRequestDto = JobRequestDto(**body)
-        job_response: SimpleJobDto = jobmanager_service.create_and_run_job(job_dto)
+        job_response: SimpleJobDto = job_service.create_and_run_job(job_dto)
         return jsonify(job_response)
 
 
@@ -61,13 +61,13 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema())
     def get(self, job_id: str):
         """Get the details/results of a job."""
-        job_response_dto: JobResponseDto = jobmanager_service.get_job(int(job_id))
+        job_response_dto: JobResponseDto = job_service.get_job_by_id(int(job_id))
         return jsonify(job_response_dto), 200
 
     @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema())
     def delete(self, job_id: str):
         """Delete job data via id and return the deleted job."""
-        return jobmanager_service.delete_job_data_by_id(job_id)
+        return job_service.delete_job_data_by_id(job_id)
 
 
 @JOBMANAGER_API.route("/run/<string:job_id>/")
@@ -80,7 +80,7 @@ class JobRunView(MethodView):
         """Run job on IBM that was previously Uploaded."""
         logging.info("Request: run job")
         job_execution_dto: JobExecutePythonFileDto = JobExecutePythonFileDto(**body)
-        return jsonify(jobmanager_service.run_job_by_id(int(job_id), job_execution_dto)), 200
+        return jsonify(job_service.run_job_by_id(int(job_id), job_execution_dto)), 200
 
 
 @JOBMANAGER_API.route("/rerun/<string:job_id>/")
@@ -92,7 +92,7 @@ class JobReRunView(MethodView):
     def post(self, body, job_id: int):
         """Create a new job on basis of an existing job and execute it."""
         logging.info("Request: re run job")
-        return jsonify(jobmanager_service.re_run_job_by_id(job_id, body["token"]))
+        return jsonify(job_service.re_run_job_by_id(job_id, body["token"]))
 
 
 @JOBMANAGER_API.route("/cancel/<string:job_id>/")
@@ -104,33 +104,4 @@ class JobCancelView(MethodView):
     def post(self, body, job_id: str):
         """TBD: Cancel a job execution via id."""
         logging.info("Request: cancel job")
-        return jsonify(jobmanager_service.cancel_job_by_id(job_id))
-
-
-@JOBMANAGER_API.route("/pause/<string:job_id>/")
-class JobPauseView(MethodView):
-    """Jobs endpoint for a single job."""
-
-    @JOBMANAGER_API.arguments(TokenSchema(), location="json")
-    @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
-    def post(self, body, job_id: str):
-        """TBD: Pause a job via id."""
-        logging.info("Request: pause job")
-        return jsonify(jobmanager_service.pause_job_by_id(job_id))
-
-
-@JOBMANAGER_API.route("/<string:deployment_id>/")
-class JobsByDeploymentView(MethodView):
-    """API endpoint for jobs of a specific deployment."""
-
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))
-    def get(self, deployment_id: str):
-        """Get the details of all jobs with a specific deployment id."""
-        logging.info("Request: get jobs with deployment id")
-        return jsonify(jobmanager_service.get_jobs_by_deployment_id(deployment_id))
-
-    @JOBMANAGER_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))
-    def delete(self, deployment_id: str):
-        """Delete all jobs with a specific deployment id."""
-        logging.info("Request: delete jobs with deployment id")
-        return jsonify(jobmanager_service.delete_jobs_by_deployment_id(deployment_id))
+        return jsonify(job_service.cancel_job_by_id(job_id))

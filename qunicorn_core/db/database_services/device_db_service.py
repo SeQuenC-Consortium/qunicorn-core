@@ -20,10 +20,10 @@ from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.util import logging
 
 
-def get_device_with_name(device_name: str) -> DeviceDataclass:
+def get_device_by_name(device_name: str) -> DeviceDataclass:
     """Returns the default device of the provider with the name provider_name"""
     devices: list[DeviceDataclass] = (
-        db_service.get_session().query(DeviceDataclass).filter(DeviceDataclass.device_name == device_name).all()
+        db_service.get_session().query(DeviceDataclass).filter(DeviceDataclass.name == device_name).all()
     )
 
     if len(devices) != 1:
@@ -37,20 +37,21 @@ def get_all_devices() -> list[DeviceDataclass]:
     return db_service.get_all_database_objects(DeviceDataclass)
 
 
-def get_device(device_id: int) -> DeviceDataclass:
+def get_device_by_id(device_id: int) -> DeviceDataclass:
     """Get a device by id"""
     return db_service.get_database_object_by_id(device_id, DeviceDataclass)
 
 
-def save_device_by_name(device: DeviceDataclass):
+def save_device_by_name(device: DeviceDataclass) -> DeviceDataclass:
     """Updates device object in database if it exists and creates new entry if it doesn't exist"""
-    successful = (
+    device_exists_and_is_updated = (
         session.query(DeviceDataclass)
-        .filter(DeviceDataclass.device_name == device.device_name)
+        .filter(DeviceDataclass.name == device.name)
         .update(
             {"num_qubits": device.num_qubits, "provider_id": device.provider_id, "is_simulator": device.is_simulator}
         )
     )
-    if not successful:
+    if not device_exists_and_is_updated:
         session.add(device)
     session.commit()
+    return get_device_by_name(device.name)

@@ -16,12 +16,13 @@
 """Module containing all Dtos and their Schemas for tasks in the Jobmanager API."""
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 import marshmallow as ma
 
 from .deployment_dtos import DeploymentDto
 from .device_dtos import DeviceDto, DeviceDtoSchema
-from .result_dtos import ResultDto
+from .result_dtos import ResultDto, ResultDtoSchema
 from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
@@ -78,6 +79,7 @@ class JobCoreDto:
     ibm_file_options: dict | None = None
     ibm_file_inputs: dict | None = None
     token: str | None = None
+    transpiled_circuits: Optional[list] = None
 
 
 @dataclass
@@ -113,19 +115,18 @@ class JobExecutePythonFileDto:
 
 
 class JobRequestDtoSchema(MaBaseSchema):
-    name = ma.fields.String(required=True, example="JobName")
-    provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
-    device_name = ma.fields.String(required=True, example="aer_simulator")
+    name = ma.fields.String(required=True, metadata={"example": "JobName"})
+    provider_name = ma.fields.Enum(required=True, metadata={"example": ProviderName.IBM}, enum=ProviderName)
+    device_name = ma.fields.String(required=True, metadata={"example": "aer_simulator"})
     shots = ma.fields.Int(
         required=False,
         allow_none=True,
-        metadata={"label": "Shots", "description": "Number of shots", "input_type": "number"},
-        example=4000,
+        metadata={"example": 4000, "label": "shots", "description": "number of shots", "input_type": "number"},
     )
     parameters = ma.fields.List(ma.fields.Float(), required=False)
-    token = ma.fields.String(required=True, example="")
-    type = ma.fields.Enum(required=True, example=JobType.RUNNER, enum=JobType)
-    deployment_id = ma.fields.Integer(required=False, allow_none=True, example=1)
+    token = ma.fields.String(required=True, metadata={"example": ""})
+    type = ma.fields.Enum(required=True, metadata={"example": JobType.RUNNER}, enum=JobType)
+    deployment_id = ma.fields.Integer(required=False, allow_none=True, metadata={"example": 1})
 
 
 class JobResponseDtoSchema(MaBaseSchema):
@@ -138,7 +139,7 @@ class JobResponseDtoSchema(MaBaseSchema):
     started_at = ma.fields.String(required=True, dump_only=True)
     finished_at = ma.fields.String(required=True, dump_only=True)
     data = ma.fields.String(required=True, dump_only=True)
-    results = ma.fields.List(ma.fields.Dict(), required=True, dump_only=True)
+    results = ma.fields.Nested(ResultDtoSchema(), many=True, required=True, dump_only=True)
     parameters = ma.fields.String(required=True, dump_only=True)
 
 
@@ -149,10 +150,10 @@ class SimpleJobDtoSchema(MaBaseSchema):
 
 
 class TokenSchema(MaBaseSchema):
-    token = ma.fields.String(required=True, example="")
+    token = ma.fields.String(required=True, metadata={"example": ""})
 
 
 class JobExecutionDtoSchema(MaBaseSchema):
-    token = ma.fields.String(required=True, example="")
-    python_file_options = ma.fields.Dict(required=True, example={"backend": "ibmq_qasm_simulator"})
+    token = ma.fields.String(required=True, metadata={"example": ""})
+    python_file_options = ma.fields.Dict(required=True, metadata={"example": {"backend": "ibmq_qasm_simulator"}})
     python_file_inputs = ma.fields.Dict(required=True)

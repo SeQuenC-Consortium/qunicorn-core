@@ -37,6 +37,6 @@ def delete(id: int):
     db_service.remove_database_object_by_id(DeploymentDataclass, id)
 
 
-def get_deployment(deployment_id: int) -> DeploymentDataclass:
+def get_deployment_by_id(deployment_id: int) -> DeploymentDataclass:
     """Gets the Deployment with the deployment_id from the database"""
     return db_service.get_database_object_by_id(deployment_id, DeploymentDataclass)

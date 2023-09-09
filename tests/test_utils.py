@@ -17,14 +17,17 @@ import json
 import os
 
 from qunicorn_core.api.api_models import DeploymentRequestDto, JobRequestDto, DeploymentDto
-from qunicorn_core.core.jobmanager import deployment_service
+from qunicorn_core.core import deployment_service
+from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.provider_name import ProviderName
 
 JOB_JSON_IBM = "job_request_dto_test_data_IBM.json"
 JOB_JSON_AWS = "job_request_dto_test_data_AWS.json"
 DEPLOYMENT_JSON = "deployment_request_dto_test_data.json"
-DEPLOYMENT_CIRCUITS_JSON_IBM = "deployment_request_dto_with_circuit_test_data_IBM.json"
-DEPLOYMENT_CIRCUITS_JSON_AWS = "deployment_request_dto_with_circuit_test_data_AWS.json"
+DEPLOYMENT_QASM2_CIRCUITS_JSON_IBM = "deployment_request_dto_with_qasm_circuit_test_data_IBM.json"
+DEPLOYMENT_QASM3_CIRCUITS_JSON_AWS = "deployment_request_dto_with_qasm_circuit_test_data_AWS.json"
+DEPLOYMENT_BRAKET_CIRCUITS_JSON_AWS = "deployment_request_dto_with_braket_circuit_test_data_AWS.json"
+DEPLOYMENT_QISKIT_CIRCUITS_JSON_IBM = "deployment_request_dto_with_qiskit_circuit_test_data_IBM.json"
 PROGRAM_JSON = "program_request_dto_test_data.json"
 
 
@@ -39,19 +42,29 @@ def get_object_from_json(json_file_name: str):
     return data
 
 
-def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, provider: ProviderName):
-    deployment_request: DeploymentRequestDto = get_test_deployment_request(provider)
+def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, provider: ProviderName, assembler_language):
+    deployment_request: DeploymentRequestDto = get_test_deployment_request(
+        provider, assembler_language=assembler_language
+    )
     deployment: DeploymentDto = deployment_service.create_deployment(deployment_request)
     job_request_dto.deployment_id = deployment.id
 
 
-def get_test_deployment_request(provider: ProviderName) -> DeploymentRequestDto:
+def get_test_deployment_request(provider: ProviderName, assembler_language: AssemblerLanguage) -> DeploymentRequestDto:
     if provider == ProviderName.IBM:
-        deployment_dict: dict = get_object_from_json(DEPLOYMENT_CIRCUITS_JSON_IBM)
-        return DeploymentRequestDto.from_dict(deployment_dict)
+        if assembler_language == AssemblerLanguage.QISKIT:
+            deployment_dict: dict = get_object_from_json(DEPLOYMENT_QISKIT_CIRCUITS_JSON_IBM)
+            return DeploymentRequestDto.from_dict(deployment_dict)
+        elif assembler_language == AssemblerLanguage.QASM2:
+            deployment_dict: dict = get_object_from_json(DEPLOYMENT_QASM2_CIRCUITS_JSON_IBM)
+            return DeploymentRequestDto.from_dict(deployment_dict)
     elif provider == ProviderName.AWS:
-        deployment_dict: dict = get_object_from_json(DEPLOYMENT_CIRCUITS_JSON_AWS)
-        return DeploymentRequestDto.from_dict(deployment_dict)
+        if assembler_language == AssemblerLanguage.BRAKET:
+            deployment_dict: dict = get_object_from_json(DEPLOYMENT_BRAKET_CIRCUITS_JSON_AWS)
+            return DeploymentRequestDto.from_dict(deployment_dict)
+        elif assembler_language == AssemblerLanguage.QASM3:
+            deployment_dict: dict = get_object_from_json(DEPLOYMENT_QASM3_CIRCUITS_JSON_AWS)
+            return DeploymentRequestDto.from_dict(deployment_dict)
 
 
 def get_test_job(provider: ProviderName) -> JobRequestDto:

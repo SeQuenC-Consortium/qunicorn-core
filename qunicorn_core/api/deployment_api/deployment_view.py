@@ -20,8 +20,9 @@ from http import HTTPStatus
 from flask.views import MethodView
 
 from .root import DEPLOYMENT_API
+from ..api_models import JobResponseDtoSchema
 from ..api_models.deployment_dtos import DeploymentDtoSchema, DeploymentRequestDtoSchema, DeploymentRequestDto
-from ...core.jobmanager import deployment_service
+from ...core import deployment_service, job_service
 from ...util import logging
 
 
@@ -52,7 +53,7 @@ class DeploymentDetailView(MethodView):
     def get(self, deployment_id: int):
         """Get detailed information for single deployed job-definition."""
         logging.info("Request: get deployment by id")
-        return deployment_service.get_deployment(deployment_id)
+        return deployment_service.get_deployment_by_id(deployment_id)
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     def delete(self, deployment_id: int):
@@ -67,3 +68,20 @@ class DeploymentDetailView(MethodView):
         logging.info("Request: update deployment by id")
         deployment_dto: DeploymentRequestDto = DeploymentRequestDto.from_dict(body)
         return deployment_service.update_deployment(deployment_dto, deployment_id)
+
+
+@DEPLOYMENT_API.route("/<string:deployment_id>/jobs")
+class JobsByDeploymentView(MethodView):
+    """API endpoint for jobs of a specific deployment."""
+
+    @DEPLOYMENT_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))
+    def get(self, deployment_id: str):
+        """Get the details of all jobs with a specific deployment id."""
+        logging.info("Request: get jobs with deployment id")
+        return job_service.get_jobs_by_deployment_id(deployment_id)
+
+    @DEPLOYMENT_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))
+    def delete(self, deployment_id: str):
+        """Delete all jobs with a specific deployment id."""
+        logging.info("Request: delete jobs with deployment id")
+        return job_service.delete_jobs_by_deployment_id(deployment_id)

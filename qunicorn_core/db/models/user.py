@@ -29,4 +29,5 @@ class UserDataclass(DbModel):
         name (str): Name of the user.
     """
 
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)

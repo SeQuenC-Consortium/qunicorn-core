@@ -12,12 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from qunicorn_core.api.api_models import UserDto
+# originally from <https://github.com/buehlefs/flask-template/>
+
 from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.user import UserDataclass
+from qunicorn_core.api.api_models import UserDto
 
 
-# originally from <https://github.com/buehlefs/flask-template/>
+def get_all_users() -> list[UserDataclass]:
+    """Gets all Users from the DB"""
+    return db_service.get_all_database_objects(UserDataclass)
+
+
+def get_user_by_id(user_id: int) -> UserDataclass:
+    """Get a user by id"""
+    return db_service.get_database_object_by_id(user_id, UserDataclass)
 
 
 def get_default_user() -> UserDataclass:

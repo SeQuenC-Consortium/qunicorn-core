@@ -11,67 +11,128 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from braket.circuits import Circuit
+from datetime import datetime
+
 from braket.devices import LocalSimulator
-from braket.ir.openqasm import Program as OpenQASMProgram
 from braket.tasks import GateModelQuantumTaskResult
 from braket.tasks.local_quantum_task_batch import LocalQuantumTaskBatch
 
+from qunicorn_core.api.api_models import DeviceDto
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
-from qunicorn_core.core.mapper import result_mapper
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from qunicorn_core.db.database_services import job_db_service
+from qunicorn_core.db.database_services import device_db_service, provider_db_service
+from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
+from qunicorn_core.db.models.deployment import DeploymentDataclass
+from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
+from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
+from qunicorn_core.static.enums.provider_name import ProviderName
+from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.util import logging
 
 
 class AWSPilot(Pilot):
     """The AWS Pilot"""
 
-    def execute(self, job_core_dto: JobCoreDto):
-        """Execute a job with AWS Pilot and saves results in the database"""
+    provider_name: ProviderName = ProviderName.AWS
 
-        logging.info(f"Executing job {job_core_dto} with AWS Pilot")
-        if job_core_dto.type == JobType.RUNNER:
-            if job_core_dto.executed_on.device_name == "local_simulator":
-                self.__local_simulation(job_core_dto)
-            else:
-                exception: Exception = ValueError("No valid device specified")
-                raise exception
-        else:
-            exception: Exception = ValueError("No valid Job Type specified")
-            results = result_mapper.exception_to_error_results(exception)
-            job_db_service.update_finished_job(job_core_dto.id, results, JobState.ERROR)
-            raise exception
+    supported_language: AssemblerLanguage = AssemblerLanguage.BRAKET
+
+    def run(self, job_core_dto: JobCoreDto):
+        """Execute the job on a local simulator and saves results in the database"""
+        if not job_core_dto.executed_on.is_local:
+            raise return_exception_and_update_job(job_core_dto.id, ValueError("Device need to be local for AWS"))
+
+        device = LocalSimulator()
+        quantum_tasks: LocalQuantumTaskBatch = device.run_batch(
+            job_core_dto.transpiled_circuits, shots=job_core_dto.shots
+        )
+        aws_simulator_results: list[GateModelQuantumTaskResult] = quantum_tasks.results()
+        return AWSPilot.__map_simulator_results_to_dataclass(aws_simulator_results, job_core_dto)
+
+    def execute_provider_specific(self, job_core_dto: JobCoreDto):
+        """Execute a job of a provider specific type on a backend using a Pilot"""
+
+        raise return_exception_and_update_job(job_core_dto.id, ValueError("No valid Job Type specified"))
 
     @staticmethod
-    def transpile(job_core_dto: JobCoreDto) -> [OpenQASMProgram | Circuit]:
-        """Transpile job for an AWS backend"""
-        logging.info("Transpile a quantum circuit for a specific AWS backend")
-        transpiled_programs: list[OpenQASMProgram | Circuit] = []
+    def __map_simulator_results_to_dataclass(
+        aws_results: list[GateModelQuantumTaskResult], job_dto: JobCoreDto
+    ) -> list[ResultDataclass]:
+        """Map the results from the aws simulator to a result dataclass object"""
+        result_dtos: list[ResultDataclass] = [
+            ResultDataclass(
+                result_dict={
+                    "counts": dict(aws_result.measurement_counts.items()),
+                    "probabilities": aws_result.measurement_probabilities,
+                },
+                job_id=job_dto.id,
+                circuit=aws_result.additional_metadata.action.source,
+                meta_data="",
+                result_type=ResultType.COUNTS,
+            )
+            for aws_result in aws_results
+        ]
+        return result_dtos
 
-        # TODO add exception handing - if language does not match syntax
-        for program in job_core_dto.deployment.programs:
-            if program.assembler_language == AssemblerLanguage.QASM:
-                transpiled_programs.append(OpenQASMProgram(source=program.quantum_circuit))
-            elif program.assembler_language == AssemblerLanguage.BRAKET:
-                circuit: Circuit = eval(program.quantum_circuit)
-                transpiled_programs.append(circuit)
+    def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
+        """Get the standard job including its deployment for a certain user and device"""
+        language: AssemblerLanguage = AssemblerLanguage.QASM3
+        qasm3_str: str = (
+            "OPENQASM 3; \nqubit[3] q;\nbit[3] c;\nh q[0];\ncnot q[0], q[1];\ncnot q[1], q[2];\nc = " "measure q;"
+        )
+        programs: list[QuantumProgramDataclass] = [
+            QuantumProgramDataclass(quantum_circuit=qasm3_str, assembler_language=language)
+        ]
+        deployment = DeploymentDataclass(
+            deployed_by=user, programs=programs, deployed_at=datetime.now(), name="DeploymentAWSQasmName"
+        )
 
-        return transpiled_programs
+        return JobDataclass(
+            executed_by=user,
+            executed_on=device,
+            deployment=deployment,
+            progress=0,
+            state=JobState.READY,
+            shots=4000,
+            type=JobType.RUNNER,
+            started_at=datetime.now(),
+            name="AWSJob",
+            results=[
+                ResultDataclass(
+                    result_dict={
+                        "counts": {"000": 2007, "111": 1993},
+                        "probabilities": {"000": 0.50175, "111": 0.49825},
+                    }
+                )
+            ],
+        )
 
-    def __local_simulation(self, job_core_dto: JobCoreDto):
-        """Execute the job on a local simulator and saves results in the database"""
+    def save_devices_from_provider(self, device_request):
+        """
+        Save the available aws device into the database.
+        Since there is currently only a local simulator in use, the device_request parameter is unused.
+        """
+        provider: ProviderDataclass = provider_db_service.get_provider_by_name(self.provider_name)
+        aws_device: DeviceDataclass = DeviceDataclass(
+            provider_id=provider.id,
+            num_qubits=-1,
+            name="local_simulator",
+            is_simulator=True,
+            is_local=True,
+            provider=provider,
+        )
+        device_db_service.save_device_by_name(aws_device)
 
-        job_db_service.update_attribute(job_core_dto.id, JobState.RUNNING, JobDataclass.state)
-        device = LocalSimulator()
-        circuits = self.transpile(job_core_dto)
+    def get_standard_provider(self):
+        return ProviderDataclass(with_token=False, supported_language=self.supported_language, name=self.provider_name)
 
-        quantum_tasks: LocalQuantumTaskBatch = device.run_batch(circuits, shots=job_core_dto.shots)
-        aws_simulator_results: list[GateModelQuantumTaskResult] = quantum_tasks.results()
-        results: list[ResultDataclass] = result_mapper.aws_runner_to_dataclass(aws_simulator_results, job_core_dto)
-        job_db_service.update_finished_job(job_core_dto.id, results)
+    def is_device_available(self, device: DeviceDto, token: str) -> bool:
+        logging.info("AWS local simulator is always available")
+        return True

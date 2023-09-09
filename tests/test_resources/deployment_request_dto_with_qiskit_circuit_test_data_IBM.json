@@ -1,0 +1,17 @@
+{
+  "name": "DeploymentName",
+  "programs": [
+    {
+      "quantum_circuit": "global qiskit_circuit; qiskit_circuit = QuantumCircuit(2, 2);qiskit_circuit.h(0);qiskit_circuit.cx(0, 1);qiskit_circuit.measure(0, 0);qiskit_circuit.measure(1, 1)",
+      "assembler_language": "QISKIT",
+      "python_file_metadata": "",
+      "python_file_path": ""
+    },
+    {
+      "quantum_circuit": "global qiskit_circuit; qiskit_circuit = QuantumCircuit(2, 2);qiskit_circuit.h(0);qiskit_circuit.h(0);qiskit_circuit.cx(0, 1);qiskit_circuit.measure(0, 0);qiskit_circuit.measure(1, 1)",
+      "assembler_language": "QISKIT",
+      "python_file_metadata": "",
+      "python_file_path": ""
+    }
+  ]
+}
