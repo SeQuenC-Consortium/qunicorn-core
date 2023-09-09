@@ -30,6 +30,7 @@ class UserView(MethodView):
     """Root endpoint of the user api, to list all available user_apis."""
 
     @USER_API.response(HTTPStatus.OK, UserDtoSchema(many=True))
+    @USER_API.require_jwt()
     def get(self):
         """Get all users from the database"""
         return usermanager_service.get_all_users()

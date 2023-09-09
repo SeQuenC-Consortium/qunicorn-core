@@ -17,9 +17,11 @@
 
 """Module containing JWT security features for the API."""
 import inspect
+import warnings
 from copy import deepcopy
 from datetime import timedelta
 from functools import wraps
+from os import environ
 from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
 from warnings import warn
 
@@ -44,10 +46,11 @@ SECURITY_SCHEMES = {
     "jwt": JWT_SCHEME,
 }
 
-RT = TypeVar("RT")
+jwks_client = None
+if "JWKS_URL" in environ:
+    jwks_client = PyJWKClient(environ["JWKS_URL"], cache_keys=True)
 
-jwks_client = PyJWKClient("http://localhost:8081/auth/realms/qunicorn/protocol/openid-connect/certs",
-                          cache_keys=True)
+RT = TypeVar("RT")
 
 
 class JWTMixin:
@@ -62,16 +65,15 @@ class JWTMixin:
         BEARER = "Bearer "
         if not auth_header.startswith(BEARER):
             abort(401, message="Not a bearer token")
-        bearer_token = auth_header[len(BEARER):]
+        bearer_token = auth_header[len(BEARER) :]
         try:
             signing_key = jwks_client.get_signing_key_from_jwt(bearer_token)
             payload = jwt.decode(
                 bearer_token,
                 signing_key.key,
                 algorithms=["RS256"],
-                issuer="http://localhost:8081/auth/realms/qunicorn",
                 leeway=timedelta(minutes=4),
-                options={"verify_exp": True, "verify_nbf": True, "verify_aud": False, "verify_iss": True},
+                options={"verify_exp": True, "verify_nbf": True, "verify_aud": False, "verify_iss": False},
             )
             return payload.get("sub")
         except InvalidTokenError as e:
@@ -91,12 +93,18 @@ class JWTMixin:
             _jwt_optional = optional
             # Check if view function accepts a jwt_subject as named parameter
             signature = inspect.signature(func)
-            pass_jwt_subject = any(p.name == "jwt_subject" or p.kind == inspect.Parameter.VAR_KEYWORD for p in
-                                   signature.parameters.values())
+            pass_jwt_subject = any(
+                p.name == "jwt_subject" or p.kind == inspect.Parameter.VAR_KEYWORD
+                for p in signature.parameters.values()
+            )
 
             @wraps(func)
             def wrapper(*args: Any, **kwargs) -> RT:
-                jwt_subject = self._validate_request(_jwt_optional)
+                if jwks_client is None:
+                    warnings.warn("Skipping JWT check because not JWKS Url is set")
+                    jwt_subject = None
+                else:
+                    jwt_subject = self._validate_request(_jwt_optional)
                 if pass_jwt_subject:
                     kwargs["jwt_subject"] = jwt_subject
                 return func(*args, **kwargs)
