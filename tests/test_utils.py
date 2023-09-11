@@ -16,10 +16,13 @@
 import json
 import os
 
-from qunicorn_core.api.api_models import DeploymentRequestDto, JobRequestDto, DeploymentDto
-from qunicorn_core.core import deployment_service
+from qunicorn_core.api.api_models import DeploymentRequestDto, JobRequestDto, DeploymentDto, SimpleJobDto
+from qunicorn_core.core import deployment_service, job_service
+from qunicorn_core.db.database_services import job_db_service
+from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.provider_name import ProviderName
+from tests.conftest import set_up_env
 
 JOB_JSON_IBM = "job_request_dto_test_data_IBM.json"
 JOB_JSON_AWS = "job_request_dto_test_data_AWS.json"
@@ -29,6 +32,19 @@ DEPLOYMENT_QASM3_CIRCUITS_JSON = "deployment_request_dto_with_qasm3_circuit_test
 DEPLOYMENT_BRAKET_CIRCUITS_JSON = "deployment_request_dto_with_braket_circuit_test_data.json"
 DEPLOYMENT_QISKIT_CIRCUITS_JSON = "deployment_request_dto_with_qiskit_circuit_test_data.json"
 PROGRAM_JSON = "program_request_dto_test_data.json"
+
+
+def generic_test(
+    app, provider: ProviderName, input_assembler_language: AssemblerLanguage, is_asynchronous: bool
+) -> tuple[list[ResultDataclass], int]:
+    """creates a new job and returns the dto with the response"""
+    with app.app_context():
+        job_request_dto: JobRequestDto = get_test_job(provider)
+        save_deployment_and_add_id_to_job(job_request_dto, input_assembler_language)
+        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, is_asynchronous)
+        results: list[ResultDataclass] = job_db_service.get_job_by_id(return_dto.id).results
+
+        return results, job_request_dto.shots
 
 
 def get_object_from_json(json_file_name: str):

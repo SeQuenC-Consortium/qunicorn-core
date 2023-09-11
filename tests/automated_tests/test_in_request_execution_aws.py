@@ -26,6 +26,7 @@ from tests import test_utils
 from tests.conftest import set_up_env
 
 IS_ASYNCHRONOUS: bool = False
+RESULT_TOLERANCE: int = 100
 
 
 def test_create_and_run_aws_local_simulator():
@@ -43,56 +44,56 @@ def test_create_and_run_aws_local_simulator():
         assert return_dto.state == JobState.RUNNING
 
 
-def test_aws_local_simulator_qasm3_job_results():
-    """creates a new job and tests the result of the aws local simulator in the db with a qasm3 circuit"""
-    # GIVEN: Database Setup - AWS added as a provider
-    app = set_up_env()
-
-    # WHEN: create_and_run executed
-    with app.app_context():
-        job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QASM3)
-        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
-        results: list[ResultDataclass] = job_db_service.get_job_by_id(return_dto.id).results
-
-    # THEN: Check if the correct job with its result is saved in the db
-    with app.app_context():
-        assert check_aws_local_simulator_results(results, job_request_dto.shots)
-
-
 def test_aws_local_simulator_braket_job_results():
-    """creates a new job and tests the result of the aws local simulator in the db with a braket circuit"""
+    """creates a new job and a braket deployment from json input (from test resources) and runs it on the aws
+    local_simulator.
+    Then the results in the db are checked."""
     # GIVEN: Database Setup - AWS added as a provider
     app = set_up_env()
-
-    # WHEN: create_and_run executed
     with app.app_context():
-        job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.BRAKET)
-        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
-        results: list[ResultDataclass] = job_db_service.get_job_by_id(return_dto.id).results
-
-    # THEN: Check if the correct job with its result is saved in the db
-    with app.app_context():
-        print(results)
-        assert check_aws_local_simulator_results(results, job_request_dto.shots)
+        # WHEN: create_and_run executed in generic_test
+        results, shots = test_utils.generic_test(app, ProviderName.AWS, AssemblerLanguage.BRAKET, IS_ASYNCHRONOUS)
+        # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
+        assert check_aws_local_simulator_results(results, shots)
 
 
 def test_aws_local_simulator_qiskit_job_results():
-    """creates a new job and tests the result of the aws local simulator in the db with a qiskit circuit"""
+    """creates a new job and a qiskit deployment from json input (from test resources) and runs it on the aws
+    local_simulator.
+    Then the results in the db are checked."""
     # GIVEN: Database Setup - AWS added as a provider
     app = set_up_env()
-
-    # WHEN: create_and_run executed
     with app.app_context():
-        job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QISKIT)
-        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
-        results: list[ResultDataclass] = job_db_service.get_job_by_id(return_dto.id).results
+        # WHEN: create_and_run executed in generic_test
+        results, shots = test_utils.generic_test(app, ProviderName.AWS, AssemblerLanguage.QISKIT, IS_ASYNCHRONOUS)
+        # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
+        assert check_aws_local_simulator_results(results, shots)
 
-    # THEN: Check if the correct job with its result is saved in the db
+
+def test_aws_local_simulator_qasm3_job_results():
+    """creates a new job and a qasm3 deployment from json input (from test resources) and runs it on the aws
+    local_simulator.
+    Then the results in the db are checked."""
+    # GIVEN: Database Setup - AWS added as a provider
+    app = set_up_env()
     with app.app_context():
-        assert check_aws_local_simulator_results(results, job_request_dto.shots)
+        # WHEN: create_and_run executed in generic_test
+        results, shots = test_utils.generic_test(app, ProviderName.AWS, AssemblerLanguage.QASM3, IS_ASYNCHRONOUS)
+        # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
+        assert check_aws_local_simulator_results(results, shots)
+
+
+def test_aws_local_simulator_qasm2_job_results():
+    """creates a new job and a qasm2 deployment from json input (from test resources) and runs it on the aws
+    local_simulator.
+    Then the results in the db are checked."""
+    # GIVEN: Database Setup - AWS added as a provider
+    app = set_up_env()
+    with app.app_context():
+        # WHEN: create_and_run executed in generic_test
+        results, shots = test_utils.generic_test(app, ProviderName.AWS, AssemblerLanguage.QASM2, IS_ASYNCHRONOUS)
+        # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
+        assert check_aws_local_simulator_results(results, shots)
 
 
 def check_aws_local_simulator_results(results, shots: int):
@@ -101,7 +102,6 @@ def check_aws_local_simulator_results(results, shots: int):
         results_dict = results[i].result_dict
         counts: Counter = results_dict.get("counts")
         probabilities: dict = results_dict.get("probabilities")
-        tolerance: int = 100
         if i == 0:
             if counts.get("00") is not None and counts.get("11") is not None:
                 counts0 = counts.get("00")
@@ -110,8 +110,8 @@ def check_aws_local_simulator_results(results, shots: int):
                 probabilities1 = probabilities.get("11")
             else:
                 raise AssertionError
-            condition1 = shots / 2 - tolerance < counts0 < shots / 2 + tolerance
-            condition2 = shots / 2 - tolerance < counts1 < shots / 2 + tolerance
+            condition1 = shots / 2 - RESULT_TOLERANCE < counts0 < shots / 2 + RESULT_TOLERANCE
+            condition2 = shots / 2 - RESULT_TOLERANCE < counts1 < shots / 2 + RESULT_TOLERANCE
             if not (condition1 and condition2):
                 is_check_successful = False
             elif not (0.48 < probabilities0 < 0.52 and 0.48 < probabilities1 < 0.52):
