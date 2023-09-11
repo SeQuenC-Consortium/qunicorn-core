@@ -45,6 +45,7 @@ myst-parser = "^2.0.0"
 pytest = "^7.2.0"
 pytest-mock = "^3.11.1"
 qiskit-aer = "^0.12.2"
+qiskit-qasm3-import = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "^23.1.0"

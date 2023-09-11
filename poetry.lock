@@ -2127,6 +2127,21 @@ urllib3 = ">=1.21.1"
 websocket-client = ">=1.5.1"
 
 [[package]]
+name = "qiskit-qasm3-import"
+version = "0.2.0"
+description = "Importer for parsing OpenQASM 3 strings into Qiskit circuits"
+optional = false
+python-versions = "*"
+files = [
+    {file = "qiskit-qasm3-import-0.2.0.tar.gz", hash = "sha256:1750ca958cc4d2a497cf7ac3d16e13584dfe87256836ff1ef9da5d0a712f5d15"},
+    {file = "qiskit_qasm3_import-0.2.0-py3-none-any.whl", hash = "sha256:c9b9bd2beb0caf31fc6a3583a3d4f880f8aef07cc1b76dff3f2d0067eadf3687"},
+]
+
+[package.dependencies]
+openqasm3 = {version = ">=0.4,<0.5", extras = ["parser"]}
+qiskit-terra = ">=0.21.0"
+
+[[package]]
 name = "qiskit-terra"
 version = "0.25.1"
 description = "Software for developing quantum computing programs"
@@ -3061,4 +3076,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11.0"
-content-hash = "f8de50cc1c17ca299d0b2af2a2c5a8457b5627730528a3ddc72c28263122bd80"
+content-hash = "6c4acd4b83d2ce1e82c93645cbf4b85c48b5ae8b08feb0d7a1f892d8ceedd70f"

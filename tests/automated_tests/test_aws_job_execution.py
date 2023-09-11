@@ -52,9 +52,10 @@ def test_aws_local_simulator_braket_job_results():
     app = set_up_env()
     with app.app_context():
         # WHEN: create_and_run executed in generic_test
-        results, shots = test_utils.generic_test(app, ProviderName.AWS, AssemblerLanguage.BRAKET, IS_ASYNCHRONOUS)
+        job = test_utils.generic_test(
+            app, ProviderName.AWS, "local_simulator", AssemblerLanguage.BRAKET, IS_ASYNCHRONOUS
+        )
         # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
-        assert check_aws_local_simulator_results(results, shots)
 
 
 def test_aws_local_simulator_qiskit_job_results():
@@ -65,9 +66,11 @@ def test_aws_local_simulator_qiskit_job_results():
     app = set_up_env()
     with app.app_context():
         # WHEN: create_and_run executed in generic_test
-        results, shots = test_utils.generic_test(app, ProviderName.AWS, AssemblerLanguage.QISKIT, IS_ASYNCHRONOUS)
+        job = test_utils.generic_test(
+            app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QISKIT, IS_ASYNCHRONOUS
+        )
         # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
-        assert check_aws_local_simulator_results(results, shots)
+        # assert moved to generic test
 
 
 def test_aws_local_simulator_qasm3_job_results():
@@ -78,9 +81,10 @@ def test_aws_local_simulator_qasm3_job_results():
     app = set_up_env()
     with app.app_context():
         # WHEN: create_and_run executed in generic_test
-        results, shots = test_utils.generic_test(app, ProviderName.AWS, AssemblerLanguage.QASM3, IS_ASYNCHRONOUS)
+        job = test_utils.generic_test(
+            app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM3, IS_ASYNCHRONOUS
+        )
         # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
-        assert check_aws_local_simulator_results(results, shots)
 
 
 def test_aws_local_simulator_qasm2_job_results():
@@ -91,32 +95,7 @@ def test_aws_local_simulator_qasm2_job_results():
     app = set_up_env()
     with app.app_context():
         # WHEN: create_and_run executed in generic_test
-        results, shots = test_utils.generic_test(app, ProviderName.AWS, AssemblerLanguage.QASM2, IS_ASYNCHRONOUS)
+        job = test_utils.generic_test(
+            app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM2, IS_ASYNCHRONOUS
+        )
         # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
-        assert check_aws_local_simulator_results(results, shots)
-
-
-def check_aws_local_simulator_results(results, shots: int):
-    is_check_successful = True
-    for i in range(len(results)):
-        results_dict = results[i].result_dict
-        counts: Counter = results_dict.get("counts")
-        probabilities: dict = results_dict.get("probabilities")
-        if i == 0:
-            if counts.get("00") is not None and counts.get("11") is not None:
-                counts0 = counts.get("00")
-                probabilities0 = probabilities.get("00")
-                counts1 = counts.get("11")
-                probabilities1 = probabilities.get("11")
-            else:
-                raise AssertionError
-            condition1 = shots / 2 - RESULT_TOLERANCE < counts0 < shots / 2 + RESULT_TOLERANCE
-            condition2 = shots / 2 - RESULT_TOLERANCE < counts1 < shots / 2 + RESULT_TOLERANCE
-            if not (condition1 and condition2):
-                is_check_successful = False
-            elif not (0.48 < probabilities0 < 0.52 and 0.48 < probabilities1 < 0.52):
-                is_check_successful = False
-        else:
-            if counts.get("00") != shots:
-                is_check_successful = False
-    return is_check_successful

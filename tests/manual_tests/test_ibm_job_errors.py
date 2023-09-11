@@ -30,7 +30,7 @@ from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.result_type import ResultType
 from tests import test_utils
 from tests.conftest import set_up_env
-from tests.manual_tests.test_jobmanager_with_ibm import EXPECTED_ID, JOB_FINISHED_PROGRESS, IS_ASYNCHRONOUS
+from tests.manual_tests.test_ibm_job_execution import EXPECTED_ID, JOB_FINISHED_PROGRESS, IS_ASYNCHRONOUS
 from tests.test_utils import get_object_from_json
 
 
