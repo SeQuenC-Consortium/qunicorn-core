@@ -57,9 +57,7 @@ def test_aws_local_simulator_qasm3_job_results():
 
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
-        for result in results:
-            print(result.circuit)
-            assert check_aws_local_simulator_results(result.result_dict, job_request_dto.shots)
+        assert check_aws_local_simulator_results(results, job_request_dto.shots)
 
 
 def test_aws_local_simulator_braket_job_results():
@@ -76,9 +74,8 @@ def test_aws_local_simulator_braket_job_results():
 
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
-        for result in results:
-            print(result.circuit)
-            assert check_aws_local_simulator_results(result.result_dict, job_request_dto.shots)
+        print(results)
+        assert check_aws_local_simulator_results(results, job_request_dto.shots)
 
 
 def test_aws_local_simulator_qiskit_job_results():
@@ -95,27 +92,31 @@ def test_aws_local_simulator_qiskit_job_results():
 
     # THEN: Check if the correct job with its result is saved in the db
     with app.app_context():
-        for result in results:
-            print(result.circuit)
-            assert check_aws_local_simulator_results(result.result_dict, job_request_dto.shots)
+        assert check_aws_local_simulator_results(results, job_request_dto.shots)
 
 
-def check_aws_local_simulator_results(results_dict: dict, shots: int):
+def check_aws_local_simulator_results(results, shots: int):
     is_check_successful = True
-    counts: Counter = results_dict.get("counts")
-    probabilities: dict = results_dict.get("probabilities")
-    tolerance: int = 100
-    if counts.get("00") is not None and counts.get("11") is not None:
-        counts0 = counts.get("00")
-        probabilities0 = probabilities.get("00")
-        counts1 = counts.get("11")
-        probabilities1 = probabilities.get("11")
-    else:
-        raise AssertionError
-    condition1 = shots / 2 - tolerance < counts0 < shots / 2 + tolerance
-    condition2 = shots / 2 - tolerance < counts1 < shots / 2 + tolerance
-    if not (condition1 and condition2):
-        is_check_successful = False
-    elif not (0.48 < probabilities0 < 0.52 and 0.48 < probabilities1 < 0.52):
-        is_check_successful = False
+    for i in range(len(results)):
+        results_dict = results[i].result_dict
+        counts: Counter = results_dict.get("counts")
+        probabilities: dict = results_dict.get("probabilities")
+        tolerance: int = 100
+        if i == 0:
+            if counts.get("00") is not None and counts.get("11") is not None:
+                counts0 = counts.get("00")
+                probabilities0 = probabilities.get("00")
+                counts1 = counts.get("11")
+                probabilities1 = probabilities.get("11")
+            else:
+                raise AssertionError
+            condition1 = shots / 2 - tolerance < counts0 < shots / 2 + tolerance
+            condition2 = shots / 2 - tolerance < counts1 < shots / 2 + tolerance
+            if not (condition1 and condition2):
+                is_check_successful = False
+            elif not (0.48 < probabilities0 < 0.52 and 0.48 < probabilities1 < 0.52):
+                is_check_successful = False
+        else:
+            if counts.get("00") != shots:
+                is_check_successful = False
     return is_check_successful
