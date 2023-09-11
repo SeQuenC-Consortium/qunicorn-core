@@ -27,6 +27,7 @@ import qunicorn_core.core.pilotmanager.pilot_manager
 from . import models  # noqa
 from .db import DB
 from .models.deployment import DeploymentDataclass
+from .models.job import JobDataclass
 from .models.quantum_program import QuantumProgramDataclass
 from .models.user import UserDataclass
 from ..static.enums.assembler_languages import AssemblerLanguage
@@ -38,19 +39,20 @@ DB_CLI = DB_CLI_BLP.cli  # expose as attribute for autodoc generation
 DB_COMMAND_LOGGER = "db"
 
 
-@DB_CLI.command("create-and-load-db")
-def create_load_db():
-    """Create all db tables."""
+@DB_CLI.command("recreate-and-load-db")
+def recreate_and_load_db():
+    """(Re-)create all db tables."""
     drop_db_function(current_app)
     create_db_function(current_app)
     load_db_function(current_app)
     click.echo("Database created and loaded.")
 
 
-@DB_CLI.command("create-db")
-def create_db():
-    """Create all db tables."""
+@DB_CLI.command("create-and-db")
+def create_and_load_db():
+    """Create all db tables and load testdata."""
     create_db_function(current_app)
+    load_db_function(current_app)
     click.echo("Database created.")
 
 
@@ -62,11 +64,14 @@ def create_db_function(app: Flask):
 @DB_CLI.command("load-test-data")
 def load_test_data():
     """Load database test data"""
-    load_db_function(current_app)
+    load_db_function(current_app, if_not_exists=False)
     click.echo("Test Data Loaded.")
 
 
-def load_db_function(app: Flask):
+def load_db_function(app: Flask, if_not_exists=True):
+    db_is_empty = DB.session.query(JobDataclass).first() is None
+    if if_not_exists and not db_is_empty:
+        return
     user = UserDataclass(name="DefaultUser")
     DB.session.add(create_default_braket_deployment(user))
     DB.session.add(create_default_qiskit_deployment(user))

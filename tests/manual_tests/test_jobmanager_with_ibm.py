@@ -48,7 +48,7 @@ def create_and_run_runner(device: str):
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QASM2)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QASM2)
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
@@ -69,7 +69,7 @@ def test_create_and_run_sampler():
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QASM2)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QASM2)
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
@@ -90,7 +90,7 @@ def test_create_and_run_estimator():
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QASM2)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QASM2)
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db
@@ -110,7 +110,7 @@ def test_run_qiskit_input_on_runner():
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, ProviderName.IBM, AssemblerLanguage.QISKIT)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QISKIT)
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db

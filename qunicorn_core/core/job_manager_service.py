@@ -74,7 +74,7 @@ def __transpile_circuits(job_dto: JobCoreDto, dest_language: AssemblerLanguage):
     for program in job_dto.deployment.programs:
         src_language: AssemblerLanguage = program.assembler_language
         try:
-            # Preprocess a string to a cricuit object if necessary
+            # Preprocess a string to a circuit object if necessary
             preprocessor = preprocessing_manager.get_preprocessor(src_language)
             circuit = preprocessor(program.quantum_circuit)
 

@@ -19,7 +19,6 @@ from qunicorn_core.core import deployment_service
 from qunicorn_core.db.database_services import deployment_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
-from qunicorn_core.static.enums.provider_name import ProviderName
 from tests import test_utils
 from tests.conftest import set_up_env
 
@@ -31,7 +30,7 @@ def test_create_deployments():
     """Testing if the creation of deployments works"""
     # GIVEN: Get Deployments from JSON
     app = set_up_env()
-    deployment: DeploymentRequestDto = test_utils.get_test_deployment_request(ProviderName.IBM, AssemblerLanguage.QASM2)
+    deployment: DeploymentRequestDto = test_utils.get_test_deployment_request(AssemblerLanguage.QASM2)
 
     # WHEN: Create deployment and save it in the db
     with app.app_context():
