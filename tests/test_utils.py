@@ -27,7 +27,6 @@ from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
-from tests.conftest import set_up_env
 
 JOB_JSON_IBM = "job_request_dto_test_data_IBM.json"
 JOB_JSON_AWS = "job_request_dto_test_data_AWS.json"
@@ -46,7 +45,7 @@ RESULT_TOLERANCE: int = 100
 
 def generic_test(
     app, provider: ProviderName, device: str, input_assembler_language: AssemblerLanguage, is_asynchronous: bool
-) -> tuple[list[ResultDataclass], int]:
+):
     """creates a new job and returns the dto with the response"""
     with app.app_context():
         job_request_dto: JobRequestDto = get_test_job(provider)
@@ -61,7 +60,6 @@ def generic_test(
             ibm_check_if_job_runner_result_correct(job)
         elif provider is ProviderName.AWS:
             check_aws_local_simulator_results(job.results, job.shots)
-        return job
 
 
 def get_object_from_json(json_file_name: str):

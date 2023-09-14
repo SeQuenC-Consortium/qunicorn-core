@@ -13,12 +13,9 @@
 # limitations under the License.
 
 """test in-request execution for aws"""
-from collections import Counter
 
 from qunicorn_core.api.api_models.job_dtos import SimpleJobDto, JobRequestDto
 from qunicorn_core.core import job_service
-from qunicorn_core.db.database_services import job_db_service
-from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.provider_name import ProviderName
@@ -52,10 +49,8 @@ def test_aws_local_simulator_braket_job_results():
     app = set_up_env()
     with app.app_context():
         # WHEN: create_and_run executed in generic_test
-        job = test_utils.generic_test(
-            app, ProviderName.AWS, "local_simulator", AssemblerLanguage.BRAKET, IS_ASYNCHRONOUS
-        )
         # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
+        test_utils.generic_test(app, ProviderName.AWS, "local_simulator", AssemblerLanguage.BRAKET, IS_ASYNCHRONOUS)
 
 
 def test_aws_local_simulator_qiskit_job_results():
@@ -66,11 +61,8 @@ def test_aws_local_simulator_qiskit_job_results():
     app = set_up_env()
     with app.app_context():
         # WHEN: create_and_run executed in generic_test
-        job = test_utils.generic_test(
-            app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QISKIT, IS_ASYNCHRONOUS
-        )
         # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
-        # assert moved to generic test
+        test_utils.generic_test(app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QISKIT, IS_ASYNCHRONOUS)
 
 
 def test_aws_local_simulator_qasm3_job_results():
@@ -81,10 +73,8 @@ def test_aws_local_simulator_qasm3_job_results():
     app = set_up_env()
     with app.app_context():
         # WHEN: create_and_run executed in generic_test
-        job = test_utils.generic_test(
-            app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM3, IS_ASYNCHRONOUS
-        )
         # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
+        test_utils.generic_test(app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM3, IS_ASYNCHRONOUS)
 
 
 def test_aws_local_simulator_qasm2_job_results():
@@ -95,7 +85,5 @@ def test_aws_local_simulator_qasm2_job_results():
     app = set_up_env()
     with app.app_context():
         # WHEN: create_and_run executed in generic_test
-        job = test_utils.generic_test(
-            app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM2, IS_ASYNCHRONOUS
-        )
         # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
+        test_utils.generic_test(app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM2, IS_ASYNCHRONOUS)
