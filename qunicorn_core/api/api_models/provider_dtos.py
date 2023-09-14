@@ -36,7 +36,7 @@ class ProviderDto:
 class ProviderDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=True, allow_none=False)
     with_token = ma.fields.Boolean(required=False, allow_none=True)
-    supported_language = ma.fields.String(required=False, allow_none=True)
+    supported_language = ma.fields.List(ma.fields.Integer(), required=False, allow_none=True)
     name = ma.fields.Enum(required=True, allow_none=False, enum=ProviderName)
 
 

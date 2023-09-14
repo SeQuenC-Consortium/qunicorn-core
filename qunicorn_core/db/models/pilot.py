@@ -39,5 +39,5 @@ class PilotDataclass(DbModel):
     )
     job: Mapped[JobDataclass.__name__] = relationship(JobDataclass.__name__, default=None)
 
-    programming_language: Mapped[str] = mapped_column(sql.Enum(ProgrammingLanguage), default=None)
+    programming_language: Mapped[[str]] = mapped_column(sql.Enum(ProgrammingLanguage), default=None)
     state: Mapped[PilotState] = mapped_column(sql.String(50), default=None)
