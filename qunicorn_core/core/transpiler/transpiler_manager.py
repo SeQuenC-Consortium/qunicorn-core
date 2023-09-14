@@ -10,7 +10,6 @@ from braket.circuits import Circuit
 from braket.circuits.serialization import IRType
 from braket.ir.openqasm import Program as OpenQASMProgram
 from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
-
 from rustworkx.visualization import graphviz_draw
 
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
@@ -112,6 +111,7 @@ def qiskit_to_qasm3(circuit: qiskit.circuit.QuantumCircuit) -> str:
 
 @transpile_manager.register_transpile_method(AssemblerLanguage.QASM3, AssemblerLanguage.QISKIT)
 def qasm3_to_qiskit(source: str) -> qiskit.circuit.QuantumCircuit:
+    source = source.replace("cnot", "cx")
     return qiskit.qasm3.loads(source)
 
 
