@@ -59,7 +59,7 @@ def generic_test(
         if provider is ProviderName.IBM:
             ibm_check_if_job_runner_result_correct(job)
         elif provider is ProviderName.AWS:
-            assert check_aws_local_simulator_results(job.results, job.shots)
+            check_aws_local_simulator_results(job.results, job.shots)
 
 
 def get_object_from_json(json_file_name: str):
