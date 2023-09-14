@@ -59,7 +59,7 @@ def generic_test(
         if provider is ProviderName.IBM:
             ibm_check_if_job_runner_result_correct(job)
         elif provider is ProviderName.AWS:
-            check_aws_local_simulator_results(job.results, job.shots)
+            assert check_aws_local_simulator_results(job.results, job.shots)
 
 
 def get_object_from_json(json_file_name: str):
@@ -123,16 +123,14 @@ def ibm_check_if_job_runner_result_correct(job: JobDataclass):
         assert result.meta_data is not None
         shots: int = job.shots
         if i == 0:
-            tolerance: int = 150
-            assert (shots / 2 + tolerance) > result.result_dict["0x0"] > (shots / 2 - tolerance)
-            assert (shots / 2 + tolerance) > result.result_dict["0x3"] > (shots / 2 - tolerance)
+            assert (shots / 2 + RESULT_TOLERANCE) > result.result_dict["0x0"] > (shots / 2 - RESULT_TOLERANCE)
+            assert (shots / 2 + RESULT_TOLERANCE) > result.result_dict["0x3"] > (shots / 2 - RESULT_TOLERANCE)
             assert (result.result_dict["0x0"] + result.result_dict["0x3"]) == shots
         else:
             assert result.result_dict["0x0"] == shots
 
 
 def check_aws_local_simulator_results(results, shots: int):
-    is_check_successful = True
     for i in range(len(results)):
         results_dict = results[i].result_dict
         counts: Counter = results_dict.get("counts")
@@ -145,16 +143,11 @@ def check_aws_local_simulator_results(results, shots: int):
                 probabilities1 = probabilities.get("11")
             else:
                 raise AssertionError
-            condition1 = shots / 2 - RESULT_TOLERANCE < counts0 < shots / 2 + RESULT_TOLERANCE
-            condition2 = shots / 2 - RESULT_TOLERANCE < counts1 < shots / 2 + RESULT_TOLERANCE
-            if not (condition1 and condition2):
-                is_check_successful = False
-            elif not (0.48 < probabilities0 < 0.52 and 0.48 < probabilities1 < 0.52):
-                is_check_successful = False
+            assert shots / 2 - RESULT_TOLERANCE < counts0 < shots / 2 + RESULT_TOLERANCE
+            assert shots / 2 - RESULT_TOLERANCE < counts1 < shots / 2 + RESULT_TOLERANCE
+            assert 0.48 < probabilities0 < 0.52 and 0.48 < probabilities1 < 0.52
         else:
-            if counts.get("00") != shots:
-                is_check_successful = False
-    return is_check_successful
+            assert counts.get("00") == shots
 
 
 def check_standard_result_data(i, job, result):
