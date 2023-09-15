@@ -18,7 +18,6 @@ from qunicorn_core.core.mapper import pilot_assembler_language_list_mapper
 from qunicorn_core.core.mapper.general_mapper import map_from_to
 from qunicorn_core.db.models.pilot_assembler_language_list import PilotAssemblerLanguageListDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
-from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
 
 def dto_to_dataclass(provider_dto: ProviderDto) -> ProviderDataclass:

@@ -32,13 +32,13 @@ tz = ["python-dateutil"]
 
 [[package]]
 name = "amazon-braket-default-simulator"
-version = "1.20.0"
+version = "1.20.0.post0"
 description = "An open source quantum circuit simulator to be run locally with the Amazon Braket SDK"
 optional = false
 python-versions = ">= 3.8"
 files = [
-    {file = "amazon-braket-default-simulator-1.20.0.tar.gz", hash = "sha256:d30d0d594ff55b06777a86ec0a6b164597fb68d4d5b7b792768db66c03639a78"},
-    {file = "amazon_braket_default_simulator-1.20.0-py3-none-any.whl", hash = "sha256:d20180800acd171ba09ef1d7b1bf7e69c27f3e4c3222dda8e28ecc7d7c9edf39"},
+    {file = "amazon-braket-default-simulator-1.20.0.post0.tar.gz", hash = "sha256:916f68dfa5a9e56cfedeaead3bef012719b2eb6bf5fa68b87c5a4bf7ad65e1f7"},
+    {file = "amazon_braket_default_simulator-1.20.0.post0-py3-none-any.whl", hash = "sha256:fab6e52a80492d77413d0d6dfc5d6a29276bf34c854f3f2c1869b6facf94c0ff"},
 ]
 
 [package.dependencies]
@@ -55,13 +55,13 @@ test = ["black", "flake8", "flake8-rst-docstrings", "isort", "pre-commit", "pyli
 
 [[package]]
 name = "amazon-braket-schemas"
-version = "1.19.1"
+version = "1.19.1.post0"
 description = "An open source library that contains the schemas for Amazon Braket"
 optional = false
 python-versions = ">= 3.8"
 files = [
-    {file = "amazon-braket-schemas-1.19.1.tar.gz", hash = "sha256:d9fcdb6ba21e27e70a58bc2d6449babec8dccf58499d94e3ae267a181b10e691"},
-    {file = "amazon_braket_schemas-1.19.1-py3-none-any.whl", hash = "sha256:542b04847718f6d07cea5ba05f8681561bcd6b11570fc065e3c34ecfe12601aa"},
+    {file = "amazon-braket-schemas-1.19.1.post0.tar.gz", hash = "sha256:d34126bcbca68d5b9370a1d001ffa24fd0875b9af82f01c15fc077d9595faad8"},
+    {file = "amazon_braket_schemas-1.19.1.post0-py3-none-any.whl", hash = "sha256:89dca740342e95947f1b38af689ff1ba4d2ad719a61db97ae8272021234f4186"},
 ]
 
 [package.dependencies]
@@ -72,13 +72,13 @@ test = ["black", "flake8", "flake8-rst-docstrings", "isort", "jsonschema (==3.2.
 
 [[package]]
 name = "amazon-braket-sdk"
-version = "1.55.0"
+version = "1.55.1"
 description = "An open source library for interacting with quantum computing devices on Amazon Braket"
 optional = false
 python-versions = ">= 3.8.2"
 files = [
-    {file = "amazon-braket-sdk-1.55.0.tar.gz", hash = "sha256:2178697eb6e028b9a9c86b8e375c355d5b468f6b28c6fd869e3370ed5eba0751"},
-    {file = "amazon_braket_sdk-1.55.0-py3-none-any.whl", hash = "sha256:3d08a846e6a0096e49fd4b259110a9165c5829342c1e8b0facea4e0b393fa783"},
+    {file = "amazon-braket-sdk-1.55.1.tar.gz", hash = "sha256:daeedec7d6c4f319eeaabce8d66d06f4157de934c90e1d12c3b1bdc47c919f0f"},
+    {file = "amazon_braket_sdk-1.55.1-py3-none-any.whl", hash = "sha256:1041d3347e541195aac17918451422b7d3e9d9c58a05d257cdf758c3b2f6912e"},
 ]
 
 [package.dependencies]
@@ -277,17 +277,17 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.28.47"
+version = "1.28.48"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.28.47-py3-none-any.whl", hash = "sha256:27560da44099e7e2ee961d3971d8ea659de2e0dc24e78043d1c3027d89b2d8a2"},
-    {file = "boto3-1.28.47.tar.gz", hash = "sha256:be69cd28e3732b63ad61f6d2429b1eac92428588911a5a7367faa4e129a4738d"},
+    {file = "boto3-1.28.48-py3-none-any.whl", hash = "sha256:ec7895504e3b2dd35fbdb7397bc3c48daaba8e6f37bc436aa928ff4e745f0f1c"},
+    {file = "boto3-1.28.48.tar.gz", hash = "sha256:fed2d673fce33384697baa0028edfd18b06aa17af5c3ef82da75e9254a8ffb07"},
 ]
 
 [package.dependencies]
-botocore = ">=1.31.47,<1.32.0"
+botocore = ">=1.31.48,<1.32.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -296,13 +296,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.31.47"
+version = "1.31.48"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.31.47-py3-none-any.whl", hash = "sha256:6a60f9601270458102529b17fdcba5551b918f9eedc32bbc2f467e63edfb2662"},
-    {file = "botocore-1.31.47.tar.gz", hash = "sha256:a0ba5629eb17a37bf449bccda9df6ae652d5755f73145519d5eb244f6963b31b"},
+    {file = "botocore-1.31.48-py3-none-any.whl", hash = "sha256:9618c06f7e08ed590dae6613b8b2511055f7d6c07517382143ef8563169d4ef1"},
+    {file = "botocore-1.31.48.tar.gz", hash = "sha256:6ed16f66aa6ed6070fed26d69764cb14c7759e4cc0b1c191283cc48b05d65de9"},
 ]
 
 [package.dependencies]
@@ -971,12 +971,12 @@ urllib3 = ">=1.26.0,<2.0.0"
 
 [[package]]
 name = "ibm-platform-services"
-version = "0.41.0"
+version = "0.43.0"
 description = "Python client library for IBM Cloud Platform Services"
 optional = false
 python-versions = "*"
 files = [
-    {file = "ibm-platform-services-0.41.0.tar.gz", hash = "sha256:44e6d17dad4783ebe1b066322eefe56fb5364a535181d5280b3939f533edc9ac"},
+    {file = "ibm-platform-services-0.43.0.tar.gz", hash = "sha256:765a26fb7e795f0ae719c01e4b6dac2e1307fa8cb5e452f0c0d6dc747cef93f3"},
 ]
 
 [package.dependencies]
