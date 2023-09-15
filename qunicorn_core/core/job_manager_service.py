@@ -26,6 +26,7 @@ from qunicorn_core.core.transpiler.preprocessing_manager import preprocessing_ma
 from qunicorn_core.core.transpiler.transpiler_manager import transpile_manager
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.pilot_assembler_language_list import PilotAssemblerLanguageListDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
@@ -48,7 +49,7 @@ def run_job(job_core_dto_dict: dict):
 
     for pilot in PILOTS:
         if pilot.has_same_provider(device.provider.name):
-            __transpile_circuits(job_core_dto, pilot.supported_language)
+            __transpile_circuits(job_core_dto, pilot.supported_languages)
             logging.info(f"Run job with id {job_core_dto.id} on {pilot.__class__}")
             results = pilot.execute(job_core_dto)
             break
@@ -64,7 +65,7 @@ def run_job(job_core_dto_dict: dict):
     logging.info(f"Run job with id {job_core_dto.id} and get the result {results}")
 
 
-def __transpile_circuits(job_dto: JobCoreDto, dest_language: AssemblerLanguage):
+def __transpile_circuits(job_dto: JobCoreDto, dest_languages: [PilotAssemblerLanguageListDataclass]):
     """Transforms all circuits of the deployment into the circuits in the destination language"""
     logging.info(f"Transpile all circuits of job with id{job_dto.id}")
     error_results: list[ResultDataclass] = []
@@ -79,12 +80,12 @@ def __transpile_circuits(job_dto: JobCoreDto, dest_language: AssemblerLanguage):
             circuit = preprocessor(program.quantum_circuit)
 
             # We only need to transpile, when the source language is not the destination language
-            if src_language == dest_language:
+            if src_language in dest_languages:
                 job_dto.transpiled_circuits.append(circuit)
                 continue
 
             # Transpile the circuit to the destination language
-            transpiler = transpile_manager.get_transpiler(src_language, dest_language)
+            transpiler = transpile_manager.get_transpiler(src_language, dest_languages)
             job_dto.transpiled_circuits.append(transpiler(circuit))
         except Exception as exception:
             error_results.extend(result_mapper.exception_to_error_results(exception, program.quantum_circuit))

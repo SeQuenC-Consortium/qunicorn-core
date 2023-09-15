@@ -20,7 +20,6 @@ from .db_model import DbModel
 from .job import JobDataclass
 from ..db import REGISTRY
 from ...static.enums.pilot_state import PilotState
-from ...static.enums.programming_language import ProgrammingLanguage
 
 
 @REGISTRY.mapped_as_dataclass
@@ -28,7 +27,7 @@ class PilotDataclass(DbModel):
     """Dataclass for storing Pilots
 
     Attributes:
-        programming_language (ProgrammingLanguage): Programming language that the code should have after translation
+        programming_languages : Programming language that the code should have after translation
         job (int): ID of the job that is executed by the pilot.
         state (PilotState): Represents progress and current state of pilot.
     """
@@ -39,5 +38,13 @@ class PilotDataclass(DbModel):
     )
     job: Mapped[JobDataclass.__name__] = relationship(JobDataclass.__name__, default=None)
 
-    programming_language: Mapped[[str]] = mapped_column(sql.Enum(ProgrammingLanguage), default=None)
+    # programming_languages: Mapped[List[PilotAssemblerLanguageListDataclass.__name__]] = relationship(
+    #    PilotAssemblerLanguageListDataclass.__name__, default=None
+    # )
+    # Column(ArrayOfEnum(Enum(AchievementsType))))
+    #    (mapped_column(
+    #    sql.ARRAY(sql.Enum(ProgrammingLanguage), as_tuple=False, dimensions=None, zero_indexes=False), default=None
+    # ))
+    # programming_languages: Mapped[str] = mapped_column(sql.Enum(ProgrammingLanguage), default=None)
+
     state: Mapped[PilotState] = mapped_column(sql.String(50), default=None)

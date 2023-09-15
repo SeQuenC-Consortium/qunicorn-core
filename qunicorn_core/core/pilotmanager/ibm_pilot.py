@@ -28,6 +28,7 @@ from qunicorn_core.db.database_services import job_db_service, device_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.pilot_assembler_language_list import PilotAssemblerLanguageListDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
@@ -45,7 +46,9 @@ class IBMPilot(Pilot):
 
     provider_name: ProviderName = ProviderName.IBM
 
-    supported_language: AssemblerLanguage = AssemblerLanguage.QISKIT
+    supported_languages: [PilotAssemblerLanguageListDataclass] = [
+        PilotAssemblerLanguageListDataclass(provider_ID=1, programming_language=AssemblerLanguage.QISKIT)
+    ]
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
@@ -230,7 +233,7 @@ class IBMPilot(Pilot):
         return result_dtos
 
     def get_standard_provider(self):
-        return ProviderDataclass(with_token=True, supported_language=self.supported_language, name=self.provider_name)
+        return ProviderDataclass(with_token=True, supported_languages=self.supported_languages, name=self.provider_name)
 
     def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
         language: AssemblerLanguage = AssemblerLanguage.QASM2

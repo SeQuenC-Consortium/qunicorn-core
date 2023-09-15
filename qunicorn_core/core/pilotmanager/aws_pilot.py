@@ -25,6 +25,7 @@ from qunicorn_core.db.database_services.job_db_service import return_exception_a
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.pilot_assembler_language_list import PilotAssemblerLanguageListDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
@@ -42,7 +43,10 @@ class AWSPilot(Pilot):
 
     provider_name: ProviderName = ProviderName.AWS
 
-    supported_language: AssemblerLanguage = AssemblerLanguage.BRAKET
+    supported_languages: [PilotAssemblerLanguageListDataclass] = [
+        PilotAssemblerLanguageListDataclass(provider_ID=2, programming_language=AssemblerLanguage.BRAKET),
+        PilotAssemblerLanguageListDataclass(provider_ID=2, programming_language=AssemblerLanguage.QASM3),
+    ]
 
     def run(self, job_core_dto: JobCoreDto):
         """Execute the job on a local simulator and saves results in the database"""
@@ -131,7 +135,9 @@ class AWSPilot(Pilot):
         device_db_service.save_device_by_name(aws_device)
 
     def get_standard_provider(self):
-        return ProviderDataclass(with_token=False, supported_language=self.supported_language, name=self.provider_name)
+        return ProviderDataclass(
+            with_token=False, supported_languages=self.supported_languages, name=self.provider_name
+        )
 
     def is_device_available(self, device: DeviceDto, token: str) -> bool:
         logging.info("AWS local simulator is always available")

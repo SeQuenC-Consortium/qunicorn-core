@@ -67,8 +67,12 @@ class TranspileManager:
             for src, dest in zip(path_to_dest, path_to_dest[1:])
         ]
 
-    def get_transpiler(self, src_language: AssemblerLanguage, dest_language: AssemblerLanguage):
-        steps = self._find_transpile_strategy(src_language, dest_language)
+    def get_transpiler(self, src_language: AssemblerLanguage, dest_languages: [AssemblerLanguage]):
+        steps = None
+        for dest_language in dest_languages:
+            temp = self._find_transpile_strategy(src_language, dest_language)
+            if steps is None or len(temp) < len(steps):
+                steps = temp
 
         def transpile(circuit):
             return reduce(lambda immediate_circuit, step: step.transpile_method(immediate_circuit), steps, circuit)

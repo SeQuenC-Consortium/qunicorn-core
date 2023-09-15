@@ -17,26 +17,34 @@
 from dataclasses import dataclass
 
 import marshmallow as ma
+from qunicorn_core.db.models.pilot_assembler_language_list import PilotAssemblerLanguageListDataclass
 
 from ..flask_api_utils import MaBaseSchema
 
-__all__ = ["ProviderDtoSchema", "ProviderIDSchema", "ProviderDto"]
+__all__ = ["ProviderDtoSchema", "ProviderIDSchema", "ProviderDto", "PilotAssemblerLanguageListDataclassSchema"]
 
 from ...static.enums.provider_name import ProviderName
+from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
 
 @dataclass
 class ProviderDto:
     id: int
     with_token: bool
-    supported_language: str
+    supported_languages: [PilotAssemblerLanguageListDataclass]
     name: ProviderName
+
+
+class PilotAssemblerLanguageListDataclassSchema(MaBaseSchema):
+    id = ma.fields.Integer(required=True, allow_none=False)
+    provider_id = ma.fields.String(required=True, allow_none=False)
+    name = ma.fields.Enum(required=True, allow_none=False, enum=AssemblerLanguage)
 
 
 class ProviderDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=True, allow_none=False)
     with_token = ma.fields.Boolean(required=False, allow_none=True)
-    supported_language = ma.fields.List(ma.fields.Integer(), required=False, allow_none=True)
+    supported_languages = PilotAssemblerLanguageListDataclassSchema(many=True)
     name = ma.fields.Enum(required=True, allow_none=False, enum=ProviderName)
 
 
