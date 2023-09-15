@@ -17,8 +17,8 @@
 from dataclasses import dataclass
 
 import marshmallow as ma
-from qunicorn_core.db.models.pilot_assembler_language_list import PilotAssemblerLanguageListDataclass
 
+from .pilot_assembler_language_dtos import PilotAssemblerLanguageListDto
 from ..flask_api_utils import MaBaseSchema
 
 __all__ = ["ProviderDtoSchema", "ProviderIDSchema", "ProviderDto", "PilotAssemblerLanguageListDataclassSchema"]
@@ -31,7 +31,7 @@ from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 class ProviderDto:
     id: int
     with_token: bool
-    supported_languages: [PilotAssemblerLanguageListDataclass]
+    supported_languages: list[PilotAssemblerLanguageListDto]
     name: ProviderName
 
 

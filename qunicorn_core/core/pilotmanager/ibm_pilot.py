@@ -46,9 +46,7 @@ class IBMPilot(Pilot):
 
     provider_name: ProviderName = ProviderName.IBM
 
-    supported_languages: [PilotAssemblerLanguageListDataclass] = [
-        PilotAssemblerLanguageListDataclass(provider_ID=1, programming_language=AssemblerLanguage.QISKIT)
-    ]
+    supported_languages: list[AssemblerLanguage] = [AssemblerLanguage.QISKIT]
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
@@ -233,7 +231,11 @@ class IBMPilot(Pilot):
         return result_dtos
 
     def get_standard_provider(self):
-        return ProviderDataclass(with_token=True, supported_languages=self.supported_languages, name=self.provider_name)
+
+        return ProviderDataclass(with_token=True,
+                                 supported_languages=[PilotAssemblerLanguageListDataclass(id=0, programming_language=
+                                 self.supported_languages[0])],
+                                 name=self.provider_name)
 
     def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
         language: AssemblerLanguage = AssemblerLanguage.QASM2

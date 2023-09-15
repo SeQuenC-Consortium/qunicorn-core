@@ -23,14 +23,13 @@ from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
-from qunicorn_core.db.models.pilot_assembler_language_list import PilotAssemblerLanguageListDataclass
 
 
 class Pilot:
     """Base class for Pilots"""
 
     provider_name: ProviderName
-    supported_languages: [PilotAssemblerLanguageListDataclass]
+    supported_languages: list[AssemblerLanguage]
 
     def run(self, job: JobCoreDto) -> list[ResultDataclass]:
         """Run a job of type RUNNER on a backend using a Pilot"""

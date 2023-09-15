@@ -43,10 +43,7 @@ class AWSPilot(Pilot):
 
     provider_name: ProviderName = ProviderName.AWS
 
-    supported_languages: [PilotAssemblerLanguageListDataclass] = [
-        PilotAssemblerLanguageListDataclass(provider_ID=2, programming_language=AssemblerLanguage.BRAKET),
-        PilotAssemblerLanguageListDataclass(provider_ID=2, programming_language=AssemblerLanguage.QASM3),
-    ]
+    supported_languages: list[AssemblerLanguage] = [AssemblerLanguage.BRAKET, AssemblerLanguage.QASM3]
 
     def run(self, job_core_dto: JobCoreDto):
         """Execute the job on a local simulator and saves results in the database"""
@@ -135,9 +132,11 @@ class AWSPilot(Pilot):
         device_db_service.save_device_by_name(aws_device)
 
     def get_standard_provider(self):
-        return ProviderDataclass(
-            with_token=False, supported_languages=self.supported_languages, name=self.provider_name
-        )
+        return ProviderDataclass(with_token=False,
+                                 supported_languages=[PilotAssemblerLanguageListDataclass(
+                                     id=1, programming_language=
+                                     self.supported_languages[0])],
+                                 name=self.provider_name)
 
     def is_device_available(self, device: DeviceDto, token: str) -> bool:
         logging.info("AWS local simulator is always available")
