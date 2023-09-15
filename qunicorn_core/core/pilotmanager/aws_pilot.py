@@ -36,6 +36,7 @@ from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.util import logging
+from braket.ir.openqasm import Program
 
 
 class AWSPilot(Pilot):
@@ -51,10 +52,8 @@ class AWSPilot(Pilot):
             raise return_exception_and_update_job(job_core_dto.id, ValueError("Device need to be local for AWS"))
 
         device = LocalSimulator()
-        xx = job_core_dto.transpiled_circuits
-        yy = job_core_dto.shots
-        print(xx)
-        print(yy)
+        if type(job_core_dto.transpiled_circuits[0]) is str:
+            job_core_dto.transpiled_circuits = [Program(source=circuit) for circuit in job_core_dto.transpiled_circuits]
         quantum_tasks: LocalQuantumTaskBatch = device.run_batch(
             job_core_dto.transpiled_circuits, shots=job_core_dto.shots
         )

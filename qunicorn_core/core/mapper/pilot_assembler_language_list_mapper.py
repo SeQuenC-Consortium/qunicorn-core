@@ -20,7 +20,6 @@ from qunicorn_core.db.models.pilot_assembler_language_list import PilotAssembler
 def dto_to_dataclass(
     pilot_assembler_language_dto: PilotAssemblerLanguageListDto,
 ) -> PilotAssemblerLanguageListDataclass:
-    print("dto_to_dataclass: ", pilot_assembler_language_dto)
     return map_from_to(
         pilot_assembler_language_dto,
         PilotAssemblerLanguageListDataclass,
@@ -29,7 +28,6 @@ def dto_to_dataclass(
 
 
 def dataclass_to_dto(pilot_assembler_language: PilotAssemblerLanguageListDataclass) -> PilotAssemblerLanguageListDto:
-    print("dataclass_to_dto: ", pilot_assembler_language)
     return map_from_to(
         pilot_assembler_language,
         PilotAssemblerLanguageListDto,
