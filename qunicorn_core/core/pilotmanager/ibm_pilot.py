@@ -231,11 +231,13 @@ class IBMPilot(Pilot):
         return result_dtos
 
     def get_standard_provider(self):
-
-        return ProviderDataclass(with_token=True,
-                                 supported_languages=[PilotAssemblerLanguageListDataclass(id=0, programming_language=
-                                 self.supported_languages[0])],
-                                 name=self.provider_name)
+        supported_languages: [PilotAssemblerLanguageListDataclass] = []
+        for language in self.supported_languages:
+            supported_languages.append(
+                # TODO ggf provider id dynamisch
+                PilotAssemblerLanguageListDataclass(id=0, provider_ID=1, programming_language=language)
+            )
+        return ProviderDataclass(with_token=True, supported_languages=supported_languages, name=self.provider_name)
 
     def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
         language: AssemblerLanguage = AssemblerLanguage.QASM2

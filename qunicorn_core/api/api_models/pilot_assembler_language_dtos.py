@@ -24,4 +24,5 @@ from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 @dataclass
 class PilotAssemblerLanguageListDto:
     id: int
+    provider_ID: int
     supported_language: AssemblerLanguage

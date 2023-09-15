@@ -51,6 +51,10 @@ class AWSPilot(Pilot):
             raise return_exception_and_update_job(job_core_dto.id, ValueError("Device need to be local for AWS"))
 
         device = LocalSimulator()
+        xx = job_core_dto.transpiled_circuits
+        yy = job_core_dto.shots
+        print(xx)
+        print(yy)
         quantum_tasks: LocalQuantumTaskBatch = device.run_batch(
             job_core_dto.transpiled_circuits, shots=job_core_dto.shots
         )
@@ -132,11 +136,18 @@ class AWSPilot(Pilot):
         device_db_service.save_device_by_name(aws_device)
 
     def get_standard_provider(self):
-        return ProviderDataclass(with_token=False,
-                                 supported_languages=[PilotAssemblerLanguageListDataclass(
-                                     id=1, programming_language=
-                                     self.supported_languages[0])],
-                                 name=self.provider_name)
+        return ProviderDataclass(
+            with_token=False,
+            supported_languages=[
+                PilotAssemblerLanguageListDataclass(
+                    id=1, provider_ID=2, programming_language=self.supported_languages[0]
+                ),
+                PilotAssemblerLanguageListDataclass(
+                    id=2, provider_ID=2, programming_language=self.supported_languages[1]
+                ),
+            ],
+            name=self.provider_name,
+        )
 
     def is_device_available(self, device: DeviceDto, token: str) -> bool:
         logging.info("AWS local simulator is always available")
