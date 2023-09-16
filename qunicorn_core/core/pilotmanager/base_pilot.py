@@ -75,20 +75,20 @@ class Pilot:
             return self.execute_provider_specific(job_core_dto)
 
     def cancel(self, job: JobCoreDto):
+        """Cancel the execution of a job, locally or if that is not possible at the backend"""
         if job.state == JobState.CREATED and not JobCoreDto.celery_id == "synchronous":
             res = CELERY.AsyncResult(job.celery_id)
             if res.status == PENDING:
                 res.revoke()
                 job_db_service.update_attribute(job.id, JobState.CANCELED, JobDataclass.state)
                 return True
-            else:
-                return False
         elif job.state == JobState.RUNNING:
             return self.cancel_provider_specific(job)
         else:
-            return False
+            raise ValueError(f"Job is in invalid state for canceling: {job.state}")
 
     def cancel_provider_specific(self, job):
+        """Cancel execution of a job at the corresponding backend"""
         raise NotImplementedError()
 
     def has_same_provider(self, provider_name: ProviderName) -> bool:

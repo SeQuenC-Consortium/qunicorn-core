@@ -66,7 +66,7 @@ class AWSPilot(Pilot):
             f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} failed."
             f"Canceling while in execution not supported for AWS Jobs"
         )
-        return False
+        raise ValueError("Canceling not supported on AWS devices")
 
     @staticmethod
     def __map_simulator_results_to_dataclass(

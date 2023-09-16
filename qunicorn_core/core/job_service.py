@@ -23,7 +23,6 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobExecutePythonFileDto,
 )
 from qunicorn_core.core import job_manager_service
-from qunicorn_core.core.job_manager_service import PILOTS
 from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
@@ -107,17 +106,14 @@ def send_job_to_pilot():
 def cancel_job_by_id(job_id, token):
     """cancel job execution"""
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
-    job_request: JobRequestDto = job_mapper.dataclass_to_request(job)
-    job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request)
+    job_core_dto: JobCoreDto = job_mapper.dataclass_to_core(job)
     job_core_dto.celery_id = job.celery_id
+    print("-------------------------------------------------------" + job.celery_id)
     job_core_dto.provider_specific_id = job.provider_specific_id
     job_core_dto.state = job.state
     job_core_dto.token = token
-    device = job_core_dto.executed_on
-
-    for pilot in PILOTS:
-        if pilot.has_same_provider(device.provider.name):
-            return pilot.cancel(job_core_dto)
+    job_manager_service.cancel_job(job_core_dto)
+    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.CANCELED)
 
 
 def get_jobs_by_deployment_id(deployment_id) -> list[JobResponseDto]:

@@ -20,7 +20,13 @@ from qiskit.providers import BackendV1, QiskitBackendNotFoundError
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.result import Result
 from qiskit_ibm_provider import IBMProvider
-from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
+from qiskit_ibm_runtime import (
+    QiskitRuntimeService,
+    Sampler,
+    Estimator,
+    RuntimeJob,
+    IBMRuntimeError,
+)
 
 from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
@@ -87,14 +93,10 @@ class IBMPilot(Pilot):
     def cancel_provider_specific(self, job_dto: JobCoreDto):
         """Cancel a job on an IBM backend using the IBM Pilot"""
         job = self.__get_qiskit_job_from_qiskit_runtime(job_dto)
-        if job.cancel():
-            job_db_service.update_attribute(job_dto.id, JobState.CANCELED, JobDataclass.state)
-            logging.info(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} successful.")
-            return True
-        else:
-            job_db_service.update_attribute(job_dto.id, JobState.ERROR, JobDataclass.state)
-            logging.warn(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} failed.")
-            return False
+        job.cancel()
+        job_db_service.update_attribute(job_dto.id, JobState.CANCELED, JobDataclass.state)
+        logging.info(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} successful.")
+        return True
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""

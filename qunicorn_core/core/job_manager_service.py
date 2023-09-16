@@ -92,3 +92,11 @@ def __transpile_circuits(job_dto: JobCoreDto, dest_language: AssemblerLanguage):
     if len(error_results) > 0:
         job_db_service.update_finished_job(job_dto.id, error_results, JobState.ERROR)
         raise Exception("TranspileError")
+
+
+def cancel_job(job_core_dto):
+    """cancel job execution"""
+    device = job_core_dto.executed_on
+    for pilot in PILOTS:
+        if pilot.has_same_provider(device.provider.name):
+            return pilot.cancel(job_core_dto)
