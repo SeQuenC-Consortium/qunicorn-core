@@ -23,7 +23,7 @@ from ...static.enums.assembler_languages import AssemblerLanguage
 
 
 @REGISTRY.mapped_as_dataclass
-class PilotAssemblerLanguageListDataclass(DbModel):
+class ProviderAssemblerLanguageDataclass(DbModel):
     """Dataclass for storing Assembler Languages
 
     Attributes:

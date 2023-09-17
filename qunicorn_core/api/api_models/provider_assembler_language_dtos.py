@@ -15,14 +15,22 @@
 
 """Module containing all Dtos and their Schemas  for tasks in the Services API."""
 from dataclasses import dataclass
+from ..flask_api_utils import MaBaseSchema
+import marshmallow as ma
 
-__all__ = ["PilotAssemblerLanguageListDto"]
+__all__ = ["ProviderAssemblerLanguageDto"]
 
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
 
 @dataclass
-class PilotAssemblerLanguageListDto:
+class ProviderAssemblerLanguageDto:
     id: int
     provider_ID: int
     supported_language: AssemblerLanguage
+
+
+class ProviderAssemblerLanguageDataclassSchema(MaBaseSchema):
+    id = ma.fields.Integer(required=True, allow_none=False)
+    provider_id = ma.fields.String(required=True, allow_none=False)
+    name = ma.fields.Enum(required=True, allow_none=False, enum=AssemblerLanguage)

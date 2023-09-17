@@ -28,7 +28,7 @@ from qunicorn_core.db.database_services import job_db_service, device_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.pilot_assembler_language_list import PilotAssemblerLanguageListDataclass
+from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
@@ -231,11 +231,11 @@ class IBMPilot(Pilot):
         return result_dtos
 
     def get_standard_provider(self):
-        supported_languages: [PilotAssemblerLanguageListDataclass] = []
+        supported_languages: [ProviderAssemblerLanguageDataclass] = []
         for language in self.supported_languages:
             supported_languages.append(
                 # TODO ggf provider id dynamisch
-                PilotAssemblerLanguageListDataclass(id=0, provider_ID=1, programming_language=language)
+                ProviderAssemblerLanguageDataclass(id=0, provider_ID=1, programming_language=language)
             )
         return ProviderDataclass(with_token=True, supported_languages=supported_languages, name=self.provider_name)
 

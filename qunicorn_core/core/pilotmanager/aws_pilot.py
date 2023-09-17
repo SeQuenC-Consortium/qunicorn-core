@@ -25,7 +25,7 @@ from qunicorn_core.db.database_services.job_db_service import return_exception_a
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.pilot_assembler_language_list import PilotAssemblerLanguageListDataclass
+from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
@@ -52,8 +52,9 @@ class AWSPilot(Pilot):
             raise return_exception_and_update_job(job_core_dto.id, ValueError("Device need to be local for AWS"))
 
         device = LocalSimulator()
-        if type(job_core_dto.transpiled_circuits[0]) is str:
-            job_core_dto.transpiled_circuits = [Program(source=circuit) for circuit in job_core_dto.transpiled_circuits]
+        for index in range(len(job_core_dto.transpiled_circuits)):
+            if type(job_core_dto.transpiled_circuits[index]) is str:
+                job_core_dto.transpiled_circuits[index] = Program(source=job_core_dto.transpiled_circuits[index])
         quantum_tasks: LocalQuantumTaskBatch = device.run_batch(
             job_core_dto.transpiled_circuits, shots=job_core_dto.shots
         )
@@ -138,10 +139,10 @@ class AWSPilot(Pilot):
         return ProviderDataclass(
             with_token=False,
             supported_languages=[
-                PilotAssemblerLanguageListDataclass(
+                ProviderAssemblerLanguageDataclass(
                     id=1, provider_ID=2, programming_language=self.supported_languages[0]
                 ),
-                PilotAssemblerLanguageListDataclass(
+                ProviderAssemblerLanguageDataclass(
                     id=2, provider_ID=2, programming_language=self.supported_languages[1]
                 ),
             ],

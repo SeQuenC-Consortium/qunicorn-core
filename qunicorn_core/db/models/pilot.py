@@ -37,14 +37,4 @@ class PilotDataclass(DbModel):
         ForeignKey(JobDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None
     )
     job: Mapped[JobDataclass.__name__] = relationship(JobDataclass.__name__, default=None)
-
-    # programming_languages: Mapped[List[PilotAssemblerLanguageListDataclass.__name__]] = relationship(
-    #    PilotAssemblerLanguageListDataclass.__name__, default=None
-    # )
-    # Column(ArrayOfEnum(Enum(AchievementsType))))
-    #    (mapped_column(
-    #    sql.ARRAY(sql.Enum(ProgrammingLanguage), as_tuple=False, dimensions=None, zero_indexes=False), default=None
-    # ))
-    # programming_languages: Mapped[str] = mapped_column(sql.Enum(ProgrammingLanguage), default=None)
-
     state: Mapped[PilotState] = mapped_column(sql.String(50), default=None)
