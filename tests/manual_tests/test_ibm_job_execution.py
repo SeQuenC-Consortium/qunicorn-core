@@ -35,22 +35,22 @@ IS_ASYNCHRONOUS: bool = False
 
 def test_create_and_run_runner_with_qiskit():
     """Tests the create and run job method for synchronous execution of a runner"""
-    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.QISKIT, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.QISKIT)
 
 
 def test_create_and_run_runner_with_qasm2():
     """Tests the create and run job method for synchronous execution of a runner"""
-    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.QASM2, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.QASM2)
 
 
 def test_create_and_run_runner_with_qasm3():
     """Tests the create and run job method for synchronous execution of a runner"""
-    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.QASM3, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.QASM3)
 
 
 def test_create_and_run_runner_with_braket():
     """Tests the create and run job method for synchronous execution of a runner"""
-    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.BRAKET, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.BRAKET)
 
 
 def test_create_and_run_sampler():

@@ -45,7 +45,7 @@ RESULT_TOLERANCE: int = 100
 
 
 def execute_job_test(
-    provider: ProviderName, device: str, input_assembler_language: AssemblerLanguage, is_asynchronous: bool
+    provider: ProviderName, device: str, input_assembler_language: AssemblerLanguage, is_asynchronous: bool = False
 ):
     """creates and runs a new job and checks the response"""
 

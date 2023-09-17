@@ -31,19 +31,19 @@ from qunicorn_core.static.enums.job_state import JobState
 ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
 
 
-def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = ASYNCHRONOUS) -> SimpleJobDto:
+def create_and_run_job(job_request_dto: JobRequestDto, is_asynchronous: bool = ASYNCHRONOUS) -> SimpleJobDto:
     """First creates a job to let it run afterwards on a pilot"""
     job_core_dto: JobCoreDto = job_mapper.request_to_core(job_request_dto)
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
-    run_job_with_celery(job_core_dto, asynchronous)
+    run_job_with_celery(job_core_dto, is_asynchronous)
     return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.RUNNING)
 
 
-def run_job_with_celery(job_core_dto: JobCoreDto, asynchronous: bool):
+def run_job_with_celery(job_core_dto: JobCoreDto, is_asynchronous: bool):
     serialized_job_core_dto = yaml.dump(job_core_dto)
     job_core_dto_dict = {"data": serialized_job_core_dto}
-    if asynchronous:
+    if is_asynchronous:
         job_manager_service.run_job.delay(job_core_dto_dict)
     else:
         job_manager_service.run_job(job_core_dto_dict)
