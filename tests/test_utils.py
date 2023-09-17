@@ -28,6 +28,8 @@ from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 
+from tests.conftest import set_up_env
+
 JOB_JSON_IBM = "job_request_dto_test_data_IBM.json"
 JOB_JSON_AWS = "job_request_dto_test_data_AWS.json"
 DEPLOYMENT_JSON = "deployment_request_dto_test_data.json"
@@ -36,26 +38,35 @@ DEPLOYMENT_QASM3_CIRCUITS_JSON = "deployment_request_dto_with_qasm3_circuit_test
 DEPLOYMENT_BRAKET_CIRCUITS_JSON = "deployment_request_dto_with_braket_circuit_test_data.json"
 DEPLOYMENT_QISKIT_CIRCUITS_JSON = "deployment_request_dto_with_qiskit_circuit_test_data.json"
 PROGRAM_JSON = "program_request_dto_test_data.json"
-EXPECTED_ID: int = 3
+
+EXPECTED_ID: int = 3  # hardcoded ID can be removed if tests for the correct ID are no longer needed
 JOB_FINISHED_PROGRESS: int = 100
 STANDARD_JOB_NAME: str = "JobName"
 IS_ASYNCHRONOUS: bool = False
 RESULT_TOLERANCE: int = 100
 
 
-def generic_test(
-    app, provider: ProviderName, device: str, input_assembler_language: AssemblerLanguage, is_asynchronous: bool
+
+def execute_job_test(
+    provider: ProviderName, device: str, input_assembler_language: AssemblerLanguage, is_asynchronous: bool = False
 ):
-    """creates a new job and returns the dto with the response"""
+    """creates and runs a new job and checks the response"""
+
+    # GIVEN: Database Setup
+    app = set_up_env()
+
     with app.app_context():
         job_request_dto: JobRequestDto = get_test_job(provider)
         job_request_dto.device_name = device
         save_deployment_and_add_id_to_job(job_request_dto, input_assembler_language)
+
+        # WHEN: create_and_run
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, is_asynchronous)
+
+        # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
         check_simple_job_dto(return_dto)
         job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
         check_if_job_finished(job)
-
         if provider is ProviderName.IBM:
             ibm_check_if_job_runner_result_correct(job)
         elif provider is ProviderName.AWS:
@@ -138,14 +149,16 @@ def check_aws_local_simulator_results(results, shots: int):
         if i == 0:
             if counts.get("00") is not None and counts.get("11") is not None:
                 counts0 = counts.get("00")
-                probabilities0 = probabilities.get("00")
+
+                probability00 = probabilities.get("00")
                 counts1 = counts.get("11")
-                probabilities1 = probabilities.get("11")
+                probability11 = probabilities.get("11")
             else:
                 raise AssertionError
             assert shots / 2 - RESULT_TOLERANCE < counts0 < shots / 2 + RESULT_TOLERANCE
             assert shots / 2 - RESULT_TOLERANCE < counts1 < shots / 2 + RESULT_TOLERANCE
-            assert 0.48 < probabilities0 < 0.52 and 0.48 < probabilities1 < 0.52
+
+            assert 0.48 < probability00 < 0.52 and 0.48 < probability11 < 0.52
         else:
             assert counts.get("00") == shots
 

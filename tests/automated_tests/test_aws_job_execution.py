@@ -35,55 +35,25 @@ def test_create_and_run_aws_local_simulator():
     with app.app_context():
         job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
         test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QASM3)
-        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
+
+        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto)
 
         # THEN: Check if the correct job with its result is saved in the db
         assert return_dto.state == JobState.RUNNING
 
 
 def test_aws_local_simulator_braket_job_results():
-    """creates a new job and a braket deployment from json input (from test resources) and runs it on the aws
-    local_simulator.
-    Then the results in the db are checked."""
-    # GIVEN: Database Setup - AWS added as a provider
-    app = set_up_env()
-    with app.app_context():
-        # WHEN: create_and_run executed in generic_test
-        # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
-        test_utils.generic_test(app, ProviderName.AWS, "local_simulator", AssemblerLanguage.BRAKET, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", AssemblerLanguage.BRAKET)
 
 
 def test_aws_local_simulator_qiskit_job_results():
-    """creates a new job and a qiskit deployment from json input (from test resources) and runs it on the aws
-    local_simulator.
-    Then the results in the db are checked."""
-    # GIVEN: Database Setup - AWS added as a provider
-    app = set_up_env()
-    with app.app_context():
-        # WHEN: create_and_run executed in generic_test
-        # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
-        test_utils.generic_test(app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QISKIT, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", AssemblerLanguage.QISKIT)
 
 
 def test_aws_local_simulator_qasm3_job_results():
-    """creates a new job and a qasm3 deployment from json input (from test resources) and runs it on the aws
-    local_simulator.
-    Then the results in the db are checked."""
-    # GIVEN: Database Setup - AWS added as a provider
-    app = set_up_env()
-    with app.app_context():
-        # WHEN: create_and_run executed in generic_test
-        # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
-        test_utils.generic_test(app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM3, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM3)
 
 
 def test_aws_local_simulator_qasm2_job_results():
-    """creates a new job and a qasm2 deployment from json input (from test resources) and runs it on the aws
-    local_simulator.
-    Then the results in the db are checked."""
-    # GIVEN: Database Setup - AWS added as a provider
-    app = set_up_env()
-    with app.app_context():
-        # WHEN: create_and_run executed in generic_test
-        # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
-        test_utils.generic_test(app, ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM2, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM2)
+
