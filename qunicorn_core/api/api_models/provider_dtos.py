@@ -24,7 +24,6 @@ from ..flask_api_utils import MaBaseSchema
 __all__ = ["ProviderDtoSchema", "ProviderIDSchema", "ProviderDto", "ProviderAssemblerLanguageDataclassSchema"]
 
 from ...static.enums.provider_name import ProviderName
-from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
 
 @dataclass
