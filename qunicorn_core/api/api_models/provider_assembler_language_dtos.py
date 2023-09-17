@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from ..flask_api_utils import MaBaseSchema
 import marshmallow as ma
 
-__all__ = ["ProviderAssemblerLanguageDto"]
+__all__ = ["ProviderAssemblerLanguageDto", "ProviderAssemblerLanguageDtoSchema"]
 
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
@@ -30,7 +30,7 @@ class ProviderAssemblerLanguageDto:
     supported_language: AssemblerLanguage
 
 
-class ProviderAssemblerLanguageDataclassSchema(MaBaseSchema):
+class ProviderAssemblerLanguageDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=True, allow_none=False)
     provider_id = ma.fields.String(required=True, allow_none=False)
     name = ma.fields.Enum(required=True, allow_none=False, enum=AssemblerLanguage)

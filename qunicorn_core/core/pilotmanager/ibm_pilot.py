@@ -231,12 +231,9 @@ class IBMPilot(Pilot):
         return result_dtos
 
     def get_standard_provider(self):
-        supported_languages: [ProviderAssemblerLanguageDataclass] = []
-        for language in self.supported_languages:
-            supported_languages.append(
-                # TODO ggf provider id dynamisch
-                ProviderAssemblerLanguageDataclass(id=0, provider_ID=1, programming_language=language)
-            )
+        supported_languages = [
+            ProviderAssemblerLanguageDataclass(supported_language=language) for language in self.supported_languages
+        ]
         return ProviderDataclass(with_token=True, supported_languages=supported_languages, name=self.provider_name)
 
     def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:

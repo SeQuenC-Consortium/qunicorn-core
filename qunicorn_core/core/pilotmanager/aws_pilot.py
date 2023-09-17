@@ -53,6 +53,7 @@ class AWSPilot(Pilot):
 
         device = LocalSimulator()
         for index in range(len(job_core_dto.transpiled_circuits)):
+            # Since QASM is stored as a String, it needs to be converted to a QASM Program before execution
             if type(job_core_dto.transpiled_circuits[index]) is str:
                 job_core_dto.transpiled_circuits[index] = Program(source=job_core_dto.transpiled_circuits[index])
         quantum_tasks: LocalQuantumTaskBatch = device.run_batch(
@@ -139,12 +140,8 @@ class AWSPilot(Pilot):
         return ProviderDataclass(
             with_token=False,
             supported_languages=[
-                ProviderAssemblerLanguageDataclass(
-                    id=1, provider_ID=2, programming_language=self.supported_languages[0]
-                ),
-                ProviderAssemblerLanguageDataclass(
-                    id=2, provider_ID=2, programming_language=self.supported_languages[1]
-                ),
+                ProviderAssemblerLanguageDataclass(supported_language=self.supported_languages[0]),
+                ProviderAssemblerLanguageDataclass(supported_language=self.supported_languages[1]),
             ],
             name=self.provider_name,
         )

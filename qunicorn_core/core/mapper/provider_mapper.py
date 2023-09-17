@@ -13,17 +13,15 @@
 # limitations under the License.
 
 from qunicorn_core.api.api_models import ProviderDto
-from qunicorn_core.api.api_models.provider_assembler_language_dtos import ProviderAssemblerLanguageDto
 from qunicorn_core.core.mapper import provider_assembler_language_mapper
 from qunicorn_core.core.mapper.general_mapper import map_from_to
-from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 
 
 def dto_to_dataclass(provider_dto: ProviderDto) -> ProviderDataclass:
-    supported_languages: list[ProviderAssemblerLanguageDataclass] = []
-    for language in provider_dto.supported_languages:
-        supported_languages.append(provider_assembler_language_mapper.dto_to_dataclass(language))
+    supported_languages = [
+        provider_assembler_language_mapper.dto_to_dataclass(language) for language in provider_dto.supported_languages
+    ]
     return map_from_to(
         provider_dto,
         ProviderDataclass,
@@ -32,9 +30,9 @@ def dto_to_dataclass(provider_dto: ProviderDto) -> ProviderDataclass:
 
 
 def dataclass_to_dto(provider: ProviderDataclass) -> ProviderDto:
-    supported_languages: list[ProviderAssemblerLanguageDto] = []
-    for language in provider.supported_languages:
-        supported_languages.append(provider_assembler_language_mapper.dataclass_to_dto(language))
+    supported_languages = [
+        provider_assembler_language_mapper.dataclass_to_dto(language) for language in provider.supported_languages
+    ]
     return map_from_to(
         provider,
         ProviderDto,

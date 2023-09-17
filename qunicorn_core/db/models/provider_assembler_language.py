@@ -27,10 +27,11 @@ class ProviderAssemblerLanguageDataclass(DbModel):
     """Dataclass for storing Assembler Languages
 
     Attributes:
-
+        provider_ID: the ID of the provider that supports this language
+        supported_language: the AssemblerLanguage (Enum) which is supported
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
     provider_ID: Mapped[int] = mapped_column(ForeignKey("Provider.id"), default=None, nullable=True)
 
-    programming_language: Mapped[str] = mapped_column(sql.Enum(AssemblerLanguage), default=None)
+    supported_language: Mapped[str] = mapped_column(sql.Enum(AssemblerLanguage), default=None)

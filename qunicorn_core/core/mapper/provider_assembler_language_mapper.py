@@ -23,7 +23,6 @@ def dto_to_dataclass(
     return map_from_to(
         provider_assembler_language_dto,
         ProviderAssemblerLanguageDataclass,
-        {"supported_language": provider_assembler_language_dto.supported_language},
     )
 
 
@@ -31,5 +30,4 @@ def dataclass_to_dto(provider_assembler_language: ProviderAssemblerLanguageDatac
     return map_from_to(
         provider_assembler_language,
         ProviderAssemblerLanguageDto,
-        fields_mapping={"supported_language": provider_assembler_language.programming_language},
     )
