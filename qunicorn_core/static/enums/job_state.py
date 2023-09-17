@@ -24,6 +24,7 @@ class JobState(StrEnum):
         FINISHED: Job finished the executing
         BLOCKED: Job is blocked, and cannot be used for other purposes
         ERROR: When an error occurred while executing a quantum circuit
+        CANCELED: Job execution has been successfully canceled
     """
 
     READY = "READY"
@@ -32,4 +33,3 @@ class JobState(StrEnum):
     BLOCKED = "BLOCKED"
     ERROR = "ERROR"
     CANCELED = "CANCELED"
-    CREATED = "CREATED"

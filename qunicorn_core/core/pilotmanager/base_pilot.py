@@ -76,14 +76,13 @@ class Pilot:
 
     def cancel(self, job: JobCoreDto):
         """Cancel the execution of a job, locally or if that is not possible at the backend"""
-        if job.state == JobState.CREATED and not JobCoreDto.celery_id == "synchronous":
+        if job.state == JobState.READY and not JobCoreDto.celery_id == "synchronous":
             res = CELERY.AsyncResult(job.celery_id)
             if res.status == PENDING:
                 res.revoke()
                 job_db_service.update_attribute(job.id, JobState.CANCELED, JobDataclass.state)
-                return True
         elif job.state == JobState.RUNNING:
-            return self.cancel_provider_specific(job)
+            self.cancel_provider_specific(job)
         else:
             raise ValueError(f"Job is in invalid state for canceling: {job.state}")
 

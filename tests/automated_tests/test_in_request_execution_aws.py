@@ -40,7 +40,7 @@ def test_create_and_run_aws_local_simulator():
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
         # THEN: Check if the correct job with its result is saved in the db
-        assert return_dto.state == JobState.CREATED
+        assert return_dto.state == JobState.READY
 
 
 def test_aws_local_simulator_qasm3_job_results():

@@ -37,7 +37,7 @@ def create_and_run_job(job_request_dto: JobRequestDto, asynchronous: bool = ASYN
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
     run_job_with_celery(job_core_dto, asynchronous)
-    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.CREATED)
+    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.READY)
 
 
 def run_job_with_celery(job_core_dto: JobCoreDto, asynchronous: bool):
@@ -107,9 +107,6 @@ def cancel_job_by_id(job_id, token):
     """cancel job execution"""
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
     job_core_dto: JobCoreDto = job_mapper.dataclass_to_core(job)
-    job_core_dto.celery_id = job.celery_id
-    print("-------------------------------------------------------" + job.celery_id)
-    job_core_dto.provider_specific_id = job.provider_specific_id
     job_core_dto.state = job.state
     job_core_dto.token = token
     job_manager_service.cancel_job(job_core_dto)

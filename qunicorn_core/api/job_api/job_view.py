@@ -112,7 +112,6 @@ class JobCancelView(MethodView):
                 jsonify(
                     {
                         "code": 422,
-                        "status": "Error",
                         "message": "Unable to cancel job",
                         "errors": {exception.__class__.__name__: str(exception)},
                     }

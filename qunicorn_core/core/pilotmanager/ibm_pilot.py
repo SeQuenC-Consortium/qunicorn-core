@@ -96,7 +96,6 @@ class IBMPilot(Pilot):
         job.cancel()
         job_db_service.update_attribute(job_dto.id, JobState.CANCELED, JobDataclass.state)
         logging.info(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} successful.")
-        return True
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
