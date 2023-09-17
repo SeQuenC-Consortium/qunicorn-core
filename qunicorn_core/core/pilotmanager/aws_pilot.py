@@ -140,8 +140,7 @@ class AWSPilot(Pilot):
         return ProviderDataclass(
             with_token=False,
             supported_languages=[
-                ProviderAssemblerLanguageDataclass(supported_language=self.supported_languages[0]),
-                ProviderAssemblerLanguageDataclass(supported_language=self.supported_languages[1]),
+                ProviderAssemblerLanguageDataclass(supported_language=language) for language in self.supported_languages
             ],
             name=self.provider_name,
         )
