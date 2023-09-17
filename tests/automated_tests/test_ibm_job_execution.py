@@ -142,27 +142,19 @@ def __test_job_ibm_runner(mocker):
 
 def test_create_and_run_job_on_aer_simulator_with_qiskit():
     """Tests the create and run job method for synchronous execution of a runner on aer simulator"""
-    app = set_up_env()
-
-    test_utils.generic_test(app, ProviderName.IBM, "aer_simulator", AssemblerLanguage.QISKIT, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.QISKIT, IS_ASYNCHRONOUS)
 
 
 def test_create_and_run_job_on_aer_simulator_with_qasm2():
     """Tests the create and run job method for synchronous execution of a runner on aer simulator"""
-    app = set_up_env()
-
-    test_utils.generic_test(app, ProviderName.IBM, "aer_simulator", AssemblerLanguage.QASM2, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.QASM2, IS_ASYNCHRONOUS)
 
 
 def test_create_and_run_job_on_aer_simulator_with_qasm3():
     """Tests the create and run job method for synchronous execution of a runner on aer simulator"""
-    app = set_up_env()
-
-    test_utils.generic_test(app, ProviderName.IBM, "aer_simulator", AssemblerLanguage.QASM3, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.QASM3, IS_ASYNCHRONOUS)
 
 
 def test_create_and_run_job_on_aer_simulator_with_braket():
     """Tests the create and run job method for synchronous execution of a runner on aer simulator"""
-    app = set_up_env()
-
-    test_utils.generic_test(app, ProviderName.IBM, "aer_simulator", AssemblerLanguage.BRAKET, IS_ASYNCHRONOUS)
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.BRAKET, IS_ASYNCHRONOUS)
