@@ -33,7 +33,6 @@ from tests import test_utils
 from tests.conftest import set_up_env
 
 
-
 def __test_celery_run_job(mocker):
     """Testing the synchronous call of the run_job celery task"""
     # GIVEN: Setting up Mocks and Environment
@@ -153,4 +152,3 @@ def test_create_and_run_job_on_aer_simulator_with_qasm3():
 
 def test_create_and_run_job_on_aer_simulator_with_braket():
     test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.BRAKET)
-

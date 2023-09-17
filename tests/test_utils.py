@@ -46,7 +46,6 @@ IS_ASYNCHRONOUS: bool = False
 RESULT_TOLERANCE: int = 100
 
 
-
 def execute_job_test(
     provider: ProviderName, device: str, input_assembler_language: AssemblerLanguage, is_asynchronous: bool = False
 ):

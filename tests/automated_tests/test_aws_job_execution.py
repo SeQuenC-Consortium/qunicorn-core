@@ -56,4 +56,3 @@ def test_aws_local_simulator_qasm3_job_results():
 
 def test_aws_local_simulator_qasm2_job_results():
     test_utils.execute_job_test(ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM2)
-
