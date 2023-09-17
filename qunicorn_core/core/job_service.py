@@ -107,7 +107,6 @@ def cancel_job_by_id(job_id, token):
     """cancel job execution"""
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
     job_core_dto: JobCoreDto = job_mapper.dataclass_to_core(job)
-    job_core_dto.state = job.state
     job_core_dto.token = token
     job_manager_service.cancel_job(job_core_dto)
     return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.CANCELED)
