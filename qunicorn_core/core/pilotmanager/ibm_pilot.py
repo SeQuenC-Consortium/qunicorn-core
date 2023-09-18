@@ -15,8 +15,8 @@ import os
 from datetime import datetime
 
 import qiskit
-from qiskit.primitives import EstimatorResult, SamplerResult
-from qiskit.providers import BackendV1, QiskitBackendNotFoundError
+from qiskit.primitives import EstimatorResult, SamplerResult, Sampler as LocalSampler, Estimator as LocalEstimator
+from qiskit.providers import QiskitBackendNotFoundError
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.result import Result
 from qiskit_ibm_provider import IBMProvider
@@ -85,29 +85,30 @@ class IBMPilot(Pilot):
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
-
-        backend, circuits = self.__get_backend_and_circuits_for_qiskit_runtime(job_dto)
-        sampler = Sampler(session=backend)
-        job_from_ibm: RuntimeJob = sampler.run(circuits)
+        if job_dto.executed_on.is_local:
+            sampler = LocalSampler()
+        else:
+            sampler = Sampler(session=self.__get_qiskit_runtime_backend(job_dto))
+        job_from_ibm: RuntimeJob = sampler.run(job_dto.transpiled_circuits)
         ibm_result: SamplerResult = job_from_ibm.result()
         return IBMPilot._map_sampler_results_to_dataclass(ibm_result, job_dto)
 
     def __estimate(self, job_dto: JobCoreDto):
         """Uses the Estimator to execute a job on an IBM backend using the IBM Pilot"""
-
-        backend, circuits = self.__get_backend_and_circuits_for_qiskit_runtime(job_dto)
-        estimator = Estimator(session=backend)
-        job_from_ibm = estimator.run(circuits, observables=[SparsePauliOp("IY"), SparsePauliOp("IY")])
+        observables: list = [SparsePauliOp("IY"), SparsePauliOp("IY")]
+        if job_dto.executed_on.is_local:
+            estimator = LocalEstimator()
+        else:
+            estimator = Estimator(session=self.__get_qiskit_runtime_backend(job_dto))
+        job_from_ibm = estimator.run(job_dto.transpiled_circuits, observables=observables)
         ibm_result: EstimatorResult = job_from_ibm.result()
         return IBMPilot._map_estimator_results_to_dataclass(ibm_result, job_dto, "IY")
 
-    def __get_backend_and_circuits_for_qiskit_runtime(self, job_dto):
+    def __get_qiskit_runtime_backend(self, job_dto):
         """Instantiate all important configurations and updates the job_state"""
 
         self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
-        service: QiskitRuntimeService = QiskitRuntimeService()
-        backend: BackendV1 = service.get_backend(job_dto.executed_on.name)
-        return backend, job_dto.transpiled_circuits
+        return QiskitRuntimeService().get_backend(job_dto.executed_on.name)
 
     @staticmethod
     def get_ibm_provider_and_login(token: str) -> IBMProvider:
