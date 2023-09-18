@@ -116,7 +116,7 @@ def get_test_job(provider: ProviderName) -> JobRequestDto:
 def check_simple_job_dto(return_dto: SimpleJobDto):
     assert return_dto.id == EXPECTED_ID
     assert return_dto.name == STANDARD_JOB_NAME
-    assert return_dto.state == JobState.RUNNING
+    assert return_dto.state == JobState.READY
 
 
 def check_if_job_finished(job: JobDataclass):
