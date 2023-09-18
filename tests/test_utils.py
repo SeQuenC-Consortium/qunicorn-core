@@ -44,6 +44,8 @@ IS_ASYNCHRONOUS: bool = False
 COUNTS_TOLERANCE: int = 100
 PROBABILITY_1: float = 1
 PROBABILITY_TOLERANCE: float = 0.1
+QUBIT_0: str = "0x0"
+QUBIT_3: str = "0x3"
 
 
 def execute_job_test(
@@ -123,9 +125,6 @@ def check_if_job_finished(job: JobDataclass):
 
 
 def ibm_check_if_job_runner_result_correct(job: JobDataclass):
-    qubit_0: str = "0x0"
-    qubit_2: str = "0x3"
-
     job.type = JobType.RUNNER
     for i in range(len(job.results)):
         result: ResultDataclass = job.results[i]
@@ -135,16 +134,16 @@ def ibm_check_if_job_runner_result_correct(job: JobDataclass):
         counts: dict = result.result_dict["counts"]
         probabilities: dict = result.result_dict["probabilities"]
         if i == 0:
-            assert compare_values_with_tolerance(shots / 2, counts[qubit_0], COUNTS_TOLERANCE)
-            assert compare_values_with_tolerance(shots / 2, counts[qubit_2], COUNTS_TOLERANCE)
-            assert (counts[qubit_0] + counts[qubit_2]) == shots
+            assert compare_values_with_tolerance(shots / 2, counts[QUBIT_0], COUNTS_TOLERANCE)
+            assert compare_values_with_tolerance(shots / 2, counts[QUBIT_3], COUNTS_TOLERANCE)
+            assert (counts[QUBIT_0] + counts[QUBIT_3]) == shots
 
-            assert compare_values_with_tolerance(PROBABILITY_1 / 2, probabilities[qubit_0], PROBABILITY_TOLERANCE)
-            assert compare_values_with_tolerance(PROBABILITY_1 / 2, probabilities[qubit_2], PROBABILITY_TOLERANCE)
-            assert (probabilities[qubit_0] + probabilities[qubit_2]) > PROBABILITY_1 - PROBABILITY_TOLERANCE
+            assert compare_values_with_tolerance(PROBABILITY_1 / 2, probabilities[QUBIT_0], PROBABILITY_TOLERANCE)
+            assert compare_values_with_tolerance(PROBABILITY_1 / 2, probabilities[QUBIT_3], PROBABILITY_TOLERANCE)
+            assert (probabilities[QUBIT_0] + probabilities[QUBIT_3]) > PROBABILITY_1 - PROBABILITY_TOLERANCE
         else:
-            assert counts[qubit_0] == shots
-            assert probabilities[qubit_0] == PROBABILITY_1
+            assert counts[QUBIT_0] == shots
+            assert probabilities[QUBIT_0] == PROBABILITY_1
 
 
 def compare_values_with_tolerance(value1, value2, tolerance) -> bool:

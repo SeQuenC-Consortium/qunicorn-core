@@ -24,7 +24,7 @@ from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from tests import test_utils
 from tests.conftest import set_up_env
-from tests.test_utils import IS_ASYNCHRONOUS, PROBABILITY_1, PROBABILITY_TOLERANCE
+from tests.test_utils import IS_ASYNCHRONOUS, PROBABILITY_1, PROBABILITY_TOLERANCE, QUBIT_3, QUBIT_0
 
 
 def test_create_and_run_sampler():
@@ -59,8 +59,8 @@ def check_if_job_sample_result_correct(job: JobDataclass):
         assert result.meta_data is None
         probs: dict = result.result_dict
         if i == 0:
-            assert test_utils.compare_values_with_tolerance(PROBABILITY_1 / 2, probs["3"], PROBABILITY_TOLERANCE)
-            assert test_utils.compare_values_with_tolerance(PROBABILITY_1 / 2, probs["0"], PROBABILITY_TOLERANCE)
-            assert probs["3"] + probs["0"] > PROBABILITY_1 - PROBABILITY_TOLERANCE
+            assert test_utils.compare_values_with_tolerance(PROBABILITY_1 / 2, probs[QUBIT_0], PROBABILITY_TOLERANCE)
+            assert test_utils.compare_values_with_tolerance(PROBABILITY_1 / 2, probs[QUBIT_3], PROBABILITY_TOLERANCE)
+            assert probs[QUBIT_3] + probs[QUBIT_0] > PROBABILITY_1 - PROBABILITY_TOLERANCE
         else:
-            assert probs["0"] > PROBABILITY_1 - PROBABILITY_TOLERANCE
+            assert probs[QUBIT_0] > PROBABILITY_1 - PROBABILITY_TOLERANCE

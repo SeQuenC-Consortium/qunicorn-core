@@ -76,8 +76,8 @@ class AWSPilot(Pilot):
         return [
             ResultDataclass(
                 result_dict={
-                    "counts": AWSPilot.binary_to_hex(aws_results[i].measurement_counts, job_id),
-                    "probabilities": AWSPilot.binary_to_hex(aws_results[i].measurement_probabilities, job_id),
+                    "counts": AWSPilot.qubit_binary_to_hex(aws_results[i].measurement_counts, job_id),
+                    "probabilities": AWSPilot.qubit_binary_to_hex(aws_results[i].measurement_probabilities, job_id),
                 },
                 job_id=job_id,
                 circuit=job_dto.deployment.programs[i].quantum_circuit,
@@ -88,7 +88,7 @@ class AWSPilot(Pilot):
         ]
 
     @staticmethod
-    def binary_to_hex(counts_in_binary: dict, job_id: int) -> dict:
+    def qubit_binary_to_hex(counts_in_binary: dict, job_id: int) -> dict:
         try:
             return dict([(hex(int(k, 2)), v) for k, v in counts_in_binary.items()])
         except Exception:
