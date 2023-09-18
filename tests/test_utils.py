@@ -15,7 +15,6 @@
 """"pytest utils file"""
 import json
 import os
-from collections import Counter
 
 from qunicorn_core.api.api_models import DeploymentRequestDto, JobRequestDto, DeploymentDto, SimpleJobDto
 from qunicorn_core.core import deployment_service, job_service
@@ -27,7 +26,6 @@ from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
-
 from tests.conftest import set_up_env
 
 JOB_JSON_IBM = "job_request_dto_test_data_IBM.json"
@@ -43,7 +41,9 @@ EXPECTED_ID: int = 3  # hardcoded ID can be removed if tests for the correct ID 
 JOB_FINISHED_PROGRESS: int = 100
 STANDARD_JOB_NAME: str = "JobName"
 IS_ASYNCHRONOUS: bool = False
-RESULT_TOLERANCE: int = 100
+COUNTS_TOLERANCE: int = 100
+PROBABILITY_1: float = 1
+PROBABILITY_TOLERANCE: float = 0.1
 
 
 def execute_job_test(
@@ -66,10 +66,7 @@ def execute_job_test(
         check_simple_job_dto(return_dto)
         job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
         check_if_job_finished(job)
-        if provider is ProviderName.IBM:
-            ibm_check_if_job_runner_result_correct(job)
-        elif provider is ProviderName.AWS:
-            check_aws_local_simulator_results(job.results, job.shots)
+        ibm_check_if_job_runner_result_correct(job)
 
 
 def get_object_from_json(json_file_name: str):
@@ -126,40 +123,32 @@ def check_if_job_finished(job: JobDataclass):
 
 
 def ibm_check_if_job_runner_result_correct(job: JobDataclass):
+    qubit_0: str = "0x0"
+    qubit_2: str = "0x3"
+
     job.type = JobType.RUNNER
     for i in range(len(job.results)):
         result: ResultDataclass = job.results[i]
         check_standard_result_data(i, job, result)
         assert result.meta_data is not None
         shots: int = job.shots
+        counts: dict = result.result_dict["counts"]
+        probabilities: dict = result.result_dict["probabilities"]
         if i == 0:
-            assert (shots / 2 + RESULT_TOLERANCE) > result.result_dict["0x0"] > (shots / 2 - RESULT_TOLERANCE)
-            assert (shots / 2 + RESULT_TOLERANCE) > result.result_dict["0x3"] > (shots / 2 - RESULT_TOLERANCE)
-            assert (result.result_dict["0x0"] + result.result_dict["0x3"]) == shots
+            assert compare_values_with_tolerance(shots / 2, counts[qubit_0], COUNTS_TOLERANCE)
+            assert compare_values_with_tolerance(shots / 2, counts[qubit_2], COUNTS_TOLERANCE)
+            assert (counts[qubit_0] + counts[qubit_2]) == shots
+
+            assert compare_values_with_tolerance(PROBABILITY_1 / 2, probabilities[qubit_0], PROBABILITY_TOLERANCE)
+            assert compare_values_with_tolerance(PROBABILITY_1 / 2, probabilities[qubit_2], PROBABILITY_TOLERANCE)
+            assert (probabilities[qubit_0] + probabilities[qubit_2]) > PROBABILITY_1 - PROBABILITY_TOLERANCE
         else:
-            assert result.result_dict["0x0"] == shots
+            assert counts[qubit_0] == shots
+            assert probabilities[qubit_0] == PROBABILITY_1
 
 
-def check_aws_local_simulator_results(results, shots: int):
-    for i in range(len(results)):
-        results_dict = results[i].result_dict
-        counts: Counter = results_dict.get("counts")
-        probabilities: dict = results_dict.get("probabilities")
-        if i == 0:
-            if counts.get("00") is not None and counts.get("11") is not None:
-                counts0 = counts.get("00")
-
-                probability00 = probabilities.get("00")
-                counts1 = counts.get("11")
-                probability11 = probabilities.get("11")
-            else:
-                raise AssertionError
-            assert shots / 2 - RESULT_TOLERANCE < counts0 < shots / 2 + RESULT_TOLERANCE
-            assert shots / 2 - RESULT_TOLERANCE < counts1 < shots / 2 + RESULT_TOLERANCE
-
-            assert 0.48 < probability00 < 0.52 and 0.48 < probability11 < 0.52
-        else:
-            assert counts.get("00") == shots
+def compare_values_with_tolerance(value1, value2, tolerance) -> bool:
+    return value1 + tolerance > value2 > value1 - tolerance
 
 
 def check_standard_result_data(i, job, result):

@@ -25,8 +25,10 @@ from ...static.enums.result_type import ResultType
 class ResultDataclass(DbModel):
     """Dataclass for storing results of a job
 
-    Attributes: TODO
+    Attributes:
         result_dict (dict): The results of the job, in the given result_type
+            For the Runner it should have the keys counts and probabilities
+            The counts and probabilities should be a dict with hexadecimals as quantum-bit-keys
         job_id (int): The  job_id that was executed
         circuit (str): The circuit which was executed by the job
         meta_data (dict): Some other data that was given by ibm

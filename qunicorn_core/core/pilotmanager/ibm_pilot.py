@@ -28,8 +28,8 @@ from qunicorn_core.db.database_services import job_db_service, device_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.db.models.user import UserDataclass
@@ -185,16 +185,25 @@ class IBMPilot(Pilot):
 
         for i in range(len(ibm_result.results)):
             counts: dict = ibm_result.results[i].data.counts
+            probabilities: dict = IBMPilot.calculate_probabilities(counts)
             circuit: str = job_dto.deployment.programs[i].quantum_circuit
             result_dtos.append(
                 ResultDataclass(
                     circuit=circuit,
-                    result_dict=counts,
+                    result_dict={"counts": counts, "probabilities": probabilities},
                     result_type=ResultType.COUNTS,
                     meta_data=ibm_result.results[i].to_dict(),
                 )
             )
         return result_dtos
+
+    @staticmethod
+    def calculate_probabilities(counts: dict) -> dict:
+        total_counts = sum(counts.values())
+        probabilities = {}
+        for key, value in counts.items():
+            probabilities[key] = value / total_counts
+        return probabilities
 
     @staticmethod
     def _map_estimator_results_to_dataclass(
