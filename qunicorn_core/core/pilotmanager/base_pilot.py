@@ -36,7 +36,7 @@ class Pilot:
     """Base class for Pilots"""
 
     provider_name: ProviderName
-    supported_language: AssemblerLanguage
+    supported_languages: list[AssemblerLanguage]
 
     def run(self, job: JobCoreDto) -> list[ResultDataclass]:
         """Run a job of type RUNNER on a backend using a Pilot"""

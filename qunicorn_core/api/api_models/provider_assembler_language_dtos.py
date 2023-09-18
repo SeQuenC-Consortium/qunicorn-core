@@ -15,31 +15,22 @@
 
 """Module containing all Dtos and their Schemas  for tasks in the Services API."""
 from dataclasses import dataclass
-
+from ..flask_api_utils import MaBaseSchema
 import marshmallow as ma
 
-from .provider_assembler_language_dtos import ProviderAssemblerLanguageDto, ProviderAssemblerLanguageDtoSchema
-from ..flask_api_utils import MaBaseSchema
+__all__ = ["ProviderAssemblerLanguageDto", "ProviderAssemblerLanguageDtoSchema"]
 
-__all__ = ["ProviderDtoSchema", "ProviderIDSchema", "ProviderDto"]
-
-from ...static.enums.provider_name import ProviderName
+from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
 
 @dataclass
-class ProviderDto:
+class ProviderAssemblerLanguageDto:
     id: int
-    with_token: bool
-    supported_languages: list[ProviderAssemblerLanguageDto]
-    name: ProviderName
+    provider_ID: int
+    supported_language: AssemblerLanguage
 
 
-class ProviderDtoSchema(MaBaseSchema):
+class ProviderAssemblerLanguageDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=True, allow_none=False)
-    with_token = ma.fields.Boolean(required=False, allow_none=True)
-    supported_languages = ma.fields.Nested(ProviderAssemblerLanguageDtoSchema(), many=True)
-    name = ma.fields.Enum(required=True, allow_none=False, enum=ProviderName)
-
-
-class ProviderIDSchema(MaBaseSchema):
     provider_id = ma.fields.String(required=True, allow_none=False)
+    name = ma.fields.Enum(required=True, allow_none=False, enum=AssemblerLanguage)

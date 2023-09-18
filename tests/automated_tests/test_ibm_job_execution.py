@@ -31,7 +31,6 @@ from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from tests import test_utils
 from tests.conftest import set_up_env
-from tests.manual_tests.test_jobmanager_with_ibm import create_and_run_runner
 
 
 def __test_celery_run_job(mocker):
@@ -139,6 +138,17 @@ def __test_job_ibm_runner(mocker):
         assert new_job.state == JobState.ERROR
 
 
-def test_create_and_run_job_on_aer_simulator():
-    """Tests the create and run job method for synchronous execution of a runner on aer simulator"""
-    create_and_run_runner("aer_simulator")
+def test_create_and_run_job_on_aer_simulator_with_qiskit():
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.QISKIT)
+
+
+def test_create_and_run_job_on_aer_simulator_with_qasm2():
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.QASM2)
+
+
+def test_create_and_run_job_on_aer_simulator_with_qasm3():
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.QASM3)
+
+
+def test_create_and_run_job_on_aer_simulator_with_braket():
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.BRAKET)

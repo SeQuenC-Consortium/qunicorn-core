@@ -33,30 +33,24 @@ STANDARD_JOB_NAME: str = "JobName"
 IS_ASYNCHRONOUS: bool = False
 
 
-def test_create_and_run_runner():
+def test_create_and_run_runner_with_qiskit():
     """Tests the create and run job method for synchronous execution of a runner"""
-    create_and_run_runner("ibmq_qasm_simulator")
+    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.QISKIT)
 
 
-def create_and_run_runner(device: str):
-    """Util for automated and manual create and run job tests"""
-    # ToDo: restructure all tests and create ibm utils to call from automated and manual test methods
-    # GIVEN: Database Setup & job_request_dto created
-    app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
-    job_request_dto.device_name = device
+def test_create_and_run_runner_with_qasm2():
+    """Tests the create and run job method for synchronous execution of a runner"""
+    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.QASM2)
 
-    # WHEN: create_and_run executed synchronous
-    with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QASM2)
-        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
-    # THEN: Check if the correct job with its result is saved in the db
-    with app.app_context():
-        check_simple_job_dto(return_dto)
-        job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
-        check_if_job_finished(job)
-        check_if_job_runner_result_correct(job)
+def test_create_and_run_runner_with_qasm3():
+    """Tests the create and run job method for synchronous execution of a runner"""
+    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.QASM3)
+
+
+def test_create_and_run_runner_with_braket():
+    """Tests the create and run job method for synchronous execution of a runner"""
+    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.BRAKET)
 
 
 def test_create_and_run_sampler():
@@ -101,26 +95,6 @@ def test_create_and_run_estimator():
         check_if_job_estimator_result_correct(job)
 
 
-def test_run_qiskit_input_on_runner():
-    """Tests the execution of using a qiskit string as an input instead of QASM"""
-    # GIVEN: Database Setup & job_request_dto created
-    app = set_up_env()
-    job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.IBM)
-    job_request_dto.device_name = "ibmq_qasm_simulator"
-
-    # WHEN: create_and_run executed synchronous
-    with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QISKIT)
-        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
-
-    # THEN: Check if the correct job with its result is saved in the db
-    with app.app_context():
-        check_simple_job_dto(return_dto)
-        job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
-        check_if_job_finished(job)
-        check_if_job_runner_result_correct(job)
-
-
 def check_if_job_finished(job: JobDataclass):
     assert job.id == EXPECTED_ID
     assert job.progress == JOB_FINISHED_PROGRESS
@@ -147,22 +121,6 @@ def check_if_job_sample_result_correct(job: JobDataclass):
             assert round((result.result_dict["3"] + result.result_dict["0"])) == default_dist
         else:
             assert result.result_dict["0"] == default_dist
-
-
-def check_if_job_runner_result_correct(job: JobDataclass):
-    job.type = JobType.RUNNER
-    for i in range(len(job.results)):
-        result: ResultDataclass = job.results[i]
-        check_standard_result_data(i, job, result)
-        assert result.meta_data is not None
-        shots: int = job.shots
-        if i == 0:
-            tolerance: int = 150
-            assert (shots / 2 + tolerance) > result.result_dict["0x0"] > (shots / 2 - tolerance)
-            assert (shots / 2 + tolerance) > result.result_dict["0x3"] > (shots / 2 - tolerance)
-            assert (result.result_dict["0x0"] + result.result_dict["0x3"]) == shots
-        else:
-            assert result.result_dict["0x0"] == shots
 
 
 def check_if_job_estimator_result_correct(job: JobDataclass):

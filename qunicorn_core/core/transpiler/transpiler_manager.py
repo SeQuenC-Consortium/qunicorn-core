@@ -10,7 +10,6 @@ from braket.circuits import Circuit
 from braket.circuits.serialization import IRType
 from braket.ir.openqasm import Program as OpenQASMProgram
 from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
-
 from rustworkx.visualization import graphviz_draw
 
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
@@ -68,8 +67,13 @@ class TranspileManager:
             for src, dest in zip(path_to_dest, path_to_dest[1:])
         ]
 
-    def get_transpiler(self, src_language: AssemblerLanguage, dest_language: AssemblerLanguage):
-        steps = self._find_transpile_strategy(src_language, dest_language)
+    def get_transpiler(self, src_language: AssemblerLanguage, dest_languages: [AssemblerLanguage]):
+        steps = None
+        # in case of multiple supported languages the shortest path is selected
+        for dest_language in dest_languages:
+            steps_of_current_run = self._find_transpile_strategy(src_language, dest_language)
+            if steps is None or len(steps_of_current_run) < len(steps):
+                steps = steps_of_current_run
 
         def transpile(circuit):
             return reduce(lambda immediate_circuit, step: step.transpile_method(immediate_circuit), steps, circuit)
@@ -112,6 +116,11 @@ def qiskit_to_qasm3(circuit: qiskit.circuit.QuantumCircuit) -> str:
 
 @transpile_manager.register_transpile_method(AssemblerLanguage.QASM3, AssemblerLanguage.QISKIT)
 def qasm3_to_qiskit(source: str) -> qiskit.circuit.QuantumCircuit:
+    source = source.replace("cnot", "cx")
+    # only one of the following replace is executed since it can only find either one , but both are valid strings
+
+    source = source.replace("OPENQASM 3;", 'OPENQASM 3; include "stdgates.inc";')
+    source = source.replace("OPENQASM 3.0;", 'OPENQASM 3.0; include "stdgates.inc";')
     return qiskit.qasm3.loads(source)
 
 

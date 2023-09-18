@@ -25,6 +25,7 @@ from qunicorn_core.db.database_services.job_db_service import return_exception_a
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
@@ -35,6 +36,7 @@ from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.util import logging
+from braket.ir.openqasm import Program
 
 
 class AWSPilot(Pilot):
@@ -42,7 +44,7 @@ class AWSPilot(Pilot):
 
     provider_name: ProviderName = ProviderName.AWS
 
-    supported_language: AssemblerLanguage = AssemblerLanguage.BRAKET
+    supported_languages: list[AssemblerLanguage] = [AssemblerLanguage.BRAKET, AssemblerLanguage.QASM3]
 
     def run(self, job_core_dto: JobCoreDto):
         """Execute the job on a local simulator and saves results in the database"""
@@ -50,6 +52,10 @@ class AWSPilot(Pilot):
             raise return_exception_and_update_job(job_core_dto.id, ValueError("Device need to be local for AWS"))
 
         device = LocalSimulator()
+        for index in range(len(job_core_dto.transpiled_circuits)):
+            # Since QASM is stored as a String, it needs to be converted to a QASM Program before execution
+            if type(job_core_dto.transpiled_circuits[index]) is str:
+                job_core_dto.transpiled_circuits[index] = Program(source=job_core_dto.transpiled_circuits[index])
         quantum_tasks: LocalQuantumTaskBatch = device.run_batch(
             job_core_dto.transpiled_circuits, shots=job_core_dto.shots
         )
@@ -138,7 +144,13 @@ class AWSPilot(Pilot):
         device_db_service.save_device_by_name(aws_device)
 
     def get_standard_provider(self):
-        return ProviderDataclass(with_token=False, supported_language=self.supported_language, name=self.provider_name)
+        return ProviderDataclass(
+            with_token=False,
+            supported_languages=[
+                ProviderAssemblerLanguageDataclass(supported_language=language) for language in self.supported_languages
+            ],
+            name=self.provider_name,
+        )
 
     def is_device_available(self, device: DeviceDto, token: str) -> bool:
         logging.info("AWS local simulator is always available")
