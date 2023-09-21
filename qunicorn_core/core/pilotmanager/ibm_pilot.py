@@ -70,7 +70,7 @@ class IBMPilot(Pilot):
                 job_core_dto.id, ValueError("No valid Job Type specified")
             )
 
-    def run(self, job_dto: JobCoreDto):
+    def run(self, job_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute a job local using aer simulator or a real backend"""
 
         if job_dto.executed_on.is_local:
@@ -108,7 +108,7 @@ class IBMPilot(Pilot):
         ibm_result: SamplerResult = job_from_ibm.result()
         return IBMPilot._map_sampler_results_to_dataclass(ibm_result, job_dto)
 
-    def __estimate(self, job_dto: JobCoreDto):
+    def __estimate(self, job_dto: JobCoreDto) -> list[ResultDataclass]:
         """Uses the Estimator to execute a job on an IBM backend using the IBM Pilot"""
         observables: list = [SparsePauliOp("IY"), SparsePauliOp("IY")]
         if job_dto.executed_on.is_local:
@@ -154,7 +154,7 @@ class IBMPilot(Pilot):
             raise job_db_service.return_exception_and_update_job(job_dto_id, exception)
 
     @staticmethod
-    def __get_file_path_to_resources(file_name):
+    def __get_file_path_to_resources(file_name) -> str:
         working_directory_path = os.path.abspath(os.getcwd())
         return working_directory_path + os.sep + "resources" + os.sep + "upload_files" + os.sep + file_name
 
@@ -183,7 +183,7 @@ class IBMPilot(Pilot):
         try:
             ibm_job_id = job_core_dto.results[0].result_dict["ibm_job_id"]
             result = service.run(ibm_job_id, inputs=input_dict, options=options_dict).result()
-            ibm_results.extend(IBMPilot.__map_runner_results_to_dataclass(result, job_core_dto))
+            ibm_results.extend(IBMPilot.map_runner_results_to_dataclass(result, job_core_dto))
         except IBMRuntimeError as exception:
             logging.info("Error when accessing IBM, 403 Client Error")
             ibm_results.append(
@@ -203,7 +203,7 @@ class IBMPilot(Pilot):
         return service
 
     @staticmethod
-    def __map_runner_results_to_dataclass(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
+    def map_runner_results_to_dataclass(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
         result_dtos: list[ResultDataclass] = []
 
         for i in range(len(ibm_result.results)):

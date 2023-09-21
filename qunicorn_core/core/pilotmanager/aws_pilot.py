@@ -46,7 +46,7 @@ class AWSPilot(Pilot):
 
     supported_languages: list[AssemblerLanguage] = [AssemblerLanguage.BRAKET, AssemblerLanguage.QASM3]
 
-    def run(self, job_core_dto: JobCoreDto):
+    def run(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute the job on a local simulator and saves results in the database"""
         if not job_core_dto.executed_on.is_local:
             raise return_exception_and_update_job(job_core_dto.id, ValueError("Device need to be local for AWS"))
