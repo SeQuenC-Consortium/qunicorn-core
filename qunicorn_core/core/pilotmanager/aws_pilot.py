@@ -23,7 +23,6 @@ from qunicorn_core.api.api_models import DeviceDto
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.db.database_services import device_db_service, provider_db_service
-from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
@@ -49,6 +48,8 @@ class AWSPilot(Pilot):
     def run(self, job_core_dto: JobCoreDto):
         """Execute the job on a local simulator and saves results in the database"""
         if not job_core_dto.executed_on.is_local:
+            from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
+
             raise return_exception_and_update_job(job_core_dto.id, ValueError("Device need to be local for AWS"))
 
         # Since QASM is stored as a String, it needs to be converted to a QASM Program before execution
@@ -64,6 +65,7 @@ class AWSPilot(Pilot):
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
+        from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 
         raise return_exception_and_update_job(job_core_dto.id, ValueError("No valid Job Type specified"))
 

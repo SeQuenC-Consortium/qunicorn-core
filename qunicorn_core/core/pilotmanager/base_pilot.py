@@ -16,7 +16,6 @@ import os
 from typing import Optional
 
 from qunicorn_core.api.api_models import JobCoreDto, DeviceRequestDto, DeviceDto
-from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
@@ -103,6 +102,8 @@ class Pilot:
         try:
             return dict([(hex(k), v) for k, v in qubits_in_binary.items()])
         except Exception:
+            from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
+
             raise return_exception_and_update_job(job_id, ValueError("Could not convert decimal-results to hex"))
 
     @staticmethod
@@ -112,4 +113,6 @@ class Pilot:
         try:
             return dict([(hex(int(k, 2)), v) for k, v in qubits_in_binary.items()])
         except Exception:
+            from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
+
             raise return_exception_and_update_job(job_id, ValueError("Could not convert binary-results to hex"))
