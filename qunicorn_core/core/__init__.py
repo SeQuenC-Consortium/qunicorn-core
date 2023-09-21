@@ -14,8 +14,11 @@
 
 from . import (
     pilotmanager,
+    transpiler,
+    mapper,
     deployment_service,
-    jobmanager_service,
-    devicemanager_service,
-    providermanager_service,
+    job_manager_service,
+    job_service,
+    device_service,
+    provider_service,
 )

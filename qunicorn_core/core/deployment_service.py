@@ -58,7 +58,7 @@ def update_deployment(
 
 def delete_deployment(id: int, user_id: Optional[str] = None) -> DeploymentDto:
     """Remove one deployment by id"""
-    db_deployment = deployment_mapper.deployment_to_deployment_dto(deployment_db_service.get_deployment_by_id(id))
+    db_deployment = deployment_mapper.dataclass_to_dto(deployment_db_service.get_deployment_by_id(id))
     if db_deployment.deployed_by is not None and db_deployment.deployed_by != user_id:
         abort_unauthorized()
     if len(job_db_service.get_jobs_by_deployment_id(db_deployment.id)) > 0:
@@ -69,7 +69,7 @@ def delete_deployment(id: int, user_id: Optional[str] = None) -> DeploymentDto:
 
 def create_deployment(deployment_dto: DeploymentRequestDto, user_id: Optional[str] = None) -> DeploymentDto:
     """Create a deployment and save it in the database"""
-    deployment: DeploymentDataclass = deployment_mapper.request_dto_to_deployment(deployment_dto)
+    deployment: DeploymentDataclass = deployment_mapper.request_to_dataclass(deployment_dto)
     deployment.deployed_by = user_id
     deployment = deployment_db_service.create(deployment)
-    return deployment_mapper.deployment_to_deployment_dto(deployment)
+    return deployment_mapper.dataclass_to_dto(deployment)

@@ -84,7 +84,7 @@ poetry run invoke worker
 Create the initial database (If this doesn't work, try to delete the db-file from the "instance" folder)
 
 ```bash
-flask create-and-load-db
+flask recreate-and-load-db
 ```
 
 Check Linting Errors
@@ -106,8 +106,8 @@ containing the application and creates all required containers including the dat
 
 ```bash
 docker-compose up -d
-docker-compose exec server python -m flask create-and-load-db
 ```
+
 
 ![Architecture](docker-compose-architecture.svg)
 

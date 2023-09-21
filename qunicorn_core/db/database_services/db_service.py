@@ -13,12 +13,12 @@
 # limitations under the License.
 from typing import TypeVar, Type
 
-from qunicorn_core.db import DB
+from qunicorn_core.db import db
 from qunicorn_core.db.models.db_model import DbModel
 
 """Module containing all general database requests"""
 
-session = DB.session
+session = db.DB.session
 DbModelType = TypeVar("DbModelType", bound=DbModel)
 DbModelTypes = TypeVar("DbModelTypes", bound=list[DbModel])
 

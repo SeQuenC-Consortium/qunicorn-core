@@ -1,0 +1,17 @@
+{
+  "name": "DeploymentName",
+  "programs": [
+    {
+      "quantum_circuit": "OPENQASM 3.0; bit[2] bits; qubit[2] qubits; h qubits[0]; cnot qubits[0], qubits[1]; bits[0] = measure qubits[0]; bits[1] = measure qubits[1];",
+      "assembler_language": "QASM3",
+      "python_file_metadata": "",
+      "python_file_path": ""
+    },
+    {
+      "quantum_circuit": "OPENQASM 3.0; bit[2] bits; qubit[2] qubits; h qubits[0]; h qubits[0]; cnot qubits[0], qubits[1]; bits[0] = measure qubits[0]; bits[1] = measure qubits[1];",
+      "assembler_language": "QASM3",
+      "python_file_metadata": "",
+      "python_file_path": ""
+    }
+  ]
+}

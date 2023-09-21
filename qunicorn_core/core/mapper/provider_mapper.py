@@ -13,13 +13,28 @@
 # limitations under the License.
 
 from qunicorn_core.api.api_models import ProviderDto
+from qunicorn_core.core.mapper import provider_assembler_language_mapper
 from qunicorn_core.core.mapper.general_mapper import map_from_to
 from qunicorn_core.db.models.provider import ProviderDataclass
 
 
 def dto_to_dataclass(provider_dto: ProviderDto) -> ProviderDataclass:
-    return map_from_to(provider_dto, ProviderDataclass)
+    supported_languages = [
+        provider_assembler_language_mapper.dto_to_dataclass(language) for language in provider_dto.supported_languages
+    ]
+    return map_from_to(
+        provider_dto,
+        ProviderDataclass,
+        {"supported_languages": supported_languages},
+    )
 
 
 def dataclass_to_dto(provider: ProviderDataclass) -> ProviderDto:
-    return map_from_to(provider, ProviderDto)
+    supported_languages = [
+        provider_assembler_language_mapper.dataclass_to_dto(language) for language in provider.supported_languages
+    ]
+    return map_from_to(
+        provider,
+        ProviderDto,
+        fields_mapping={"supported_languages": supported_languages},
+    )
