@@ -16,6 +16,7 @@
 """Module containing all Dtos and their Schemas for tasks in the Deployment API."""
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 import marshmallow as ma
 
@@ -25,7 +26,6 @@ from .quantum_program_dtos import (
     QuantumProgramRequestDto,
     QuantumProgramDtoSchema,
 )
-from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
 __all__ = ["DeploymentDtoSchema", "DeploymentRequestDtoSchema", "DeploymentDto", "DeploymentRequestDto"]
@@ -35,7 +35,7 @@ __all__ = ["DeploymentDtoSchema", "DeploymentRequestDtoSchema", "DeploymentDto",
 class DeploymentDto:
     id: int
     programs: list[QuantumProgramDto]
-    deployed_by: UserDto
+    deployed_by: Optional[str]
     deployed_at: datetime
     name: str
 
@@ -54,7 +54,11 @@ class DeploymentRequestDto:
 
 class DeploymentDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=False, metadata={"description": "UID for the deployment_api"})
-    deployed_by = ma.fields.Nested(UserDtoSchema())
+    deployed_by = (
+        ma.fields.String(
+            required=False, metadata={"description": "an optional id of the user who created the deployment"}
+        ),
+    )
     programs = ma.fields.Nested(QuantumProgramDtoSchema(many=True))
     deployed_at = ma.fields.Date(required=False, metadata={"description": "time of deployment"})
     name = ma.fields.String(

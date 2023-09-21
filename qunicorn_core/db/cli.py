@@ -33,7 +33,6 @@ from .models.job import JobDataclass
 from .models.provider import ProviderDataclass
 from .models.quantum_program import QuantumProgramDataclass
 from .models.result import ResultDataclass
-from .models.user import UserDataclass
 from ..static.enums.assembler_languages import AssemblerLanguage
 from ..static.enums.job_state import JobState
 from ..static.enums.job_type import JobType
@@ -85,7 +84,6 @@ def get_quasm_string() -> str:
 
 
 def load_db_function(app: Flask):
-    user = UserDataclass(name="DefaultUser")
     qc = QuantumProgramDataclass(
         quantum_circuit=utils.get_default_qasm_string(1), assembler_language=AssemblerLanguage.QASM3
     )
@@ -104,22 +102,22 @@ def load_db_function(app: Flask):
     qiskit_program = QuantumProgramDataclass(quantum_circuit=qiskit_str, assembler_language=AssemblerLanguage.QISKIT)
 
     deployment_ibm_qasm2 = DeploymentDataclass(
-        deployed_by=user, programs=[qc, qc2], deployed_at=datetime.datetime.now(), name="DeploymentIBMQasmName"
+        deployed_by=None, programs=[qc, qc2], deployed_at=datetime.datetime.now(), name="DeploymentIBMQasmName"
     )
     deployment_aws_qasm3 = DeploymentDataclass(
-        deployed_by=user, programs=[qasm3_program], deployed_at=datetime.datetime.now(), name="DeploymentAWSQasmName"
+        deployed_by=None, programs=[qasm3_program], deployed_at=datetime.datetime.now(), name="DeploymentAWSQasmName"
     )
     deployment_aws_braket = DeploymentDataclass(
-        deployed_by=user, programs=[braket_program], deployed_at=datetime.datetime.now(), name="DeploymentAWSBraketName"
+        deployed_by=None, programs=[braket_program], deployed_at=datetime.datetime.now(), name="DeploymentAWSBraketName"
     )
     deployment_ibm_qiskit = DeploymentDataclass(
-        deployed_by=user, programs=[qiskit_program], deployed_at=datetime.datetime.now(), name="DeploymentIBMQiskitName"
+        deployed_by=None, programs=[qiskit_program], deployed_at=datetime.datetime.now(), name="DeploymentIBMQiskitName"
     )
 
     device_aws, device_ibm = add_devices_and_get_defaults()
 
     ibm_default_job = JobDataclass(
-        executed_by=user,
+        executed_by=None,
         executed_on=device_ibm,
         deployment=deployment_ibm_qasm2,
         progress=0,
@@ -132,7 +130,7 @@ def load_db_function(app: Flask):
     )
 
     aws_default_job = JobDataclass(
-        executed_by=user,
+        executed_by=None,
         executed_on=device_aws,
         deployment=deployment_aws_qasm3,
         progress=0,

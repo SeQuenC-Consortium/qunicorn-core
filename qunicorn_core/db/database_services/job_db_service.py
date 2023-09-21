@@ -15,23 +15,20 @@ import datetime
 
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.mapper import job_mapper
-from qunicorn_core.db.database_services import db_service, device_db_service, deployment_db_service, user_db_service
+from qunicorn_core.db.database_services import db_service, device_db_service, deployment_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
-from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.job_state import JobState
 
 
 # originally from <https://github.com/buehlefs/flask-template/>
 
 
-def create_database_job(job_core: JobCoreDto):
+def create_database_job(job_core: JobCoreDto) -> JobDataclass:
     """Creates a database job with the given circuit and saves it in the database"""
-    default_user: UserDataclass = user_db_service.get_default_user()
     db_job: JobDataclass = job_mapper.core_to_dataclass(job_core)
     db_job.state = JobState.RUNNING
     db_job.progress = 0
-    db_job.executed_by = default_user
     db_job.deployment = deployment_db_service.get_deployment_by_id(job_core.deployment.id)
     db_job.executed_on = device_db_service.get_device_with_name(job_core.executed_on.device_name)
     return db_service.save_database_object(db_job)

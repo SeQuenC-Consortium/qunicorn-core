@@ -16,13 +16,13 @@
 """Module containing all Dtos and their Schemas for tasks in the Jobmanager API."""
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 import marshmallow as ma
 
 from .deployment_dtos import DeploymentDto
 from .device_dtos import DeviceDto, DeviceDtoSchema
 from .result_dtos import ResultDto, ResultDtoSchema
-from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
 __all__ = [
@@ -61,7 +61,7 @@ class JobRequestDto:
 class JobCoreDto:
     """JobDto that is used for all internal job handling"""
 
-    executed_by: UserDto
+    executed_by: Optional[str]
     executed_on: DeviceDto
     deployment: DeploymentDto
     progress: int
@@ -85,7 +85,7 @@ class JobResponseDto:
     """JobDto that is sent to the user as a response"""
 
     id: int
-    executed_by: UserDto
+    executed_by: Optional[str]
     executed_on: DeviceDto
     progress: int
     state: str
@@ -129,7 +129,7 @@ class JobRequestDtoSchema(MaBaseSchema):
 
 class JobResponseDtoSchema(MaBaseSchema):
     id = ma.fields.Int(required=True, dump_only=True)
-    executed_by = ma.fields.Nested(UserDtoSchema())
+    executed_by = ma.fields.String(required=False, dump_only=True)
     executed_on = ma.fields.Nested(DeviceDtoSchema())
     progress = ma.fields.Int(required=True, dump_only=True)
     state = ma.fields.String(required=True, dump_only=True)

@@ -145,3 +145,7 @@ class JWTMixin:
                     warn(f"The schema '{scheme}' is not specified in the available securitySchemes.")
             doc = deepupdate(doc, {"security": operation})
         return doc
+
+
+def abort_unauthorized():
+    abort(401, message="unauthorized")

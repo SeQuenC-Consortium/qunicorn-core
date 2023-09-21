@@ -18,5 +18,4 @@ from . import (
     jobmanager_service,
     devicemanager_service,
     providermanager_service,
-    usermanager_service,
 )

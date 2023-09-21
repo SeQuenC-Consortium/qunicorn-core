@@ -23,7 +23,6 @@ from .db_model import DbModel
 from .deployment import DeploymentDataclass
 from .device import DeviceDataclass
 from .result import ResultDataclass
-from .user import UserDataclass
 from ..db import REGISTRY
 from ...static.enums.job_state import JobState
 from ...static.enums.job_type import JobType
@@ -52,10 +51,7 @@ class JobDataclass(DbModel):
     results: Mapped[Optional[List[ResultDataclass.__name__]]] = relationship(
         ResultDataclass.__name__, default_factory=list
     )
-    executed_by_id: Mapped[int] = mapped_column(
-        ForeignKey(UserDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None, nullable=True
-    )
-    executed_by: Mapped[UserDataclass.__name__] = relationship(UserDataclass.__name__, default=None)
+    executed_by: Mapped[Optional[str]] = mapped_column(sql.String(100), default=None)
 
     executed_on_id: Mapped[int] = mapped_column(
         ForeignKey(DeviceDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None, nullable=True

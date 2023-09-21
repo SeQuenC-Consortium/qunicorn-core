@@ -29,6 +29,7 @@ class ProviderView(MethodView):
     """Root endpoint of the provider api, to list all available provider_apis."""
 
     @PROVIDER_API.response(HTTPStatus.OK, ProviderDtoSchema(many=True))
+    @PROVIDER_API.require_jwt()
     def get(self):
         """Get all providers from the database"""
         return providermanager_service.get_all_providers()
@@ -39,6 +40,7 @@ class ProviderIDView(MethodView):
     """Provider Endpoint to get properties of a specific provider."""
 
     @PROVIDER_API.response(HTTPStatus.OK, ProviderDtoSchema())
+    @PROVIDER_API.require_jwt()
     def get(self, provider_id):
         """Get information about a single provider."""
         return providermanager_service.get_provider_by_id(provider_id)
