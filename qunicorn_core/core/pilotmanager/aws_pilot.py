@@ -76,8 +76,8 @@ class AWSPilot(Pilot):
         return [
             ResultDataclass(
                 result_dict={
-                    "counts": AWSPilot.qubit_binary_to_hex(aws_results[i].measurement_counts, job_id),
-                    "probabilities": AWSPilot.qubit_binary_to_hex(aws_results[i].measurement_probabilities, job_id),
+                    "counts": Pilot.qubit_binary_to_hex(aws_results[i].measurement_counts, job_id),
+                    "probabilities": Pilot.qubit_binary_to_hex(aws_results[i].measurement_probabilities, job_id),
                 },
                 job_id=job_id,
                 circuit=job_dto.deployment.programs[i].quantum_circuit,
@@ -86,13 +86,6 @@ class AWSPilot(Pilot):
             )
             for i in range(len(aws_results))
         ]
-
-    @staticmethod
-    def qubit_binary_to_hex(counts_in_binary: dict, job_id: int) -> dict:
-        try:
-            return dict([(hex(int(k, 2)), v) for k, v in counts_in_binary.items()])
-        except Exception:
-            raise return_exception_and_update_job(job_id, ValueError("Could not convert binary-results to hex"))
 
     def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
         """Get the standard job including its deployment for a certain user and device"""

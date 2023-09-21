@@ -25,7 +25,6 @@ from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, Runtime
 from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.db.database_services import job_db_service, device_db_service, provider_db_service
-from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
@@ -201,6 +200,8 @@ class IBMPilot(Pilot):
 
     @staticmethod
     def calculate_probabilities(counts: dict) -> dict:
+        """Calculates the probabilities from the counts, probability = counts / total_counts"""
+
         total_counts = sum(counts.values())
         probabilities = {}
         for key, value in counts.items():
@@ -230,7 +231,7 @@ class IBMPilot(Pilot):
     def _map_sampler_results_to_dataclass(ibm_result: SamplerResult, job_dto: JobCoreDto) -> list[ResultDataclass]:
         result_dtos: list[ResultDataclass] = []
         for i in range(ibm_result.num_experiments):
-            quasi_dist: dict = IBMPilot.qubits_decimal_to_hex(ibm_result.quasi_dists[i], job_dto.id)
+            quasi_dist: dict = Pilot.qubits_decimal_to_hex(ibm_result.quasi_dists[i], job_dto.id)
             circuit: str = job_dto.deployment.programs[i].quantum_circuit
             result_dtos.append(
                 ResultDataclass(
@@ -240,13 +241,6 @@ class IBMPilot(Pilot):
                 )
             )
         return result_dtos
-
-    @staticmethod
-    def qubits_decimal_to_hex(qubits_in_binary: dict, job_id: int) -> dict:
-        try:
-            return dict([(hex(k), v) for k, v in qubits_in_binary.items()])
-        except Exception:
-            raise return_exception_and_update_job(job_id, ValueError("Could not convert decimal-results to hex"))
 
     def get_standard_provider(self):
         supported_languages = [
