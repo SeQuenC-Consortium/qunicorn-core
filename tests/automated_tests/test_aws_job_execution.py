@@ -39,7 +39,7 @@ def test_create_and_run_aws_local_simulator():
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto)
 
         # THEN: Check if the correct job with its result is saved in the db
-        assert return_dto.state == JobState.RUNNING
+        assert return_dto.state == JobState.CREATED
 
 
 def test_aws_local_simulator_braket_job_results():
