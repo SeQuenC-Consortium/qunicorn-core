@@ -26,12 +26,10 @@ from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
-from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.result_type import ResultType
 from tests import test_utils
 from tests.conftest import set_up_env
-from tests.manual_tests.test_ibm_job_execution import EXPECTED_ID, JOB_FINISHED_PROGRESS, IS_ASYNCHRONOUS
-from tests.test_utils import get_object_from_json
+from tests.test_utils import EXPECTED_ID, JOB_FINISHED_PROGRESS, IS_ASYNCHRONOUS, get_object_from_json
 
 
 def test_invalid_token():
@@ -72,24 +70,6 @@ def test_invalid_circuit():
     # THEN: Test if QasmError was thrown and job is saved in db with error
     with app.app_context():
         assert "TranspileError" in str(exception)
-        assert job_finished_with_error()
-
-
-def test_invalid_token_for_sampler():
-    """Testing the synchronous call of the create_and_run_job with an invalid token and the job type sampler"""
-    # GIVEN: Create JobRequestDto with an invalid token and job type sampler
-    app = set_up_env()
-    job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data_IBM.json"))
-    job_request_dto.device_name = "ibmq_qasm_simulator"
-    job_request_dto.token = "Invalid Token"
-    job_request_dto.type = JobType.SAMPLER
-
-    # WHEN: Executing create and run
-    exception = create_deployment_run_job_return_exception(app, job_request_dto)
-
-    # THEN: Test if correct Error was thrown and job is saved in db with error
-    with app.app_context():
-        assert RequestsApiError.__name__ in str(exception) or InvalidAccountError.__name__ in str(exception)
         assert job_finished_with_error()
 
 

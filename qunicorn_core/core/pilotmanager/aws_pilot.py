@@ -14,6 +14,7 @@
 from datetime import datetime
 
 from braket.devices import LocalSimulator
+from braket.ir.openqasm import Program
 from braket.tasks import GateModelQuantumTaskResult
 from braket.tasks.local_quantum_task_batch import LocalQuantumTaskBatch
 
@@ -25,8 +26,8 @@ from qunicorn_core.db.database_services.job_db_service import return_exception_a
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.db.models.user import UserDataclass
@@ -36,7 +37,6 @@ from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.util import logging
-from braket.ir.openqasm import Program
 
 
 class AWSPilot(Pilot):
@@ -51,16 +51,16 @@ class AWSPilot(Pilot):
         if not job_core_dto.executed_on.is_local:
             raise return_exception_and_update_job(job_core_dto.id, ValueError("Device need to be local for AWS"))
 
-        device = LocalSimulator()
+        # Since QASM is stored as a String, it needs to be converted to a QASM Program before execution
         for index in range(len(job_core_dto.transpiled_circuits)):
-            # Since QASM is stored as a String, it needs to be converted to a QASM Program before execution
             if type(job_core_dto.transpiled_circuits[index]) is str:
                 job_core_dto.transpiled_circuits[index] = Program(source=job_core_dto.transpiled_circuits[index])
-        quantum_tasks: LocalQuantumTaskBatch = device.run_batch(
+
+        quantum_tasks: LocalQuantumTaskBatch = LocalSimulator().run_batch(
             job_core_dto.transpiled_circuits, shots=job_core_dto.shots
         )
-        aws_simulator_results: list[GateModelQuantumTaskResult] = quantum_tasks.results()
-        return AWSPilot.__map_simulator_results_to_dataclass(aws_simulator_results, job_core_dto)
+
+        return AWSPilot.__map_aws_results_to_dataclass(quantum_tasks.results(), job_core_dto)
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
@@ -75,24 +75,24 @@ class AWSPilot(Pilot):
         raise ValueError("Canceling not supported on AWS devices")
 
     @staticmethod
-    def __map_simulator_results_to_dataclass(
+    def __map_aws_results_to_dataclass(
         aws_results: list[GateModelQuantumTaskResult], job_dto: JobCoreDto
     ) -> list[ResultDataclass]:
         """Map the results from the aws simulator to a result dataclass object"""
-        result_dtos: list[ResultDataclass] = [
+        job_id: int = job_dto.id
+        return [
             ResultDataclass(
                 result_dict={
-                    "counts": dict(aws_result.measurement_counts.items()),
-                    "probabilities": aws_result.measurement_probabilities,
+                    "counts": Pilot.qubit_binary_to_hex(aws_results[i].measurement_counts, job_id),
+                    "probabilities": Pilot.qubit_binary_to_hex(aws_results[i].measurement_probabilities, job_id),
                 },
-                job_id=job_dto.id,
-                circuit=aws_result.additional_metadata.action.source,
+                job_id=job_id,
+                circuit=job_dto.deployment.programs[i].quantum_circuit,
                 meta_data="",
                 result_type=ResultType.COUNTS,
             )
-            for aws_result in aws_results
+            for i in range(len(aws_results))
         ]
-        return result_dtos
 
     def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
         """Get the standard job including its deployment for a certain user and device"""

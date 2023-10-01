@@ -15,8 +15,8 @@ import os
 from datetime import datetime
 
 import qiskit
-from qiskit.primitives import EstimatorResult, SamplerResult
-from qiskit.providers import BackendV1, QiskitBackendNotFoundError
+from qiskit.primitives import EstimatorResult, SamplerResult, Sampler as LocalSampler, Estimator as LocalEstimator
+from qiskit.providers import QiskitBackendNotFoundError
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.result import Result
 from qiskit_ibm_provider import IBMProvider
@@ -34,8 +34,8 @@ from qunicorn_core.db.database_services import job_db_service, device_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.db.models.user import UserDataclass
@@ -100,29 +100,30 @@ class IBMPilot(Pilot):
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
-
-        backend, circuits = self.__get_backend_and_circuits_for_qiskit_runtime(job_dto)
-        sampler = Sampler(session=backend)
-        job_from_ibm: RuntimeJob = sampler.run(circuits)
+        if job_dto.executed_on.is_local:
+            sampler = LocalSampler()
+        else:
+            sampler = Sampler(session=self.__get_qiskit_runtime_backend(job_dto))
+        job_from_ibm: RuntimeJob = sampler.run(job_dto.transpiled_circuits)
         ibm_result: SamplerResult = job_from_ibm.result()
         return IBMPilot._map_sampler_results_to_dataclass(ibm_result, job_dto)
 
     def __estimate(self, job_dto: JobCoreDto):
         """Uses the Estimator to execute a job on an IBM backend using the IBM Pilot"""
-
-        backend, circuits = self.__get_backend_and_circuits_for_qiskit_runtime(job_dto)
-        estimator = Estimator(session=backend)
-        job_from_ibm = estimator.run(circuits, observables=[SparsePauliOp("IY"), SparsePauliOp("IY")])
+        observables: list = [SparsePauliOp("IY"), SparsePauliOp("IY")]
+        if job_dto.executed_on.is_local:
+            estimator = LocalEstimator()
+        else:
+            estimator = Estimator(session=self.__get_qiskit_runtime_backend(job_dto))
+        job_from_ibm = estimator.run(job_dto.transpiled_circuits, observables=observables)
         ibm_result: EstimatorResult = job_from_ibm.result()
         return IBMPilot._map_estimator_results_to_dataclass(ibm_result, job_dto, "IY")
 
-    def __get_backend_and_circuits_for_qiskit_runtime(self, job_dto):
+    def __get_qiskit_runtime_backend(self, job_dto):
         """Instantiate all important configurations and updates the job_state"""
 
         self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
-        service: QiskitRuntimeService = QiskitRuntimeService()
-        backend: BackendV1 = service.get_backend(job_dto.executed_on.name)
-        return backend, job_dto.transpiled_circuits
+        return QiskitRuntimeService().get_backend(job_dto.executed_on.name)
 
     def __get_qiskit_job_from_qiskit_runtime(self, job_dto: JobCoreDto):
         """Returns the job of the provider specific ID created on the given account"""
@@ -207,16 +208,27 @@ class IBMPilot(Pilot):
 
         for i in range(len(ibm_result.results)):
             counts: dict = ibm_result.results[i].data.counts
+            probabilities: dict = IBMPilot.calculate_probabilities(counts)
             circuit: str = job_dto.deployment.programs[i].quantum_circuit
             result_dtos.append(
                 ResultDataclass(
                     circuit=circuit,
-                    result_dict=counts,
+                    result_dict={"counts": counts, "probabilities": probabilities},
                     result_type=ResultType.COUNTS,
                     meta_data=ibm_result.results[i].to_dict(),
                 )
             )
         return result_dtos
+
+    @staticmethod
+    def calculate_probabilities(counts: dict) -> dict:
+        """Calculates the probabilities from the counts, probability = counts / total_counts"""
+
+        total_counts = sum(counts.values())
+        probabilities = {}
+        for key, value in counts.items():
+            probabilities[key] = value / total_counts
+        return probabilities
 
     @staticmethod
     def _map_estimator_results_to_dataclass(
@@ -241,7 +253,7 @@ class IBMPilot(Pilot):
     def _map_sampler_results_to_dataclass(ibm_result: SamplerResult, job_dto: JobCoreDto) -> list[ResultDataclass]:
         result_dtos: list[ResultDataclass] = []
         for i in range(ibm_result.num_experiments):
-            quasi_dist: dict = ibm_result.quasi_dists[i]
+            quasi_dist: dict = Pilot.qubits_decimal_to_hex(ibm_result.quasi_dists[i], job_dto.id)
             circuit: str = job_dto.deployment.programs[i].quantum_circuit
             result_dtos.append(
                 ResultDataclass(
