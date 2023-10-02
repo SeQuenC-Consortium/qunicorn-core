@@ -50,10 +50,12 @@ class QuantumProgramRequestDtoSchema(MaBaseSchema):
         required=True, metadata={"example": AssemblerLanguage.QASM3}, enum=AssemblerLanguage
     )
     python_file_path = ma.fields.String(
-        required=False, metadata={"example": "ibm_upload_test_data_file.py"}, allow_none=True
+        required=False, metadata={"example": "ibm_upload_test_data_file.py (Note: this is an experimental feature "
+                                             "for IBM_UPLOAD job type)"}, allow_none=True
     )
     python_file_metadata = ma.fields.String(
-        required=False, metadata={"example": "ibm_upload_test_data_metadata.json"}, allow_none=True
+        required=False, metadata={"example": "ibm_upload_test_data_metadata.json (Note: this is an experimental "
+                                             "feature for IBM_UPLOAD job type)"}, allow_none=True
     )
 
 
