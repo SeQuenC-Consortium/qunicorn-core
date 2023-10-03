@@ -183,7 +183,7 @@ class IBMPilot(Pilot):
         try:
             ibm_job_id = job_core_dto.results[0].result_dict["ibm_job_id"]
             result = service.run(ibm_job_id, inputs=input_dict, options=options_dict).result()
-            ibm_results.extend(IBMPilot.map_runner_results_to_dataclass(result, job_core_dto))
+            ibm_results.extend(IBMPilot.__map_runner_results_to_dataclass(result, job_core_dto))
         except IBMRuntimeError as exception:
             logging.info("Error when accessing IBM, 403 Client Error")
             ibm_results.append(
@@ -203,7 +203,7 @@ class IBMPilot(Pilot):
         return service
 
     @staticmethod
-    def map_runner_results_to_dataclass(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
+    def __map_runner_results_to_dataclass(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
         result_dtos: list[ResultDataclass] = []
 
         for i in range(len(ibm_result.results)):

@@ -152,3 +152,7 @@ def test_create_and_run_job_on_aer_simulator_with_qasm3():
 
 def test_create_and_run_job_on_aer_simulator_with_braket():
     test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.BRAKET)
+
+
+def test_create_and_run_job_on_aer_simulator_with_qrisp():
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.QRISP)
