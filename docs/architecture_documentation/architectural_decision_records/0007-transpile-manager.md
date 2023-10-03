@@ -17,12 +17,14 @@ QuantumCircuits from different providers and in different languages should be us
 
 ## Decision Outcome
 
-Introduction of transpile manager
+It was decided to introduce a transpile manager
 
 ## Description of Changes
 
 The transpile manager transpiles QuantumCircuits from different languages into different languages.
 It does this most effectively by using the shorted route between languages.
+For this it creates a graph and finds the shortest route using the Dijkstra algorithm.
+When multiple languages are available, the language with the least transpile steps is used.
 
 
 <!-- markdownlint-disable-file MD013 -->

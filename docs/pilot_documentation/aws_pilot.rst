@@ -2,6 +2,7 @@ AWS Pilot
 ================
 
 The AWS Pilot is used to work with the AWS API.
+Supports local execution.
 
 Main Languages
 ^^^^^^^^^^^^^^^^^^^^

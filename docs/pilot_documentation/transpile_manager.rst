@@ -7,6 +7,7 @@ Introduction
 The transpile manager is the main translation component of the qunicorn system. It allows for translation inbetween various
 languages used by the quantum providers.
 It does this by searching for a path between two languages in a graph. It then uses the shortest path, as found by a dijkstra algorithm.
+The transpile manager is called within the job manager. There a Quantum Circuit is translated into the language of the provider.
 
 Preprocessing Manager
 #######################

@@ -18,7 +18,7 @@ The pilots are currently not very readable and not very clean. Furthermore, logi
 
 ## Decision Outcome
 
-Base Pilot
+It was decided to introduce a Base Pilot.
 
 ## Description of Changes
 

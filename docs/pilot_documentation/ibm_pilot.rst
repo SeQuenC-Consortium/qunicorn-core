@@ -2,6 +2,7 @@ IBM Pilot
 ================
 
 The AWS Pilot is used to work with the IBM API.
+Supports local and remote execution.
 
 Main Languages
 ^^^^^^^^^^^^^^^^^^^^
@@ -39,7 +40,7 @@ File Runner
 
 **Description:** Executes files already uploaded to the IBM Backend using their id.
 
-**Notes:** Experimental Feature
+**Notes:** Experimental Feature. Could not be fully tested due to missing authorization to the IBM Backend. It should be used with Caution.
 
 **Requires:** A file uploaded to the IBM backend using File Upload.
 
@@ -48,6 +49,6 @@ File Upload
 
 **Description:** Uploads a file to the IBM Backend.
 
-**Notes:** Experimental Feature
+**Notes:** Experimental Feature. Could not be fully tested due to missing authorization to the IBM Backend. It should be used with Caution.
 
 **Requires:** A .py file to be executed and a corresponding metadata json, needs to follow the standards presented by IBM. Need to be added to the /resources/upload_files folder.
