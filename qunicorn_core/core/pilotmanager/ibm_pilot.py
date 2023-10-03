@@ -60,11 +60,11 @@ class IBMPilot(Pilot):
         if job_core_dto.type == JobType.ESTIMATOR:
             return self.__estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
-            self.__sample(job_core_dto)
+            return self.__sample(job_core_dto)
         elif job_core_dto.type == JobType.IBM_RUNNER:
-            self.__run_ibm_program(job_core_dto)
+            return self.__run_ibm_program(job_core_dto)
         elif job_core_dto.type == JobType.IBM_UPLOAD:
-            self.__upload_ibm_program(job_core_dto)
+            return self.__upload_ibm_program(job_core_dto)
         else:
             raise job_db_service.return_exception_and_update_job(
                 job_core_dto.id, ValueError("No valid Job Type specified")
