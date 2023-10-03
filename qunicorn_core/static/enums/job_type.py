@@ -28,5 +28,5 @@ class JobType(StrEnum):
     SAMPLER = "SAMPLER"
     ESTIMATOR = "ESTIMATOR"
     """IBM RUN and IBM UPLOAD are currently Experimental Job Types, they should be used with caution"""
-    IBM_RUN = "IBM_RUN"
+    IBM_RUNNER = "IBM_RUNNER"
     IBM_UPLOAD = "IBM_UPLOAD"

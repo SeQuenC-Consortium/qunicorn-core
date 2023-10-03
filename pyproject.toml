@@ -45,6 +45,10 @@ myst-parser = "^2.0.0"
 pytest = "^7.2.0"
 pytest-mock = "^3.11.1"
 qiskit-aer = "^0.12.2"
+qiskit-qasm3-import = "^0.2.0"
+graphviz = "^0.20.1"
+pydot = "^1.4.2"
+pillow = "^10.0.1"
 
 [tool.poetry.dev-dependencies]
 black = "^23.1.0"
@@ -55,6 +59,9 @@ pip-licenses = "^4.0.3"
 
 [tool.poetry.scripts]
 #flask = 'flask.cli:main'
+
+[tool.poetry.group.dev.dependencies]
+pydot = "^1.4.2"
 
 [tool.black]
 include = '\.pyi?$'

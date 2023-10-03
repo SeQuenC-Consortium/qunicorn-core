@@ -18,5 +18,6 @@ from qunicorn_core.db.database_services import (
     deployment_db_service,
     device_db_service,
     job_db_service,
+    provider_db_service,
     user_db_service,
 )

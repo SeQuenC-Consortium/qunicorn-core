@@ -1,0 +1,24 @@
+name: Build "Read the Docs"
+
+on: [ push ]
+
+jobs:
+  build-read-the-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11.0
+      - name: Install graphviz
+        run: sudo apt-get install -y graphviz
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.4.0
+      - name: Install requirements with poetry
+        run: python -m poetry export --without-hashes --format=requirements.txt -o requirements.txt && python -m pip install -r requirements.txt
+      - name: Build "Read the Docs"
+        run: python -m poetry run sphinx-build -a docs ./tmp/mydoc

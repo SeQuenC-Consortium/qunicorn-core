@@ -52,7 +52,7 @@ communication.
 * JobResponseDto: DTO used to respond via API
 
 #### Flask/poetry methods defined:
-* flask create-and-load-db: Drops the current db, creates a new one, and loads example data
+* flask recreate-and-load-db: Drops the current db, creates a new one, and loads example data
 * poetry run invoke check-linting: Checks flake8 and black linting/formatting. 
 
 

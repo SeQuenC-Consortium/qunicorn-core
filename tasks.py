@@ -14,8 +14,7 @@
 
 # flake8: noqa
 
-from os import environ
-from os import execvpe as replace_process
+from os import environ, execvpe as replace_process
 from pathlib import Path
 from platform import system
 from re import match
@@ -23,8 +22,7 @@ from shutil import copytree
 from typing import List, Optional, cast
 
 from dotenv import load_dotenv, set_key, unset_key
-from invoke import UnexpectedExit
-from invoke import task
+from invoke import UnexpectedExit, task
 from invoke.context import Context
 from invoke.runners import Result
 
@@ -253,14 +251,19 @@ def worker(c, pool="solo", concurrency=1, dev=False, log_level="INFO", periodic_
 
     Args:
         c (Context): task context
-        pool (str, optional): the executor pool to use for celery workers (defaults to "solo" for development on linux and windows)
+        pool (str, optional): the executor pool to use for celery workers (defaults to "solo" for development on
+        linux and windows)
         concurrency (int, optional): the number of concurrent workers (defaults to 1 for development)
-        dev (bool, optional): If true the redis docker container will be started before the worker and stopped after the workers
+        dev (bool, optional): If true the redis docker container will be started before the worker and stopped after
+        the workers
         finished. Defaults to False.  #noqa
-        log_level (str, optional): The log level of the celery logger in the worker (DEBUG|INFO|WARNING|ERROR|CRITICAL|FATAL). Defaults
+        log_level (str, optional): The log level of the celery logger in the worker (
+        DEBUG|INFO|WARNING|ERROR|CRITICAL|FATAL). Defaults
         to "INFO".  #noqa
-        periodic_scheduler (bool, optional): If true a celery beat scheduler will be started alongside the worker. This is needed for
-        periodic tasks. Should only be set to True for one worker otherwise the periodic tasks get executed too often (see readme file).
+        periodic_scheduler (bool, optional): If true a celery beat scheduler will be started alongside the worker.
+        This is needed for
+        periodic tasks. Should only be set to True for one worker otherwise the periodic tasks get executed too often
+        (see readme file).
         S #noqa
     """
     if dev:
@@ -508,7 +511,8 @@ def load_git_plugins(c, plugins_path="./git-plugins"):
     for git_plugin in git_plugins.splitlines():
         plugin_match = match(
             # roughly matches <vcs=git>+<repo_url>[@<ref>][#…subdirectory=<sub_dir>…]
-            r"^(?P<vcs>git)\+(?P<url>[^@#\n]+)(?:@(?P<ref>[^#\n]+))?(?:#(?:[^&\n]+&)?subdirectory=\/?(?P<dir>[^&\n]+)[^\n]*)?$",
+            r"^(?P<vcs>git)\+(?P<url>[^@#\n]+)(?:@(?P<ref>[^#\n]+))?(?:#(?:[^&\n]+&)?subdirectory=\/?(?P<dir>["
+            r"^&\n]+)[^\n]*)?$",
             git_plugin,
         )
         if not plugin_match:
@@ -577,7 +581,7 @@ def ensure_paths(c):
 @task(ensure_paths)
 def start_docker(c):
     """Docker entry point task. Do not call!"""
-
+    c.run("python -m flask create-and-db", echo=True)
     log_level = environ.get("DEFAULT_LOG_LEVEL", "INFO")
     concurrency_env = environ.get("CONCURRENCY", "1")
     concurrency = int(concurrency_env) if concurrency_env.isdigit() else 1
@@ -705,12 +709,16 @@ def list_licenses(c, format_="json", include_installed=False, summary=False, sho
 
     Args:
         c (Context): task context
-        format_ (str, optional): The output format (json, html, markdown, plain, plain-vertical, rst, confluence, json-license-finder,
+        format_ (str, optional): The output format (json, html, markdown, plain, plain-vertical, rst, confluence,
+        json-license-finder,
         csv). Defaults to "json". #noqa
-        include_installed (bool, optional): If true all currently installed packages are considered dependencies. Defaults to False.
+        include_installed (bool, optional): If true all currently installed packages are considered dependencies.
+        Defaults to False.
         summary (bool, optional): If true output a summary of found licenses. Defaults to False.
-        short (bool, optional): If true only name, version, license and authors of a apackage are printed. Defaults to False.
-        echo (bool, optional): If true the command used to generate the license output is printed to console. Defaults to False.
+        short (bool, optional): If true only name, version, license and authors of a apackage are printed. Defaults
+        to False.
+        echo (bool, optional): If true the command used to generate the license output is printed to console.
+        Defaults to False.
     """
     packages: List[str] = []
     if not include_installed:

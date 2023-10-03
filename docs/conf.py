@@ -64,6 +64,12 @@ subprocess.run(
     cwd=project_root,
 )
 
+# Update transpile strategy graph
+
+from qunicorn_core.core.transpiler.transpiler_manager import transpile_manager  # noqa
+
+transpile_manager.visualize_transpile_strategy(project_root / "docs/resources/images/transpile_strategys.png")
+
 api_spec_path = project_root / Path("docs/api.json")
 
 api_title: str

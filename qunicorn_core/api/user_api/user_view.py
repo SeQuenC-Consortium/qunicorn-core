@@ -22,7 +22,7 @@ from flask.views import MethodView
 from .root import USER_API
 from ..api_models.user_dtos import UserDtoSchema
 
-from ...core import usermanager_service
+from ...core import user_service
 
 
 @USER_API.route("/")
@@ -32,7 +32,7 @@ class UserView(MethodView):
     @USER_API.response(HTTPStatus.OK, UserDtoSchema(many=True))
     def get(self):
         """Get all users from the database"""
-        return usermanager_service.get_all_users()
+        return user_service.get_all_users()
 
 
 @USER_API.route("/<string:user_id>/")
@@ -42,4 +42,4 @@ class UserIdView(MethodView):
     @USER_API.response(HTTPStatus.OK, UserDtoSchema())
     def get(self, user_id):
         """Get information about a single user."""
-        return usermanager_service.get_user_by_id(user_id), 200
+        return user_service.get_user_by_id(user_id), 200
