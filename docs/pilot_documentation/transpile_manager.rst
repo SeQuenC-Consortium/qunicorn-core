@@ -39,6 +39,9 @@ Extending the Transpile Manager
 
 Steps on how to extend the transpile manager with new languages.
 
+.. image:: ../resources/images/transpile_manager_transpile_method_example.png
+
+
 1. Extend de AssemblerLanguage Enum by the new language
 2. Create transpile methods in the transpile manager
     1. The new language should be able to be translated into at least one of the already existing languages. A method each for back and forth translation should be created.
