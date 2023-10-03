@@ -10,6 +10,7 @@ QuantumCircuits from different providers and in different languages should be us
 
 * Flexibility of usage of QuantumCircuits
 * Don't be restricted to one provider and language
+* Provide Extendability to new providers and languages
 
 ## Considered Options
 

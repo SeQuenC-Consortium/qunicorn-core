@@ -18,7 +18,7 @@ Supported Job Types
 Runner
 *******
 
-**Description:** Executed a simple Job on the AWS API.
+**Description:** Execute a simple Job on the local simulator.
 
 **Notes:** Currently only allows for execution on the local simulator.
 
