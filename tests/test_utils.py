@@ -35,6 +35,7 @@ DEPLOYMENT_QASM2_CIRCUITS_JSON = "deployment_request_dto_with_qasm2_circuit_test
 DEPLOYMENT_QASM3_CIRCUITS_JSON = "deployment_request_dto_with_qasm3_circuit_test_data.json"
 DEPLOYMENT_BRAKET_CIRCUITS_JSON = "deployment_request_dto_with_braket_circuit_test_data.json"
 DEPLOYMENT_QISKIT_CIRCUITS_JSON = "deployment_request_dto_with_qiskit_circuit_test_data.json"
+DEPLOYMENT_QRISP_CIRCUITS_JSON = "deployment_request_dto_with_qrisp_circuit_test_data.json"
 PROGRAM_JSON = "program_request_dto_test_data.json"
 
 EXPECTED_ID: int = 3  # hardcoded ID can be removed if tests for the correct ID are no longer needed
@@ -95,11 +96,14 @@ def get_test_deployment_request(assembler_language: AssemblerLanguage) -> Deploy
     elif assembler_language == AssemblerLanguage.QASM2:
         deployment_dict: dict = get_object_from_json(DEPLOYMENT_QASM2_CIRCUITS_JSON)
         return DeploymentRequestDto.from_dict(deployment_dict)
-    if assembler_language == AssemblerLanguage.BRAKET:
+    elif assembler_language == AssemblerLanguage.BRAKET:
         deployment_dict: dict = get_object_from_json(DEPLOYMENT_BRAKET_CIRCUITS_JSON)
         return DeploymentRequestDto.from_dict(deployment_dict)
     elif assembler_language == AssemblerLanguage.QASM3:
         deployment_dict: dict = get_object_from_json(DEPLOYMENT_QASM3_CIRCUITS_JSON)
+        return DeploymentRequestDto.from_dict(deployment_dict)
+    elif assembler_language == AssemblerLanguage.QRISP:
+        deployment_dict: dict = get_object_from_json(DEPLOYMENT_QRISP_CIRCUITS_JSON)
         return DeploymentRequestDto.from_dict(deployment_dict)
 
 

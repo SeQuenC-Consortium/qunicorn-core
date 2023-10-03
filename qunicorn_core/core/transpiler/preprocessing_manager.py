@@ -2,6 +2,7 @@ from typing import Callable
 
 from braket.circuits import Circuit  # noqa
 from qiskit import QuantumCircuit  # noqa
+from qrisp import QuantumCircuit as QrispQC
 
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
@@ -55,3 +56,11 @@ def preprocess_braket(program: str) -> Circuit:
     """braket.Circuit needs to be included here as an import here so eval works with the type"""
     circuit_globals = {"Circuit": Circuit}
     return eval(program, circuit_globals)
+
+
+@preprocessing_manager.register(AssemblerLanguage.QRISP)
+def preprocess_qrisp(program: str) -> QrispQC:
+    """qrisp.QuantumCircuit needs to be included here as an import here so eval works with the type"""
+    circuit_globals = {"QuantumCircuit": QrispQC}
+    exec(program, circuit_globals)
+    return circuit_globals["circuit"]
