@@ -40,7 +40,7 @@ Extending the Transpile Manager
 
 Steps on how to extend the transpile manager with new languages.
 
-.. image:: ../resources/images/transpile_manager_transpile_method_example.png
+.. image:: ../resources/images/transpile_manager_transpile_method_example.JPG
 
 
 1. Extend de AssemblerLanguage Enum by the new language
