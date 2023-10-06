@@ -7,6 +7,7 @@ Note that you might need to authorize with an Access Token in order to access th
 In this Case the following steps need to be performed.
 
 1. Create a personal access token on Github (Account --> Settings --> Developer Settings --> Personal acces tokens)
+    Make sure you have the following permissions: read:packages
 2. Execute:
 
 .. code-block:: bash
