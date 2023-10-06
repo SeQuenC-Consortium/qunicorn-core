@@ -60,7 +60,7 @@ def preprocess_braket(program: str) -> Circuit:
 
 @preprocessing_manager.register(AssemblerLanguage.QRISP)
 def preprocess_qrisp(program: str) -> QrispQC:
-    """qrisp.QuantumCircuit needs to be included here as an import here so eval works with the type"""
+    """qrisp.QuantumCircuit needs to be included here as an import so eval works with the type"""
     circuit_globals = {"QuantumCircuit": QrispQC}
     exec(program, circuit_globals)
     return circuit_globals["circuit"]
