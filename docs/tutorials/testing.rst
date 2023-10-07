@@ -27,7 +27,7 @@ PyTest
 
     pytest tests
 
-* pytest finds test methods through the 'test_ '  prefix
+* pytest finds test methods through the ``test_``  prefix
 
 Test Structure
 ###############

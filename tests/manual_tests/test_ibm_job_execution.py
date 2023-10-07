@@ -44,6 +44,10 @@ def test_create_and_run_runner_with_braket():
     test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.BRAKET)
 
 
+def test_create_and_run_runner_with_qrisp():
+    test_utils.execute_job_test(ProviderName.IBM, "ibmq_qasm_simulator", AssemblerLanguage.QRISP)
+
+
 def test_create_and_run_sampler():
     test_ibm_sampler.create_and_run_sampler_with_device("ibmq_qasm_simulator")
 

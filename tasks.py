@@ -581,7 +581,7 @@ def ensure_paths(c):
 @task(ensure_paths)
 def start_docker(c):
     """Docker entry point task. Do not call!"""
-    c.run("python -m flask create-and-db", echo=True)
+    c.run("python -m flask create-and-load-db", echo=True)
     log_level = environ.get("DEFAULT_LOG_LEVEL", "INFO")
     concurrency_env = environ.get("CONCURRENCY", "1")
     concurrency = int(concurrency_env) if concurrency_env.isdigit() else 1

@@ -16,7 +16,7 @@ SQLAlchemy = "^2.0.4"
 flask = { extras = ["dotenv"], version = "^2.2.3" }
 flask-babel = "^3.0.0"
 flask-smorest = "^0.40.0"
-python = "^3.11.0"
+python = ">=3.11.0, <3.13"
 tomli = "^2.0.0"
 celery = "^5.2.7"
 redis = "^4.5.4"
@@ -49,6 +49,8 @@ qiskit-qasm3-import = "^0.2.0"
 graphviz = "^0.20.1"
 pydot = "^1.4.2"
 pillow = "^10.0.1"
+scipy = "^1.11.3"
+qrisp = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 black = "^23.1.0"
