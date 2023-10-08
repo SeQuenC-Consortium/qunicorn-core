@@ -34,3 +34,4 @@ class AssemblerLanguage(StrEnum):
     QISKIT = "QISKIT"
     PYTHON = "PYTHON"
     BASIQ = "BASIQ"
+    QUIL = "Quil"

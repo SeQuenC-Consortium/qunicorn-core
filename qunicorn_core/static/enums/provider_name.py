@@ -25,3 +25,4 @@ class ProviderName(StrEnum):
 
     IBM = "IBM"
     AWS = "AWS"
+    RIGETTI = "Rigetti"
