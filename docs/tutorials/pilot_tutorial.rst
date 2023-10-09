@@ -23,14 +23,13 @@ Implement your pilot
 
 4. Check out the comments in the base_pilot.py file for more information about the methods and also find some examples in the aws_pilot or ibm_pilot file.
 
-Change the Transpile and Preprocessing Manager if necessary
+Change the transpile and preprocessing manager if necessary
 -----------------------------------------------------------
 
 1. This is only necessary if you added a new assembler language to the AssemblerLanguage.py file.
 
-2. If your circuit in the language is a string but should be handled as a object.
-   Then you need to add an annotated method to the perprocessing manager.
-   This method should return a circuit object and not the string.
+2. If your circuit in the language is a string but should be handled as an object, you need to add an annotated method to the preprocessing manager.
+   This method should then return a circuit object instead of a string.
    One example method would be preprocess_braket.
 
 3. The next step is to also add some annotated methods to the transpile_manager.
@@ -38,12 +37,14 @@ Change the Transpile and Preprocessing Manager if necessary
    You should add a method to transpile your language to one already existing.
    And also add a method to transpile from one already existing to your language.
 
-Add some tests
---------------
+Add some tests and documentation
+--------------------------------
 
 1. Add some tests to the `qunicorn_core.core.tests` directory.
 
-2. If there exists a local executor you can add your tests to the automated_tests directory.
+2. If there exists a local executor (simulator?) you can add your tests to the automated_tests directory.
    Otherwise use the manual_tests directory.
 
-3. WIP
+3. Write comments and documentation to your new implemented code, if there are some special architectural decisions you should also add them to the documentation.
+
+4. WIP
