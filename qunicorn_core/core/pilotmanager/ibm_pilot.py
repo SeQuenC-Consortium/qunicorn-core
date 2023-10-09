@@ -21,7 +21,13 @@ from qiskit.providers import QiskitBackendNotFoundError
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.result import Result
 from qiskit_ibm_provider import IBMProvider
-from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
+from qiskit_ibm_runtime import (
+    QiskitRuntimeService,
+    Sampler,
+    Estimator,
+    RuntimeJob,
+    IBMRuntimeError,
+)
 
 from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
@@ -55,16 +61,16 @@ class IBMPilot(Pilot):
             return self.__estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
             return self.__sample(job_core_dto)
-        elif job_core_dto.type == JobType.FILE_RUNNER:
-            return self.__run_program(job_core_dto)
-        elif job_core_dto.type == JobType.FILE_UPLOAD:
-            return self.__upload_program(job_core_dto)
+        elif job_core_dto.type == JobType.IBM_RUNNER:
+            return self.__run_ibm_program(job_core_dto)
+        elif job_core_dto.type == JobType.IBM_UPLOAD:
+            return self.__upload_ibm_program(job_core_dto)
         else:
             raise job_db_service.return_exception_and_update_job(
                 job_core_dto.id, ValueError("No valid Job Type specified")
             )
 
-    def run(self, job_dto: JobCoreDto):
+    def run(self, job_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute a job local using aer simulator or a real backend"""
 
         if job_dto.executed_on.is_local:
@@ -73,7 +79,9 @@ class IBMPilot(Pilot):
             provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
             backend = provider.get_backend(job_dto.executed_on.name)
 
-        result = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots).result()
+        job = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots)
+        job_db_service.update_attribute(job_dto.id, job.job_id(), JobDataclass.provider_specific_id)
+        result = job.result()
         results: list[ResultDataclass] = IBMPilot.__map_runner_results_to_dataclass(result, job_dto)
 
         # AerCircuit is not serializable and needs to be removed
@@ -82,6 +90,13 @@ class IBMPilot(Pilot):
                 res.meta_data.pop("circuit")
 
         return results
+
+    def cancel_provider_specific(self, job_dto: JobCoreDto):
+        """Cancel a job on an IBM backend using the IBM Pilot"""
+        job = self.__get_qiskit_job_from_qiskit_runtime(job_dto)
+        job.cancel()
+        job_db_service.update_attribute(job_dto.id, JobState.CANCELED, JobDataclass.state)
+        logging.info(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} successful.")
 
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
@@ -93,7 +108,7 @@ class IBMPilot(Pilot):
         ibm_result: SamplerResult = job_from_ibm.result()
         return IBMPilot._map_sampler_results_to_dataclass(ibm_result, job_dto)
 
-    def __estimate(self, job_dto: JobCoreDto):
+    def __estimate(self, job_dto: JobCoreDto) -> list[ResultDataclass]:
         """Uses the Estimator to execute a job on an IBM backend using the IBM Pilot"""
         observables: list = [SparsePauliOp("IY"), SparsePauliOp("IY")]
         if job_dto.executed_on.is_local:
@@ -109,6 +124,13 @@ class IBMPilot(Pilot):
 
         self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
         return QiskitRuntimeService().get_backend(job_dto.executed_on.name)
+
+    def __get_qiskit_job_from_qiskit_runtime(self, job_dto: JobCoreDto):
+        """Returns the job of the provider specific ID created on the given account"""
+
+        self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
+        service: QiskitRuntimeService = QiskitRuntimeService()
+        return service.job(job_dto.provider_specific_id)
 
     @staticmethod
     def get_ibm_provider_and_login(token: str) -> IBMProvider:
@@ -132,12 +154,14 @@ class IBMPilot(Pilot):
             raise job_db_service.return_exception_and_update_job(job_dto_id, exception)
 
     @staticmethod
-    def __get_file_path_to_resources(file_name):
+    def __get_file_path_to_resources(file_name) -> str:
         working_directory_path = os.path.abspath(os.getcwd())
         return working_directory_path + os.sep + "resources" + os.sep + "upload_files" + os.sep + file_name
 
-    def __upload_program(self, job_core_dto: JobCoreDto):
+    def __upload_ibm_program(self, job_core_dto: JobCoreDto):
+        """EXPERIMENTAL"""
         """Upload and then run a quantum program on the QiskitRuntimeService"""
+        logging.warn("This function is experimental and could not be fully tested yet")
 
         service = self.__get_runtime_service(job_core_dto)
         ibm_program_ids = []
@@ -152,7 +176,11 @@ class IBMPilot(Pilot):
         ]
         job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.READY)
 
-    def __run_program(self, job_core_dto: JobCoreDto):
+    def __run_ibm_program(self, job_core_dto: JobCoreDto):
+        """EXPERIMENTAL"""
+        """Run a program previously uploaded to the IBM Backend"""
+        logging.warn("This function is experimental and could not be fully tested yet")
+
         service = self.__get_runtime_service(job_core_dto)
         ibm_results = []
         options_dict: dict = job_core_dto.ibm_file_options

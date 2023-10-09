@@ -27,7 +27,7 @@ Then this method will be executed via the terminal, with the command
     flask [your-command]
 
 How to add a dependency to poetry
-##############################
+##################################
 
 .. code-block:: bash
 

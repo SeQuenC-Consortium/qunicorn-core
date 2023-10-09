@@ -79,6 +79,8 @@ class JobCoreDto:
     ibm_file_inputs: dict | None = None
     token: str | None = None
     transpiled_circuits: Optional[list] = None
+    provider_specific_id: str | None = None
+    celery_id: str | None = None
 
 
 @dataclass

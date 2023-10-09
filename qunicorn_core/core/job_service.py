@@ -42,16 +42,18 @@ def create_and_run_job(
     job: JobDataclass = job_db_service.create_database_job(job_core_dto)
     job_core_dto.id = job.id
     run_job_with_celery(job_core_dto, is_asynchronous)
-    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.RUNNING)
+    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.READY)
 
 
 def run_job_with_celery(job_core_dto: JobCoreDto, is_asynchronous: bool):
     serialized_job_core_dto = yaml.dump(job_core_dto)
     job_core_dto_dict = {"data": serialized_job_core_dto}
     if is_asynchronous:
-        job_manager_service.run_job.delay(job_core_dto_dict)
+        task = job_manager_service.run_job.delay(job_core_dto_dict)
+        job_db_service.update_attribute(job_core_dto.id, task.id, JobDataclass.celery_id)
     else:
         job_manager_service.run_job(job_core_dto_dict)
+        job_db_service.update_attribute(job_core_dto.id, "synchronous", JobDataclass.celery_id)
 
 
 def re_run_job_by_id(job_id: int, token: str, user_id: Optional[str] = None) -> SimpleJobDto:
@@ -119,10 +121,15 @@ def send_job_to_pilot():
     raise NotImplementedError
 
 
-def cancel_job_by_id(job_id, user_id: Optional[str] = None):
+def cancel_job_by_id(job_id, token, user_id: Optional[str] = None):
     """cancel job execution"""
-    # TODO: Implement Cancel
-    raise NotImplementedError
+    job: JobDataclass = job_db_service.get_job_by_id(job_id)
+    if job.executed_by is not None and job.executed_by != user_id:
+        abort_unauthorized()
+    job_core_dto: JobCoreDto = job_mapper.dataclass_to_core(job)
+    job_core_dto.token = token
+    job_manager_service.cancel_job(job_core_dto)
+    return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.CANCELED)
 
 
 def get_jobs_by_deployment_id(deployment_id) -> list[JobResponseDto]:

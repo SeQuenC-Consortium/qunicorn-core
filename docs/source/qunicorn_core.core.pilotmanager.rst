@@ -20,10 +20,18 @@ qunicorn\_core.core.pilotmanager.base\_pilot module
    :undoc-members:
    :show-inheritance:
 
-qunicorn\_core.core.pilotmanager.qiskit\_pilot module
------------------------------------------------------
+qunicorn\_core.core.pilotmanager.ibm\_pilot module
+--------------------------------------------------
 
-.. automodule:: qunicorn_core.core.pilotmanager.qiskit_pilot
+.. automodule:: qunicorn_core.core.pilotmanager.ibm_pilot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+qunicorn\_core.core.pilotmanager.pilot\_manager module
+------------------------------------------------------
+
+.. automodule:: qunicorn_core.core.pilotmanager.pilot_manager
    :members:
    :undoc-members:
    :show-inheritance:

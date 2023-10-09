@@ -45,7 +45,7 @@ class AWSPilot(Pilot):
 
     supported_languages: list[AssemblerLanguage] = [AssemblerLanguage.BRAKET, AssemblerLanguage.QASM3]
 
-    def run(self, job_core_dto: JobCoreDto):
+    def run(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute the job on a local simulator and saves results in the database"""
         if not job_core_dto.executed_on.is_local:
             from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
@@ -68,6 +68,13 @@ class AWSPilot(Pilot):
         from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 
         raise return_exception_and_update_job(job_core_dto.id, ValueError("No valid Job Type specified"))
+
+    def cancel_provider_specific(self, job_dto):
+        logging.warn(
+            f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} failed."
+            f"Canceling while in execution not supported for AWS Jobs"
+        )
+        raise ValueError("Canceling not supported on AWS devices")
 
     @staticmethod
     def __map_aws_results_to_dataclass(

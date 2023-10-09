@@ -27,7 +27,7 @@ from qunicorn_core.static.enums.job_state import JobState
 def create_database_job(job_core: JobCoreDto) -> JobDataclass:
     """Creates a database job with the given circuit and saves it in the database"""
     db_job: JobDataclass = job_mapper.core_to_dataclass(job_core)
-    db_job.state = JobState.RUNNING
+    db_job.state = JobState.READY
     db_job.progress = 0
     db_job.deployment = deployment_db_service.get_deployment_by_id(job_core.deployment.id)
     db_job.executed_on = device_db_service.get_device_by_name(job_core.executed_on.name)

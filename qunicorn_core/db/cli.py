@@ -47,7 +47,7 @@ def recreate_and_load_db():
     click.echo("Database created and loaded.")
 
 
-@DB_CLI.command("create-and-db")
+@DB_CLI.command("create-and-load-db")
 def create_and_load_db():
     """Create all db tables and load testdata."""
     create_db_function(current_app)

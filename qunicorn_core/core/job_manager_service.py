@@ -40,11 +40,9 @@ ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
 @CELERY.task()
 def run_job(job_core_dto_dict: dict):
     """Assign the job to the target pilot which executes the job"""
-
     job_core_dto: JobCoreDto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
-
-    device = job_core_dto.executed_on
     job_db_service.update_attribute(job_core_dto.id, JobState.RUNNING, JobDataclass.state)
+    device = job_core_dto.executed_on
     results: Optional[list[ResultDataclass]] = None
 
     for pilot in PILOTS:
@@ -94,3 +92,12 @@ def __transpile_circuits(job_dto: JobCoreDto, dest_languages: [ProviderAssembler
     if len(error_results) > 0:
         job_db_service.update_finished_job(job_dto.id, error_results, JobState.ERROR)
         raise Exception("TranspileError")
+
+
+def cancel_job(job_core_dto):
+    """cancel job execution"""
+    device = job_core_dto.executed_on
+    for pilot in PILOTS:
+        if pilot.has_same_provider(device.provider.name):
+            pilot.cancel(job_core_dto)
+            return

@@ -20,10 +20,26 @@ qunicorn\_core.core.mapper.device\_mapper module
    :undoc-members:
    :show-inheritance:
 
+qunicorn\_core.core.mapper.general\_mapper module
+-------------------------------------------------
+
+.. automodule:: qunicorn_core.core.mapper.general_mapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 qunicorn\_core.core.mapper.job\_mapper module
 ---------------------------------------------
 
 .. automodule:: qunicorn_core.core.mapper.job_mapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+qunicorn\_core.core.mapper.provider\_assembler\_language\_mapper module
+-----------------------------------------------------------------------
+
+.. automodule:: qunicorn_core.core.mapper.provider_assembler_language_mapper
    :members:
    :undoc-members:
    :show-inheritance:

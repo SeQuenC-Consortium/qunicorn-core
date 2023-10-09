@@ -1,8 +1,7 @@
 version: "3"
 services:
   server:
-    build: .
-    image: qunicorn:local
+    image: "ghcr.io/sequenc-consortium/qunicorn-core:main"
     networks:
       - qunicorn
     environment:
@@ -21,8 +20,7 @@ services:
       kompose.service.type: "loadbalancer"
 
   worker:
-    build: .
-    image: qunicorn:local
+    image: "ghcr.io/sequenc-consortium/qunicorn-core:main"
     networks:
       - qunicorn
     environment:
