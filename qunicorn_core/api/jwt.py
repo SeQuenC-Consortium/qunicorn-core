@@ -16,23 +16,22 @@
 
 
 """Module containing JWT security features for the API."""
-
+import inspect
+import warnings
 from copy import deepcopy
-from dataclasses import dataclass
+from datetime import timedelta
 from functools import wraps
+from os import environ
 from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
 from warnings import warn
 
+import jwt
 from apispec.core import APISpec
 from apispec.utils import deepupdate
 from flask.app import Flask
-from flask.globals import current_app
-from flask_jwt_extended import JWTManager
-from flask_jwt_extended.exceptions import JWTExtendedException
-from flask_jwt_extended.view_decorators import verify_jwt_in_request
+from flask.globals import request
 from flask_smorest import Api, abort
-
-JWT = JWTManager()
+from jwt import PyJWKClient, InvalidTokenError
 
 """Basic JWT security scheme."""
 JWT_SCHEME = {
@@ -42,19 +41,14 @@ JWT_SCHEME = {
     "description": "The jwt access token as returned by login or refresh.",
 }
 
-"""JWT security scheme for JWT refresh tokens."""
-JWT_REFRESH_SCHEME = {
-    "type": "http",
-    "scheme": "bearer",
-    "bearerFormat": "JWT",
-    "description": "The jwt refresh token as returned by login. Must only be used to get a new access token.",
-}
-
 """Security schemes to be added to the swagger.json api documentation."""
 SECURITY_SCHEMES = {
     "jwt": JWT_SCHEME,
-    "jwt-refresh-token": JWT_REFRESH_SCHEME,
 }
+
+jwks_client = None
+if "JWKS_URL" in environ:
+    jwks_client = PyJWKClient(environ["JWKS_URL"], cache_keys=True)
 
 RT = TypeVar("RT")
 
@@ -62,13 +56,33 @@ RT = TypeVar("RT")
 class JWTMixin:
     """Extend Blueprint to add security documentation and jwt handling"""
 
+    def _validate_request(self, optional):
+        auth_header = request.headers.get("Authorization")
+        if auth_header is None:
+            if optional:
+                return None
+            abort(401, message="Authorization header missing")
+        BEARER = "Bearer "
+        if not auth_header.startswith(BEARER):
+            abort(401, message="Not a bearer token")
+        bearer_token = auth_header[len(BEARER) :]
+        try:
+            signing_key = jwks_client.get_signing_key_from_jwt(bearer_token)
+            payload = jwt.decode(
+                bearer_token,
+                signing_key.key,
+                algorithms=["RS256"],
+                leeway=timedelta(minutes=4),
+                options={"verify_exp": True, "verify_nbf": True, "verify_aud": False, "verify_iss": False},
+            )
+            return payload.get("sub")
+        except InvalidTokenError as e:
+            abort(401, message="Invalid Authorization Token", exc=e)
+
     def require_jwt(
         self,
-        security_scheme: Union[str, Dict[str, List[Any]]],
-        *,
-        fresh: bool = False,
+        security_scheme: Union[str, Dict[str, List[Any]]] = "jwt",
         optional: bool = False,
-        refresh_token: bool = False,
     ) -> Callable[[Callable[..., RT]], Callable[..., RT]]:
         """Decorator validating jwt tokens and documenting them for openapi specification (only version 3...)."""
         if isinstance(security_scheme, str):
@@ -77,22 +91,22 @@ class JWTMixin:
         def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
             # map to names that are less likely to have collisions with user defined arguments!
             _jwt_optional = optional
-            _jwt_fresh = fresh
-            _jwt_refresh_token = refresh_token
+            # Check if view function accepts a jwt_subject as named parameter
+            signature = inspect.signature(func)
+            pass_jwt_subject = any(
+                p.name == "jwt_subject" or p.kind == inspect.Parameter.VAR_KEYWORD
+                for p in signature.parameters.values()
+            )
 
             @wraps(func)
             def wrapper(*args: Any, **kwargs) -> RT:
-                try:
-                    verify_jwt_in_request(
-                        fresh=_jwt_fresh,
-                        optional=_jwt_optional,
-                        refresh=_jwt_refresh_token,
-                    )
-                except JWTExtendedException as exc:
-                    # trap exception and emulate flask exception handling
-                    # as flask only handles one exception per request
-                    # but we want to raise a custom exception for jwt exceptions
-                    return current_app.handle_user_exception(exc)
+                if jwks_client is None:
+                    warnings.warn("Skipping JWT check because not JWKS Url is set")
+                    jwt_subject = None
+                else:
+                    jwt_subject = self._validate_request(_jwt_optional)
+                if pass_jwt_subject:
+                    kwargs["jwt_subject"] = jwt_subject
                 return func(*args, **kwargs)
 
             # Store doc in wrapper function
@@ -133,74 +147,5 @@ class JWTMixin:
         return doc
 
 
-# JWT identity and claims
-
-
-@dataclass
-class DemoUser:
-    """This class **should** be replaced by the actual user class!"""
-
-    username: str
-
-
-@JWT.user_identity_loader
-def load_user_identity(user: DemoUser):
-    # load the user identity (primary key) from the user object here
-    return user.username
-
-
-@JWT.user_lookup_loader
-def loadUserObject(jwt_header: dict, jwt_payload: dict):
-    # load the actual user object from the user identity here
-    identity: Optional[str] = jwt_payload.get("sub")
-    if not identity:
-        raise KeyError("Could not find user Identity!")
-    return DemoUser(identity)
-
-
-# JWT errors
-
-
-@JWT.user_lookup_error_loader
-def on_user_load_error(jwt_header: dict, jwt_payload: dict):
-    identity: Optional[str] = jwt_payload.get("sub")
-    abort(401, message=f"The user with the id '{identity}' could not be loaded.")
-
-
-@JWT.expired_token_loader
-def on_expired_token(jwt_header: dict, jwt_payload: dict):
-    abort(401, message="Your authentication token has expired.")
-
-
-@JWT.invalid_token_loader
-def on_invalid_token(message: str):
-    abort(401, message="Your authentication token is invalid.")
-
-
-@JWT.unauthorized_loader
-def on_unauthorized(message: str):
-    abort(
-        401,
-        message="Unauthorized to access this resource without a valid api token.",
-    )
-
-
-@JWT.needs_fresh_token_loader
-def on_stale_token(jwt_header: dict, jwt_payload: dict):
-    abort(
-        401,
-        message=(
-            "Unauthorized to access this resource without a valid and fesh api token.\n"
-            "Request a new fresh api token from the login resource."
-        ),
-    )
-
-
-@JWT.revoked_token_loader
-def on_revoked_token(jwt_header: dict, jwt_payload: dict):
-    abort(401, message="Your authentication token has expired.")
-
-
-def register_jwt(app: Flask):
-    """Register jwt manager with flask app."""
-    JWT.init_app(app)
+def abort_unauthorized():
+    abort(401, message="unauthorized")

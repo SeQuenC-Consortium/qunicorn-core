@@ -6,6 +6,7 @@ from typing import Callable
 import qiskit.circuit
 import qiskit.qasm2
 import qiskit.qasm3
+import qrisp.circuit
 from braket.circuits import Circuit
 from braket.circuits.serialization import IRType
 from braket.ir.openqasm import Program as OpenQASMProgram
@@ -133,3 +134,10 @@ def qasm2_to_qiskit(source: str) -> qiskit.circuit.QuantumCircuit:
 @transpile_manager.register_transpile_method(AssemblerLanguage.QASM3, AssemblerLanguage.BRAKET)
 def qasm_to_braket(source: str) -> OpenQASMProgram:
     return OpenQASMProgram(source=source)
+
+
+@transpile_manager.register_transpile_method(AssemblerLanguage.QRISP, AssemblerLanguage.QISKIT)
+def qrisp_to_qiskit(circuit: qrisp.circuit.QuantumCircuit) -> OpenQASMProgram:
+    from qrisp.interface.circuit_converter import convert_circuit
+
+    return convert_circuit(circuit, "qiskit")

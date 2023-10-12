@@ -13,14 +13,21 @@
 # limitations under the License.
 import json
 import os
+from typing import Optional
 
+
+from celery.states import PENDING
+
+
+from qunicorn_core.celery import CELERY
+from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.api.api_models import JobCoreDto, DeviceRequestDto, DeviceDto
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.db.models.result import ResultDataclass
-from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
+from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 
@@ -43,7 +50,7 @@ class Pilot:
         """Create the standard ProviderDataclass Object for the pilot and return it"""
         raise NotImplementedError()
 
-    def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
+    def get_standard_job_with_deployment(self, user_id: Optional[str], device: DeviceDataclass) -> JobDataclass:
         """Create the standard ProviderDataclass Object for the pilot and return it"""
         raise NotImplementedError()
 
@@ -66,6 +73,22 @@ class Pilot:
             return self.run(job_core_dto)
         else:
             return self.execute_provider_specific(job_core_dto)
+
+    def cancel(self, job: JobCoreDto):
+        """Cancel the execution of a job, locally or if that is not possible at the backend"""
+        if job.state == JobState.READY and not JobCoreDto.celery_id == "synchronous":
+            res = CELERY.AsyncResult(job.celery_id)
+            if res.status == PENDING:
+                res.revoke()
+                job_db_service.update_attribute(job.id, JobState.CANCELED, JobDataclass.state)
+        elif job.state == JobState.RUNNING:
+            self.cancel_provider_specific(job)
+        else:
+            raise ValueError(f"Job is in invalid state for canceling: {job.state}")
+
+    def cancel_provider_specific(self, job):
+        """Cancel execution of a job at the corresponding backend"""
+        raise NotImplementedError()
 
     def has_same_provider(self, provider_name: ProviderName) -> bool:
         """Check if the provider name is the same as the pilot provider name"""
@@ -94,3 +117,25 @@ class Pilot:
             raise ValueError("No default device found for provider {}".format(self.provider_name))
 
         return devices_without_default, default_device
+
+    @staticmethod
+    def qubits_decimal_to_hex(qubits_in_binary: dict, job_id: int) -> dict:
+        """To make sure that the qubits in the counts or probabilities are in hex format and not in decimal format"""
+
+        try:
+            return dict([(hex(k), v) for k, v in qubits_in_binary.items()])
+        except Exception:
+            from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
+
+            raise return_exception_and_update_job(job_id, ValueError("Could not convert decimal-results to hex"))
+
+    @staticmethod
+    def qubit_binary_to_hex(qubits_in_binary: dict, job_id: int) -> dict:
+        """To make sure that the qubits in the counts or probabilities are in hex format and not in binary format"""
+
+        try:
+            return dict([(hex(int(k, 2)), v) for k, v in qubits_in_binary.items()])
+        except Exception:
+            from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
+
+            raise return_exception_and_update_job(job_id, ValueError("Could not convert binary-results to hex"))

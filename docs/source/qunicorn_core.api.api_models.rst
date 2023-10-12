@@ -28,6 +28,14 @@ qunicorn\_core.api.api\_models.job\_dtos module
    :undoc-members:
    :show-inheritance:
 
+qunicorn\_core.api.api\_models.provider\_assembler\_language\_dtos module
+-------------------------------------------------------------------------
+
+.. automodule:: qunicorn_core.api.api_models.provider_assembler_language_dtos
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 qunicorn\_core.api.api\_models.provider\_dtos module
 ----------------------------------------------------
 

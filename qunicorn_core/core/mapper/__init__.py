@@ -18,6 +18,5 @@ from . import (
     job_mapper,
     provider_mapper,
     quantum_program_mapper,
-    user_mapper,
     result_mapper,
 )

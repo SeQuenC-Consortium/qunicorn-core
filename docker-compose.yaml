@@ -1,8 +1,7 @@
 version: "3"
 services:
   server:
-    build: .
-    image: qunicorn:local
+    image: "ghcr.io/sequenc-consortium/qunicorn-core:main"
     networks:
       - qunicorn
     environment:
@@ -10,6 +9,7 @@ services:
       SERVER_PORT: 8080
       BROKER_URL: "redis://broker:6379"
       DB_URL: "postgresql://postgres:passwd@postgres/qunicorn"
+      JWKS_URL: "http://keycloak:8080/auth/realms/qunicorn/protocol/openid-connect/certs"
     depends_on:
       - postgres
       - broker
@@ -20,8 +20,7 @@ services:
       kompose.service.type: "loadbalancer"
 
   worker:
-    build: .
-    image: qunicorn:local
+    image: "ghcr.io/sequenc-consortium/qunicorn-core:main"
     networks:
       - qunicorn
     environment:

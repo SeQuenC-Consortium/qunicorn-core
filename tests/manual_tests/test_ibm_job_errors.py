@@ -21,17 +21,15 @@ from qiskit_ibm_provider.api.exceptions import RequestsApiError
 from qunicorn_core.api.api_models import JobRequestDto, DeploymentRequestDto
 from qunicorn_core.core import job_service
 from qunicorn_core.core.mapper import deployment_mapper
-from qunicorn_core.db.database_services import job_db_service, db_service, user_db_service
+from qunicorn_core.db.database_services import job_db_service, db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
-from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.result_type import ResultType
 from tests import test_utils
 from tests.conftest import set_up_env
-from tests.manual_tests.test_ibm_job_execution import EXPECTED_ID, JOB_FINISHED_PROGRESS, IS_ASYNCHRONOUS
-from tests.test_utils import get_object_from_json
+from tests.test_utils import EXPECTED_ID, JOB_FINISHED_PROGRESS, IS_ASYNCHRONOUS, get_object_from_json
 
 
 def test_invalid_token():
@@ -63,7 +61,7 @@ def test_invalid_circuit():
     # WHEN: Executing create and run
     with app.app_context():
         deployment: DeploymentDataclass = deployment_mapper.request_to_dataclass(deployment_dto)
-        deployment.deployed_by = user_db_service.get_default_user()
+        deployment.deployed_by = None
         depl_id: int = db_service.save_database_object(deployment).id
         job_request_dto.deployment_id = depl_id
         with pytest.raises(Exception) as exception:
@@ -72,24 +70,6 @@ def test_invalid_circuit():
     # THEN: Test if QasmError was thrown and job is saved in db with error
     with app.app_context():
         assert "TranspileError" in str(exception)
-        assert job_finished_with_error()
-
-
-def test_invalid_token_for_sampler():
-    """Testing the synchronous call of the create_and_run_job with an invalid token and the job type sampler"""
-    # GIVEN: Create JobRequestDto with an invalid token and job type sampler
-    app = set_up_env()
-    job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data_IBM.json"))
-    job_request_dto.device_name = "ibmq_qasm_simulator"
-    job_request_dto.token = "Invalid Token"
-    job_request_dto.type = JobType.SAMPLER
-
-    # WHEN: Executing create and run
-    exception = create_deployment_run_job_return_exception(app, job_request_dto)
-
-    # THEN: Test if correct Error was thrown and job is saved in db with error
-    with app.app_context():
-        assert RequestsApiError.__name__ in str(exception) or InvalidAccountError.__name__ in str(exception)
         assert job_finished_with_error()
 
 

@@ -29,7 +29,6 @@ from .db import DB
 from .models.deployment import DeploymentDataclass
 from .models.job import JobDataclass
 from .models.quantum_program import QuantumProgramDataclass
-from .models.user import UserDataclass
 from ..static.enums.assembler_languages import AssemblerLanguage
 from ..util.logging import get_logger
 
@@ -48,7 +47,7 @@ def recreate_and_load_db():
     click.echo("Database created and loaded.")
 
 
-@DB_CLI.command("create-and-db")
+@DB_CLI.command("create-and-load-db")
 def create_and_load_db():
     """Create all db tables and load testdata."""
     create_db_function(current_app)
@@ -72,30 +71,29 @@ def load_db_function(app: Flask, if_not_exists=True):
     db_is_empty = DB.session.query(JobDataclass).first() is None
     if if_not_exists and not db_is_empty:
         return
-    user = UserDataclass(name="DefaultUser")
-    DB.session.add(create_default_braket_deployment(user))
-    DB.session.add(create_default_qiskit_deployment(user))
+    DB.session.add(create_default_braket_deployment())
+    DB.session.add(create_default_qiskit_deployment())
     DB.session.commit()
     qunicorn_core.core.pilotmanager.pilot_manager.save_default_jobs_and_devices_from_provider()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
 
 
-def create_default_braket_deployment(user: UserDataclass) -> DeploymentDataclass:
+def create_default_braket_deployment() -> DeploymentDataclass:
     braket_str: str = "Circuit().h(0).cnot(0, 1)"
     braket_program = QuantumProgramDataclass(quantum_circuit=braket_str, assembler_language=AssemblerLanguage.BRAKET)
     return DeploymentDataclass(
-        deployed_by=user, programs=[braket_program], deployed_at=datetime.datetime.now(), name="BraketDeployment"
+        deployed_by=None, programs=[braket_program], deployed_at=datetime.datetime.now(), name="BraketDeployment"
     )
 
 
-def create_default_qiskit_deployment(user: UserDataclass) -> DeploymentDataclass:
+def create_default_qiskit_deployment() -> DeploymentDataclass:
     qiskit_str: str = (
         "qiskit_circuit = QuantumCircuit(2, 2);qiskit_circuit.h(0);"
         "qiskit_circuit.cx(0, 1);qiskit_circuit.measure(0, 0);qiskit_circuit.measure(1, 1)"
     )
     qiskit_program = QuantumProgramDataclass(quantum_circuit=qiskit_str, assembler_language=AssemblerLanguage.QISKIT)
     return DeploymentDataclass(
-        deployed_by=user, programs=[qiskit_program], deployed_at=datetime.datetime.now(), name="QiskitDeployment"
+        deployed_by=None, programs=[qiskit_program], deployed_at=datetime.datetime.now(), name="QiskitDeployment"
     )
 
 

@@ -36,18 +36,18 @@ qunicorn\_core.db.models.job module
    :undoc-members:
    :show-inheritance:
 
-qunicorn\_core.db.models.pilot module
--------------------------------------
-
-.. automodule:: qunicorn_core.db.models.pilot
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 qunicorn\_core.db.models.provider module
 ----------------------------------------
 
 .. automodule:: qunicorn_core.db.models.provider
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+qunicorn\_core.db.models.provider\_assembler\_language module
+-------------------------------------------------------------
+
+.. automodule:: qunicorn_core.db.models.provider_assembler_language
    :members:
    :undoc-members:
    :show-inheritance:

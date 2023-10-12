@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from datetime import datetime
+from typing import Optional
 
 from braket.devices import LocalSimulator
+from braket.ir.openqasm import Program
 from braket.tasks import GateModelQuantumTaskResult
 from braket.tasks.local_quantum_task_batch import LocalQuantumTaskBatch
 
@@ -21,22 +23,19 @@ from qunicorn_core.api.api_models import DeviceDto
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.db.database_services import device_db_service, provider_db_service
-from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
-from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.util import logging
-from braket.ir.openqasm import Program
 
 
 class AWSPilot(Pilot):
@@ -46,48 +45,58 @@ class AWSPilot(Pilot):
 
     supported_languages: list[AssemblerLanguage] = [AssemblerLanguage.BRAKET, AssemblerLanguage.QASM3]
 
-    def run(self, job_core_dto: JobCoreDto):
+    def run(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute the job on a local simulator and saves results in the database"""
         if not job_core_dto.executed_on.is_local:
+            from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
+
             raise return_exception_and_update_job(job_core_dto.id, ValueError("Device need to be local for AWS"))
 
-        device = LocalSimulator()
+        # Since QASM is stored as a String, it needs to be converted to a QASM Program before execution
         for index in range(len(job_core_dto.transpiled_circuits)):
-            # Since QASM is stored as a String, it needs to be converted to a QASM Program before execution
             if type(job_core_dto.transpiled_circuits[index]) is str:
                 job_core_dto.transpiled_circuits[index] = Program(source=job_core_dto.transpiled_circuits[index])
-        quantum_tasks: LocalQuantumTaskBatch = device.run_batch(
+
+        quantum_tasks: LocalQuantumTaskBatch = LocalSimulator().run_batch(
             job_core_dto.transpiled_circuits, shots=job_core_dto.shots
         )
-        aws_simulator_results: list[GateModelQuantumTaskResult] = quantum_tasks.results()
-        return AWSPilot.__map_simulator_results_to_dataclass(aws_simulator_results, job_core_dto)
+
+        return AWSPilot.__map_aws_results_to_dataclass(quantum_tasks.results(), job_core_dto)
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
+        from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 
         raise return_exception_and_update_job(job_core_dto.id, ValueError("No valid Job Type specified"))
 
+    def cancel_provider_specific(self, job_dto):
+        logging.warn(
+            f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} failed."
+            f"Canceling while in execution not supported for AWS Jobs"
+        )
+        raise ValueError("Canceling not supported on AWS devices")
+
     @staticmethod
-    def __map_simulator_results_to_dataclass(
+    def __map_aws_results_to_dataclass(
         aws_results: list[GateModelQuantumTaskResult], job_dto: JobCoreDto
     ) -> list[ResultDataclass]:
         """Map the results from the aws simulator to a result dataclass object"""
-        result_dtos: list[ResultDataclass] = [
+        job_id: int = job_dto.id
+        return [
             ResultDataclass(
                 result_dict={
-                    "counts": dict(aws_result.measurement_counts.items()),
-                    "probabilities": aws_result.measurement_probabilities,
+                    "counts": Pilot.qubit_binary_to_hex(aws_results[i].measurement_counts, job_id),
+                    "probabilities": Pilot.qubit_binary_to_hex(aws_results[i].measurement_probabilities, job_id),
                 },
-                job_id=job_dto.id,
-                circuit=aws_result.additional_metadata.action.source,
+                job_id=job_id,
+                circuit=job_dto.deployment.programs[i].quantum_circuit,
                 meta_data="",
                 result_type=ResultType.COUNTS,
             )
-            for aws_result in aws_results
+            for i in range(len(aws_results))
         ]
-        return result_dtos
 
-    def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
+    def get_standard_job_with_deployment(self, user_id: Optional[str], device: DeviceDataclass) -> JobDataclass:
         """Get the standard job including its deployment for a certain user and device"""
         language: AssemblerLanguage = AssemblerLanguage.QASM3
         qasm3_str: str = (
@@ -97,11 +106,11 @@ class AWSPilot(Pilot):
             QuantumProgramDataclass(quantum_circuit=qasm3_str, assembler_language=language)
         ]
         deployment = DeploymentDataclass(
-            deployed_by=user, programs=programs, deployed_at=datetime.now(), name="DeploymentAWSQasmName"
+            deployed_by=user_id, programs=programs, deployed_at=datetime.now(), name="DeploymentAWSQasmName"
         )
 
         return JobDataclass(
-            executed_by=user,
+            executed_by=user_id,
             executed_on=device,
             deployment=deployment,
             progress=0,

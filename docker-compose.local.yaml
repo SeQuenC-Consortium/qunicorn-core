@@ -1,0 +1,9 @@
+version: "3"
+services:
+  server:
+    build: .
+    image: qunicorn:local
+
+  worker:
+    build: .
+    image: qunicorn:local

@@ -13,14 +13,21 @@
 # limitations under the License.
 import os
 from datetime import datetime
+from typing import Optional
 
 import qiskit
-from qiskit.primitives import EstimatorResult, SamplerResult
-from qiskit.providers import BackendV1, QiskitBackendNotFoundError
+from qiskit.primitives import EstimatorResult, SamplerResult, Sampler as LocalSampler, Estimator as LocalEstimator
+from qiskit.providers import QiskitBackendNotFoundError
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.result import Result
 from qiskit_ibm_provider import IBMProvider
-from qiskit_ibm_runtime import QiskitRuntimeService, Sampler, Estimator, RuntimeJob, IBMRuntimeError
+from qiskit_ibm_runtime import (
+    QiskitRuntimeService,
+    Sampler,
+    Estimator,
+    RuntimeJob,
+    IBMRuntimeError,
+)
 
 from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
@@ -28,11 +35,10 @@ from qunicorn_core.db.database_services import job_db_service, device_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
-from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
@@ -55,16 +61,16 @@ class IBMPilot(Pilot):
             return self.__estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
             return self.__sample(job_core_dto)
-        elif job_core_dto.type == JobType.FILE_RUNNER:
-            return self.__run_program(job_core_dto)
-        elif job_core_dto.type == JobType.FILE_UPLOAD:
-            return self.__upload_program(job_core_dto)
+        elif job_core_dto.type == JobType.IBM_RUNNER:
+            return self.__run_ibm_program(job_core_dto)
+        elif job_core_dto.type == JobType.IBM_UPLOAD:
+            return self.__upload_ibm_program(job_core_dto)
         else:
             raise job_db_service.return_exception_and_update_job(
                 job_core_dto.id, ValueError("No valid Job Type specified")
             )
 
-    def run(self, job_dto: JobCoreDto):
+    def run(self, job_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute a job local using aer simulator or a real backend"""
 
         if job_dto.executed_on.is_local:
@@ -73,7 +79,9 @@ class IBMPilot(Pilot):
             provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
             backend = provider.get_backend(job_dto.executed_on.name)
 
-        result = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots).result()
+        job = qiskit.execute(job_dto.transpiled_circuits, backend=backend, shots=job_dto.shots)
+        job_db_service.update_attribute(job_dto.id, job.job_id(), JobDataclass.provider_specific_id)
+        result = job.result()
         results: list[ResultDataclass] = IBMPilot.__map_runner_results_to_dataclass(result, job_dto)
 
         # AerCircuit is not serializable and needs to be removed
@@ -83,31 +91,46 @@ class IBMPilot(Pilot):
 
         return results
 
+    def cancel_provider_specific(self, job_dto: JobCoreDto):
+        """Cancel a job on an IBM backend using the IBM Pilot"""
+        job = self.__get_qiskit_job_from_qiskit_runtime(job_dto)
+        job.cancel()
+        job_db_service.update_attribute(job_dto.id, JobState.CANCELED, JobDataclass.state)
+        logging.info(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} successful.")
+
     def __sample(self, job_dto: JobCoreDto):
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
-
-        backend, circuits = self.__get_backend_and_circuits_for_qiskit_runtime(job_dto)
-        sampler = Sampler(session=backend)
-        job_from_ibm: RuntimeJob = sampler.run(circuits)
+        if job_dto.executed_on.is_local:
+            sampler = LocalSampler()
+        else:
+            sampler = Sampler(session=self.__get_qiskit_runtime_backend(job_dto))
+        job_from_ibm: RuntimeJob = sampler.run(job_dto.transpiled_circuits)
         ibm_result: SamplerResult = job_from_ibm.result()
         return IBMPilot._map_sampler_results_to_dataclass(ibm_result, job_dto)
 
-    def __estimate(self, job_dto: JobCoreDto):
+    def __estimate(self, job_dto: JobCoreDto) -> list[ResultDataclass]:
         """Uses the Estimator to execute a job on an IBM backend using the IBM Pilot"""
-
-        backend, circuits = self.__get_backend_and_circuits_for_qiskit_runtime(job_dto)
-        estimator = Estimator(session=backend)
-        job_from_ibm = estimator.run(circuits, observables=[SparsePauliOp("IY"), SparsePauliOp("IY")])
+        observables: list = [SparsePauliOp("IY"), SparsePauliOp("IY")]
+        if job_dto.executed_on.is_local:
+            estimator = LocalEstimator()
+        else:
+            estimator = Estimator(session=self.__get_qiskit_runtime_backend(job_dto))
+        job_from_ibm = estimator.run(job_dto.transpiled_circuits, observables=observables)
         ibm_result: EstimatorResult = job_from_ibm.result()
         return IBMPilot._map_estimator_results_to_dataclass(ibm_result, job_dto, "IY")
 
-    def __get_backend_and_circuits_for_qiskit_runtime(self, job_dto):
+    def __get_qiskit_runtime_backend(self, job_dto):
         """Instantiate all important configurations and updates the job_state"""
 
         self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
+        return QiskitRuntimeService().get_backend(job_dto.executed_on.name)
+
+    def __get_qiskit_job_from_qiskit_runtime(self, job_dto: JobCoreDto):
+        """Returns the job of the provider specific ID created on the given account"""
+
+        self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
         service: QiskitRuntimeService = QiskitRuntimeService()
-        backend: BackendV1 = service.get_backend(job_dto.executed_on.name)
-        return backend, job_dto.transpiled_circuits
+        return service.job(job_dto.provider_specific_id)
 
     @staticmethod
     def get_ibm_provider_and_login(token: str) -> IBMProvider:
@@ -131,12 +154,14 @@ class IBMPilot(Pilot):
             raise job_db_service.return_exception_and_update_job(job_dto_id, exception)
 
     @staticmethod
-    def __get_file_path_to_resources(file_name):
+    def __get_file_path_to_resources(file_name) -> str:
         working_directory_path = os.path.abspath(os.getcwd())
         return working_directory_path + os.sep + "resources" + os.sep + "upload_files" + os.sep + file_name
 
-    def __upload_program(self, job_core_dto: JobCoreDto):
+    def __upload_ibm_program(self, job_core_dto: JobCoreDto):
+        """EXPERIMENTAL"""
         """Upload and then run a quantum program on the QiskitRuntimeService"""
+        logging.warn("This function is experimental and could not be fully tested yet")
 
         service = self.__get_runtime_service(job_core_dto)
         ibm_program_ids = []
@@ -151,7 +176,11 @@ class IBMPilot(Pilot):
         ]
         job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.READY)
 
-    def __run_program(self, job_core_dto: JobCoreDto):
+    def __run_ibm_program(self, job_core_dto: JobCoreDto):
+        """EXPERIMENTAL"""
+        """Run a program previously uploaded to the IBM Backend"""
+        logging.warn("This function is experimental and could not be fully tested yet")
+
         service = self.__get_runtime_service(job_core_dto)
         ibm_results = []
         options_dict: dict = job_core_dto.ibm_file_options
@@ -185,16 +214,27 @@ class IBMPilot(Pilot):
 
         for i in range(len(ibm_result.results)):
             counts: dict = ibm_result.results[i].data.counts
+            probabilities: dict = IBMPilot.calculate_probabilities(counts)
             circuit: str = job_dto.deployment.programs[i].quantum_circuit
             result_dtos.append(
                 ResultDataclass(
                     circuit=circuit,
-                    result_dict=counts,
+                    result_dict={"counts": counts, "probabilities": probabilities},
                     result_type=ResultType.COUNTS,
                     meta_data=ibm_result.results[i].to_dict(),
                 )
             )
         return result_dtos
+
+    @staticmethod
+    def calculate_probabilities(counts: dict) -> dict:
+        """Calculates the probabilities from the counts, probability = counts / total_counts"""
+
+        total_counts = sum(counts.values())
+        probabilities = {}
+        for key, value in counts.items():
+            probabilities[key] = value / total_counts
+        return probabilities
 
     @staticmethod
     def _map_estimator_results_to_dataclass(
@@ -219,7 +259,7 @@ class IBMPilot(Pilot):
     def _map_sampler_results_to_dataclass(ibm_result: SamplerResult, job_dto: JobCoreDto) -> list[ResultDataclass]:
         result_dtos: list[ResultDataclass] = []
         for i in range(ibm_result.num_experiments):
-            quasi_dist: dict = ibm_result.quasi_dists[i]
+            quasi_dist: dict = Pilot.qubits_decimal_to_hex(ibm_result.quasi_dists[i], job_dto.id)
             circuit: str = job_dto.deployment.programs[i].quantum_circuit
             result_dtos.append(
                 ResultDataclass(
@@ -236,21 +276,21 @@ class IBMPilot(Pilot):
         ]
         return ProviderDataclass(with_token=True, supported_languages=supported_languages, name=self.provider_name)
 
-    def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
+    def get_standard_job_with_deployment(self, user_id: Optional[str], device: DeviceDataclass) -> JobDataclass:
         language: AssemblerLanguage = AssemblerLanguage.QASM2
         programs: list[QuantumProgramDataclass] = [
             QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(1), assembler_language=language),
             QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(2), assembler_language=language),
         ]
         deployment = DeploymentDataclass(
-            deployed_by=user,
+            deployed_by=user_id,
             programs=programs,
             deployed_at=datetime.now(),
             name="DeploymentIBMQasmName",
         )
 
         return JobDataclass(
-            executed_by=user,
+            executed_by=user_id,
             executed_on=device,
             deployment=deployment,
             progress=0,

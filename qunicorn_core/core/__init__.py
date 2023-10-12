@@ -21,5 +21,4 @@ from . import (
     job_service,
     device_service,
     provider_service,
-    user_service,
 )

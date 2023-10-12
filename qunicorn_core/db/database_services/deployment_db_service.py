@@ -13,7 +13,7 @@
 # limitations under the License.
 from datetime import datetime
 
-from qunicorn_core.db.database_services import db_service, user_db_service
+from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 
 
@@ -22,7 +22,6 @@ from qunicorn_core.db.models.deployment import DeploymentDataclass
 
 def create(deployment: DeploymentDataclass) -> DeploymentDataclass:
     """Creates a database job with the given circuit and saves it in the database"""
-    deployment.deployed_by = user_db_service.get_default_user()
     deployment.deployed_at = datetime.now()
     return db_service.save_database_object(deployment)
 
