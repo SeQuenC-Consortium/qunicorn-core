@@ -26,22 +26,6 @@ IS_ASYNCHRONOUS: bool = False
 RESULT_TOLERANCE: int = 100
 
 
-def test_create_and_run_aws_local_simulator():
-    """Tests the create and run job method for synchronous execution of the aws local simulator"""
-    # GIVEN: Database Setup - AWS added as a provider
-    app = set_up_env()
-
-    # WHEN: create_and_run executed
-    with app.app_context():
-        job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QASM3)
-
-        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto)
-
-        # THEN: Check if the correct job with its result is saved in the db
-        assert return_dto.state == JobState.READY
-
-
 def test_aws_local_simulator_braket_job_results():
     test_utils.execute_job_test(ProviderName.AWS, "local_simulator", AssemblerLanguage.BRAKET)
 
@@ -56,3 +40,19 @@ def test_aws_local_simulator_qasm3_job_results():
 
 def test_aws_local_simulator_qasm2_job_results():
     test_utils.execute_job_test(ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM2)
+
+
+def test_create_and_run_aws_local_simulator():
+    """Tests the create and run job method for synchronous execution of the aws local simulator"""
+    # GIVEN: Database Setup - AWS added as a provider
+    app = set_up_env()
+
+    # WHEN: create_and_run executed
+    with app.app_context():
+        job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QASM3)
+
+        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto)
+
+        # THEN: Check if the correct job with its result is saved in the db
+        assert return_dto.state == JobState.READY

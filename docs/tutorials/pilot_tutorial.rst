@@ -40,10 +40,12 @@ Change the transpile and preprocessing manager if necessary
 Add some tests and documentation
 --------------------------------
 
-1. Add some tests to the `qunicorn_core.core.tests` directory.
+1. Add some tests to the `qunicorn_core.core.tests` directory. Use the principles written in the tests/README.md file.
 
 2. If there exists a local executor (simulator?) you can add your tests to the automated_tests directory.
    Otherwise use the manual_tests directory.
 
-3. Write comments and documentation to your new implemented code, if there are some special architectural decisions you should also add them to the documentation.
-WIP
+3. If you added a new assembler language and pilot you can use the method `test_utils.execute_job_test` like it is done in the `test_ibm_job_execution.py` file.
+
+4. Write comments and documentation to your new implemented code, if there are some special architectural decisions you should also add them to the documentation.
+
