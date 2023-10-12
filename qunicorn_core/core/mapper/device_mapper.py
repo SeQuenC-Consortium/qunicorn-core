@@ -15,44 +15,37 @@
 from qunicorn_core.api.api_models import DeviceDto
 from qunicorn_core.api.api_models.device_dtos import SimpleDeviceDto
 from qunicorn_core.core.mapper import provider_mapper
+from qunicorn_core.core.mapper.general_mapper import map_from_to
 from qunicorn_core.db.models.device import DeviceDataclass
 
 
-def device_dto_to_device(device: DeviceDto) -> DeviceDataclass:
-    return DeviceDataclass(
-        id=device.id,
-        num_qubits=device.num_qubits,
-        is_simulator=device.is_simulator,
-        provider=provider_mapper.dto_to_dataclass(device.provider),
-        device_name=device.device_name,
-        url=device.url,
+def dto_to_dataclass(device: DeviceDto) -> DeviceDataclass:
+    return map_from_to(
+        from_object=device,
+        to_type=DeviceDataclass,
+        fields_mapping={
+            "provider": provider_mapper.dto_to_dataclass(device.provider),
+        },
     )
 
 
-def device_dto_to_device_without_id(device: DeviceDto) -> DeviceDataclass:
-    return DeviceDataclass(
-        num_qubits=device.num_qubits,
-        is_simulator=device.is_simulator,
-        provider=provider_mapper.dto_to_dataclass(device.provider),
-        device_name=device.device_name,
-        url=device.url,
+def dataclass_to_dto(device: DeviceDataclass) -> DeviceDto:
+    return map_from_to(
+        from_object=device,
+        to_type=DeviceDto,
+        fields_mapping={
+            "provider": provider_mapper.dataclass_to_dto(device.provider),
+        },
     )
 
 
-def device_to_device_dto(device: DeviceDataclass) -> DeviceDto:
-    return DeviceDto(
-        id=device.id,
-        num_qubits=device.num_qubits,
-        is_simulator=device.is_simulator,
-        provider=provider_mapper.dataclass_to_dto(device.provider),
-        device_name=device.device_name,
-        url=device.url,
-    )
-
-
-def device_to_simple_device(device: DeviceDataclass) -> SimpleDeviceDto:
-    return SimpleDeviceDto(
-        device_id=device.id,
-        device_name=device.device_name,
-        provider_name=device.provider.name,
+def dataclass_to_simple(device: DeviceDataclass) -> SimpleDeviceDto:
+    return map_from_to(
+        from_object=device,
+        to_type=SimpleDeviceDto,
+        fields_mapping={
+            "device_id": device.id,
+            "device_name": device.name,
+            "provider_name": device.provider.name,
+        },
     )

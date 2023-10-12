@@ -20,7 +20,7 @@ python = "^3.11.0"
 tomli = "^2.0.0"
 celery = "^5.2.7"
 redis = "^4.5.4"
-qiskit = "^0.43.1"
+qiskit = "^0.44.0"
 qiskit-ibm-provider = "^0.6.0"
 qiskit-ibm-runtime = "^0.11.1"
 PyYAML = "^6.0"
@@ -44,6 +44,8 @@ sphinx = "^7.2.2"
 myst-parser = "^2.0.0"
 pytest = "^7.2.0"
 pytest-mock = "^3.11.1"
+qiskit-aer = "^0.12.2"
+qiskit-qasm3-import = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "^23.1.0"
@@ -54,6 +56,9 @@ pip-licenses = "^4.0.3"
 
 [tool.poetry.scripts]
 #flask = 'flask.cli:main'
+
+[tool.poetry.group.dev.dependencies]
+pydot = "^1.4.2"
 
 [tool.black]
 include = '\.pyi?$'

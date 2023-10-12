@@ -26,8 +26,12 @@ class DeviceDataclass(DbModel):
     """Dataclass for storing CloudDevices of a provider
 
     Attributes:
-        url (str): Rest-endpoint how to connect to the Cloud device
         provider: The provider of the cloud_service with the needed configurations
+        num_qubits: The amount of qubits that is available at this device
+        name: The name of the device
+        is_simulator: The information whether the device is a simulator (true) or not (false)
+        is_local: The information whether jobs executed on this device are executed local or not
+        provider: The provider of this device
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
@@ -35,8 +39,7 @@ class DeviceDataclass(DbModel):
         ForeignKey(ProviderDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None
     )
     num_qubits: Mapped[int] = mapped_column(sql.INTEGER, default=-1)
-    device_name: Mapped[str] = mapped_column(sql.String, default="")
+    name: Mapped[str] = mapped_column(sql.String, default="")
     is_simulator: Mapped[bool] = mapped_column(sql.BOOLEAN, default=False)
-    url: Mapped[str] = mapped_column(sql.String(50), default=None)
-
+    is_local: Mapped[bool] = mapped_column(sql.BOOLEAN, default=False)
     provider: Mapped[ProviderDataclass.__name__] = relationship(ProviderDataclass.__name__, default=None)

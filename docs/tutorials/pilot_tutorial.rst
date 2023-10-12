@@ -46,5 +46,4 @@ Add some tests and documentation
    Otherwise use the manual_tests directory.
 
 3. Write comments and documentation to your new implemented code, if there are some special architectural decisions you should also add them to the documentation.
-
-4. WIP
+WIP
