@@ -15,13 +15,11 @@ import json
 import os
 from typing import Optional
 
-
 from celery.states import PENDING
 
-
+from qunicorn_core.api.api_models import JobCoreDto, DeviceRequestDto, DeviceDto
 from qunicorn_core.celery import CELERY
 from qunicorn_core.db.database_services import job_db_service
-from qunicorn_core.api.api_models import JobCoreDto, DeviceRequestDto, DeviceDto
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
@@ -125,9 +123,8 @@ class Pilot:
         try:
             return dict([(hex(k), v) for k, v in qubits_in_binary.items()])
         except Exception:
-            from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
-
-            raise return_exception_and_update_job(job_id, ValueError("Could not convert decimal-results to hex"))
+            raise job_db_service.return_exception_and_update_job(job_id,
+                                                                 ValueError("Could not convert decimal-results to hex"))
 
     @staticmethod
     def qubit_binary_to_hex(qubits_in_binary: dict, job_id: int) -> dict:
@@ -136,6 +133,5 @@ class Pilot:
         try:
             return dict([(hex(int(k, 2)), v) for k, v in qubits_in_binary.items()])
         except Exception:
-            from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
-
-            raise return_exception_and_update_job(job_id, ValueError("Could not convert binary-results to hex"))
+            raise job_db_service.return_exception_and_update_job(job_id,
+                                                                 ValueError("Could not convert binary-results to hex"))
