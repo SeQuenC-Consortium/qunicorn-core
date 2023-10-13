@@ -18,7 +18,7 @@ Implement your pilot
 --------------------
 
 1. Define the qunicorn provider by adding a new enum value to the ProviderName.py enum. And set it as your provider_name.
-.. image:: ../resources/images/tutorial_demo/provider.png
+    .. image:: ../resources/images/tutorial_demo/provider.png
 
 2. Define the supported_languages. Add a new qunicorn enum value to the AssemblerLanguage.py enum.
 .. image:: ../resources/images/tutorial_demo/assembler.png
