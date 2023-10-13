@@ -14,13 +14,11 @@
 import json
 import os
 
-
 from celery.states import PENDING
 
-
+from qunicorn_core.api.api_models import JobCoreDto, DeviceRequestDto, DeviceDto
 from qunicorn_core.celery import CELERY
 from qunicorn_core.db.database_services import job_db_service
-from qunicorn_core.api.api_models import JobCoreDto, DeviceRequestDto, DeviceDto
 from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
