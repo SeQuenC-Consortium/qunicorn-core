@@ -86,6 +86,19 @@ services:
     ports:
       - "5432:5432"
 
+  qvm:
+    image: rigetti/qvm
+    networks:
+      - qunicorn
+    ports:
+      - "5555:5555"
+
+  quilc:
+    image: rigetti/quilc
+    networks:
+      - qunicorn
+    ports:
+      - "5000:5000"
 
 networks:
   qunicorn:

@@ -1,6 +1,7 @@
 from typing import Callable
 
 from braket.circuits import Circuit  # noqa
+from pyquil import Program
 from qiskit import QuantumCircuit  # noqa
 from qrisp import QuantumCircuit as QrispQC
 
@@ -64,3 +65,10 @@ def preprocess_qrisp(program: str) -> QrispQC:
     circuit_globals = {"QuantumCircuit": QrispQC}
     exec(program, circuit_globals)
     return circuit_globals["circuit"]
+
+
+@preprocessing_manager.register(AssemblerLanguage.QUIL)
+def preprocess_quil(program: str) -> Program:
+    """quil.QuantumCircuit needs to be included here as an import so eval works with the type"""
+    exec(program, globals())
+    return globals().get("program")
