@@ -26,7 +26,8 @@ Files that belong to the service-layer or core. They calculate or process data, 
 **QASM-Format**:
 The most used format to describe quantum circuits.
 
-**CLI**: Shortcut for command line interface, used for example to initially set up the database with custom commands.
+**CLI**:
+Abbreviation for command line interface, used for example to initially set up the database with custom commands.
 
 **Celery**:
 A python library that is used to run tasks in the background in an asynchronous task queue based on messaging.
@@ -41,3 +42,8 @@ Used in the context of celery and docker. Manages the Celery Worker.
 **In-Request**:
 Something that is done in a request. For example in-request-execution means that the execution of a quantum program is done in the request.
 
+**DTOs**:
+Abbreviation for "Data transfer object" is an object that carries data between processes.
+
+**transpiler**:
+A transpiler is a compiler that translates the source code of a program from one programming language to another.

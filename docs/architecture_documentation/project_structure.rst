@@ -1,4 +1,4 @@
-Project structure
+Project Structure
 #####################
 
 This chapter gives a brief overview of the project structure of the qunicorn project.
