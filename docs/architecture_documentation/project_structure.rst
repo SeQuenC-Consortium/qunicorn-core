@@ -17,16 +17,8 @@ The api package contains all the api views and models. It is used to define the 
 * api_models <Package>:
     * contains DTOS and Schemas for all Objects
     * these are used for computation and to define the schemas for the api views
-* deployment_api <Package>:
-    * contains the api definition for deployments.
-* device_api <Package>:
-    * contains the api definition for devices.
-* job_api <Package>:
-    * contains the api definition for jobs.
-* provider_api <Package>:
-    * contains the api definition for providers.
-* user_api <Package>:
-    * contains the api definition for users.
+* {component}_api <Package>:
+    * contains the api definition for a component.
 
 core <Package>:
 ^^^^^^^^^^^^^^^^
@@ -45,18 +37,8 @@ The core package contains all the core logic of the project. This includes mappe
         * Contains resources for the pilots in the json format.
 * transpiler <Package>:
     * contains the transpiler, which is used to transpile between assembler languages used by different providers.
-* deployment_service <.py File>
-    * a service file for deployments which handles communication between the api and other parts of the core package and the db package.
-* device_service <.py File>
-    * a service file for devices which handles communication between the api and other parts of the core package and the db package.
-* job_manager_service <.py File>
-    * a service file to prepare jobs for execution on one of the pilots.
-* job_service <.py File>
-    * a service file for jobs which handles communication between the api and other parts of the core package and the db package.
-* provider_service <.py File>
-    * a service file for providers which handles communication between the api and other parts of the core package and the db package.
-* user_service <.py File>
-    * IS EMPTY
+* {component}_service <.py File>
+    * a service file for a component which handles communication between the api and other parts of the core package and the db package.
 
 db <Package>:
 ^^^^^^^^^^^^^^^^
