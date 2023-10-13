@@ -4,7 +4,7 @@ Hint: To see it on a live example:
 :doc:`Create a Qunicorn-Pilot <pilot_tutorial_demo>`
 
 
-1.Create a new python file in the `qunicorn_core.core.pilotmanager` directory. The naming pattern is: [provider]_pilot.py
+1. Create a new python file in the `qunicorn_core.core.pilotmanager` directory. The naming pattern is: [provider]_pilot.py
 
 2. For the creation you can also just copy the base_pilot.py file and rename it.
 
