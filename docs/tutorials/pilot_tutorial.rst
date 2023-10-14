@@ -20,7 +20,7 @@ Implement your pilot
 
 1. Define the provider_name by adding a new enum value to the ProviderName.py enum. And set it as your provider_name.
 
-2. Define the supported_languages. If necessary add a new enum value to the AssemblerLanguage.py enum or use the already existing one.
+2. Define the supported_languages. If necessary add a new enum value to the AssemblerLanguage.py enum or use an already existing one.
 
 3. Implement all methods that raise a "NotImplementedError" in the base_pilot.py file.
 
