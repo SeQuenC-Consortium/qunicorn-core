@@ -21,20 +21,20 @@ from qunicorn_core.db.database_services import deployment_db_service, db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 
 
-def get_all_deployments(user_id: Optional[str] = None) -> list[DeploymentDataclass]:
+def get_all_deployments(user_id: Optional[str] = None) -> list[DeploymentDto]:
     """Gets all deployments"""
-    return [
-        deployment
-        for deployment in deployment_db_service.get_all_deployments()
-        if deployment.deployed_by is None or deployment.deployed_by == user_id
-    ]
+    deployment_list: list[DeploymentDto] = []
+    for deployment in deployment_db_service.get_all_deployments():
+        if deployment.deployed_by is None or deployment.deployed_by == user_id:
+            deployment_list.append(deployment_mapper.dataclass_to_dto(deployment))
+    return deployment_list
 
 
-def get_deployment_by_id(id: int, user_id: Optional[str] = None) -> DeploymentDataclass:
+def get_deployment_by_id(depl_id: int, user_id: Optional[str] = None) -> DeploymentDto:
     """Gets one deployment"""
-    deployment = deployment_db_service.get_deployment_by_id(id)
+    deployment = deployment_db_service.get_deployment_by_id(depl_id)
     abort_if_user_not_none_and_unauthorized(deployment.deployed_by, user_id)
-    return deployment
+    return deployment_mapper.dataclass_to_dto(deployment)
 
 
 def update_deployment(
@@ -42,7 +42,7 @@ def update_deployment(
 ) -> DeploymentDto:
     """Updates one deployment"""
     try:
-        db_deployment = get_deployment_by_id(deployment_id)
+        db_deployment = deployment_db_service.get_deployment_by_id(deployment_id)
         abort_if_user_not_none_and_unauthorized(db_deployment.deployed_by, user_id)
         db_deployment.deployed_at = datetime.now()
         db_deployment.name = deployment_dto.name

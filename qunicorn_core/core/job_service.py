@@ -125,8 +125,6 @@ def send_job_to_pilot():
 
 def cancel_job_by_id(job_id, token, user_id: Optional[str] = None):
     """cancel job execution"""
-    # TODO: Implement Cancel
-    raise NotImplementedError
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
     abort_if_user_not_none_and_unauthorized(job.executed_by, user_id)
     job_core_dto: JobCoreDto = job_mapper.dataclass_to_core(job)

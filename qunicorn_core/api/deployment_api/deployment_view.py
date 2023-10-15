@@ -31,7 +31,7 @@ from ...util import logging
 class DeploymentIDView(MethodView):
     """Deployments endpoint for collection of all deployed jobs."""
 
-    @DEPLOYMENT_API.response(HTTPStatus.OK)
+    @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema(many=True))
     @DEPLOYMENT_API.require_jwt(optional=True)
     def get(self, jwt_subject: Optional[str]):
         """Get the list of deployments."""
@@ -57,7 +57,7 @@ class DeploymentDetailView(MethodView):
     def get(self, deployment_id: int, jwt_subject: Optional[str]):
         """Get detailed information for single deployed job-definition."""
         logging.info("Request: get deployment by id")
-        return deployment_service.get_deployment_by_id(deployment_id)
+        return deployment_service.get_deployment_by_id(deployment_id, jwt_subject)
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     @DEPLOYMENT_API.require_jwt(optional=True)
