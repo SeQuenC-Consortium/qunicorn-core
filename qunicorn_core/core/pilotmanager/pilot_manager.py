@@ -29,7 +29,7 @@ def save_default_jobs_and_devices_from_provider():
     for pilot in PILOTS:
         device_list_without_default, default_device = pilot.get_standard_devices()
         saved_device = device_db_service.save_device_by_name(default_device)
-        job: JobDataclass = pilot.get_standard_job_with_deployment(None, saved_device)
+        job: JobDataclass = pilot.get_standard_job_with_deployment(saved_device)
         db_service.get_session().add(job)
         db_service.get_session().add_all(device_list_without_default)
         db_service.get_session().commit()

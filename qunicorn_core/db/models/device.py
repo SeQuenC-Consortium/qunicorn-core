@@ -26,7 +26,10 @@ class DeviceDataclass(DbModel):
     """Dataclass for storing CloudDevices of a provider
 
     Attributes:
+        url (str): Rest-endpoint how to connect to the Cloud device
         provider: The provider of the cloud_service with the needed configurations
+        id: The id of the device
+        provider_id: provider_id of the provider saved in the provider table
         num_qubits: The amount of qubits that is available at this device
         name: The name of the device
         is_simulator: The information whether the device is a simulator (true) or not (false)

@@ -23,12 +23,17 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobResponseDto,
     JobExecutePythonFileDto,
 )
-from qunicorn_core.api.jwt import abort_unauthorized
+from qunicorn_core.api.jwt import abort_if_user_not_none_and_unauthorized
 from qunicorn_core.core import job_manager_service
 from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
+
+"""
+This module contains the service layer for jobs. It is used to create and run jobs.
+It calls the job_manager_service to run the jobs with celery.
+"""
 
 ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
 
@@ -46,6 +51,7 @@ def create_and_run_job(
 
 
 def run_job_with_celery(job_core_dto: JobCoreDto, is_asynchronous: bool):
+    """Serialize the job and run it with celery"""
     serialized_job_core_dto = yaml.dump(job_core_dto)
     job_core_dto_dict = {"data": serialized_job_core_dto}
     if is_asynchronous:
@@ -59,8 +65,7 @@ def run_job_with_celery(job_core_dto: JobCoreDto, is_asynchronous: bool):
 def re_run_job_by_id(job_id: int, token: str, user_id: Optional[str] = None) -> SimpleJobDto:
     """Get job from DB, Save it as new job and run it with the new id"""
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
-    if job.executed_by is not None and job.executed_by != user_id:
-        abort_unauthorized()
+    abort_if_user_not_none_and_unauthorized(job.executed_by, user_id)
     job_request: JobRequestDto = job_mapper.dataclass_to_request(job)
     job_request.token = token
     return create_and_run_job(job_request)
@@ -69,11 +74,9 @@ def re_run_job_by_id(job_id: int, token: str, user_id: Optional[str] = None) -> 
 def run_job_by_id(
     job_id: int, job_exec_dto: JobExecutePythonFileDto, asyn: bool = ASYNCHRONOUS, user_id: Optional[str] = None
 ) -> SimpleJobDto:
-    """Get uploaded job from DB, and run it on a provider"""
+    """EXPERIMENTAL: Get uploaded job from DB, and run it on a provider"""
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
-    if job.executed_by is not None and job.executed_by != user_id:
-        abort_unauthorized()
-
+    abort_if_user_not_none_and_unauthorized(job.executed_by, user_id)
     job_core_dto: JobCoreDto = job_mapper.dataclass_to_core(job)
     job_core_dto.ibm_file_inputs = job_exec_dto.python_file_inputs
     job_core_dto.ibm_file_options = job_exec_dto.python_file_options
@@ -91,8 +94,7 @@ def get_job_by_id(job_id: int) -> JobResponseDto:
 def delete_job_data_by_id(job_id, user_id: Optional[str]) -> JobResponseDto:
     """delete job data from db"""
     job = get_job_by_id(job_id)
-    if job.executed_by is not None and job.executed_by != user_id:
-        abort_unauthorized()
+    abort_if_user_not_none_and_unauthorized(job.executed_by, user_id)
     job_db_service.delete(job_id)
     return job
 
@@ -123,9 +125,10 @@ def send_job_to_pilot():
 
 def cancel_job_by_id(job_id, token, user_id: Optional[str] = None):
     """cancel job execution"""
+    # TODO: Implement Cancel
+    raise NotImplementedError
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
-    if job.executed_by is not None and job.executed_by != user_id:
-        abort_unauthorized()
+    abort_if_user_not_none_and_unauthorized(job.executed_by, user_id)
     job_core_dto: JobCoreDto = job_mapper.dataclass_to_core(job)
     job_core_dto.token = token
     job_manager_service.cancel_job(job_core_dto)

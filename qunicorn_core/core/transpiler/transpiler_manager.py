@@ -10,6 +10,7 @@ import qrisp.circuit
 from braket.circuits import Circuit
 from braket.circuits.serialization import IRType
 from braket.ir.openqasm import Program as OpenQASMProgram
+from qrisp.interface.circuit_converter import convert_circuit
 from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
 from rustworkx.visualization import graphviz_draw
 
@@ -130,7 +131,6 @@ def qasm2_to_qiskit(source: str) -> qiskit.circuit.QuantumCircuit:
     return qiskit.qasm2.loads(source)
 
 
-# @transpile_manager.register_transpile_method(AssemblerLanguage.QASM2, AssemblerLanguage.BRAKET)
 @transpile_manager.register_transpile_method(AssemblerLanguage.QASM3, AssemblerLanguage.BRAKET)
 def qasm_to_braket(source: str) -> OpenQASMProgram:
     return OpenQASMProgram(source=source)
@@ -138,6 +138,4 @@ def qasm_to_braket(source: str) -> OpenQASMProgram:
 
 @transpile_manager.register_transpile_method(AssemblerLanguage.QRISP, AssemblerLanguage.QISKIT)
 def qrisp_to_qiskit(circuit: qrisp.circuit.QuantumCircuit) -> OpenQASMProgram:
-    from qrisp.interface.circuit_converter import convert_circuit
-
     return convert_circuit(circuit, "qiskit")

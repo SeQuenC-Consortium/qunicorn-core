@@ -36,7 +36,7 @@ def test_invalid_token():
     """Testing the synchronous call of the create_and_run_job with an invalid token"""
     # GIVEN: Create JobRequestDto with an invalid token
     app = set_up_env()
-    job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data_IBM.json"))
+    job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_ibm_test_data.json"))
     job_request_dto.device_name = "ibmq_qasm_simulator"
     job_request_dto.token = "Invalid Token"
 
@@ -53,7 +53,7 @@ def test_invalid_circuit():
     """Testing the synchronous call of the create_and_run_job with an invalid circuit (a correct token is needed)"""
     # GIVEN: Create JobRequestDto with an invalid circuit
     app = set_up_env()
-    job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_test_data_IBM.json"))
+    job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_ibm_test_data.json"))
     job_request_dto.device_name = "ibmq_qasm_simulator"
     deployment_dto: DeploymentRequestDto = test_utils.get_test_deployment_request(AssemblerLanguage.QISKIT)
     deployment_dto.programs[0].quantum_circuit = "invalid circuit"

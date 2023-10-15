@@ -83,12 +83,12 @@ Change the transpile and preprocessing manager - if necessary
 Add some tests and documentation
 --------------------------------
 
-1. The pilot should be working now and we need to add a small test. Therefore we need to add the two .json-files in the `test/test_resources` folder.
+1. The pilot should be working now and we need to add a small test. Therefore we need to add the two json-files in the `test/test_resources` folder.
     .. image:: ../resources/images/tutorial_demo/test-data.png
         :width: 80%
 
-2. We also use them in the `test_utils.py`. Inside it, create these two static variables: DEPLOYMENT_QUNICORN_CIRCUITS_JSON="deployment_request_dto_with_qunicorn_circuit_test_data.json" and JOB_JSON_QUNICORN="job_request_dto_test_data_QUNICORN.json" And add them to the `get_test_jobs/deployments`:
-    .. image:: ../resources/images/tutorial_demo/use-test-data.png
+2. We use them in the `test_utils.py`. Inside it, we need to add them to both lists:
+    .. image:: ../resources/images/tutorial_demo/add-test-json-file-names-to-paths.png
         :width: 90%
 
 3. After that a new test file can be created in `automated_tests`: `test_qunicorn_job_execution.py` to use the test method and test the pilot end-to-end:

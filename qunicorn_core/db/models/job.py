@@ -33,18 +33,25 @@ class JobDataclass(DbModel):
     """Dataclass for storing Jobs
 
     Attributes:
-        name (str, optional): Optional name for a job
-        executed_by_id (str): A user_id associated to the job, user that wants to execute the job
+        id: The id of a job
+        results (ResultDataclass, optional): List of results for each quantum program that was executed
+        executed_by(str): A user_id associated to the job, user that wants to execute the job
+        executed_on_id (int): The device_id of the device where the job is running on
+        executed_on (DeviceDataclass): The device where the job is running on
         deployment_id (int): A deployment_id associated with the job
+        deployment (DeploymentDataclass): The deployment where the program is coming from
+        progress (float): The progress of the job
         state (Optional[str], optional): The state of a job, enum JobState
+        shots (int): The number of shots for the job
+        type (JobType): The type of the job
         started_at (datetime, optional): The moment the job was scheduled.
             (default :py:func:`~datetime.datetime.utcnow`)
         finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
-        data (Union[dict, list, str, float, int, bool, None], optional): Mutable JSON-like store for additional
-            lightweight task data. Default value is empty dict.
-        results (ResultDataclass, optional): List of results for each quantum program that was executed
-        parameters (str, optional): The parameters for the Job. Job parameters should already be prepared and error
-            checked before starting the task.
+        name (str, optional): Optional name for a job
+        data (Union[dict, list, str, float, int, bool, None], optional): Mutable JSON-like store for additional data.
+        parameters (str, optional): The parameters for the Job.
+        provider_specific_id (str, optional): The provider specific id for the job. (Used for canceling)
+        celery_id (str, optional): The celery id for the job. (Used for canceling)
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)

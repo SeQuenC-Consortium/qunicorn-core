@@ -27,10 +27,11 @@ class DeploymentDataclass(DbModel):
     """Dataclass for storing deployments
 
     Attributes:
-        name (str, optional): Optional name for a deployment_api
+        id (int): The id of a deployment
         deployed_by (str): The  user_id that deployed this Deployment
         programs (list): A list of quantum programs
         deployed_at (Date): Date of the creation of a deployment_api
+        name (str, optional): Optional name for a deployment_api
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)

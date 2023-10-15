@@ -276,7 +276,7 @@ class IBMPilot(Pilot):
         ]
         return ProviderDataclass(with_token=True, supported_languages=supported_languages, name=self.provider_name)
 
-    def get_standard_job_with_deployment(self, user_id: Optional[str], device: DeviceDataclass) -> JobDataclass:
+    def get_standard_job_with_deployment(self, device: DeviceDataclass, user_id: Optional[str] = None) -> JobDataclass:
         language: AssemblerLanguage = AssemblerLanguage.QASM2
         programs: list[QuantumProgramDataclass] = [
             QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(1), assembler_language=language),

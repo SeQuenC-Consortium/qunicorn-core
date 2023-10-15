@@ -28,15 +28,22 @@ from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from tests.conftest import set_up_env
 
-JOB_JSON_IBM = "job_request_dto_test_data_IBM.json"
-JOB_JSON_AWS = "job_request_dto_test_data_AWS.json"
-DEPLOYMENT_JSON = "deployment_request_dto_test_data.json"
-DEPLOYMENT_QASM2_CIRCUITS_JSON = "deployment_request_dto_with_qasm2_circuit_test_data.json"
-DEPLOYMENT_QASM3_CIRCUITS_JSON = "deployment_request_dto_with_qasm3_circuit_test_data.json"
-DEPLOYMENT_BRAKET_CIRCUITS_JSON = "deployment_request_dto_with_braket_circuit_test_data.json"
-DEPLOYMENT_QISKIT_CIRCUITS_JSON = "deployment_request_dto_with_qiskit_circuit_test_data.json"
-DEPLOYMENT_QRISP_CIRCUITS_JSON = "deployment_request_dto_with_qrisp_circuit_test_data.json"
-PROGRAM_JSON = "program_request_dto_test_data.json"
+# The ProviderName must be in lower case in the file name
+JOB_JSON_PATHS = [
+    "job_request_dto_ibm_test_data.json",
+    "job_request_dto_aws_test_data.json",
+    "job_request_dto_qunicorn_test_data.json",
+]
+
+# The AssemblerLanguage must be in lower case in the file name
+DEPLOYMENT_JSON_PATHS = [
+    "deployment_request_dto_qasm2_test_data.json",
+    "deployment_request_dto_qasm3_test_data.json",
+    "deployment_request_dto_braket_test_data.json",
+    "deployment_request_dto_qiskit_test_data.json",
+    "deployment_request_dto_qrisp_test_data.json",
+    "deployment_request_dto_qunicorn_test_data.json",
+]
 
 EXPECTED_ID: int = 3  # hardcoded ID can be removed if tests for the correct ID are no longer needed
 JOB_FINISHED_PROGRESS: int = 100
@@ -52,7 +59,15 @@ QUBIT_3: str = "0x3"
 def execute_job_test(
     provider: ProviderName, device: str, input_assembler_language: AssemblerLanguage, is_asynchronous: bool = False
 ):
-    """creates and runs a new job and checks the response"""
+    """
+    This is the main testing method to test the execution of a job on a device of a provider.
+    To use this method you need a program with two circuits, which are logically equivalent to the others.
+    Eg: deployment_request_dto_qiskit_test_data.json
+
+    It is an End-to-End test, which means that the job is created and executed on the provider.
+    Afterward it is checked if the job is saved in the database and if the results are correct.
+    This can be done for different assembler languages and providers.
+    """
 
     # GIVEN: Database Setup
     app = set_up_env()
@@ -90,30 +105,23 @@ def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, assembler_
 
 
 def get_test_deployment_request(assembler_language: AssemblerLanguage) -> DeploymentRequestDto:
-    if assembler_language == AssemblerLanguage.QISKIT:
-        deployment_dict: dict = get_object_from_json(DEPLOYMENT_QISKIT_CIRCUITS_JSON)
-        return DeploymentRequestDto.from_dict(deployment_dict)
-    elif assembler_language == AssemblerLanguage.QASM2:
-        deployment_dict: dict = get_object_from_json(DEPLOYMENT_QASM2_CIRCUITS_JSON)
-        return DeploymentRequestDto.from_dict(deployment_dict)
-    elif assembler_language == AssemblerLanguage.BRAKET:
-        deployment_dict: dict = get_object_from_json(DEPLOYMENT_BRAKET_CIRCUITS_JSON)
-        return DeploymentRequestDto.from_dict(deployment_dict)
-    elif assembler_language == AssemblerLanguage.QASM3:
-        deployment_dict: dict = get_object_from_json(DEPLOYMENT_QASM3_CIRCUITS_JSON)
-        return DeploymentRequestDto.from_dict(deployment_dict)
-    elif assembler_language == AssemblerLanguage.QRISP:
-        deployment_dict: dict = get_object_from_json(DEPLOYMENT_QRISP_CIRCUITS_JSON)
-        return DeploymentRequestDto.from_dict(deployment_dict)
+    """Search for an assembler_language in the file names to create a DeploymentRequestDto"""
+    for path in DEPLOYMENT_JSON_PATHS:
+        if assembler_language.lower() in path:
+            deployment_dict: dict = get_object_from_json(path)
+            return DeploymentRequestDto.from_dict(deployment_dict)
+
+    raise ValueError("No deployment json found for assembler language: {}".format(assembler_language))
 
 
 def get_test_job(provider: ProviderName) -> JobRequestDto:
-    if provider == ProviderName.IBM:
-        job_dict: dict = get_object_from_json(JOB_JSON_IBM)
-        return JobRequestDto(**job_dict)
-    elif provider == ProviderName.AWS:
-        job_dict: dict = get_object_from_json(JOB_JSON_AWS)
-        return JobRequestDto(**job_dict)
+    """Search for a ProviderName in the file names to create a JobRequestDto"""
+    for path in JOB_JSON_PATHS:
+        if provider.lower() in path:
+            job_dict: dict = get_object_from_json(path)
+            return JobRequestDto(**job_dict)
+
+    raise ValueError("No job json found for provider: {}".format(provider))
 
 
 def check_simple_job_dto(return_dto: SimpleJobDto):

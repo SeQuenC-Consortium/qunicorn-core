@@ -34,7 +34,6 @@ from ..util.logging import get_logger
 
 DB_CLI_BLP = Blueprint("db_cli", __name__, cli_group=None)
 DB_CLI = DB_CLI_BLP.cli  # expose as attribute for autodoc generation
-
 DB_COMMAND_LOGGER = "db"
 
 

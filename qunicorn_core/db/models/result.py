@@ -25,7 +25,9 @@ from ...static.enums.result_type import ResultType
 class ResultDataclass(DbModel):
     """Dataclass for storing results of a job
 
+
     Attributes:
+        id: the ID of the result
         result_dict (dict): The results of the job, in the given result_type
             For the Runner it should have the keys counts and probabilities
             The counts and probabilities should be a dict with hexadecimals as quantum-bit-keys
