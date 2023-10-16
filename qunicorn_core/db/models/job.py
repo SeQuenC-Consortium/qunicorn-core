@@ -48,8 +48,6 @@ class JobDataclass(DbModel):
             (default :py:func:`~datetime.datetime.utcnow`)
         finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
         name (str, optional): Optional name for a job
-        data (Union[dict, list, str, float, int, bool, None], optional): Mutable JSON-like store for additional data.
-        parameters (str, optional): The parameters for the Job.
         provider_specific_id (str, optional): The provider specific id for the job. (Used for canceling)
         celery_id (str, optional): The celery id for the job. (Used for canceling)
     """
@@ -82,7 +80,5 @@ class JobDataclass(DbModel):
     started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-    data: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-    parameters: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     provider_specific_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     celery_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)

@@ -51,7 +51,6 @@ class JobRequestDto:
     provider_name: str
     device_name: str
     shots: int
-    parameters: str
     token: str
     type: JobType
     deployment_id: int
@@ -72,8 +71,6 @@ class JobCoreDto:
     name: str
     results: list[ResultDto]
     id: int | None = None
-    parameters: str | None = None
-    data: str | None = None
     finished_at: datetime | None = None
     ibm_file_options: dict | None = None
     ibm_file_inputs: dict | None = None
@@ -96,9 +93,7 @@ class JobResponseDto:
     started_at: datetime
     finished_at: datetime
     name: str
-    data: str
     results: list[ResultDto]
-    parameters: str
 
 
 @dataclass
@@ -124,7 +119,6 @@ class JobRequestDtoSchema(MaBaseSchema):
         allow_none=True,
         metadata={"example": 4000, "label": "shots", "description": "number of shots", "input_type": "number"},
     )
-    parameters = ma.fields.List(ma.fields.Float(), required=False)
     token = ma.fields.String(required=True, metadata={"example": ""})
     type = ma.fields.Enum(required=True, metadata={"example": JobType.RUNNER}, enum=JobType)
     deployment_id = ma.fields.Integer(required=False, allow_none=True, metadata={"example": 1})
@@ -139,9 +133,7 @@ class JobResponseDtoSchema(MaBaseSchema):
     type = ma.fields.String(required=True, dump_only=True)
     started_at = ma.fields.String(required=True, dump_only=True)
     finished_at = ma.fields.String(required=True, dump_only=True)
-    data = ma.fields.String(required=True, dump_only=True)
     results = ma.fields.Nested(ResultDtoSchema(), many=True, required=True, dump_only=True)
-    parameters = ma.fields.String(required=True, dump_only=True)
 
 
 class SimpleJobDtoSchema(MaBaseSchema):

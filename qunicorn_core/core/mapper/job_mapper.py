@@ -72,7 +72,6 @@ def core_to_dataclass(job: JobCoreDto) -> JobDataclass:
             "executed_by": job.executed_by,
             "executed_on": device_mapper.dto_to_dataclass(job.executed_on),
             "deployment": deployment_mapper.dto_to_dataclass(job.deployment),
-            "parameters": str(job.parameters),
         },
     )
 
