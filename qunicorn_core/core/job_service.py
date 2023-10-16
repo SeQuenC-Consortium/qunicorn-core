@@ -23,7 +23,7 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobResponseDto,
     JobExecutePythonFileDto,
 )
-from qunicorn_core.api.jwt import abort_if_user_not_none_and_unauthorized
+from qunicorn_core.api.jwt import abort_if_user_unauthorized
 from qunicorn_core.core import job_manager_service
 from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import job_db_service
@@ -65,7 +65,7 @@ def run_job_with_celery(job_core_dto: JobCoreDto, is_asynchronous: bool):
 def re_run_job_by_id(job_id: int, token: str, user_id: Optional[str] = None) -> SimpleJobDto:
     """Get job from DB, Save it as new job and run it with the new id"""
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
-    abort_if_user_not_none_and_unauthorized(job.executed_by, user_id)
+    abort_if_user_unauthorized(job.executed_by, user_id)
     job_request: JobRequestDto = job_mapper.dataclass_to_request(job)
     job_request.token = token
     return create_and_run_job(job_request)
@@ -76,7 +76,7 @@ def run_job_by_id(
 ) -> SimpleJobDto:
     """EXPERIMENTAL: Get uploaded job from DB, and run it on a provider"""
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
-    abort_if_user_not_none_and_unauthorized(job.executed_by, user_id)
+    abort_if_user_unauthorized(job.executed_by, user_id)
     job_core_dto: JobCoreDto = job_mapper.dataclass_to_core(job)
     job_core_dto.ibm_file_inputs = job_exec_dto.python_file_inputs
     job_core_dto.ibm_file_options = job_exec_dto.python_file_options
@@ -94,7 +94,7 @@ def get_job_by_id(job_id: int) -> JobResponseDto:
 def delete_job_data_by_id(job_id, user_id: Optional[str]) -> JobResponseDto:
     """delete job data from db"""
     job = get_job_by_id(job_id)
-    abort_if_user_not_none_and_unauthorized(job.executed_by, user_id)
+    abort_if_user_unauthorized(job.executed_by, user_id)
     job_db_service.delete(job_id)
     return job
 
@@ -126,7 +126,7 @@ def send_job_to_pilot():
 def cancel_job_by_id(job_id, token, user_id: Optional[str] = None):
     """cancel job execution"""
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
-    abort_if_user_not_none_and_unauthorized(job.executed_by, user_id)
+    abort_if_user_unauthorized(job.executed_by, user_id)
     job_core_dto: JobCoreDto = job_mapper.dataclass_to_core(job)
     job_core_dto.token = token
     job_manager_service.cancel_job(job_core_dto)

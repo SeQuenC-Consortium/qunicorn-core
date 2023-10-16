@@ -65,7 +65,7 @@ def execute_job_test(
     Eg: deployment_request_dto_qiskit_test_data.json
 
     It is an End-to-End test, which means that the job is created and executed on the provider.
-    Afterward it is checked if the job is saved in the database and if the results are correct.
+    Afterwards it is checked if the job is saved in the database and if the results are correct.
     This can be done for different assembler languages and providers.
     """
 

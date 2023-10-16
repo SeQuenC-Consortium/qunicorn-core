@@ -44,7 +44,7 @@ def test_create_deployments():
 
 
 def test_get_all_deployments():
-    """Testing if the get all endpoint of deployments works"""
+    """Testing if the "get_all"-endpoint of deployments works"""
     # GIVEN: Database is initiated correctly
     app = set_up_env()
 

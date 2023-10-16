@@ -149,6 +149,10 @@ class JWTMixin:
         return doc
 
 
-def abort_if_user_not_none_and_unauthorized(user: Optional[str], user_id: str):
-    if user is not None and user != user_id:
+def abort_if_user_unauthorized(user_from_data_object: Optional[str], logged_in_user_id: str):
+    """
+    If the user_from_data_object is None everybody can access it.
+    If the user_from_data_object is not None, only the correct user can access it -> Otherwise abort.
+    """
+    if user_from_data_object is not None and user_from_data_object != logged_in_user_id:
         abort(401, message="unauthorized")

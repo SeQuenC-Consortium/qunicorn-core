@@ -19,7 +19,7 @@ from tests.conftest import set_up_env
 
 
 def test_get_all_provider():
-    """Testing if the get all endpoint of providers works"""
+    """Testing if the "get_all"-endpoint of providers works"""
     # GIVEN: Database is initiated correctly
     app = set_up_env()
 
@@ -37,7 +37,7 @@ def test_get_all_provider():
 
 
 def test_get_all_devices():
-    """Testing if the get all endpoint of devices works"""
+    """Testing if the "get_all"-endpoint of devices works"""
     # GIVEN: Database is initiated correctly
     app = set_up_env()
 

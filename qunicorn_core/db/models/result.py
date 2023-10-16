@@ -27,14 +27,14 @@ class ResultDataclass(DbModel):
 
 
     Attributes:
-        id: the ID of the result
-        result_dict (dict): The results of the job, in the given result_type
-            For the Runner it should have the keys counts and probabilities
-            The counts and probabilities should be a dict with hexadecimals as quantum-bit-keys
-        job_id (int): The  job_id that was executed
-        circuit (str): The circuit which was executed by the job
-        meta_data (dict): Some other data that was given by ibm
-        result_type (Enum): Result type depending on the Job_Type of the job
+        id: The ID of the result.
+        result_dict (dict): The results of the job, in the given result_type.
+            For the Runner it should have the keys counts and probabilities.
+            The counts and probabilities should be a dict with hexadecimals as quantum-bit-keys.
+        job_id (int): The  job_id that was executed.
+        circuit (str): The circuit which was executed by the job.
+        meta_data (dict): Some other data that was given by ibm.
+        result_type (Enum): Result type depending on the Job_Type of the job.
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)

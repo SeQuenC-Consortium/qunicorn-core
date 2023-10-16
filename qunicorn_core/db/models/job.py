@@ -33,21 +33,20 @@ class JobDataclass(DbModel):
     """Dataclass for storing Jobs
 
     Attributes:
-        id: The id of a job
-        results (ResultDataclass, optional): List of results for each quantum program that was executed
-        executed_by(str): A user_id associated to the job, user that wants to execute the job
-        executed_on_id (int): The device_id of the device where the job is running on
-        executed_on (DeviceDataclass): The device where the job is running on
-        deployment_id (int): A deployment_id associated with the job
-        deployment (DeploymentDataclass): The deployment where the program is coming from
-        progress (float): The progress of the job
-        state (Optional[str], optional): The state of a job, enum JobState
+        id: The id of a job.
+        results (ResultDataclass, optional): List of results for each quantum program that was executed.
+        executed_by(str): A user_id associated to the job, user that wants to execute the job.
+        executed_on_id (int): The device_id of the device where the job is running on.
+        executed_on (DeviceDataclass): The device where the job is running on.
+        deployment_id (int): A deployment_id associated with the job.
+        deployment (DeploymentDataclass): The deployment where the program is coming from.
+        progress (float): The progress of the job.
+        state (Optional[str], optional): The state of a job, enum JobState.
         shots (int): The number of shots for the job
-        type (JobType): The type of the job
-        started_at (datetime, optional): The moment the job was scheduled.
-            (default :py:func:`~datetime.datetime.utcnow`)
+        type (JobType): The type of the job.
+        started_at (datetime, optional): The moment the job was scheduled. (default: datetime.utcnow)
         finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
-        name (str, optional): Optional name for a job
+        name (str, optional): Optional name for a job.
         provider_specific_id (str, optional): The provider specific id for the job. (Used for canceling)
         celery_id (str, optional): The celery id for the job. (Used for canceling)
     """

@@ -25,10 +25,10 @@ class QuantumProgramDataclass(DbModel):
     """Dataclass for storing QuantumPrograms
 
     Attributes:
-        id: the ID of the quantum program
+        id: The ID of the quantum program.
         quantum_circuit (str): Quantum code that needs to be executed.
-        assembler_language (enum): Assembler language in which the code should be interpreted
-        deployment_id (int): The deployment where a list of quantum program is used
+        assembler_language (enum): Assembler language in which the code should be interpreted.
+        deployment_id (int): The deployment where a list of quantum program is used.
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)

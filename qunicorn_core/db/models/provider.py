@@ -27,9 +27,9 @@ class ProviderDataclass(DbModel):
     """Dataclass for storing Providers
 
     Attributes:
-        id (int): The id of a provider
-        with_token (bool): If authentication is needed and can be done by passing a token this attribute true.
-        supported_languages: The programming language that this provider supports.
+        id (int): The id of a provider.
+        with_token (bool): If authentication is needed and can be done by passing a token this attribute is true.
+        supported_languages: The programming language that is supported by this provider.
         name (ProviderName): Name of the cloud service.
     """
 
