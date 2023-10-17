@@ -16,10 +16,11 @@ from qunicorn_core.core.mapper import device_mapper
 from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
+from qunicorn_core.core.pilotmanager.rigetti_pilot import RigettiPilot
 from qunicorn_core.db.database_services import device_db_service, db_service
 from qunicorn_core.db.models.job import JobDataclass
 
-PILOTS: list[Pilot] = [IBMPilot(), AWSPilot()]
+PILOTS: list[Pilot] = [IBMPilot(), AWSPilot(), RigettiPilot()]
 
 """"This Class is responsible for managing the pilots and their data, all pilots are saved in the PILOTS list"""
 

@@ -1,0 +1,9 @@
+{
+  "name": "JobName",
+  "provider_name": "RIGETTI",
+  "type": "RUNNER",
+  "token": "",
+  "device_name": "local_simulator",
+  "shots": 4000,
+  "deployment_id": 6
+}
