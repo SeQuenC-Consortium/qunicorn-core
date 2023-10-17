@@ -18,13 +18,13 @@ Architecture
 Component interactions
 -----------------------
 .. image:: ../resources/images/qunicorn_component_interaction.png
-  :width: 600
+  :width: 800
   :alt: Alternative text
 
 Domain model
 ----------------------
 .. image:: ../resources/images/qunicorn_domain_model.png
-  :width: 600
+  :width: 700
   :alt: Alternative text
 
 Sequence Diagram for Creating a Deployment
