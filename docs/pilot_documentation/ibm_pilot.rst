@@ -4,6 +4,12 @@ IBM Pilot
 The AWS Pilot is used to work with the IBM API.
 Supports local and remote execution.
 
+Standard Devices
+^^^^^^^^^^^^^^^^^^
+
+The local simulator has the device name: **aer_simulator**
+Set this as the name in the requests.
+
 Main Languages
 ^^^^^^^^^^^^^^^^^^^^
 

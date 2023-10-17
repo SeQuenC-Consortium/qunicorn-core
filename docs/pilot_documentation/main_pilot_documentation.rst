@@ -5,6 +5,5 @@ Pilot and Transpilemanager Documentation
    :maxdepth: 2
    :caption: Contents:
 
-   aws_pilot
-   ibm_pilot
+   general_pilot
    transpile_manager
