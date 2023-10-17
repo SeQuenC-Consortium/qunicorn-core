@@ -26,7 +26,10 @@ def get_all_providers() -> list[ProviderDataclass]:
 
 def get_provider_by_id(provider_id: int) -> ProviderDataclass:
     """Get a provider by id"""
-    return db_service.get_database_object_by_id(provider_id, ProviderDataclass)
+    db_provider = db_service.get_database_object_by_id(provider_id, ProviderDataclass)
+    if db_provider is None:
+        raise ValueError(("provider_id '" + str(provider_id) + "' can not be found"))
+    return db_provider
 
 
 def get_provider_by_name(provider_name: str) -> ProviderDataclass:
