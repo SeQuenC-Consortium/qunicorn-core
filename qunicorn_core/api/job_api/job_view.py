@@ -19,9 +19,7 @@ from typing import Optional
 
 from flask import jsonify
 from flask.views import MethodView
-from qiskit_ibm_runtime.exceptions import RuntimeInvalidStateError
-from qiskit_ibm_runtime.exceptions import IBMRuntimeError
-
+from qiskit_ibm_runtime import IBMRuntimeError, RuntimeInvalidStateError
 
 from .root import JOBMANAGER_API
 from ..api_models.job_dtos import (
@@ -69,10 +67,7 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.require_jwt(optional=True)
     def get(self, job_id: str, jwt_subject: Optional[str]):
         """Get the details/results of a job."""
-        # try:
         job_response_dto: JobResponseDto = job_service.get_job_by_id(int(job_id))
-        # except ValueError as ve:
-        #    return jsonify({'Error': str(ve)}), 500
         if job_response_dto.executed_by is not None and job_response_dto.executed_by != jwt_subject:
             abort_unauthorized()
         return jsonify(job_response_dto), 200

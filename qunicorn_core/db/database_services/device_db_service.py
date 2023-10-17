@@ -39,10 +39,7 @@ def get_all_devices() -> list[DeviceDataclass]:
 
 def get_device_by_id(device_id: int) -> DeviceDataclass:
     """Get a device by id"""
-    db_device = db_service.get_database_object_by_id(device_id, DeviceDataclass)
-    if db_device is None:
-        raise ValueError(("device_id '" + str(device_id) + "' can not be found"))
-    return db_device
+    return db_service.get_database_object_by_id(device_id, DeviceDataclass)
 
 
 def save_device_by_name(device: DeviceDataclass) -> DeviceDataclass:

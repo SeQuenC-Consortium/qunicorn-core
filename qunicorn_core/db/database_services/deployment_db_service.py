@@ -38,7 +38,4 @@ def delete(id: int):
 
 def get_deployment_by_id(deployment_id: int) -> DeploymentDataclass:
     """Gets the Deployment with the deployment_id from the database"""
-    db_deployment = db_service.get_database_object_by_id(deployment_id, DeploymentDataclass)
-    if db_deployment is None:
-        raise ValueError(("deployment_id '" + str(deployment_id) + "' can not be found"))
-    return db_deployment
+    return db_service.get_database_object_by_id(deployment_id, DeploymentDataclass)

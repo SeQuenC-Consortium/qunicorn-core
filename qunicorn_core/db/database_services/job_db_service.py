@@ -54,10 +54,7 @@ def update_finished_job(job_id: int, results: list[ResultDataclass], job_state: 
 
 def get_job_by_id(job_id: int) -> JobDataclass:
     """Gets the job with the job_id from the database"""
-    db_job = db_service.get_database_object_by_id(job_id, JobDataclass)
-    if db_job is None:
-        raise ValueError(("job_id '" + str(job_id) + "' can not be found"))
-    return db_job
+    return db_service.get_database_object_by_id(job_id, JobDataclass)
 
 
 def delete(id: int):
