@@ -16,7 +16,15 @@ All pilots implement the *Pilot* class from the base_pilot. The *Pilot* class is
 It also implements some general logic used by all pilots.
 
 This ensures a consistent interface for all pilots and allows for easy extension of the pilot framework.
-For more information on how to create a new Pilot, refer to this Tutorial: HIER TUTORIAL EINBAUEN
+For more information on how to create a new Pilot, refer to this Tutorial:
+
+:doc:`How to create a new pilot <../tutorials/pilot_tutorial>`
+
+Providers
+^^^^^^^^^^
+
+Each Pilot belongs to a Provider, providers are companies, and other institutions, which provide quantum computing services.
+The Pilot communicates with the API provided by the providers, or uses the provider specific SDKs to perform local simulations.
 
 Available Pilot Implementations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
