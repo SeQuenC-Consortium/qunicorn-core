@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 
 from pyquil import get_qc
@@ -6,7 +5,6 @@ from pyquil.api._qam import QAMExecutionResult
 
 from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from qunicorn_core.core.pilotmanager.rigetti_utils import get_qpu, get_qvm
 from qunicorn_core.db.database_services import provider_db_service, device_db_service
 from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
 from qunicorn_core.db.models.deployment import DeploymentDataclass
@@ -34,7 +32,7 @@ class RigettiPilot(Pilot):
 
     def run(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute the job on a local simulator and saves results in the database"""
-        if False:  # job_core_dto.executed_on.is_local:
+        if job_core_dto.executed_on.is_local:
             results = []
             for program in job_core_dto.transpiled_circuits:
                 qc = get_qc(job_core_dto.deployment.device.name)
@@ -52,25 +50,7 @@ class RigettiPilot(Pilot):
             print(final_results)
             return final_results
         else:
-            os.environ["AZURE_QUANTUM_SUBSCRIPTION_ID"] = ""
-            os.environ["AZURE_QUANTUM_WORKSPACE_RG"] = "AzureQuantum"
-            os.environ["AZURE_QUANTUM_WORKSPACE_NAME"] = "qunicorn-enpro"
-            os.environ["AZURE_QUANTUM_WORKSPACE_LOCATION"] = "Germany West Central"
-
-            os.environ["AZURE_TENANT_ID"] = ""
-            os.environ["AZURE_CLIENT_ID"] = ""
-            os.environ["AZURE_CLIENT_SECRET"] = ""
-
-            program = job_core_dto.transpiled_circuits[0]
-
-            qpu = get_qpu("aspen-m-3")
-            qvm = get_qvm()
-
-            exe = qpu.compile(program)  # This does not run quilc yet.
-            results = qpu.run(exe)  # Quilc will run in the cloud before executing the program.
-            qvm_results = qvm.run(exe)
-            print(results)
-            print(qvm_results)
+            raise return_exception_and_update_job(job_core_dto.id, ValueError("Device need to be local for RIGETTI"))
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
