@@ -33,6 +33,7 @@ Authentication token can retrieved by using the `Resource Owner Password Credent
 The following shows an example how to accomplish this by using curl
 
 .. code-block:: bash
+
     curl --location 'http://localhost:8081/auth/realms/qunicorn/protocol/openid-connect/token' \
     --header 'Content-Type: application/x-www-form-urlencoded' \
     --data-urlencode 'client_id=qunicorn' \
