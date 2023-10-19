@@ -15,6 +15,10 @@ The KeyCloak Docker Compose: `keycloak-docker-compose.yml` can be started by exe
 
 After it has been started it should be possible to access KeyCloak `http://localhost:8081`
 
+Alternatively the KeyCloak Service can be started by using the general `docker-compose.yaml`.
+After the changes to qunicorn from the `Start Qunicorn`-Section the docker needs to be restarted.
+Then afterwards qunicorn must not be started locally later, but can also not be debugged.
+
 
 Create a User
 -------------
