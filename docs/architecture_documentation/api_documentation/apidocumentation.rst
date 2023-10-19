@@ -6,7 +6,7 @@ Generated Documentation
 
 Below you can find a generated Documentation of the API. 
 
-* `Api documentation <../api.html>`_
+* `Api documentation <../../api.html>`_
 
 Examples for the request bodies for job and deployment creation can be found in the repository `here <https://github.com/qunicorn/qunicorn-core/tree/main/tests/test_resources>`_
 
