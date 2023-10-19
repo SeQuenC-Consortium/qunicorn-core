@@ -2,7 +2,6 @@ from datetime import datetime
 
 import numpy
 from pyquil import get_qc
-from pyquil.api import local_forest_runtime
 
 from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
@@ -37,19 +36,21 @@ class RigettiPilot(Pilot):
             program_index = 0
             for program in job_core_dto.transpiled_circuits:
                 program.wrap_in_numshots_loop(job_core_dto.shots)
-                with local_forest_runtime():
-                    qvm = get_qc('9q-square-qvm')
-                    string_result = qvm.run(qvm.compile(program)).readout_data.get("ro")
-                    qubit0result = sum(numpy.array(string_result)[:, 0])
-                    qubit1result = sum(numpy.array(string_result)[:, 1])
-                    result_dict = {"0x0": qubit0result, "0x3": qubit1result}
-                    result = ResultDataclass(
-                        circuit=job_core_dto.deployment.programs[program_index],
-                        result_dict={"counts": result_dict, "probabilities": 0},
-                        result_type=ResultType.COUNTS,
-                        meta_data=""
-                    )
-                    results.append(result)
+                print("#########################################")
+                print("Start running on Rigetti Pilot")
+                print("#########################################")
+                qvm = get_qc('"2q-qvm', as_qvm=True)
+                string_result = qvm.run(qvm.compile(program)).readout_data.get("ro")
+                qubit0result = sum(numpy.array(string_result)[:, 0])
+                qubit1result = sum(numpy.array(string_result)[:, 1])
+                result_dict = {"0x0": qubit0result, "0x3": qubit1result}
+                result = ResultDataclass(
+                    circuit=job_core_dto.deployment.programs[program_index],
+                    result_dict={"counts": result_dict, "probabilities": 0},
+                    result_type=ResultType.COUNTS,
+                    meta_data="")
+
+                results.append(result)
             return results
         else:
             raise job_db_service.return_exception_and_update_job(job_core_dto.id,
