@@ -8,11 +8,9 @@ Below you can find a generated Documentation of the API.
 
 * `Api documentation <../api.html>`_
 
-=====
+Examples for the request bodies for job and deployment creation can be found in the repository `here <https://github.com/qunicorn/qunicorn-core/tree/main/tests/test_resources>`_
 
-Examples for the request bodies for job and deployment creation can be found in the repository
-
-`Link here <https://github.com/qunicorn/qunicorn-core/tree/main/tests/test_resources>`_
+For deployment or job creation, the required infomration can be retrieved from the other api endpoints. e.g. the names of the devices defined by the provider (GET /devices/) to create a new job (POST /jobs/)
 
 =====
 
@@ -24,7 +22,7 @@ Available endpoints are:
 * **JOBS**
     * **GET /jobs/** *(Get all jobs)*
     * **POST /jobs/** *(Create/Register and run new job)*
-        * Needs a valid token to connect to IBM
+        * Needs a valid token to connect to IBM, local simulations from AWS or Rigetti work without a token
         * Runs asynchronously so the results are not shown in the api response
     * **GET /jobs/{job_id}/** *(Get details/results of a job)*
     * **DELETE /jobs/{job_id}/** *(Delete a job and return Deleted Job Details)*
