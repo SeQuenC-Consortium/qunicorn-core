@@ -581,11 +581,11 @@ def ensure_paths(c):
 @task(ensure_paths)
 def start_docker(c):
     """Docker entry point task. Do not call!"""
-    c.run("python -m flask create-and-load-db", echo=True)
     log_level = environ.get("DEFAULT_LOG_LEVEL", "INFO")
     concurrency_env = environ.get("CONCURRENCY", "1")
     concurrency = int(concurrency_env) if concurrency_env.isdigit() else 1
     if environ.get("CONTAINER_MODE", "").lower() == "server":
+        c.run("python -m flask create-and-load-db", echo=True)
         start_gunicorn(c, workers=concurrency, log_level=log_level, docker=True)
     elif environ.get("CONTAINER_MODE", "").lower() == "worker":
         worker_pool = environ.get("CELERY_WORKER_POOL", "threads")

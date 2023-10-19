@@ -10,6 +10,7 @@ services:
       BROKER_URL: "redis://broker:6379"
       DB_URL: "postgresql://postgres:passwd@postgres/qunicorn"
       JWKS_URL: "http://keycloak:8080/auth/realms/qunicorn/protocol/openid-connect/certs"
+      NUMBA_CACHE_DIR: "/app/cache"
     depends_on:
       - postgres
       - broker
@@ -27,6 +28,7 @@ services:
       CONTAINER_MODE: worker
       BROKER_URL: "redis://broker:6379"
       DB_URL: "postgresql://postgres:passwd@postgres/qunicorn"
+      NUMBA_CACHE_DIR: "/app/cache"
     depends_on:
       - postgres
       - broker
