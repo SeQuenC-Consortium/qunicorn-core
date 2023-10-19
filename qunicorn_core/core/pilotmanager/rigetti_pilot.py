@@ -1,14 +1,11 @@
-import os
 from datetime import datetime
 
+import numpy
 from pyquil import get_qc
-from pyquil.api._qam import QAMExecutionResult
 
 from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from qunicorn_core.core.pilotmanager.rigetti_utils import get_qpu, get_qvm
-from qunicorn_core.db.database_services import provider_db_service, device_db_service
-from qunicorn_core.db.database_services.job_db_service import return_exception_and_update_job
+from qunicorn_core.db.database_services import provider_db_service, device_db_service, job_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
@@ -16,7 +13,6 @@ from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
-from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
@@ -34,53 +30,42 @@ class RigettiPilot(Pilot):
 
     def run(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute the job on a local simulator and saves results in the database"""
-        if False:  # job_core_dto.executed_on.is_local:
+        if job_core_dto.executed_on.is_local:
+
             results = []
+            program_index = 0
             for program in job_core_dto.transpiled_circuits:
-                qc = get_qc(job_core_dto.deployment.device.name)
-                executable = qc.compile(program)
-                result: QAMExecutionResult = qc.run(executable)
-                string_result = result.data
-                results.append(string_result)
+                program.wrap_in_numshots_loop(job_core_dto.shots)
+                print("#########################################")
+                print("Start running on Rigetti Pilot")
+                print("#########################################")
+                qvm = get_qc('"2q-qvm', as_qvm=True)
+                string_result = qvm.run(qvm.compile(program)).readout_data.get("ro")
+                qubit0result = sum(numpy.array(string_result)[:, 0])
+                qubit1result = sum(numpy.array(string_result)[:, 1])
+                result_dict = {"0x0": qubit0result, "0x3": qubit1result}
+                result = ResultDataclass(
+                    circuit=job_core_dto.deployment.programs[program_index],
+                    result_dict={"counts": result_dict, "probabilities": 0},
+                    result_type=ResultType.COUNTS,
+                    meta_data="")
 
-            final_results = [ResultDataclass(
-                circuit=job_core_dto.deployment.programs[0].quantum_circuit,
-                result_dict={"counts": 0, "probabilities": 0},
-                result_type=ResultType.COUNTS,
-                meta_data=result
-            ) for result in results]
-            print(final_results)
-            return final_results
+                results.append(result)
+            return results
         else:
-            os.environ["AZURE_QUANTUM_SUBSCRIPTION_ID"] = ""
-            os.environ["AZURE_QUANTUM_WORKSPACE_RG"] = "AzureQuantum"
-            os.environ["AZURE_QUANTUM_WORKSPACE_NAME"] = "qunicorn-enpro"
-            os.environ["AZURE_QUANTUM_WORKSPACE_LOCATION"] = "Germany West Central"
-
-            os.environ["AZURE_TENANT_ID"] = ""
-            os.environ["AZURE_CLIENT_ID"] = ""
-            os.environ["AZURE_CLIENT_SECRET"] = ""
-
-            program = job_core_dto.transpiled_circuits[0]
-
-            qpu = get_qpu("aspen-m-3")
-            qvm = get_qvm()
-
-            exe = qpu.compile(program)  # This does not run quilc yet.
-            results = qpu.run(exe)  # Quilc will run in the cloud before executing the program.
-            qvm_results = qvm.run(exe)
-            print(results)
-            print(qvm_results)
+            raise job_db_service.return_exception_and_update_job(job_core_dto.id,
+                                                                 ValueError("Device need to be local for "
+                                                                            "RIGETTI"))
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
 
-        raise return_exception_and_update_job(job_core_dto.id, ValueError("No valid Job Type specified"))
+        raise job_db_service.return_exception_and_update_job(job_core_dto.id, ValueError("No valid Job Type specified"))
 
     def cancel_provider_specific(self, job_dto):
         raise ValueError("Canceling not implemented for rigetti pilot yet")
 
-    def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
+    def get_standard_job_with_deployment(self, device: DeviceDataclass) -> JobDataclass:
         language: AssemblerLanguage = AssemblerLanguage.QUIL
         programs: list[QuantumProgramDataclass] = [
             QuantumProgramDataclass(quantum_circuit='''from pyquil import Program \n
@@ -106,14 +91,14 @@ MEASURE(1, (\"ro\", 1)),
 ).wrap_in_numshots_loop(10)''', assembler_language=language),
         ]
         deployment = DeploymentDataclass(
-            deployed_by=user,
+            deployed_by=None,
             programs=programs,
             deployed_at=datetime.now(),
             name="DeploymentRigettiQasmName",
         )
 
         return JobDataclass(
-            executed_by=user,
+            executed_by=None,
             executed_on=device,
             deployment=deployment,
             progress=0,
@@ -153,3 +138,13 @@ MEASURE(1, (\"ro\", 1)),
     def is_device_available(self, device: DeviceDto, token: str) -> bool:
         logging.info("Rigetti local simulator is always available")
         return True
+
+    @staticmethod
+    def calculate_probabilities(counts: dict) -> dict:
+        """Calculates the probabilities from the counts, probability = counts / total_counts"""
+
+        total_counts = sum(counts.values())
+        probabilities = {}
+        for key, value in counts.items():
+            probabilities[key] = value / total_counts
+        return probabilities

@@ -15,11 +15,7 @@ from sqlalchemy.orm import declared_attr
 
 
 class DbModel:
-    """Dataclass for database model to create a table name and the id column
-
-    Attributes:
-        id (int): Automatically generated id of the database entity
-    """
+    """Dataclass for database model to create a table name and the id column"""
 
     @declared_attr
     def __tablename__(self):

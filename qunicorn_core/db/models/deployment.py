@@ -14,13 +14,11 @@
 from datetime import datetime
 from typing import Optional, List
 
-from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import sqltypes as sql
 
 from .db_model import DbModel
 from .quantum_program import QuantumProgramDataclass
-from .user import UserDataclass
 from ..db import REGISTRY
 
 
@@ -29,17 +27,15 @@ class DeploymentDataclass(DbModel):
     """Dataclass for storing deployments
 
     Attributes:
-        name (str, optional): Optional name for a deployment_api
-        deployed_by (str): The  user_id that deployed this Deployment
-        programs (list): A list of quantum programs
-        deployed_at (Date): Date of the creation of a deployment_api
+        id (int): The id of a deployment.
+        deployed_by (str): The  user_id that deployed this Deployment.
+        programs (list): A list of quantum programs.
+        deployed_at (Date): Date of the creation of a deployment_api.
+        name (str, optional): Optional name for a deployment_api.
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
-    deployed_by_id: Mapped[int] = mapped_column(
-        ForeignKey(UserDataclass.__tablename__ + ".id"), default=None, nullable=True
-    )
-    deployed_by: Mapped[UserDataclass.__name__] = relationship(UserDataclass.__name__, default=None)
+    deployed_by: Mapped[Optional[str]] = mapped_column(sql.String(100), default=None)
     programs: Mapped[List[QuantumProgramDataclass.__name__]] = relationship(
         QuantumProgramDataclass.__name__,
         default=None,

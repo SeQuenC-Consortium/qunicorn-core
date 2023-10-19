@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from qunicorn_core.db.database_services import (
     db_service,
     deployment_db_service,
     device_db_service,
     job_db_service,
     provider_db_service,
-    user_db_service,
 )

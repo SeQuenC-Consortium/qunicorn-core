@@ -18,16 +18,25 @@ Architecture
 Component interactions
 -----------------------
 .. image:: ../resources/images/qunicorn_component_interaction.png
-  :width: 600
+  :width: 800
   :alt: Alternative text
 
 Domain model
 ----------------------
 .. image:: ../resources/images/qunicorn_domain_model.png
-  :width: 600
+  :width: 700
   :alt: Alternative text
 
-Sequence Diagram for in-Request execution
+Sequence Diagram for Creating a Deployment
 --------------------------------------------
-`Sequence Diagram <https://sequencediagram.org/index.html#initialData=C4S2BsFMAIBUAsQGdrOgQ2qCkBQuAHdAJ1AGMQiA7YaAVSUmMJPMvRugEUBXKkMgHtiVaAEEACgElcAE3TB0AI3SNoAZWDD0AczxFSA9pwBSgpdACyHXUxaGK1WmYu9IPPPbZPoEkOEFaaypbZgNvDlo-AOBcCXCjHwBheA49S0gAVi9EyN9iQQA3EFkmbh5IngBbcWkcxzyAIgA5YSr0cEardDJEKjxNbT0AHgBaaMDukL1iAC4AJUgdZGAygAp+gHcASl9-QKRcQeJbUdGAPgmgmxnZsSSAaVwGJgvefiERWqkFyABHDxIWibMDwcqVGpiQwAMx6tA4smgjSobQ6XSSglKuHeAmEokkUguLimoVmjCoiK0uBRq2gRTKxOCpKSxEgChgLlwjJur3Ox1ss3U6EKHPM0AAIpAkGRiJRQIIqFyxUyZmNRvy9HdHtTAjB6cRoNzpkxZlJSjQQNCBAoQAroEoAJ7QABW5ik4qOWhOI1GRuZ8EgZAA1tBWcsgUxIIirkgADqKjWQM7nP23RZIAgKxFkHjEVmcGM62n6w3KnlzDS9KM8KBKiwq3nEtweWYAUSoAPcoosa3d2zrJNVvrFzcgs0lnY8pZ7faLepFBtTTAANE2PC3fDwlEgt9AAPTQDFUHdVMoSBSrET4JfEMZXWYSGvgafQd0DhvEZP39SQCkv3viv2VyDkwd77MAgqQFE4EaIoqyzNAABCAAyADyjyth6N5gTEkHOGKmjsgh8x0M0zRSM0ADinpDJAOGBL8nZAi+krSrKBDyqIjqvh6cIgIU7J7DENHekmFzfr+iLEqxMpyraipXOJBTFKUBq8BC3yQX+6k0NUh4gMQOZgHE4EXC0qKdN0vQgP0WmIsiFnopieCCBxqBUNCgj4C8n7nDinz4tIjGArQNmXqesggIJrI7uAwCHNifC4l8BLieBwVSrQhHADwhz+Xi3xqhJf7ZblzyMLeZz5SlQXqPAgibO54VRlFtLpjW8W4JJJkxGq5nEO0lnWNZtk-n+7VxT1gRFcpJRlDpOWQrVknQBNsSJvREFCiKq1Sh1ImnGluH3E8pR8QJtJXNeZbGpVEn4RY2VjtAABiFFSOoAASmGJR8BUEmqN6zK0oDQk6xIvTZyABrI5WgVVSUBZpIOWuDYqQ-wSAw1N1y3ZteFCZMT3Ea2YjigAmnDvnVYFPyLExtBrXliP-dIFyJrMlFQbtsXxfaTpvjThVnBzY2IkzVNqkLBJ2TzHVIEAA
-/>`_.
+
+.. image:: ../resources/images/sequence_diagram_deployment.png
+  :width: 600
+  :alt: https://sequencediagram.org/index.html?presentationMode=readOnly#initialData=C4S2BsFMAIGECdIENgwCKQA7gPYE8BbSAO2ACgzMl5QBjEK06AVQGdJ5Lq6GkmNs+IkwCCABQCSXGiHqNg0AbkIkFAZQ4A3WZDIATFEgBGSdtDXAc8JAHNdZNhwC0APiVDV0cRIBcCZKjQxJAA7opYysLk7iqikq4xUeZaOj7sxHrQlmTEOIE4mhzhgrHqKbSQfogo6BEepGSJnhrw2hWuFla2lWpIhcWRqo11pcmtOgA8Tk6d1nY+IrAA0sMlSd5TTk1MLW2Vi0vQIWAAFgP1ChJoDuzwm9sK3gvLR6fno1cUX0A
+
+Sequence Diagram for Creating a Job from a Deployment
+--------------------------------------------
+
+.. image:: ../resources/images/sequence_diagram_job.png
+  :width: 600
+  :alt: https://sequencediagram.org/index.html?presentationMode=readOnly#initialData=C4S2BsFMAIGECdIENgwFIHsBG0Bm8MBbaAEUgAdwMBPQyAO2ACgnyl5QBjENx6AVQDOkeK3ZceSPphwBBAAoBJFmw4huvYNBnQAslKQBzEdAD0cDIhYATFEixJh0AMrBLRyCvHrJfWJCh4amgARQBXSAiWaNUJTWh5ECpmWJ94+QIANxBrE3CpYDDiBWUmIREAWgA+HRKALgRkVG1sPAJiMkoaOkYmWqVqnX16D3gzC0QGxBR0bCZ6DGaMTJMhg2Mx81hLSCmm2ZwAdzAAC2gAHXpEXBEGTkhrUgoqWgZgS8u+1uHR8e3EaqudzGOrOJArFpHU4uYAzaAAJWQ1moXxwPw2fx2AB4KhUgfAPHVZLAANKo6AlHEVNYjDFbHZE0nQY7AM46RQkcklao1b7rEz0yaIgCOEUEWh0kAAHpBOGFQBh6J8FksVmMab9BbtZIJBCBDPQEklFtA3JCysJ4FT+opGSTmdD2ZyNXSJpBqv5AsFwpFdgBReii33mpiJZI4z0ib0RCJ1MhBiLm-EeHFhxagyAS1quGZ1BH8AByBcUBYA4kwkJxQJk4WnmHXqhlljk8mECkUKUoM-RHvlGB3YCB4HKwEwMOQtIpcKaTjAwpbmQVBKaMNBhDAQNPWTAAFatEDL+Bhej0ED0QwscrwQateoisVaMiwpKCFg2m9o-mbN11e+QcVPM+4Cvi6ApuoCbgEiCf4AU+SAvuS6Jgf8kBUsmILOAwjxwQhNrWnytLIQymE9oB8HARaIj4XIXbOCcGCHGRCFYaGxrAFSTbZLkYx9oUxS0VhCL-mE4DMOhqEVHWoLgjAiKCCJYmQR4uJVFJxJkrklbVrWbGXpaH6draMFZjgckKYIpg4cB0BYMEHJcgMvKfoR34oXUpaZkJ8micutnQPZoGuTsEHArsHlaGZPk2XZzoEZqbpoUpGGCZFwAgbeSjUXoX6YpMJGPKlr5Xll9T5V55lAA

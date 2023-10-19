@@ -17,4 +17,4 @@
 
 """Module containing all SQLalchemy Models."""
 
-from . import db_model, device, deployment, job, provider, quantum_program, user, result
+from . import db_model, device, deployment, job, provider, quantum_program, result, provider_assembler_language

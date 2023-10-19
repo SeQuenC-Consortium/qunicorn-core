@@ -1,0 +1,17 @@
+{
+  "name": "DeploymentName",
+  "programs": [
+    {
+      "quantum_circuit": "from pyquil import Program \n\nfrom pyquil.gates import * \n\nfrom pyquil.quilbase import Declare\n\nprogram = Program(\nDeclare(\"ro\", \"BIT\", 2),\nH(0),\nCNOT(0, 1),\nMEASURE(0, (\"ro\", 0)),\nMEASURE(1, (\"ro\", 1)),\n)",
+      "assembler_language": "QUIL",
+      "python_file_metadata": "",
+      "python_file_path": ""
+    },
+    {
+      "quantum_circuit": "from pyquil import Program \n\nfrom pyquil.gates import * \n\nfrom pyquil.quilbase import Declare\n\nprogram = Program(\nDeclare(\"ro\", \"BIT\", 2),\nH(0),\nCNOT(0, 1),\nMEASURE(0, (\"ro\", 0)),\nMEASURE(1, (\"ro\", 1)),\n)",
+      "assembler_language": "QUIL",
+      "python_file_metadata": "",
+      "python_file_path": ""
+    }
+  ]
+}

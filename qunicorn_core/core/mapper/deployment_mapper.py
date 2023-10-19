@@ -13,8 +13,8 @@
 # limitations under the License.
 from datetime import datetime
 
-from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto, UserDto
-from qunicorn_core.core.mapper import quantum_program_mapper, user_mapper
+from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto
+from qunicorn_core.core.mapper import quantum_program_mapper
 from qunicorn_core.core.mapper.general_mapper import map_from_to
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 
@@ -24,7 +24,6 @@ def dto_to_dataclass(deployment: DeploymentDto) -> DeploymentDataclass:
         from_object=deployment,
         to_type=DeploymentDataclass,
         fields_mapping={
-            "deployed_by": user_mapper.dto_to_dataclass(deployment.deployed_by),
             "deployed_at": deployment.deployed_at,
             "programs": [quantum_program_mapper.dto_to_dataclass(qc) for qc in deployment.programs],
         },
@@ -36,7 +35,6 @@ def request_to_dataclass(deployment: DeploymentRequestDto) -> DeploymentDataclas
         from_object=deployment,
         to_type=DeploymentDataclass,
         fields_mapping={
-            "deployed_by": user_mapper.dto_to_dataclass(UserDto.get_default_user()),
             "deployed_at": datetime.now(),
             "programs": [quantum_program_mapper.request_to_dataclass(qc) for qc in deployment.programs],
         },
@@ -48,7 +46,6 @@ def dataclass_to_dto(deployment: DeploymentDataclass) -> DeploymentDto:
         from_object=deployment,
         to_type=DeploymentDto,
         fields_mapping={
-            "deployed_by": user_mapper.dataclass_to_dto(deployment.deployed_by),
             "programs": [quantum_program_mapper.dataclass_to_dto(qc) for qc in deployment.programs],
         },
     )

@@ -15,23 +15,20 @@ import datetime
 
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.mapper import job_mapper, result_mapper
-from qunicorn_core.db.database_services import db_service, device_db_service, deployment_db_service, user_db_service
+from qunicorn_core.db.database_services import db_service, device_db_service, deployment_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
-from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.job_state import JobState
 
 
 # originally from <https://github.com/buehlefs/flask-template/>
 
 
-def create_database_job(job_core: JobCoreDto):
+def create_database_job(job_core: JobCoreDto) -> JobDataclass:
     """Creates a database job with the given circuit and saves it in the database"""
-    default_user: UserDataclass = user_db_service.get_default_user()
     db_job: JobDataclass = job_mapper.core_to_dataclass(job_core)
     db_job.state = JobState.READY
     db_job.progress = 0
-    db_job.executed_by = default_user
     db_job.deployment = deployment_db_service.get_deployment_by_id(job_core.deployment.id)
     db_job.executed_on = device_db_service.get_device_by_name(job_core.executed_on.name)
     return db_service.save_database_object(db_job)
@@ -57,7 +54,10 @@ def update_finished_job(job_id: int, results: list[ResultDataclass], job_state: 
 
 def get_job_by_id(job_id: int) -> JobDataclass:
     """Gets the job with the job_id from the database"""
-    return db_service.get_database_object_by_id(job_id, JobDataclass)
+    db_job = db_service.get_database_object_by_id(job_id, JobDataclass)
+    if db_job is None:
+        raise ValueError(("job_id '" + str(job_id) + "' can not be found"))
+    return db_job
 
 
 def delete(id: int):

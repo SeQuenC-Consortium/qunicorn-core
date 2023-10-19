@@ -15,7 +15,7 @@
 from qiskit import QuantumCircuit
 
 
-def get_default_qasm_string(hadamard_amount: int = 1) -> str:
+def get_default_qasm2_string(hadamard_amount: int = 1) -> str:
     qc = QuantumCircuit(2)
     for _ in range(hadamard_amount):
         qc.h(0)

@@ -23,7 +23,6 @@ from .db_model import DbModel
 from .deployment import DeploymentDataclass
 from .device import DeviceDataclass
 from .result import ResultDataclass
-from .user import UserDataclass
 from ..db import REGISTRY
 from ...static.enums.job_state import JobState
 from ...static.enums.job_type import JobType
@@ -34,28 +33,29 @@ class JobDataclass(DbModel):
     """Dataclass for storing Jobs
 
     Attributes:
-        name (str, optional): Optional name for a job
-        executed_by_id (str): A user_id associated to the job, user that wants to execute the job
-        deployment_id (int): A deployment_id associated with the job
-        state (Optional[str], optional): The state of a job, enum JobState
-        started_at (datetime, optional): The moment the job was scheduled.
-            (default :py:func:`~datetime.datetime.utcnow`)
+        id: The id of a job.
+        results (ResultDataclass, optional): List of results for each quantum program that was executed.
+        executed_by(str): A user_id associated to the job, user that wants to execute the job.
+        executed_on_id (int): The device_id of the device where the job is running on.
+        executed_on (DeviceDataclass): The device where the job is running on.
+        deployment_id (int): A deployment_id associated with the job.
+        deployment (DeploymentDataclass): The deployment where the program is coming from.
+        progress (float): The progress of the job.
+        state (Optional[str], optional): The state of a job, enum JobState.
+        shots (int): The number of shots for the job
+        type (JobType): The type of the job.
+        started_at (datetime, optional): The moment the job was scheduled. (default: datetime.utcnow)
         finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
-        data (Union[dict, list, str, float, int, bool, None], optional): Mutable JSON-like store for additional
-            lightweight task data. Default value is empty dict.
-        results (ResultDataclass, optional): List of results for each quantum program that was executed
-        parameters (str, optional): The parameters for the Job. Job parameters should already be prepared and error
-            checked before starting the task.
+        name (str, optional): Optional name for a job.
+        provider_specific_id (str, optional): The provider specific id for the job. (Used for canceling)
+        celery_id (str, optional): The celery id for the job. (Used for canceling)
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
     results: Mapped[Optional[List[ResultDataclass.__name__]]] = relationship(
         ResultDataclass.__name__, default_factory=list
     )
-    executed_by_id: Mapped[int] = mapped_column(
-        ForeignKey(UserDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None, nullable=True
-    )
-    executed_by: Mapped[UserDataclass.__name__] = relationship(UserDataclass.__name__, default=None)
+    executed_by: Mapped[Optional[str]] = mapped_column(sql.String(100), default=None)
 
     executed_on_id: Mapped[int] = mapped_column(
         ForeignKey(DeviceDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None, nullable=True
@@ -79,7 +79,5 @@ class JobDataclass(DbModel):
     started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
     name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-    data: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-    parameters: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     provider_specific_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     celery_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)

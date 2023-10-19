@@ -13,7 +13,7 @@
 # limitations under the License.
 from datetime import datetime
 
-from qunicorn_core.db.database_services import db_service, user_db_service
+from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 
 
@@ -22,7 +22,6 @@ from qunicorn_core.db.models.deployment import DeploymentDataclass
 
 def create(deployment: DeploymentDataclass) -> DeploymentDataclass:
     """Creates a database job with the given circuit and saves it in the database"""
-    deployment.deployed_by = user_db_service.get_default_user()
     deployment.deployed_at = datetime.now()
     return db_service.save_database_object(deployment)
 
@@ -39,4 +38,7 @@ def delete(id: int):
 
 def get_deployment_by_id(deployment_id: int) -> DeploymentDataclass:
     """Gets the Deployment with the deployment_id from the database"""
-    return db_service.get_database_object_by_id(deployment_id, DeploymentDataclass)
+    db_deployment = db_service.get_database_object_by_id(deployment_id, DeploymentDataclass)
+    if db_deployment is None:
+        raise ValueError(("deployment_id '" + str(deployment_id) + "' can not be found"))
+    return db_deployment

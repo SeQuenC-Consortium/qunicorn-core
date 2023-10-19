@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import aws_pilot, base_pilot, ibm_pilot, pilot_manager
+from . import aws_pilot, base_pilot, ibm_pilot, pilot_manager, rigetti_pilot

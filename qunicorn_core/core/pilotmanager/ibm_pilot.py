@@ -13,6 +13,7 @@
 # limitations under the License.
 import os
 from datetime import datetime
+from typing import Optional
 
 import qiskit
 from qiskit.primitives import EstimatorResult, SamplerResult, Sampler as LocalSampler, Estimator as LocalEstimator
@@ -38,7 +39,6 @@ from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
 from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
-from qunicorn_core.db.models.user import UserDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
@@ -61,10 +61,10 @@ class IBMPilot(Pilot):
             return self.__estimate(job_core_dto)
         elif job_core_dto.type == JobType.SAMPLER:
             return self.__sample(job_core_dto)
-        elif job_core_dto.type == JobType.FILE_RUNNER:
-            return self.__run_program(job_core_dto)
-        elif job_core_dto.type == JobType.FILE_UPLOAD:
-            return self.__upload_program(job_core_dto)
+        elif job_core_dto.type == JobType.IBM_RUNNER:
+            return self.__run_ibm_program(job_core_dto)
+        elif job_core_dto.type == JobType.IBM_UPLOAD:
+            return self.__upload_ibm_program(job_core_dto)
         else:
             raise job_db_service.return_exception_and_update_job(
                 job_core_dto.id, ValueError("No valid Job Type specified")
@@ -158,8 +158,10 @@ class IBMPilot(Pilot):
         working_directory_path = os.path.abspath(os.getcwd())
         return working_directory_path + os.sep + "resources" + os.sep + "upload_files" + os.sep + file_name
 
-    def __upload_program(self, job_core_dto: JobCoreDto):
+    def __upload_ibm_program(self, job_core_dto: JobCoreDto):
+        """EXPERIMENTAL"""
         """Upload and then run a quantum program on the QiskitRuntimeService"""
+        logging.warn("This function is experimental and could not be fully tested yet")
 
         service = self.__get_runtime_service(job_core_dto)
         ibm_program_ids = []
@@ -174,7 +176,11 @@ class IBMPilot(Pilot):
         ]
         job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.READY)
 
-    def __run_program(self, job_core_dto: JobCoreDto):
+    def __run_ibm_program(self, job_core_dto: JobCoreDto):
+        """EXPERIMENTAL"""
+        """Run a program previously uploaded to the IBM Backend"""
+        logging.warn("This function is experimental and could not be fully tested yet")
+
         service = self.__get_runtime_service(job_core_dto)
         ibm_results = []
         options_dict: dict = job_core_dto.ibm_file_options
@@ -270,21 +276,21 @@ class IBMPilot(Pilot):
         ]
         return ProviderDataclass(with_token=True, supported_languages=supported_languages, name=self.provider_name)
 
-    def get_standard_job_with_deployment(self, user: UserDataclass, device: DeviceDataclass) -> JobDataclass:
+    def get_standard_job_with_deployment(self, device: DeviceDataclass, user_id: Optional[str] = None) -> JobDataclass:
         language: AssemblerLanguage = AssemblerLanguage.QASM2
         programs: list[QuantumProgramDataclass] = [
-            QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(1), assembler_language=language),
-            QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm_string(2), assembler_language=language),
+            QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm2_string(1), assembler_language=language),
+            QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm2_string(2), assembler_language=language),
         ]
         deployment = DeploymentDataclass(
-            deployed_by=user,
+            deployed_by=user_id,
             programs=programs,
             deployed_at=datetime.now(),
             name="DeploymentIBMQasmName",
         )
 
         return JobDataclass(
-            executed_by=user,
+            executed_by=user_id,
             executed_on=device,
             deployment=deployment,
             progress=0,

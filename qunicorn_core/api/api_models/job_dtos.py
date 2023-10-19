@@ -23,7 +23,6 @@ import marshmallow as ma
 from .deployment_dtos import DeploymentDto
 from .device_dtos import DeviceDto, DeviceDtoSchema
 from .result_dtos import ResultDto, ResultDtoSchema
-from .user_dtos import UserDto, UserDtoSchema
 from ..flask_api_utils import MaBaseSchema
 
 __all__ = [
@@ -52,7 +51,6 @@ class JobRequestDto:
     provider_name: str
     device_name: str
     shots: int
-    parameters: str
     token: str
     type: JobType
     deployment_id: int
@@ -62,7 +60,7 @@ class JobRequestDto:
 class JobCoreDto:
     """JobDto that is used for all internal job handling"""
 
-    executed_by: UserDto
+    executed_by: Optional[str]
     executed_on: DeviceDto
     deployment: DeploymentDto
     progress: int
@@ -73,8 +71,6 @@ class JobCoreDto:
     name: str
     results: list[ResultDto]
     id: int | None = None
-    parameters: str | None = None
-    data: str | None = None
     finished_at: datetime | None = None
     ibm_file_options: dict | None = None
     ibm_file_inputs: dict | None = None
@@ -89,7 +85,7 @@ class JobResponseDto:
     """JobDto that is sent to the user as a response"""
 
     id: int
-    executed_by: UserDto
+    executed_by: Optional[str]
     executed_on: DeviceDto
     progress: int
     state: str
@@ -97,9 +93,7 @@ class JobResponseDto:
     started_at: datetime
     finished_at: datetime
     name: str
-    data: str
     results: list[ResultDto]
-    parameters: str
 
 
 @dataclass
@@ -125,7 +119,6 @@ class JobRequestDtoSchema(MaBaseSchema):
         allow_none=True,
         metadata={"example": 4000, "label": "shots", "description": "number of shots", "input_type": "number"},
     )
-    parameters = ma.fields.List(ma.fields.Float(), required=False)
     token = ma.fields.String(required=True, metadata={"example": ""})
     type = ma.fields.Enum(required=True, metadata={"example": JobType.RUNNER}, enum=JobType)
     deployment_id = ma.fields.Integer(required=False, allow_none=True, metadata={"example": 1})
@@ -133,16 +126,14 @@ class JobRequestDtoSchema(MaBaseSchema):
 
 class JobResponseDtoSchema(MaBaseSchema):
     id = ma.fields.Int(required=True, dump_only=True)
-    executed_by = ma.fields.Nested(UserDtoSchema())
+    executed_by = ma.fields.String(required=False, dump_only=True)
     executed_on = ma.fields.Nested(DeviceDtoSchema())
     progress = ma.fields.Int(required=True, dump_only=True)
     state = ma.fields.String(required=True, dump_only=True)
     type = ma.fields.String(required=True, dump_only=True)
     started_at = ma.fields.String(required=True, dump_only=True)
     finished_at = ma.fields.String(required=True, dump_only=True)
-    data = ma.fields.String(required=True, dump_only=True)
     results = ma.fields.Nested(ResultDtoSchema(), many=True, required=True, dump_only=True)
-    parameters = ma.fields.String(required=True, dump_only=True)
 
 
 class SimpleJobDtoSchema(MaBaseSchema):

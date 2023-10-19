@@ -14,7 +14,7 @@
 
 """"Test class to test the functionality of the job_api"""
 
-from qunicorn_core.api.api_models import DeploymentRequestDto
+from qunicorn_core.api.api_models import DeploymentRequestDto, DeploymentDto
 from qunicorn_core.core import deployment_service
 from qunicorn_core.db.database_services import deployment_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
@@ -41,3 +41,21 @@ def test_create_deployments():
         deployment: DeploymentDataclass = deployment_db_service.get_deployment_by_id(depl_id)
         assert deployment.name == DEPLOYMENT_NAME
         assert len(deployment.programs) == PROGRAM_NUMBER
+
+
+def test_get_all_deployments():
+    """Testing if the "get_all"-endpoint of deployments works"""
+    # GIVEN: Database is initiated correctly
+    app = set_up_env()
+
+    # WHEN: get all deployments
+    with app.app_context():
+        all_deployments: list[DeploymentDto] = deployment_service.get_all_deployments()
+        first_deployment: DeploymentDto = deployment_service.get_deployment_by_id(1)
+
+    # THEN: Test if the name and number of deployments is correct
+    with app.app_context():
+        assert len(all_deployments) > 0
+        assert all_deployments[0].name == first_deployment.name
+        assert type(first_deployment) is DeploymentDto
+        assert type(all_deployments[0]) is DeploymentDto

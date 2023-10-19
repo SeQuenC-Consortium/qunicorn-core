@@ -1,4 +1,4 @@
-# Copyright 2023 University of Stuttgart.
+# Copyright 2023 University of Stuttgart
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,20 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import StrEnum
+"""test in-request execution for aws"""
+
+from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
+from qunicorn_core.static.enums.provider_name import ProviderName
+from tests import test_utils
+
+IS_ASYNCHRONOUS: bool = False
+RESULT_TOLERANCE: int = 100
 
 
-class ProgrammingLanguage(StrEnum):
-    """Enum to save the different programming languages for quantum circuits
-
-    Values:
-        QISKIT: The programming language is QISKIT
-        PYQUIL: The programming language is PYQUIL
-        QMWARE: The programming language is QMWARE
-        BRAKET: The programming language is BRAKET
-    """
-
-    QISKIT = "QISKIT"
-    PYQUIL = "PYQUIL"
-    QMWARE = "QMWARE"
-    BRAKET = "BRAKET"
+def test_rigetti_local_simulator_braket_job_results():
+    test_utils.execute_job_test(ProviderName.RIGETTI, "rigetti_device", AssemblerLanguage.QUIL)

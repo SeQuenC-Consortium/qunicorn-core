@@ -44,16 +44,25 @@ class QuantumProgramRequestDto:
 
 class QuantumProgramRequestDtoSchema(MaBaseSchema):
     quantum_circuit = ma.fields.String(
-        required=True, allow_none=True, metadata={"example": utils.get_default_qasm_string()}
+        required=True, allow_none=True, metadata={"example": utils.get_default_qasm2_string()}
     )
     assembler_language = ma.fields.Enum(
-        required=True, metadata={"example": AssemblerLanguage.QASM3}, enum=AssemblerLanguage
+        required=True, metadata={"example": AssemblerLanguage.QASM2}, enum=AssemblerLanguage
     )
     python_file_path = ma.fields.String(
-        required=False, metadata={"example": "ibm_upload_test_data_file.py"}, allow_none=True
+        required=False,
+        metadata={
+            "example": "ibm_upload_test_data_file.py (Note: this is an experimental feature " "for IBM_UPLOAD job type)"
+        },
+        allow_none=True,
     )
     python_file_metadata = ma.fields.String(
-        required=False, metadata={"example": "ibm_upload_test_data_metadata.json"}, allow_none=True
+        required=False,
+        metadata={
+            "example": "ibm_upload_test_data_metadata.json (Note: this is an experimental "
+            "feature for IBM_UPLOAD job type)"
+        },
+        allow_none=True,
     )
 
 

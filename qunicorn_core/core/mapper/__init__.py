@@ -15,9 +15,10 @@
 from . import (
     deployment_mapper,
     device_mapper,
+    general_mapper,
     job_mapper,
+    provider_assembler_language_mapper,
     provider_mapper,
     quantum_program_mapper,
-    user_mapper,
     result_mapper,
 )

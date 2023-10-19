@@ -19,8 +19,7 @@ from qunicorn_core.api.api_models.job_dtos import (
     JobResponseDto,
     SimpleJobDto,
 )
-from qunicorn_core.api.api_models.user_dtos import UserDto
-from qunicorn_core.core.mapper import deployment_mapper, device_mapper, user_mapper, result_mapper
+from qunicorn_core.core.mapper import deployment_mapper, device_mapper, result_mapper
 from qunicorn_core.core.mapper.general_mapper import map_from_to
 from qunicorn_core.db.database_services import device_db_service, deployment_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
@@ -38,7 +37,7 @@ def request_to_core(job: JobRequestDto):
         from_object=job,
         to_type=JobCoreDto,
         fields_mapping={
-            "executed_by": UserDto.get_default_user(),
+            "executed_by": None,
             "executed_on": device_mapper.dataclass_to_dto(device),
             "deployment": deployment_mapper.dataclass_to_dto(deployment),
             "progress": 0,
@@ -58,7 +57,7 @@ def dataclass_to_response(job: JobDataclass) -> JobResponseDto | None:
         from_object=job,
         to_type=JobResponseDto,
         fields_mapping={
-            "executed_by": user_mapper.dataclass_to_dto(job.executed_by),
+            "executed_by": job.executed_by,
             "executed_on": device_mapper.dataclass_to_dto(job.executed_on),
             "results": [result_mapper.dataclass_to_dto(result) for result in job.results],
         },
@@ -70,10 +69,9 @@ def core_to_dataclass(job: JobCoreDto) -> JobDataclass:
         from_object=job,
         to_type=JobDataclass,
         fields_mapping={
-            "executed_by": user_mapper.dto_to_dataclass(job.executed_by),
+            "executed_by": job.executed_by,
             "executed_on": device_mapper.dto_to_dataclass(job.executed_on),
             "deployment": deployment_mapper.dto_to_dataclass(job.deployment),
-            "parameters": str(job.parameters),
         },
     )
 
@@ -83,7 +81,7 @@ def dataclass_to_core(job: JobDataclass) -> JobCoreDto:
         from_object=job,
         to_type=JobCoreDto,
         fields_mapping={
-            "executed_by": user_mapper.dataclass_to_dto(job.executed_by),
+            "executed_by": job.executed_by,
             "executed_on": device_mapper.dataclass_to_dto(job.executed_on),
             "deployment": deployment_mapper.dataclass_to_dto(job.deployment),
             "results": [result_mapper.dataclass_to_dto(result) for result in job.results],

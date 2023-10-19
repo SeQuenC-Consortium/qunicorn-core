@@ -26,12 +26,13 @@ class DeviceDataclass(DbModel):
     """Dataclass for storing CloudDevices of a provider
 
     Attributes:
-        provider: The provider of the cloud_service with the needed configurations
-        num_qubits: The amount of qubits that is available at this device
-        name: The name of the device
-        is_simulator: The information whether the device is a simulator (true) or not (false)
-        is_local: The information whether jobs executed on this device are executed local or not
-        provider: The provider of this device
+        id: The id of the device.
+        provider_id: provider_id of the provider saved in the provider table.
+        num_qubits: The amount of qubits that is available at this device.
+        name: The name of the device.
+        is_simulator: The information whether the device is a simulator (true) or not (false).
+        is_local: The information whether jobs executed on this device are executed local or not.
+        provider: The provider of this device.
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)

@@ -1,8 +1,16 @@
 AWS Pilot
 ================
 
-The AWS Pilot is used to work with the AWS API.
-Supports local execution.
+This site gives an overview of the functionality of the AWS Pilot.
+The AWS Pilot is used to communicate with AWS Braket, which is the quantum computing service provided by AWS.
+
+The AWS Pilot currently allows for local simulation of quantum program, using the Amazon Braket SDK.
+Execution on the AWS Servers is currently not supported.
+
+Standard Devices
+^^^^^^^^^^^^^^^^^^
+
+The local simulator has the device name: **local_simulator**
 
 Main Languages
 ^^^^^^^^^^^^^^^^^^^^

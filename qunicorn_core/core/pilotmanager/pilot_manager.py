@@ -17,9 +17,8 @@ from qunicorn_core.core.pilotmanager.aws_pilot import AWSPilot
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
 from qunicorn_core.core.pilotmanager.rigetti_pilot import RigettiPilot
-from qunicorn_core.db.database_services import user_db_service, device_db_service, db_service
+from qunicorn_core.db.database_services import device_db_service, db_service
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.user import UserDataclass
 
 PILOTS: list[Pilot] = [IBMPilot(), AWSPilot(), RigettiPilot()]
 
@@ -28,11 +27,10 @@ PILOTS: list[Pilot] = [IBMPilot(), AWSPilot(), RigettiPilot()]
 
 def save_default_jobs_and_devices_from_provider():
     """Get all default data from the pilots and save them to the database"""
-    user: UserDataclass = user_db_service.get_default_user()
     for pilot in PILOTS:
         device_list_without_default, default_device = pilot.get_standard_devices()
         saved_device = device_db_service.save_device_by_name(default_device)
-        job: JobDataclass = pilot.get_standard_job_with_deployment(user, saved_device)
+        job: JobDataclass = pilot.get_standard_job_with_deployment(saved_device)
         db_service.get_session().add(job)
         db_service.get_session().add_all(device_list_without_default)
         db_service.get_session().commit()

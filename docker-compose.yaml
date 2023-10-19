@@ -9,6 +9,8 @@ services:
       SERVER_PORT: 8080
       BROKER_URL: "redis://broker:6379"
       DB_URL: "postgresql://postgres:passwd@postgres/qunicorn"
+      JWKS_URL: "http://keycloak:8080/auth/realms/qunicorn/protocol/openid-connect/certs"
+      NUMBA_CACHE_DIR: "/app/cache"
     depends_on:
       - postgres
       - broker
@@ -26,6 +28,7 @@ services:
       CONTAINER_MODE: worker
       BROKER_URL: "redis://broker:6379"
       DB_URL: "postgresql://postgres:passwd@postgres/qunicorn"
+      NUMBA_CACHE_DIR: "/app/cache"
     depends_on:
       - postgres
       - broker
@@ -83,19 +86,27 @@ services:
     ports:
       - "5432:5432"
 
-  qvm:
-    image: rigetti/qvm
-    networks:
-      - qunicorn
-    ports:
-      - "5555:5555"
-
   quilc:
     image: rigetti/quilc
+    command: -S -P --safe-include-directory /inc/
+    expose:
+      - "5555"
+    ports:
+      - '5555:5555'
     networks:
       - qunicorn
+    volumes:
+      - ./inc:/inc
+
+  qvm:
+    image: rigetti/qvm
+    command: -S
+    expose:
+      - "5000"
     ports:
-      - "5000:5000"
+      - '5000:5000'
+    networks:
+      - qunicorn
 
 networks:
   qunicorn:
