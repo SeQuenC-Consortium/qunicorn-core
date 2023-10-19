@@ -10,7 +10,7 @@ Below you can find a generated Documentation of the API.
 
 Examples for the request bodies for job and deployment creation can be found in the repository `here <https://github.com/qunicorn/qunicorn-core/tree/main/tests/test_resources>`_
 
-For deployment or job creation, the required infomration can be retrieved from the other api endpoints. e.g. the names of the devices defined by the provider (GET /devices/) to create a new job (POST /jobs/)
+For deployment or job creation, the required information can be retrieved from the other api endpoints. e.g. the names of the devices defined by the provider (GET /devices/) to create a new job (POST /jobs/)
 
 =====
 
@@ -30,6 +30,13 @@ Available endpoints are:
     * **POST /jobs/rerun/{job_id}/** *(Copies and Runs again an existing Job)*
     * **POST /jobs/cancel/{job_id}/** *(Cancel a job that has be started)*
 
+* **DEVICES**
+    * **GET /devices/** *(Get all currently saved devices)*
+    * **PUT /devices/** *(Updates the device list from the provider)*
+    * **GET /devices/{device_id}/** *(Get details about one device)*
+    * **POST /devices/{device_id}/status** *(To check if a device is available)*
+    * **POST /devices/{device_id}/calibration** *(To get device properties for configuration)*
+
 * **DEPLOYMENTS**
     * **GET /deployments/** *(Get all Deployments)*
     * **POST /deployments/** *(Create a Deployment)*
@@ -38,13 +45,6 @@ Available endpoints are:
     * **DELETE /deployments/{deployment_id}/** *(Deletes a Deployment)*
     * **GET /deployments/{deployment_id}/jobs** *(Get the details of all jobs with a specific deployment id)*
     * **DELETE /deployments/{deployment_id}/jobs** *(Delete all jobs with a specific deployment id)*
-
-* **DEVICES**
-    * **GET /devices/** *(Get all currently saved devices)*
-    * **PUT /devices/** *(Updates the device list from the provider)*
-    * **GET /devices/{device_id}/** *(Get details about one device)*
-    * **POST /devices/{device_id}/status** *(To check if a device is available)*
-    * **POST /devices/{device_id}/calibration** *(To get device properties for configuration)*
 
 * **PROVIDER**
     * **GET /provider/** *(Get all providers from the database)*
