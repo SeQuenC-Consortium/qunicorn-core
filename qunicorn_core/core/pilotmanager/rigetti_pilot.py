@@ -36,17 +36,14 @@ class RigettiPilot(Pilot):
             program_index = 0
             for program in job_core_dto.transpiled_circuits:
                 program.wrap_in_numshots_loop(job_core_dto.shots)
-                print("#########################################")
-                print("Start running on Rigetti Pilot")
-                print("#########################################")
-                qvm = get_qc('"2q-qvm', as_qvm=True)
+                qvm = get_qc('9q-square-qvm')
                 string_result = qvm.run(qvm.compile(program)).readout_data.get("ro")
                 qubit0result = sum(numpy.array(string_result)[:, 0])
                 qubit1result = sum(numpy.array(string_result)[:, 1])
-                result_dict = {"0x0": qubit0result, "0x3": qubit1result}
+                result_dict = {"0x0": str(qubit0result), "0x3": str(qubit1result)}
                 result = ResultDataclass(
-                    circuit=job_core_dto.deployment.programs[program_index],
-                    result_dict={"counts": result_dict, "probabilities": 0},
+                    circuit=job_core_dto.deployment.programs[program_index].quantum_circuit,
+                    result_dict={"counts": result_dict, "probabilities": {}},
                     result_type=ResultType.COUNTS,
                     meta_data="")
 
@@ -54,8 +51,7 @@ class RigettiPilot(Pilot):
             return results
         else:
             raise job_db_service.return_exception_and_update_job(job_core_dto.id,
-                                                                 ValueError("Device need to be local for "
-                                                                            "RIGETTI"))
+                                                                 ValueError("Device need to be local for RIGETTI"))
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
