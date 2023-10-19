@@ -6,7 +6,13 @@ Generated Documentation
 
 Below you can find a generated Documentation of the API. 
 
-* `Api documentation <api.html>`_
+* `Api documentation <../api.html>`_
+
+=====
+
+Examples for the request bodies for job and deployment creation can be found in the repository
+
+`Link here <https://github.com/qunicorn/qunicorn-core/tree/main/tests/test_resources>`_
 
 =====
 
@@ -16,27 +22,32 @@ Available Endpoints
 Available endpoints are:
 
 * **JOBS**
+    * **GET /jobs/** *(Get all jobs)*
     * **POST /jobs/** *(Create/Register and run new job)*
         * Needs a valid token to connect to IBM
         * Runs asynchronously so the results are not shown in the api response
-    * **GET /jobs/** *(Get all jobs)*
     * **GET /jobs/{job_id}/** *(Get details/results of a job)*
-    * **DELETE /jobs/{job_id}/** *(Get details/results of a job)*
+    * **DELETE /jobs/{job_id}/** *(Delete a job and return Deleted Job Details)*
     * **POST /jobs/run/{job_id}/** *(Executes an uploaded python file)*
     * **POST /jobs/rerun/{job_id}/** *(Copies and Runs again an existing Job)*
-    * **GET /jobs/{deployment_id}/** *(Get all jobs with the given deploymentId)*
-    * **DELETE /jobs/{deployment_id}/** *(Delete all jobs with the given deploymentId)*
+    * **POST /jobs/cancel/{job_id}/** *(Cancel a job that has be started)*
 
 * **DEPLOYMENTS**
     * **GET /deployments/** *(Get all Deployments)*
     * **POST /deployments/** *(Create a Deployment)*
-    * **GET /deployments/{deployment_id}/** *(Gets a Deployment)*
+    * **GET /deployments/{deployment_id}/** *(Get a Deployment by ID)*
     * **PUT /deployments/{deployment_id}/** *(Update a Deployment)*
     * **DELETE /deployments/{deployment_id}/** *(Deletes a Deployment)*
+    * **GET /deployments/{deployment_id}/jobs** *(Get the details of all jobs with a specific deployment id)*
+    * **DELETE /deployments/{deployment_id}/jobs** *(Delete all jobs with a specific deployment id)*
 
 * **DEVICES**
     * **GET /devices/** *(Get all currently saved devices)*
-    * **PUT /devices/** *(Updates the devices, by retrieving them from IBM)*
-    * **PUT /devices/{device_id}/** *(Get details about one device)*
-    * **PUT /devices/{device_id}/status** *(To check if a device is running)*
-    * **PUT /devices/{device_id}/calibration** *(To get some device properties)*
+    * **PUT /devices/** *(Updates the device list from the provider)*
+    * **GET /devices/{device_id}/** *(Get details about one device)*
+    * **POST /devices/{device_id}/status** *(To check if a device is available)*
+    * **POST /devices/{device_id}/calibration** *(To get device properties for configuration)*
+
+* **PROVIDER**
+    * **GET /provider/** *(Get all providers from the database)*
+    * **GET /provider/{provider_id}/** *(Get details of a provider)*
