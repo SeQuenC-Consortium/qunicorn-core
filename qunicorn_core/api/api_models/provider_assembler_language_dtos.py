@@ -26,7 +26,7 @@ from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 @dataclass
 class ProviderAssemblerLanguageDto:
     id: int
-    provider_ID: int
+    provider_id: int
     supported_language: AssemblerLanguage
 
 

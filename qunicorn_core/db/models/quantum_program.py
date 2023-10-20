@@ -25,18 +25,20 @@ class QuantumProgramDataclass(DbModel):
     """Dataclass for storing QuantumPrograms
 
     Attributes:
-        id: The ID of the quantum program.
         quantum_circuit (str): Quantum code that needs to be executed.
         assembler_language (enum): Assembler language in which the code should be interpreted.
+        id: The ID of the quantum program.
         deployment_id (int): The deployment where a list of quantum program is used.
     """
 
+    # non-default arguments
+    quantum_circuit: Mapped[str] = mapped_column(sql.String(500))
+    assembler_language: Mapped[str] = mapped_column(sql.Enum(AssemblerLanguage))
+    # default arguments
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
     deployment_id: Mapped[int] = mapped_column(
         ForeignKey("Deployment.id", ondelete="CASCADE"), default=None, nullable=True
     )
-    quantum_circuit: Mapped[str] = mapped_column(sql.String(500), default=None)
-    assembler_language: Mapped[str] = mapped_column(sql.Enum(AssemblerLanguage), default=None)
 
     # Experimental
     python_file_path: Mapped[str] = mapped_column(sql.String(500), default=None, nullable=True)

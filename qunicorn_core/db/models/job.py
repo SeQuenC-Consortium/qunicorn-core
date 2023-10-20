@@ -34,50 +34,46 @@ class JobDataclass(DbModel):
 
     Attributes:
         id: The id of a job.
+        provider_specific_id (str, optional): The provider specific id for the job. (Used for canceling)
+        celery_id (str, optional): The celery id for the job. (Used for canceling)
+        executed_on_id (int): The device_id of the device where the job is running on.
+        finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
+        deployment_id (int): A deployment_id associated with the job.
+        name (str, optional): Optional name for a job.
         results (ResultDataclass, optional): List of results for each quantum program that was executed.
         executed_by(str): A user_id associated to the job, user that wants to execute the job.
-        executed_on_id (int): The device_id of the device where the job is running on.
         executed_on (DeviceDataclass): The device where the job is running on.
-        deployment_id (int): A deployment_id associated with the job.
         deployment (DeploymentDataclass): The deployment where the program is coming from.
         progress (float): The progress of the job.
         state (Optional[str], optional): The state of a job, enum JobState.
         shots (int): The number of shots for the job
         type (JobType): The type of the job.
         started_at (datetime, optional): The moment the job was scheduled. (default: datetime.utcnow)
-        finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
-        name (str, optional): Optional name for a job.
-        provider_specific_id (str, optional): The provider specific id for the job. (Used for canceling)
-        celery_id (str, optional): The celery id for the job. (Used for canceling)
     """
 
+    # non-default arguments
+    name: Mapped[Optional[str]] = mapped_column(sql.String(50))
+    results: Mapped[Optional[List[ResultDataclass.__name__]]] = relationship(ResultDataclass.__name__)
+    executed_by: Mapped[Optional[str]] = mapped_column(sql.String(100))
+    executed_on: Mapped[DeviceDataclass.__name__] = relationship(DeviceDataclass.__name__)
+    deployment: Mapped[DeploymentDataclass.__name__] = relationship(DeploymentDataclass.__name__, cascade="save-update")
+    progress: Mapped[str] = mapped_column(sql.INTEGER())
+    state: Mapped[str] = mapped_column(sql.Enum(JobState))
+    shots: Mapped[int] = mapped_column(sql.INTEGER())
+    type: Mapped[str] = mapped_column(sql.Enum(JobType))
+    started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True))
+    # default arguments
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
-    name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
-    results: Mapped[Optional[List[ResultDataclass.__name__]]] = relationship(
-        ResultDataclass.__name__, default_factory=list
-    )
-    executed_by: Mapped[Optional[str]] = mapped_column(sql.String(100), default=None)
-
-    executed_on_id: Mapped[int] = mapped_column(
-        ForeignKey(DeviceDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None, nullable=True
-    )
-    executed_on: Mapped[DeviceDataclass.__name__] = relationship(
-        DeviceDataclass.__name__,
-        default=None,
-    )
-
-    deployment_id: Mapped[int] = mapped_column(
-        ForeignKey(DeploymentDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None, nullable=True
-    )
-    deployment: Mapped[DeploymentDataclass.__name__] = relationship(
-        DeploymentDataclass.__name__, default=None, cascade="save-update"
-    )
-
-    progress: Mapped[str] = mapped_column(sql.INTEGER(), default=None)
-    state: Mapped[str] = mapped_column(sql.Enum(JobState), default=None)
-    shots: Mapped[int] = mapped_column(sql.INTEGER(), default=4000)
-    type: Mapped[str] = mapped_column(sql.Enum(JobType), default=JobType.RUNNER)
-    started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
-    finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
     provider_specific_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     celery_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
+    executed_on_id: Mapped[int] = mapped_column(
+        ForeignKey(DeviceDataclass.__tablename__ + ".id", ondelete="SET NULL"),
+        default=None,
+        nullable=True
+    )
+    deployment_id: Mapped[int] = mapped_column(
+        ForeignKey(DeploymentDataclass.__tablename__ + ".id", ondelete="SET NULL"),
+        default=None,
+        nullable=True
+    )
+    finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
