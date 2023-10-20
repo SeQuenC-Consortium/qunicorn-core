@@ -29,14 +29,6 @@ Attributes of Deployment Data
     *   - created 
         - Date 
         - Date of the creation of a deployment
-
-    *   - parameters 
-        - str 
-        - The parameters for the Job. Job parameters should already be prepared and error checked before starting the task.
-
-    *   - data 
-        - Union[dict, list, str, float, int, bool, None] 
-        - Mutable JSON-like store for additional lightweight task data. Default value is empty dict.
    
 =====
 
@@ -76,14 +68,6 @@ Attributes of Job Data
     *   - finished_at 
         - Optional[datetime] (optional) 
         - The moment the job finished successfully or with an error.
-
-    *   - parameters 
-        - str 
-        - The parameters for the Job. Job parameters should already be prepared and error checked before starting the task.
-
-    *   - data 
-        - Union[dict, list, str, float, int, bool, None] 
-        - Mutable JSON-like store for additional lightweight task data. Default value is empty dict.
 
     *   - task_status 
         - Optional[str] (optional) 

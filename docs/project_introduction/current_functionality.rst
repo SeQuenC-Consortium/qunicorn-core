@@ -1,5 +1,5 @@
 Current Functionality
-######################
+#####################
 
 To give a brief overview of the current functionality of the application.
 The user currently has one main way to access the application, this is through the defined API Endpoints.
@@ -9,12 +9,11 @@ A good way to get an overview, as well as example values, is to access those thr
 The Endpoints defined can be found on the api documentation under :doc:`my document <../architecture_documentation/api_documentation/apidocumentation>`.
 
 Available Providers
-#####################
+^^^^^^^^^^^^^^^^^^^
 Currently the following providers are available:
 
 * IBMQ:
    * Base languages:
-        * QASM
         * Qiskit
    * Available Job Types:
         * RUNNER
@@ -34,13 +33,10 @@ Currently the following providers are available:
 Please note that this list is not exhaustive and will be updated as more providers are added.
 
 
-Supported Languages
-####################
+Supported Assembler languages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Qunicorn supports a vast array of different assembler languages in the context of quantum computing.
 
-Qunicorn supports a vast array of different programming and assembler languages in the context of quantum computing.
-
-Assembler languages:
-^^^^^^^^^^^^^^^^^^^^
 * QASM
 * Braket
 * Python
@@ -49,18 +45,14 @@ Assembler languages:
 
 Please note that this list is not exhaustive and will be updated as more assembler languages are added.
 
-Programming languages:
-^^^^^^^^^^^^^^^^^^^^^^
 
-* Qiskit
-* PyQuil
-* QMWare
-* Braket
-
-Please note that this list is not exhaustive and will be updated as more programming languages are added.
-
-Job Types:
+Job Types
 ^^^^^^^^^^
 
 The following Job Types are currently available, check with the provider for more information on the specific job types.
 
+* RUNNER
+* SAMPLER
+* ESTIMATOR
+* IBM_UPLOAD (Experimental)
+* IBM_RUNNER (Experimental)

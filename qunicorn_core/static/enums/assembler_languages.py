@@ -24,7 +24,7 @@ class AssemblerLanguage(StrEnum):
         QISKIT: Assembler format form IBM
         PYTHON: Python language for IBM File Upload
         QRISP: Assembler format from Fraunhofer
-        BASIQ: Assembler format from QMWARE
+        BASIQ: Assembler format from QMWARE (Not implemented yet)
     """
 
     QASM2 = "QASM2"
