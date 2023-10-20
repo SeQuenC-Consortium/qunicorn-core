@@ -148,9 +148,9 @@ Configured in `qunicorn_core/util/config/smorest_config.py`.
 
 #### Authentication:
 
-The authentication is done with keycloak.
-All endpoints are available for everybody but jobs created by a user with a token can only be seen by them.
-To authenticate yourself have a look in the read the docs (ArchitectureDocumentation/Authentication).
+The authentication is done with Keycloak.
+All endpoints are available for everybody but jobs created by a user with a token can only be seen by the user himself.
+To authenticate yourself have a look at the following read the docs chapter: ArchitectureDocumentation/Authentication.
 
 #### Debug pages:
 
