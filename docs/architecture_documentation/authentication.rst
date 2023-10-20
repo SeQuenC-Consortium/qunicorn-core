@@ -44,7 +44,8 @@ Get an Authentication Token
 ---------------------------
 
 Authentication token can retrieved by using the `Resource Owner Password Credentials Grant Flow <https://datatracker.ietf.org/doc/html/rfc6749#section-4.3>`_
-The following shows an example how to accomplish this by using curl
+The following shows an example how to accomplish this by using curl for the user (name:alice, password: passw0rd)
+Exchange this placeholder with the credentials of your newly created user.
 
 .. code-block:: bash
 
@@ -56,9 +57,9 @@ The following shows an example how to accomplish this by using curl
     --data-urlencode 'password=passw0rd'
 
 If this does not work it is also possible to use postman for this:
-.. image:: ../resources/images/keycloak-postman-get-token.png
+    .. image:: ../resources/images/keycloak-postman-get-token.png
 
-After sending the request, a response with an access_token should be returned.
+After sending the request, a response with an `access_token` should be returned.
 This access token needs to be saved.
 It will be used for the authentication of the requests to the qunicorn core.
 
