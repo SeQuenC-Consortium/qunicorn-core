@@ -3,6 +3,7 @@ from functools import reduce
 from os import path
 from typing import Callable
 
+import pyquil
 import qiskit.circuit
 import qiskit.qasm2
 import qiskit.qasm3
@@ -10,13 +11,20 @@ import qrisp.circuit
 from braket.circuits import Circuit
 from braket.circuits.serialization import IRType
 from braket.ir.openqasm import Program as OpenQASMProgram
+from pyquil import get_qc
+from pyquil.api import AbstractCompiler, QPUCompiler
 from qrisp.interface.circuit_converter import convert_circuit
 from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
 from rustworkx.visualization import graphviz_draw
 
+
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 
-"""Class that handles all transpiling between different assembler languages"""
+"""
+Class that handles all transpiling between different assembler languages
+
+The different languages are implemented as nodes and the shortest route is used to find the required transpiling steps     
+"""
 
 
 @dataclasses.dataclass
@@ -139,3 +147,10 @@ def qasm_to_braket(source: str) -> OpenQASMProgram:
 @transpile_manager.register_transpile_method(AssemblerLanguage.QRISP, AssemblerLanguage.QISKIT)
 def qrisp_to_qiskit(circuit: qrisp.circuit.QuantumCircuit) -> OpenQASMProgram:
     return convert_circuit(circuit, "qiskit")
+
+
+@transpile_manager.register_transpile_method(AssemblerLanguage.QASM2, AssemblerLanguage.QUIL)
+def qasm_to_quil(source: str):
+    # qvm and quilc from pyquil should run in server mode and can be found with get_qc
+    quilc_compiler = get_qc("9q-square-qvm").compiler
+    return quilc_compiler.transpile_qasm_2(source)

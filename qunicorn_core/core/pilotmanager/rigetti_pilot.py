@@ -22,7 +22,7 @@ from qunicorn_core.util import logging
 
 
 class RigettiPilot(Pilot):
-    """The AWS Pilot"""
+    """The Rigetti Pilot"""
 
     provider_name: ProviderName = ProviderName.RIGETTI
 
@@ -31,12 +31,11 @@ class RigettiPilot(Pilot):
     def run(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute the job on a local simulator and saves results in the database"""
         if job_core_dto.executed_on.is_local:
-
             results = []
             program_index = 0
             for program in job_core_dto.transpiled_circuits:
                 program.wrap_in_numshots_loop(job_core_dto.shots)
-                qvm = get_qc('9q-square-qvm')
+                qvm = get_qc("9q-square-qvm")
                 string_result = qvm.run(qvm.compile(program)).readout_data.get("ro")
                 qubit0result = sum(numpy.array(string_result)[:, 0])
                 qubit1result = sum(numpy.array(string_result)[:, 1])
@@ -45,13 +44,15 @@ class RigettiPilot(Pilot):
                     circuit=job_core_dto.deployment.programs[program_index].quantum_circuit,
                     result_dict={"counts": result_dict, "probabilities": {}},
                     result_type=ResultType.COUNTS,
-                    meta_data="")
+                    meta_data="",
+                )
 
                 results.append(result)
             return results
         else:
-            raise job_db_service.return_exception_and_update_job(job_core_dto.id,
-                                                                 ValueError("Device need to be local for RIGETTI"))
+            raise job_db_service.return_exception_and_update_job(
+                job_core_dto.id, ValueError("Device need to be local for RIGETTI")
+            )
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
@@ -64,18 +65,8 @@ class RigettiPilot(Pilot):
     def get_standard_job_with_deployment(self, device: DeviceDataclass) -> JobDataclass:
         language: AssemblerLanguage = AssemblerLanguage.QUIL
         programs: list[QuantumProgramDataclass] = [
-            QuantumProgramDataclass(quantum_circuit='''from pyquil import Program \n
-from pyquil.gates import * \n
-from pyquil.quilbase import Declare\n
-program = Program(
-Declare(\"ro\", \"BIT\", 2),
-H(0),
-CNOT(0, 1),
-MEASURE(0, (\"ro\", 0)),
-MEASURE(1, (\"ro\", 1)),
-).wrap_in_numshots_loop(10)''', assembler_language=language),
             QuantumProgramDataclass(
-                quantum_circuit='''from pyquil import Program \n
+                quantum_circuit="""from pyquil import Program \n
 from pyquil.gates import * \n
 from pyquil.quilbase import Declare\n
 program = Program(
@@ -84,7 +75,22 @@ H(0),
 CNOT(0, 1),
 MEASURE(0, (\"ro\", 0)),
 MEASURE(1, (\"ro\", 1)),
-).wrap_in_numshots_loop(10)''', assembler_language=language),
+).wrap_in_numshots_loop(10)""",
+                assembler_language=language,
+            ),
+            QuantumProgramDataclass(
+                quantum_circuit="""from pyquil import Program \n
+from pyquil.gates import * \n
+from pyquil.quilbase import Declare\n
+program = Program(
+Declare(\"ro\", \"BIT\", 2),
+H(0),
+CNOT(0, 1),
+MEASURE(0, (\"ro\", 0)),
+MEASURE(1, (\"ro\", 1)),
+).wrap_in_numshots_loop(10)""",
+                assembler_language=language,
+            ),
         ]
         deployment = DeploymentDataclass(
             deployed_by=None,
