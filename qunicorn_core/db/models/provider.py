@@ -34,8 +34,8 @@ class ProviderDataclass(DbModel):
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
+    name: Mapped[str] = mapped_column(sql.Enum(ProviderName), default=None)
     with_token: Mapped[bool] = mapped_column(sql.BOOLEAN, default=None)
     supported_languages: Mapped[List[ProviderAssemblerLanguageDataclass.__name__]] = relationship(
         ProviderAssemblerLanguageDataclass.__name__, default=None
     )
-    name: Mapped[str] = mapped_column(sql.Enum(ProviderName), default=None)

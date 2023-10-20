@@ -52,6 +52,7 @@ class JobDataclass(DbModel):
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
+    name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     results: Mapped[Optional[List[ResultDataclass.__name__]]] = relationship(
         ResultDataclass.__name__, default_factory=list
     )
@@ -78,6 +79,5 @@ class JobDataclass(DbModel):
     type: Mapped[str] = mapped_column(sql.Enum(JobType), default=JobType.RUNNER)
     started_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
-    name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     provider_specific_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     celery_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)

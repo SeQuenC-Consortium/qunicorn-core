@@ -35,10 +35,10 @@ class DeploymentDataclass(DbModel):
     """
 
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
+    name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     deployed_by: Mapped[Optional[str]] = mapped_column(sql.String(100), default=None)
+    deployed_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
     programs: Mapped[List[QuantumProgramDataclass.__name__]] = relationship(
         QuantumProgramDataclass.__name__,
         default=None,
     )
-    deployed_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True), default=datetime.utcnow())
-    name: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
