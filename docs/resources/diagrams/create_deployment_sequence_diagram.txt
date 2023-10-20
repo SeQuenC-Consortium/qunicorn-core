@@ -1,0 +1,18 @@
+This is the source-text of a sequence Diagram for https://sequencediagram.org.
+
+title Create Deployment
+
+participant User
+participant Deployment API
+participant Deployment Service
+database Storage
+
+User->Deployment API:Create new Deployment
+Deployment API->Deployment Service:send to
+note over Deployment Service:Create Deployment
+Deployment Service->Storage:Save Deployment
+Deployment Service<--Storage:ACK
+Deployment API<--Deployment Service:ACK with Deployment ID
+User<--Deployment API:ACK with Deployment ID
+
+
