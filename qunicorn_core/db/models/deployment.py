@@ -37,10 +37,7 @@ class DeploymentDataclass(DbModel):
     # non-default arguments
     name: Mapped[Optional[str]] = mapped_column(sql.String(50))
     deployed_at: Mapped[datetime] = mapped_column(sql.TIMESTAMP(timezone=True))
-    programs: Mapped[List[QuantumProgramDataclass.__name__]] = relationship(
-        QuantumProgramDataclass.__name__
-    )
+    programs: Mapped[List[QuantumProgramDataclass.__name__]] = relationship(QuantumProgramDataclass.__name__)
     # default arguments
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
     deployed_by: Mapped[Optional[str]] = mapped_column(sql.String(100), default=None)
-

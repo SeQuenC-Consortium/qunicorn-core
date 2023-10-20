@@ -67,13 +67,9 @@ class JobDataclass(DbModel):
     provider_specific_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     celery_id: Mapped[Optional[str]] = mapped_column(sql.String(50), default=None)
     executed_on_id: Mapped[int] = mapped_column(
-        ForeignKey(DeviceDataclass.__tablename__ + ".id", ondelete="SET NULL"),
-        default=None,
-        nullable=True
+        ForeignKey(DeviceDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None, nullable=True
     )
     deployment_id: Mapped[int] = mapped_column(
-        ForeignKey(DeploymentDataclass.__tablename__ + ".id", ondelete="SET NULL"),
-        default=None,
-        nullable=True
+        ForeignKey(DeploymentDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None, nullable=True
     )
     finished_at: Mapped[Optional[datetime]] = mapped_column(sql.TIMESTAMP(timezone=True), default=None, nullable=True)
