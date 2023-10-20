@@ -26,6 +26,7 @@ from flask.app import Flask
 from flask.cli import FlaskGroup
 from flask.logging import default_handler
 from flask_cors import CORS
+from qiskit_ibm_runtime import IBMRuntimeError
 from tomli import load as load_toml
 
 from . import db, api, celery, licenses, core, util
@@ -149,6 +150,10 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
             error_code = error.status_code
         elif isinstance(error, ValueError):
             error_code: int = 404
+        elif isinstance(error, NotImplementedError):
+            error_code: int = 501
+        elif isinstance(error, IBMRuntimeError):
+            error_code: int = 403
         else:
             error_code: int = 500
         return {

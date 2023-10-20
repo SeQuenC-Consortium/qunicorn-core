@@ -65,7 +65,25 @@ class DeploymentDetailView(MethodView):
     def delete(self, deployment_id: int, jwt_subject: Optional[str]):
         """Delete single deployment by ID."""
         logging.info("Request: delete deployment by id")
-        return deployment_service.delete_deployment(deployment_id, user_id=jwt_subject)
+        try:
+            return deployment_service.delete_deployment(deployment_id, user_id=jwt_subject)
+        except ValueError as ve:
+            # differentiation of ValueErrors
+            # since value can either be invalid or operation with the value can be currently unavailable
+            if str(ve) == "Deployment is in use by a job":
+                status_code = 422
+                return (
+                    jsonify(
+                        {
+                            "code": status_code,
+                            "message": "Unable to delete Deployment",
+                            "errors": {ve.__class__.__name__: str(ve)},
+                        }
+                    ),
+                    status_code,
+                )
+            else:
+                raise ve
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     @DEPLOYMENT_API.arguments(DeploymentRequestDtoSchema(), location="json")

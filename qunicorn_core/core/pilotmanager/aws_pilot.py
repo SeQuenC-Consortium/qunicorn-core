@@ -49,7 +49,7 @@ class AWSPilot(Pilot):
         """Execute the job on a local simulator and saves results in the database"""
         if not job_core_dto.executed_on.is_local:
             raise job_db_service.return_exception_and_update_job(
-                job_core_dto.id, ValueError("Device need to be local for AWS")
+                job_core_dto.id, ValueError("Device not found, device needs to be local for AWS")
             )
 
         # Since QASM is stored as a String, it needs to be converted to a QASM Program before execution
