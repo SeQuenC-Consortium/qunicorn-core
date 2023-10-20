@@ -3,7 +3,6 @@ from functools import reduce
 from os import path
 from typing import Callable
 
-import pyquil
 import qiskit.circuit
 import qiskit.qasm2
 import qiskit.qasm3
@@ -12,7 +11,6 @@ from braket.circuits import Circuit
 from braket.circuits.serialization import IRType
 from braket.ir.openqasm import Program as OpenQASMProgram
 from pyquil import get_qc
-from pyquil.api import AbstractCompiler, QPUCompiler
 from qrisp.interface.circuit_converter import convert_circuit
 from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
 from rustworkx.visualization import graphviz_draw
@@ -23,7 +21,7 @@ from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 """
 Class that handles all transpiling between different assembler languages
 
-The different languages are implemented as nodes and the shortest route is used to find the required transpiling steps     
+The different languages are implemented as nodes and the shortest route is used to find the required transpiling steps
 """
 
 
