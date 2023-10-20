@@ -143,9 +143,14 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
 
     # To display the errors differently in the swagger ui
     @app.errorhandler(Exception)
-    def handle_internal_server_error(error):
+    def handle_errors(error):
         logging.error(str(error))
-        error_code: int = 500 if not hasattr(error, "status_code") else error.status_code
+        if hasattr(error, "status_code"):
+            error_code = error.status_code
+        elif isinstance(error, ValueError):
+            error_code: int = 404
+        else:
+            error_code: int = 500
         return {
             "code": error_code,
             "error": type(error).__name__,

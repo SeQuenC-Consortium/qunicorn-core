@@ -120,13 +120,14 @@ class JobCancelView(MethodView):
         try:
             return jsonify(job_service.cancel_job_by_id(job_id, body["token"], user_id=jwt_subject)), 200
         except (ValueError, IBMRuntimeError, RuntimeInvalidStateError) as exception:
+            status_code = 422
             return (
                 jsonify(
                     {
-                        "code": 422,
+                        "code": status_code,
                         "message": "Unable to cancel job",
                         "errors": {exception.__class__.__name__: str(exception)},
                     }
                 ),
-                422,
+                status_code,
             )
