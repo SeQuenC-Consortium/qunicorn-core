@@ -21,6 +21,8 @@ from typing import Optional
 from flask import jsonify
 from flask.views import MethodView
 
+from qunicorn_core.static.qunicorn_exception import QunicornError
+
 from .root import DEPLOYMENT_API
 from ..api_models import JobResponseDtoSchema
 from ..api_models.deployment_dtos import DeploymentDtoSchema, DeploymentRequestDtoSchema, DeploymentRequestDto
@@ -67,7 +69,7 @@ class DeploymentDetailView(MethodView):
         logging.info("Request: delete deployment by id")
         try:
             return deployment_service.delete_deployment(deployment_id, user_id=jwt_subject)
-        except ValueError as ve:
+        except QunicornError as ve:
             # differentiation of ValueErrors
             # since value can either be invalid or operation with the value can be currently unavailable
             if str(ve) == "Deployment is in use by a job":

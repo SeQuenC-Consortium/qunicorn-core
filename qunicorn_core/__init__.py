@@ -27,6 +27,7 @@ from flask.cli import FlaskGroup
 from flask.logging import default_handler
 from flask_cors import CORS
 from qiskit_ibm_runtime import IBMRuntimeError
+from qunicorn_core.static.qunicorn_exception import QunicornError
 from tomli import load as load_toml
 
 from . import db, api, celery, licenses, core, util
@@ -148,7 +149,7 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
         logging.error(str(error))
         if hasattr(error, "status_code"):
             error_code = error.status_code
-        elif isinstance(error, ValueError):
+        elif isinstance(error, QunicornError):
             error_code: int = 404
         elif isinstance(error, NotImplementedError):
             error_code: int = 501

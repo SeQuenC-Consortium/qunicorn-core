@@ -17,6 +17,7 @@
 from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.database_services.db_service import session
 from qunicorn_core.db.models.device import DeviceDataclass
+from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import logging
 
 
@@ -41,7 +42,7 @@ def get_device_by_id(device_id: int) -> DeviceDataclass:
     """Get a device by id"""
     db_device = db_service.get_database_object_by_id(device_id, DeviceDataclass)
     if db_device is None:
-        raise ValueError(("device_id '" + str(device_id) + "' can not be found"))
+        raise QunicornError(("device_id '" + str(device_id) + "' can not be found"))
     return db_device
 
 

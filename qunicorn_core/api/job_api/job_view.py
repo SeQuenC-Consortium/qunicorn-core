@@ -22,6 +22,8 @@ from flask.views import MethodView
 from qiskit_ibm_runtime.exceptions import RuntimeInvalidStateError
 from qiskit_ibm_runtime.exceptions import IBMRuntimeError
 
+from qunicorn_core.static.qunicorn_exception import QunicornError
+
 
 from .root import JOBMANAGER_API
 from ..api_models.job_dtos import (
@@ -119,7 +121,7 @@ class JobCancelView(MethodView):
         logging.info("Request: cancel job")
         try:
             return jsonify(job_service.cancel_job_by_id(job_id, body["token"], user_id=jwt_subject)), 200
-        except (ValueError, IBMRuntimeError, RuntimeInvalidStateError) as exception:
+        except (ValueError, QunicornError, IBMRuntimeError, RuntimeInvalidStateError) as exception:
             status_code = 422
             return (
                 jsonify(
