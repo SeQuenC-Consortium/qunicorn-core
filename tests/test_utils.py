@@ -89,6 +89,37 @@ def execute_job_test(
         ibm_check_if_job_runner_result_correct(job)
 
 
+def execute_job_test_less_ibm_specific(
+    provider: ProviderName, device: str, input_assembler_language: AssemblerLanguage, is_asynchronous: bool =
+    False
+):
+    """
+    This is the main testing method to test the execution of a job on a device of a provider.
+    To use this method you need a program with two circuits, which are logically equivalent to the others.
+    Eg: deployment_request_dto_qiskit_test_data.json
+
+    It is an End-to-End test, which means that the job is created and executed on the provider.
+    Afterwards it is checked if the job is saved in the database and if the results are correct.
+    This can be done for different assembler languages and providers.
+    """
+
+    # GIVEN: Database Setup
+    app = set_up_env()
+
+    with app.app_context():
+        job_request_dto: JobRequestDto = get_test_job(provider)
+        job_request_dto.device_name = device
+        save_deployment_and_add_id_to_job(job_request_dto, input_assembler_language)
+
+        # WHEN: create_and_run
+        return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, is_asynchronous)
+
+        # THEN: Check if the correct job with its result is saved in the db with results with a RESULT_TOLERANCE
+        check_simple_job_dto(return_dto)
+        job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
+        check_if_job_finished(job)
+
+
 def get_object_from_json(json_file_name: str):
     """Returns the json object out of the json file with the name json_file_name"""
     resource_folder: str = "test_resources"

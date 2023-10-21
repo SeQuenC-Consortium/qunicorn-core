@@ -21,6 +21,8 @@ from tests import test_utils
 IS_ASYNCHRONOUS: bool = False
 RESULT_TOLERANCE: int = 100
 
+"""Tests the execution of rigetti. quilc and qvm need to be running in server mode for this test to work"""
+
 
 def test_rigetti_local_simulator_braket_job_results():
-    test_utils.execute_job_test(ProviderName.RIGETTI, "rigetti_device", AssemblerLanguage.QUIL)
+    test_utils.execute_job_test_less_ibm_specific(ProviderName.RIGETTI, "rigetti_device", AssemblerLanguage.QUIL)

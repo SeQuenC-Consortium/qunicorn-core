@@ -22,6 +22,7 @@ import click
 from flask import Flask, Blueprint, current_app
 
 import qunicorn_core.core.pilotmanager.pilot_manager
+
 # make sure all models are imported for CLI to work properly
 from . import models  # noqa
 from .db import DB
@@ -97,9 +98,7 @@ def create_default_qiskit_deployment() -> DeploymentDataclass:
 
 
 def create_default_quil_deployment() -> DeploymentDataclass:
-    quil_str: str = (
-        "program = Program()"
-    )
+    quil_str: str = "program = Program()"
     quil_program = QuantumProgramDataclass(quantum_circuit=quil_str, assembler_language=AssemblerLanguage.QUIL)
     return DeploymentDataclass(
         deployed_by=None, programs=[quil_program], deployed_at=datetime.datetime.now(), name="QuilDeployment"
