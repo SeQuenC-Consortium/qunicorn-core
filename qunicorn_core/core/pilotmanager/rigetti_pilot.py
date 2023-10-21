@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import numpy
-from pyquil import get_qc
+from pyquil.api import get_qc
 
 from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
@@ -36,7 +36,7 @@ class RigettiPilot(Pilot):
             program_index = 0
             for program in job_core_dto.transpiled_circuits:
                 program.wrap_in_numshots_loop(job_core_dto.shots)
-                qvm = get_qc('9q-square-qvm')
+                qvm = get_qc("5q-qvm")
                 string_result = qvm.run(qvm.compile(program)).readout_data.get("ro")
                 qubit0result = sum(numpy.array(string_result)[:, 0])
                 qubit1result = sum(numpy.array(string_result)[:, 1])

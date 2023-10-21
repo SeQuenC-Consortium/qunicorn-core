@@ -26,6 +26,7 @@ Currently Supported Languages
 * QASM3
 * QISKIT
 * BRAKET
+* QUIL
 
 Currently Supported Transpile Strategies
 -----------------------------------------

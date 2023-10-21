@@ -62,6 +62,20 @@ Create the initial database (If this doesn't work, try to delete the db-file fro
 
    flask create-and-load-db
 
+
+If you want to run requests using the rigetti pilot you furthermore need to have instances of quilc and qvm running.
+For this first download the forest-sdk on https://qcs.rigetti.com/sdk-downloads and then run the following commands:
+
+.. code-block:: bash
+
+    // Terminal 1
+
+   quilc -S
+
+    // Terminal 2
+
+    qvm -S
+
 Check Linting Errors
 
 .. code-block:: bash
