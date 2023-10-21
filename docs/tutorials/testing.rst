@@ -6,9 +6,9 @@ Workflow:
 
 * Configured in .github\workflows
 * Formatting-linting.yml
-    * Executes linting provided by flake8, configured in .flake8
+    * Executes linting provided by flake8 and black, configured in .flake8
 * run-pytests.yml
-    * Executed tests defined in \tests
+    * Executed tests defined in \tests\automated_tests\
 
 PyTest
 #########
@@ -25,7 +25,7 @@ PyTest
 
 .. code-block:: bash
 
-    pytest tests
+    pytest tests\automated_tests\
 
 * pytest finds test methods through the ``test_``  prefix
 

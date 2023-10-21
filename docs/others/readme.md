@@ -146,6 +146,12 @@ Configured in `qunicorn_core/util/config/smorest_config.py`.
 * Swagger-UI: <http://localhost:5005/swagger-ui>
 * OpenAPI Spec (JSON): <http://localhost:5005/api-spec.json>
 
+#### Authentication:
+
+The authentication is done with Keycloak.
+All endpoints are available for everybody but jobs created by a user with a token can only be seen by the user himself.
+To authenticate yourself have a look at the following read the docs chapter: ArchitectureDocumentation/Authentication.
+
 #### Debug pages:
 
 * Index: <http://localhost:5005/debug/>

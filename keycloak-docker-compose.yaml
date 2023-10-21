@@ -1,0 +1,39 @@
+version: "3"
+services:
+  keycloak:
+    image: jboss/keycloak
+    networks:
+      - qunicorn
+    depends_on:
+      - keycloak_postgres
+    ports:
+      - "8081:8080"
+    volumes:
+      - "./resources/keycloak-realm-export.json:/tmp/realm-export.json"
+    environment:
+      DB_VENDOR: postgres
+      KEYCLOAK_USER: kc_user
+      KEYCLOAK_PASSWORD: kc_pass
+      DB_ADDR: keycloak_postgres
+      DB_USER: postgres
+      DB_PASSWORD: passwd
+      KEYCLOAK_IMPORT=/tmp/realm-export.json:
+
+  keycloak_postgres:
+    image: postgres:15.3
+    networks:
+      - qunicorn
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD: passwd
+      POSTGRES_DB: keycloak
+    volumes:
+      - keycloak_pgdata:/var/lib/postgresql/data \
+
+networks:
+  qunicorn:
+
+volumes:
+  pgdata:
+  keycloak_pgdata:
+

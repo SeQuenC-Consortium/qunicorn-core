@@ -1,0 +1,55 @@
+This is the source-text of a sequence Diagram for https://sequencediagram.org.
+
+title Create Job from Deployment
+
+participant User
+participant Job API
+
+participant Job Manager / Core
+
+database Storage
+
+participant Celery Queue
+
+
+
+
+participant Pilot
+participant Provider Quantum API
+
+User->Job API:Create Job from Deployment
+Job API->Job Manager / Core:Create Job
+note over Job Manager / Core:Create Job with \nreferenced Deployment\n\n
+Job Manager / Core->Storage:Save Job with State Ready
+Job Manager / Core<--Storage:ACK
+Job API<--Job Manager / Core:ACK with Job ID
+Job API->>Job Manager / Core:Request Job execution\n
+note over Job Manager / Core:Assign Pilot to Job
+User<--Job API:ACK with Job ID
+Job Manager / Core->Celery Queue:Enqueue Job
+
+Pilot<-Celery Queue:Dequeue Job
+Storage<-Pilot:Set Job State: RUNNING
+activate Pilot
+Pilot->Provider Quantum API:Send Quantum Circuit
+opt If the user wants to see if the job is running
+
+User->Job API:Request Details
+
+Job API->Job Manager / Core:Request Details
+Job Manager / Core->Storage:Request Details
+Job Manager / Core<--Storage:Send Details
+Job API<--Job Manager / Core:Send Details
+User<--Job API:Show Details
+end
+Pilot<--Provider Quantum API:Send Result
+Storage<-Pilot:Save Result
+Storage-->Pilot:ACK
+deactivate Pilot
+
+User->Job API:Request Job Results/Details by ID
+Job API->Job Manager / Core:Get Results by ID
+Job Manager / Core->Storage:Get Results by ID
+Job Manager / Core<--Storage:Send Results
+Job API<--Job Manager / Core:Send Results
+User<--Job API:Send Results
