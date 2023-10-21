@@ -3,19 +3,7 @@ services:
   server:
     build: .
     image: qunicorn:local
-    environment:
-      CONTAINER_MODE: server
-      SERVER_PORT: 8080
-      BROKER_URL: "redis://broker:6379"
-      DB_URL: "postgresql://postgres:passwd@postgres/qunicorn"
-      JWKS_URL: "http://keycloak:8080/auth/realms/qunicorn/protocol/openid-connect/certs"
-      NUMBA_CACHE_DIR: "/app/cache"
 
   worker:
     build: .
     image: qunicorn:local
-    environment:
-      CONTAINER_MODE: worker
-      BROKER_URL: "redis://broker:6379"
-      DB_URL: "postgresql://postgres:passwd@postgres/qunicorn"
-      NUMBA_CACHE_DIR: "/app/cache"

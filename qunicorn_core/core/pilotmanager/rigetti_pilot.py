@@ -35,7 +35,7 @@ class RigettiPilot(Pilot):
             program_index = 0
             for program in job_core_dto.transpiled_circuits:
                 program.wrap_in_numshots_loop(job_core_dto.shots)
-                qvm = get_qc("5q-qvm")
+                qvm = get_qc("9q-square-qvm")
                 qvm_result = qvm.run(qvm.compile(program)).readout_data.get("ro")
                 result_dict = RigettiPilot.result_to_dict(qvm_result)
                 result = ResultDataclass(

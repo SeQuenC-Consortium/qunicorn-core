@@ -47,7 +47,7 @@ DEPLOYMENT_JSON_PATHS = [
     "deployment_request_dto_quil_test_data.json",
 ]
 
-EXPECTED_ID: int = 3  # hardcoded ID can be removed if tests for the correct ID are no longer needed
+EXPECTED_ID: int = 4  # hardcoded ID can be removed if tests for the correct ID are no longer needed
 JOB_FINISHED_PROGRESS: int = 100
 STANDARD_JOB_NAME: str = "JobName"
 IS_ASYNCHRONOUS: bool = False
@@ -157,13 +157,13 @@ def get_test_job(provider: ProviderName) -> JobRequestDto:
 
 
 def check_simple_job_dto(return_dto: SimpleJobDto):
-    # assert return_dto.id == EXPECTED_ID
+    assert return_dto.id == EXPECTED_ID
     assert return_dto.name == STANDARD_JOB_NAME
     assert return_dto.state == JobState.READY
 
 
 def check_if_job_finished(job: JobDataclass):
-    # assert job.id == EXPECTED_ID
+    assert job.id == EXPECTED_ID
     assert job.progress == JOB_FINISHED_PROGRESS
     assert job.state == JobState.FINISHED
 
