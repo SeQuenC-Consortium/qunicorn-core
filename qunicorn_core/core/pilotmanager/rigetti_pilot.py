@@ -22,7 +22,7 @@ from qunicorn_core.util import logging
 
 
 class RigettiPilot(Pilot):
-    """The AWS Pilot"""
+    """The Rigetti Pilot"""
 
     provider_name: ProviderName = ProviderName.RIGETTI
 
