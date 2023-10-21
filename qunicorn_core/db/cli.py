@@ -87,8 +87,7 @@ def create_default_braket_deployment() -> DeploymentDataclass:
 
 def create_default_qiskit_deployment() -> DeploymentDataclass:
     qiskit_str: str = (
-        "circuit = QuantumCircuit(2, 2);circuit.h(0);"
-        "circuit.cx(0, 1);circuit.measure(0, 0);circuit.measure(1, 1)"
+        "circuit = QuantumCircuit(2, 2);circuit.h(0);" "circuit.cx(0, 1);circuit.measure(0, 0);circuit.measure(1, 1)"
     )
     qiskit_program = QuantumProgramDataclass(quantum_circuit=qiskit_str, assembler_language=AssemblerLanguage.QISKIT)
     return DeploymentDataclass(
