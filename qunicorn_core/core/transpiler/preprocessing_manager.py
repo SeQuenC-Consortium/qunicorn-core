@@ -44,11 +44,11 @@ preprocessing_manager = PreProcessingManager()
 def preprocess_qiskit(program: str) -> QuantumCircuit:
     """
     since the qiskit circuit modifies the circuit object instead of simple returning the object
-    (it returns the QiskitCircuit from the instruction set) the 'qiskit_circuit' is modified from the exec
+    (it returns the QiskitCircuit from the instruction set) the 'circuit' is modified from the exec
     """
     circuit_globals = {"QuantumCircuit": QuantumCircuit}
     exec(program, circuit_globals)
-    return circuit_globals["qiskit_circuit"]
+    return circuit_globals["circuit"]
 
 
 @preprocessing_manager.register(AssemblerLanguage.BRAKET)

@@ -33,12 +33,6 @@ class JobDataclass(DbModel):
     """Dataclass for storing Jobs
 
     Attributes:
-        id: The id of a job.
-        provider_specific_id (str, optional): The provider specific id for the job. (Used for canceling)
-        celery_id (str, optional): The celery id for the job. (Used for canceling)
-        executed_on_id (int): The device_id of the device where the job is running on.
-        finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
-        deployment_id (int): A deployment_id associated with the job.
         name (str, optional): Optional name for a job.
         results (ResultDataclass, optional): List of results for each quantum program that was executed.
         executed_by(str): A user_id associated to the job, user that wants to execute the job.
@@ -49,6 +43,12 @@ class JobDataclass(DbModel):
         shots (int): The number of shots for the job
         type (JobType): The type of the job.
         started_at (datetime, optional): The moment the job was scheduled. (default: datetime.utcnow)
+        id: The id of a job.
+        provider_specific_id (str, optional): The provider specific id for the job. (Used for canceling)
+        celery_id (str, optional): The celery id for the job. (Used for canceling)
+        executed_on_id (int): The device_id of the device where the job is running on.
+        finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
+        deployment_id (int): A deployment_id associated with the job.
     """
 
     # non-default arguments
