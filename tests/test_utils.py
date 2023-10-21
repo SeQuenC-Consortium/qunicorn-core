@@ -90,8 +90,7 @@ def execute_job_test(
 
 
 def execute_job_test_less_ibm_specific(
-    provider: ProviderName, device: str, input_assembler_language: AssemblerLanguage, is_asynchronous: bool =
-    False
+    provider: ProviderName, device: str, input_assembler_language: AssemblerLanguage, is_asynchronous: bool = False
 ):
     """
     This is the main testing method to test the execution of a job on a device of a provider.
