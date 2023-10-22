@@ -2,6 +2,7 @@ Rigetti Pilot
 ================
 
 This site gives an overview of the functionality of the Rigetti Pilot.
+The Rigetti Pilot is only implemented in experimental form.
 
 The Rigetti Pilot currently allows for local simulation of quantum program, using the pyquil SDK.
 Execution on the Rigetti Servers is currently not supported.
