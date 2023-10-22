@@ -22,7 +22,7 @@ from qunicorn_core.util import logging
 DEFAULT_QUANTUM_CIRCUIT_2 = """from pyquil import Program \n
 from pyquil.gates import * \n
 from pyquil.quilbase import Declare\n
-program = Program(
+circuit = Program(
 Declare(\"ro\", \"BIT\", 2),
 H(0),
 H(0),
@@ -34,7 +34,7 @@ MEASURE(1, (\"ro\", 1)),
 DEFAULT_QUANTUM_CIRCUIT_1 = """from pyquil import Program \n
 from pyquil.gates import * \n
 from pyquil.quilbase import Declare\n
-program = Program(
+circuit = Program(
 Declare(\"ro\", \"BIT\", 2),
 H(0),
 CNOT(0, 1),
@@ -60,11 +60,11 @@ class RigettiPilot(Pilot):
                 qvm = get_qc(job_core_dto.executed_on.name)
                 qvm_result = qvm.run(qvm.compile(program)).get_register_map().get("ro")
                 result_dict = RigettiPilot.result_to_dict(qvm_result)
-                hex_result_dict = RigettiPilot.qubit_binary_to_hex(result_dict, job_core_dto.id)
-                probabalities_dict = RigettiPilot.calculate_probabilities(hex_result_dict)
+                result_dict = RigettiPilot.qubit_binary_to_hex(result_dict, job_core_dto.id)
+                probabilities_dict = RigettiPilot.calculate_probabilities(result_dict)
                 result = ResultDataclass(
                     circuit=job_core_dto.deployment.programs[program_index].quantum_circuit,
-                    result_dict={"counts": hex_result_dict, "probabilities": probabalities_dict},
+                    result_dict={"counts": result_dict, "probabilities": probabilities_dict},
                     result_type=ResultType.COUNTS,
                     meta_data="",
                 )
@@ -77,20 +77,19 @@ class RigettiPilot(Pilot):
             )
 
     @staticmethod
-    def result_to_dict(string_result):
+    def result_to_dict(results: []) -> dict:
         """Converts the result of the qvm to a dictionary"""
-        result_strings = []
-        for row in string_result:
-            i = len(row)
-            result_string = ""
-            for x in range(0, i):
-                result_string += str(row[x])
-            result_strings.append(result_string)
-        result_set = set(result_strings)
-        dict_result = {}
+        results_as_strings = []
+        for row in results:
+            row_as_string = ""
+            for index in range(0, len(row)):
+                row_as_string += str(row[index])
+            results_as_strings.append(row_as_string)
+        result_set = set(results_as_strings)
+        result_dict = {}
         for result_element in result_set:
-            dict_result.update({result_element: result_strings.count(result_element)})
-        return dict_result
+            result_dict.update({result_element: results_as_strings.count(result_element)})
+        return result_dict
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""

@@ -69,6 +69,5 @@ def preprocess_qrisp(program: str) -> QrispQC:
 
 @preprocessing_manager.register(AssemblerLanguage.QUIL)
 def preprocess_quil(program: str) -> Program:
-    """quil.QuantumCircuit needs to be included here as an import so eval works with the type"""
     exec(program, globals())
-    return globals().get("program")
+    return globals().get("circuit")

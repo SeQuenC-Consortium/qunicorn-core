@@ -24,7 +24,6 @@ class AssemblerLanguage(StrEnum):
         QISKIT: Assembler format form IBM
         PYTHON: Python language for IBM File Upload
         QRISP: Assembler format from Fraunhofer
-        BASIQ: Assembler format from QMWARE (Not implemented yet)
         QUIL: Assembler format from Rigetti
     """
 
@@ -34,5 +33,4 @@ class AssemblerLanguage(StrEnum):
     BRAKET = "BRAKET"
     QISKIT = "QISKIT"
     PYTHON = "PYTHON"
-    BASIQ = "BASIQ"
     QUIL = "Quil"

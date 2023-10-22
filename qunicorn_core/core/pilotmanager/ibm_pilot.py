@@ -214,7 +214,7 @@ class IBMPilot(Pilot):
 
         for i in range(len(ibm_result.results)):
             counts: dict = ibm_result.results[i].data.counts
-            probabilities: dict = IBMPilot.calculate_probabilities(counts)
+            probabilities: dict = Pilot.calculate_probabilities(counts)
             circuit: str = job_dto.deployment.programs[i].quantum_circuit
             result_dtos.append(
                 ResultDataclass(
@@ -288,7 +288,7 @@ class IBMPilot(Pilot):
             shots=4000,
             type=JobType.RUNNER,
             started_at=datetime.now(),
-            name="IMBJob",
+            name="IBMJob",
             results=[
                 ResultDataclass(
                     result_dict={
