@@ -21,6 +21,7 @@ class ProviderName(StrEnum):
     Values:
         IBM: International Business Machines Corporation
         AWS: Amazon Web Services
+        Rigetti: Rigetti Computing
     """
 
     IBM = "IBM"

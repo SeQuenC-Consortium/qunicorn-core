@@ -22,7 +22,7 @@ from braket.tasks.local_quantum_task_batch import LocalQuantumTaskBatch
 from qunicorn_core.api.api_models import DeviceDto
 from qunicorn_core.api.api_models.job_dtos import JobCoreDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
-from qunicorn_core.db.database_services import device_db_service, provider_db_service, job_db_service
+from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
@@ -119,28 +119,15 @@ class AWSPilot(Pilot):
             results=[
                 ResultDataclass(
                     result_dict={
-                        "counts": {"000": 2007, "111": 1993},
-                        "probabilities": {"000": 0.50175, "111": 0.49825},
+                        "counts": {"0x0": 2007, "0x3": 1993},
+                        "probabilities": {"0x0": 0.50175, "0x3": 0.49825},
                     }
                 )
             ],
         )
 
     def save_devices_from_provider(self, device_request):
-        """
-        Save the available aws device into the database.
-        Since there is currently only a local simulator in use, the device_request parameter is unused.
-        """
-        provider: ProviderDataclass = provider_db_service.get_provider_by_name(self.provider_name)
-        aws_device: DeviceDataclass = DeviceDataclass(
-            provider_id=provider.id,
-            num_qubits=-1,
-            name="local_simulator",
-            is_simulator=True,
-            is_local=True,
-            provider=provider,
-        )
-        device_db_service.save_device_by_name(aws_device)
+        raise ValueError("AWS Pilot cannot fetch Devices from AWS API, because there is no Cloud Access.")
 
     def get_standard_provider(self):
         return ProviderDataclass(

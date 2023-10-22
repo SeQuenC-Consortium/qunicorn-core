@@ -25,6 +25,7 @@ class AssemblerLanguage(StrEnum):
         PYTHON: Python language for IBM File Upload
         QRISP: Assembler format from Fraunhofer
         BASIQ: Assembler format from QMWARE (Not implemented yet)
+        QUIL: Assembler format from Rigetti
     """
 
     QASM2 = "QASM2"

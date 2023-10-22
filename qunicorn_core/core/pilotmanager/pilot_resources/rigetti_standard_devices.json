@@ -1,8 +1,20 @@
 {
   "all_devices": [
     {
-      "name": "rigetti_device",
-      "num_qubits": -1,
+      "name": "2q-qvm",
+      "num_qubits": 2,
+      "is_simulator": true,
+      "is_local": true
+    },
+    {
+      "name": "5q-qvm",
+      "num_qubits": 5,
+      "is_simulator": true,
+      "is_local": true
+    },
+    {
+      "name": "9q-qvm",
+      "num_qubits": 9,
       "is_simulator": true,
       "is_local": true
     }

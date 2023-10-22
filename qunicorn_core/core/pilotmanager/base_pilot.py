@@ -53,7 +53,7 @@ class Pilot:
         raise NotImplementedError()
 
     def save_devices_from_provider(self, device_request: DeviceRequestDto):
-        """Create the standard ProviderDataclass Object for the pilot and return it"""
+        """Access the devices from the cloud service of the provider, to update the current device list of qunicorn"""
         raise NotImplementedError()
 
     def is_device_available(self, device: DeviceDto, token: str) -> bool:
@@ -106,7 +106,7 @@ class Pilot:
         default_device: DeviceDataclass | None = None
         for device_json in all_devices["all_devices"]:
             device: DeviceDataclass = DeviceDataclass(provider=provider, provider_id=provider.id, **device_json)
-            if device.is_local:
+            if device.is_local and default_device is None:
                 default_device = device
             else:
                 devices_without_default.append(device)
@@ -137,3 +137,13 @@ class Pilot:
             raise job_db_service.return_exception_and_update_job(
                 job_id, ValueError("Could not convert binary-results to hex")
             )
+
+    @staticmethod
+    def calculate_probabilities(counts: dict) -> dict:
+        """Calculates the probabilities from the counts, probability = counts / total_counts"""
+
+        total_counts = sum(counts.values())
+        probabilities = {}
+        for key, value in counts.items():
+            probabilities[key] = value / total_counts
+        return probabilities

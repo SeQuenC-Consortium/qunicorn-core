@@ -227,16 +227,6 @@ class IBMPilot(Pilot):
         return result_dtos
 
     @staticmethod
-    def calculate_probabilities(counts: dict) -> dict:
-        """Calculates the probabilities from the counts, probability = counts / total_counts"""
-
-        total_counts = sum(counts.values())
-        probabilities = {}
-        for key, value in counts.items():
-            probabilities[key] = value / total_counts
-        return probabilities
-
-    @staticmethod
     def _map_estimator_results_to_dataclass(
         ibm_result: EstimatorResult, job: JobCoreDto, observer: str
     ) -> list[ResultDataclass]:
@@ -299,7 +289,10 @@ class IBMPilot(Pilot):
             type=JobType.RUNNER,
             started_at=datetime.now(),
             name="IMBJob",
-            results=[ResultDataclass(result_dict={"0x": "550", "1x": "450"})],
+            results=[ResultDataclass(result_dict={
+                "counts": {"0x0": 2007, "0x3": 1993},
+                "probabilities": {"0x0": 0.50175, "0x3": 0.49825},
+            })],
         )
 
     def save_devices_from_provider(self, device_request):

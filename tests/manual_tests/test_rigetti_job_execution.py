@@ -25,4 +25,4 @@ RESULT_TOLERANCE: int = 100
 
 
 def test_rigetti_local_simulator_braket_job_results():
-    test_utils.execute_job_test_less_ibm_specific(ProviderName.RIGETTI, "rigetti_device", AssemblerLanguage.QUIL)
+    test_utils.execute_job_test(ProviderName.RIGETTI, "2q-qvm", AssemblerLanguage.QUIL)
