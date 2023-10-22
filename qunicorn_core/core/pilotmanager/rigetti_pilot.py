@@ -129,10 +129,14 @@ class RigettiPilot(Pilot):
             type=JobType.RUNNER,
             started_at=datetime.now(),
             name="RigettiJob",
-            results=[ResultDataclass(result_dict={
-                "counts": {"0x0": 2007, "0x3": 1993},
-                "probabilities": {"0x0": 0.50175, "0x3": 0.49825},
-            })],
+            results=[
+                ResultDataclass(
+                    result_dict={
+                        "counts": {"0x0": 2007, "0x3": 1993},
+                        "probabilities": {"0x0": 0.50175, "0x3": 0.49825},
+                    }
+                )
+            ],
         )
 
     def save_devices_from_provider(self, device_request):
