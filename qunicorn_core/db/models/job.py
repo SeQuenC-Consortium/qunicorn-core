@@ -39,14 +39,14 @@ class JobDataclass(DbModel):
         executed_on (DeviceDataclass): The device where the job is running on.
         deployment (DeploymentDataclass): The deployment where the program is coming from.
         progress (float): The progress of the job.
-        state (Optional[str], optional): The state of a job, enum JobState.
+        state (str): The state of a job, enum JobState.
         shots (int): The number of shots for the job
         type (JobType): The type of the job.
         started_at (datetime, optional): The moment the job was scheduled. (default: datetime.utcnow)
-        id: The id of a job.
+        id (int): The id of a job.
         provider_specific_id (str, optional): The provider specific id for the job. (Used for canceling)
         celery_id (str, optional): The celery id for the job. (Used for canceling)
-        executed_on_id (int): The device_id of the device where the job is running on.
+        executed_on_id (int, optional): The device_id of the device where the job is running on.
         finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
         deployment_id (int): A deployment_id associated with the job.
     """

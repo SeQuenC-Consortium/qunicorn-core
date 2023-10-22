@@ -27,9 +27,9 @@ class ProviderAssemblerLanguageDataclass(DbModel):
     """Dataclass for storing Assembler Languages
 
     Attributes:
-        supported_language: The AssemblerLanguage (Enum) which is supported.
-        id: The ID of the assembler language.
-        provider_id: The ID of the provider that supports this language.
+        supported_language (str): The AssemblerLanguage (Enum) which is supported.
+        id (int): The ID of the assembler language.
+        provider_id (int): The ID of the provider that supports this language.
     """
 
     # non-default arguments

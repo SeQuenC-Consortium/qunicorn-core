@@ -27,7 +27,7 @@ class QuantumProgramDataclass(DbModel):
     Attributes:
         quantum_circuit (str): Quantum code that needs to be executed.
         assembler_language (enum): Assembler language in which the code should be interpreted.
-        id: The ID of the quantum program.
+        id (int): The ID of the quantum program.
         deployment_id (int): The deployment where a list of quantum program is used.
     """
 

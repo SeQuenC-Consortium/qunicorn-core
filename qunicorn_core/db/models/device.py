@@ -26,13 +26,13 @@ class DeviceDataclass(DbModel):
     """Dataclass for storing CloudDevices of a provider
 
     Attributes:
-        name: The name of the device.
-        num_qubits: The amount of qubits that is available at this device.
-        is_simulator: The information whether the device is a simulator (true) or not (false).
-        is_local: The information whether jobs executed on this device are executed local or not.
-        provider: The provider of this device.
-        id: The id of the device.
-        provider_id: provider_id of the provider saved in the provider table.
+        name (str): The name of the device.
+        num_qubits (int): The amount of qubits that is available at this device.
+        is_simulator (bool): The information whether the device is a simulator (true) or not (false).
+        is_local (bool): The information whether jobs executed on this device are executed local or not.
+        provider (ProviderDataclass): The provider of this device.
+        id (int): The id of the device.
+        provider_id (int): provider_id of the provider saved in the provider table.
     """
 
     # non-default arguments

@@ -27,9 +27,9 @@ class DeploymentDataclass(DbModel):
     """Dataclass for storing deployments
 
     Attributes:
-        programs (list): A list of quantum programs.
-        deployed_at (Date): Date of the creation of a deployment_api.
         name (str, optional): Optional name for a deployment_api.
+        deployed_at (Date): Date of the creation of a deployment_api.
+        programs (list): A list of quantum programs.
         id (int): The id of a deployment.
         deployed_by (str): The  user_id that deployed this Deployment.
     """
