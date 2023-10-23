@@ -9,6 +9,7 @@ Execution on the Rigetti Servers is currently not supported.
 
 Rigetti Pilot furthermore requires the installation of the Rigetti Forest SDK and needs running server instances of
 quilc and qvm. Because of this the Rigetti Pilot is currently not available in execution through the docker-compose.
+The execution is disabled when running on docker.
 
 Check the getting-started page on how to install this.
 

@@ -28,6 +28,8 @@ Currently Supported Languages
 * BRAKET
 * QUIL
 
+**Note:** (QUIL Transpilation needs to be enabled by setting ENABLE_EXPERIMENTAL_FEATURES to True.)
+
 Currently Supported Transpile Strategies
 -----------------------------------------
 
