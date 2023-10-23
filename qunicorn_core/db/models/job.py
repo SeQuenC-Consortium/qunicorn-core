@@ -48,7 +48,7 @@ class JobDataclass(DbModel):
         celery_id (str, optional): The celery id for the job. (Used for canceling)
         executed_on_id (int, optional): The device_id of the device where the job is running on.
         finished_at (Optional[datetime], optional): The moment the job finished successfully or with an error.
-        deployment_id (int): A deployment_id associated with the job.
+        deployment_id (int, optional): A deployment_id associated with the job.
     """
 
     # non-default arguments

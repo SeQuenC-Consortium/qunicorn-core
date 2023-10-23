@@ -29,6 +29,10 @@ class QuantumProgramDataclass(DbModel):
         assembler_language (enum): Assembler language in which the code should be interpreted.
         id (int): The ID of the quantum program.
         deployment_id (int): The deployment where a list of quantum program is used.
+        python_file_path (str): Part of experimental feature: path to file to be uploaded (to IBM).
+        python_file_metadata (str): Part of experimental feature: metadata for the python_file.
+        python_file_options (str): Part of experimental feature: options for the python_file.
+        python_file_input (str): Part of experimental feature: inputs for the python_file.
     """
 
     # non-default arguments
