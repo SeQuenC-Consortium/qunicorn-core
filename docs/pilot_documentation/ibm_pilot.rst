@@ -50,7 +50,7 @@ File Runner
 
 **Description:** Executes files already uploaded to the IBM Backend using their id.
 
-**Notes:** Experimental Feature. Could not be fully tested due to missing authorization to the IBM Backend. It should be used with Caution. Needs to be enabled by setting ENABLE_EXPERIMENTAL_FEATURES to True.
+**Notes:** Experimental Feature. Could not be fully tested due to missing authentication to access the IBM Backend. It should be used with Caution. Needs to be enabled by setting ENABLE_EXPERIMENTAL_FEATURES to True.
 
 **Requires:** A file uploaded to the IBM backend using File Upload.
 
@@ -59,6 +59,6 @@ File Upload
 
 **Description:** Uploads a file to the IBM Backend.
 
-**Notes:** Experimental Feature. Could not be fully tested due to missing authorization to the IBM Backend. It should be used with Caution. Needs to be enabled by setting ENABLE_EXPERIMENTAL_FEATURES to True.
+**Notes:** Experimental Feature. Could not be fully tested due to missing authentication to access the IBM Backend. It should be used with Caution. Needs to be enabled by setting ENABLE_EXPERIMENTAL_FEATURES to True.
 
 **Requires:** A .py file to be executed and a corresponding metadata json, needs to follow the standards presented by IBM. Need to be added to the /resources/upload_files folder.

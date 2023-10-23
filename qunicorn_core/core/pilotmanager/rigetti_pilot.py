@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+from collections import Counter
 from datetime import datetime
 
 from pyquil.api import get_qc
@@ -102,17 +103,9 @@ class RigettiPilot(Pilot):
     @staticmethod
     def result_to_dict(results: []) -> dict:
         """Converts the result of the qvm to a dictionary"""
-        results_as_strings = []
-        for row in results:
-            row_as_string = ""
-            for index in range(0, len(row)):
-                row_as_string += str(row[index])
-            results_as_strings.append(row_as_string)
-        result_set = set(results_as_strings)
-        result_dict = {}
-        for result_element in result_set:
-            result_dict.update({result_element: results_as_strings.count(result_element)})
-        return result_dict
+        results_as_strings = ["".join(map(str, row)) for row in results]
+        result_counter = Counter(results_as_strings)
+        return dict(result_counter)
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
@@ -138,7 +131,7 @@ class RigettiPilot(Pilot):
             deployed_by=None,
             programs=programs,
             deployed_at=datetime.now(),
-            name="DeploymentRigettiQasmName",
+            name="DeploymentRigettiQuilName",
         )
 
         return JobDataclass(
