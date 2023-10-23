@@ -1,3 +1,18 @@
+# Copyright 2023 University of Stuttgart
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
 from datetime import datetime
 
 from pyquil.api import get_qc
@@ -52,6 +67,14 @@ class RigettiPilot(Pilot):
 
     def run(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute the job on a local simulator and saves results in the database"""
+        if os.environ.get("RUNNING_IN_DOCKER", "") == "True":
+            raise job_db_service.return_exception_and_update_job(
+                job_core_dto.id,
+                ValueError(
+                    "Rigetti Pilot can not be executed in Docker, check the documentation on how to run "
+                    "qunicorn locally to execute jobs on the Rigetti Pilot"
+                ),
+            )
         if job_core_dto.executed_on.is_local:
             results = []
             program_index = 0

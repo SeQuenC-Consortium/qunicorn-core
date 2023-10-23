@@ -1,4 +1,19 @@
+# Copyright 2023 University of Stuttgart
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import dataclasses
+import os
 from functools import reduce
 from os import path
 from typing import Callable
@@ -16,12 +31,15 @@ from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
 from rustworkx.visualization import graphviz_draw
 
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
+from qunicorn_core.util import logging
 
 """
 Class that handles all transpiling between different assembler languages
 
 The different languages are implemented as nodes and the shortest route is used to find the required transpiling steps
 """
+
+ENABLE_EXPERIMENTAL_FEATURES = os.environ.get("ENABLE_EXPERIMENTAL_FEATURES")
 
 
 @dataclasses.dataclass
@@ -150,5 +168,11 @@ def qrisp_to_qiskit(circuit: qrisp.circuit.QuantumCircuit) -> OpenQASMProgram:
 def qasm_to_quil(source: str):
     # qvm and quilc from pyquil should run in server mode and can be found with get_qc
     # WARNING: the qasm to quil transpilation does not allow for the use of standard gates.
+    if ENABLE_EXPERIMENTAL_FEATURES == "False":
+        raise ValueError(
+            "Experimental transpilation features are disabled, set ENABLE_EXPERIMENTAL_TRANSPILATION to true to "
+            "enable them"
+        )
+    logging.warn("This function is experimental and could not be fully tested yet")
     quilc_compiler = get_qc("9q-square-qvm").compiler
     return quilc_compiler.transpile_qasm_2(source)

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from os import environ
 from typing import Optional
 
@@ -91,7 +92,8 @@ def __transpile_circuits(job_dto: JobCoreDto, dest_languages: [ProviderAssembler
     # If an error was caught -> Update the job and raise it again
     if len(error_results) > 0:
         job_db_service.update_finished_job(job_dto.id, error_results, JobState.ERROR)
-        raise Exception("TranspileError")
+        for error in error_results:
+            raise Exception("Transpilation Error: " + error.result_dict["exception_message"])
 
 
 def cancel_job(job_core_dto):

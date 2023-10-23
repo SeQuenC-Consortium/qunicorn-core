@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import os
 from datetime import datetime
 from typing import Optional
@@ -45,6 +46,8 @@ from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.util import logging, utils
+
+ENABLE_EXPERIMENTAL_FEATURES = os.environ.get("ENABLE_EXPERIMENTAL_FEATURES")
 
 
 class IBMPilot(Pilot):
@@ -161,6 +164,14 @@ class IBMPilot(Pilot):
     def __upload_ibm_program(self, job_core_dto: JobCoreDto):
         """EXPERIMENTAL"""
         """Upload and then run a quantum program on the QiskitRuntimeService"""
+        if ENABLE_EXPERIMENTAL_FEATURES == "False":
+            raise job_db_service.return_exception_and_update_job(
+                job_core_dto.id,
+                ValueError(
+                    "Running uploaded IBM Programs is experimental and was not fully tested. Set "
+                    "ENABLE_EXPERIMENTAL_FEATURES to True to enable this feature."
+                ),
+            )
         logging.warn("This function is experimental and could not be fully tested yet")
 
         service = self.__get_runtime_service(job_core_dto)
@@ -169,7 +180,7 @@ class IBMPilot(Pilot):
             python_file_path = self.__get_file_path_to_resources(program.python_file_path)
             python_file_metadata_path = self.__get_file_path_to_resources(program.python_file_metadata)
             ibm_program_ids.append(service.upload_program(python_file_path, python_file_metadata_path))
-        job_db_service.update_attribute(job_core_dto.id, JobType.FILE_RUNNER, JobDataclass.type)
+        job_db_service.update_attribute(job_core_dto.id, JobType.IBM_RUNNER, JobDataclass.type)
         job_db_service.update_attribute(job_core_dto.id, JobState.READY, JobDataclass.state)
         ibm_results = [
             ResultDataclass(result_dict={"ibm_job_id": ibm_program_ids[0]}, result_type=ResultType.UPLOAD_SUCCESSFUL)
@@ -179,6 +190,14 @@ class IBMPilot(Pilot):
     def __run_ibm_program(self, job_core_dto: JobCoreDto):
         """EXPERIMENTAL"""
         """Run a program previously uploaded to the IBM Backend"""
+        if ENABLE_EXPERIMENTAL_FEATURES == "False":
+            raise job_db_service.return_exception_and_update_job(
+                job_core_dto.id,
+                ValueError(
+                    "Running uploaded IBM Programs is experimental and was not fully tested. Set "
+                    "ENABLE_EXPERIMENTAL_FEATURES to True to enable this feature."
+                ),
+            )
         logging.warn("This function is experimental and could not be fully tested yet")
 
         service = self.__get_runtime_service(job_core_dto)
