@@ -32,6 +32,7 @@ from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
+from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import logging, utils
 
 DEFAULT_QUANTUM_CIRCUIT_2 = """from pyquil import Program \n
@@ -70,9 +71,10 @@ class RigettiPilot(Pilot):
         if utils.is_running_in_docker():
             raise job_db_service.return_exception_and_update_job(
                 job_core_dto.id,
-                ValueError(
+                QunicornError(
                     "Rigetti Pilot can not be executed in Docker, check the documentation on how to run "
-                    "qunicorn locally to execute jobs on the Rigetti Pilot"
+                    "qunicorn locally to execute jobs on the Rigetti Pilot",
+                    405,
                 ),
             )
         if job_core_dto.executed_on.is_local:
@@ -96,7 +98,7 @@ class RigettiPilot(Pilot):
             return results
         else:
             raise job_db_service.return_exception_and_update_job(
-                job_core_dto.id, ValueError("Device need to be local for RIGETTI")
+                job_core_dto.id, QunicornError("Device need to be local for RIGETTI")
             )
 
     @staticmethod
@@ -109,10 +111,12 @@ class RigettiPilot(Pilot):
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
 
-        raise job_db_service.return_exception_and_update_job(job_core_dto.id, ValueError("No valid Job Type specified"))
+        raise job_db_service.return_exception_and_update_job(
+            job_core_dto.id, QunicornError("No valid Job Type specified")
+        )
 
     def cancel_provider_specific(self, job_dto):
-        raise ValueError("Canceling not implemented for rigetti pilot yet")
+        raise QunicornError("Canceling not implemented for rigetti pilot yet")
 
     def get_standard_job_with_deployment(self, device: DeviceDataclass) -> JobDataclass:
         language: AssemblerLanguage = AssemblerLanguage.QUIL
@@ -154,7 +158,9 @@ class RigettiPilot(Pilot):
         )
 
     def save_devices_from_provider(self, device_request):
-        raise ValueError("Rigetti Pilot cannot fetch Devices from Rigetti Computing, because there is no Cloud Access.")
+        raise QunicornError(
+            "Rigetti Pilot cannot fetch Devices from Rigetti Computing, because there is no Cloud Access."
+        )
 
     def get_standard_provider(self):
         return ProviderDataclass(

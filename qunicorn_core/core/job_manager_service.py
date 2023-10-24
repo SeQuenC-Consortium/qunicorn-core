@@ -93,8 +93,9 @@ def __transpile_circuits(job_dto: JobCoreDto, dest_languages: [ProviderAssembler
     # If an error was caught -> Update the job and raise it again
     if len(error_results) > 0:
         job_db_service.update_finished_job(job_dto.id, error_results, JobState.ERROR)
-        for error in error_results:
-            raise QunicornError("Transpilation Error: " + error.result_dict["exception_message"])
+        string_errors = " ".join(str(error.result_dict.get("exception_message", "")) for error in error_results)
+        if string_errors:
+            raise QunicornError("Transpilation Error: " + string_errors)
 
 
 def cancel_job(job_core_dto):

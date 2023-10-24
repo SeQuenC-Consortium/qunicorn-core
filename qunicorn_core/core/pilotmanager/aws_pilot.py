@@ -130,7 +130,7 @@ class AWSPilot(Pilot):
         )
 
     def save_devices_from_provider(self, device_request):
-        raise ValueError("AWS Pilot cannot fetch Devices from AWS API, because there is no Cloud Access.")
+        raise QunicornError("AWS Pilot cannot fetch Devices from AWS API, because there is no Cloud Access.")
 
     def get_standard_provider(self):
         return ProviderDataclass(
