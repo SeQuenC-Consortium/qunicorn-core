@@ -169,9 +169,9 @@ class IBMPilot(Pilot):
         if not utils.are_experimental_features_enabled():
             raise job_db_service.return_exception_and_update_job(
                 job_core_dto.id,
-                ValueError(
+                QunicornError(
                     "Running uploaded IBM Programs is experimental and was not fully tested. Set "
-                    "ENABLE_EXPERIMENTAL_FEATURES to True to enable this feature."
+                    "ENABLE_EXPERIMENTAL_FEATURES to True to enable this feature.", 405
                 ),
             )
         logging.warn("This function is experimental and could not be fully tested yet")
@@ -195,9 +195,9 @@ class IBMPilot(Pilot):
         if not utils.are_experimental_features_enabled():
             raise job_db_service.return_exception_and_update_job(
                 job_core_dto.id,
-                ValueError(
+                QunicornError(
                     "Running uploaded IBM Programs is experimental and was not fully tested. Set "
-                    "ENABLE_EXPERIMENTAL_FEATURES to True to enable this feature."
+                    "ENABLE_EXPERIMENTAL_FEATURES to True to enable this feature.", 405
                 ),
             )
         logging.warn("This function is experimental and could not be fully tested yet")

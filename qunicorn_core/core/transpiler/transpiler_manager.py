@@ -167,9 +167,9 @@ def qasm_to_quil(source: str):
     # qvm and quilc from pyquil should run in server mode and can be found with get_qc
     # WARNING: the qasm to quil transpilation does not allow for the use of standard gates.
     if not utils.are_experimental_features_enabled():
-        raise ValueError(
+        raise QunicornError(
             "Experimental transpilation features are disabled, set ENABLE_EXPERIMENTAL_TRANSPILATION to true to "
-            "enable them"
+            "enable them", 405
         )
     logging.warn("This function is experimental and could not be fully tested yet")
     quilc_compiler = get_qc("9q-square-qvm").compiler
