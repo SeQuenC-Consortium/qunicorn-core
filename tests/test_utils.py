@@ -26,6 +26,7 @@ from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
+from qunicorn_core.static.qunicorn_exception import QunicornError
 from tests.conftest import set_up_env
 
 # The ProviderName must be in lower case in the file name
@@ -111,7 +112,7 @@ def get_test_deployment_request(assembler_language: AssemblerLanguage) -> Deploy
             deployment_dict: dict = get_object_from_json(path)
             return DeploymentRequestDto.from_dict(deployment_dict)
 
-    raise ValueError("No deployment json found for assembler language: {}".format(assembler_language))
+    raise QunicornError("No deployment json found for assembler language: {}".format(assembler_language))
 
 
 def get_test_job(provider: ProviderName) -> JobRequestDto:
@@ -121,7 +122,7 @@ def get_test_job(provider: ProviderName) -> JobRequestDto:
             job_dict: dict = get_object_from_json(path)
             return JobRequestDto(**job_dict)
 
-    raise ValueError("No job json found for provider: {}".format(provider))
+    raise QunicornError("No job json found for provider: {}".format(provider))
 
 
 def check_simple_job_dto(return_dto: SimpleJobDto):

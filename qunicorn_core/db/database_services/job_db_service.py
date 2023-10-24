@@ -19,6 +19,7 @@ from qunicorn_core.db.database_services import db_service, device_db_service, de
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.job_state import JobState
+from qunicorn_core.static.qunicorn_exception import QunicornError
 
 
 # originally from <https://github.com/buehlefs/flask-template/>
@@ -56,7 +57,7 @@ def get_job_by_id(job_id: int) -> JobDataclass:
     """Gets the job with the job_id from the database"""
     db_job = db_service.get_database_object_by_id(job_id, JobDataclass)
     if db_job is None:
-        raise ValueError(("job_id '" + str(job_id) + "' can not be found"))
+        raise QunicornError("job_id '" + str(job_id) + "' can not be found")
     return db_job
 
 

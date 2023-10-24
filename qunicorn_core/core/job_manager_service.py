@@ -30,6 +30,7 @@ from qunicorn_core.db.models.provider_assembler_language import ProviderAssemble
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
+from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import logging
 
 """This Class is responsible for running a job on a pilot and scheduling them with celery"""
@@ -53,7 +54,7 @@ def run_job(job_core_dto_dict: dict):
             break
 
     if results is None:
-        exception: Exception = ValueError("No valid Target specified")
+        exception: Exception = QunicornError("No valid Target specified")
         job_db_service.update_finished_job(
             job_core_dto.id, result_mapper.exception_to_error_results(exception), JobState.ERROR
         )
@@ -91,7 +92,7 @@ def __transpile_circuits(job_dto: JobCoreDto, dest_languages: [ProviderAssembler
     # If an error was caught -> Update the job and raise it again
     if len(error_results) > 0:
         job_db_service.update_finished_job(job_dto.id, error_results, JobState.ERROR)
-        raise Exception("TranspileError")
+        raise QunicornError("TranspileError")
 
 
 def cancel_job(job_core_dto):
