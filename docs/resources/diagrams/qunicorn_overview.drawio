@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-10-22T13:42:23.912Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36" etag="yRkWCiiQQ0NeblyIbFd9" version="22.0.6" type="device">
+<mxfile host="app.diagrams.net" modified="2023-10-24T19:53:29.684Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36" etag="wopMaXQMgDAn30hsnxly" version="22.0.7" type="device">
   <diagram id="woZmq--j6TU2j0kvm82t" name="Seite-1">
     <mxGraphModel dx="2362" dy="885" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" background="none" math="0" shadow="0">
       <root>
@@ -72,7 +72,7 @@
             <mxPoint x="-246.58999999999992" y="148.83999999999997" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="iRkPKjhTWpxQjBQank2m-1" value="AWS" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="iRkPKjhTWpxQjBQank2m-1" value="Rigetti" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-210" y="387" width="120" height="60" as="geometry" />
         </mxCell>
       </root>

@@ -22,7 +22,6 @@ import click
 from flask import Flask, Blueprint, current_app
 
 import qunicorn_core.core.pilotmanager.pilot_manager
-
 # make sure all models are imported for CLI to work properly
 from . import models  # noqa
 from .db import DB
@@ -70,9 +69,10 @@ def load_db_function(app: Flask, if_not_exists=True):
     db_is_empty = DB.session.query(JobDataclass).first() is None
     if if_not_exists and not db_is_empty:
         return
+
+    # Create default deployments for languages that do not have their own primary pilot.
     DB.session.add(create_default_braket_deployment())
     DB.session.add(create_default_qiskit_deployment())
-    DB.session.add(create_default_quil_deployment())
     DB.session.commit()
     qunicorn_core.core.pilotmanager.pilot_manager.save_default_jobs_and_devices_from_provider()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")

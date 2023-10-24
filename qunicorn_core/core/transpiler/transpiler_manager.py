@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import dataclasses
-import os
 from functools import reduce
 from os import path
 from typing import Callable
@@ -31,15 +30,13 @@ from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
 from rustworkx.visualization import graphviz_draw
 
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
-from qunicorn_core.util import logging
+from qunicorn_core.util import logging, utils
 
 """
 Class that handles all transpiling between different assembler languages
 
 The different languages are implemented as nodes and the shortest route is used to find the required transpiling steps
 """
-
-ENABLE_EXPERIMENTAL_FEATURES = os.environ.get("ENABLE_EXPERIMENTAL_FEATURES")
 
 
 @dataclasses.dataclass
@@ -168,7 +165,7 @@ def qrisp_to_qiskit(circuit: qrisp.circuit.QuantumCircuit) -> OpenQASMProgram:
 def qasm_to_quil(source: str):
     # qvm and quilc from pyquil should run in server mode and can be found with get_qc
     # WARNING: the qasm to quil transpilation does not allow for the use of standard gates.
-    if not os.environ.get("ENABLE_EXPERIMENTAL_FEATURES") == "True":
+    if not utils.are_experimental_features_enabled():
         raise ValueError(
             "Experimental transpilation features are disabled, set ENABLE_EXPERIMENTAL_TRANSPILATION to true to "
             "enable them"
