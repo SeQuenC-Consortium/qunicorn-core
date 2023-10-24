@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 class SmorestProductionConfig:
     OPENAPI_VERSION = "3.0.2"
     OPENAPI_JSON_PATH = "api-spec.json"
