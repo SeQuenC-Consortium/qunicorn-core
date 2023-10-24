@@ -25,5 +25,5 @@ def get_default_qasm2_string(hadamard_amount: int = 1) -> str:
     return qc.qasm()
 
 
-def are_experimental_features_enabled() -> bool:
+def is_experimental_feature_enabled() -> bool:
     return os.environ.get("ENABLE_EXPERIMENTAL_FEATURES") == "True"

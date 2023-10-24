@@ -166,7 +166,7 @@ def qrisp_to_qiskit(circuit: qrisp.circuit.QuantumCircuit) -> OpenQASMProgram:
 def qasm_to_quil(source: str):
     # qvm and quilc from pyquil should run in server mode and can be found with get_qc
     # WARNING: the qasm to quil transpilation does not allow for the use of standard gates.
-    if not utils.are_experimental_features_enabled():
+    if not utils.is_experimental_feature_enabled():
         raise QunicornError(
             "Experimental transpilation features are disabled, set ENABLE_EXPERIMENTAL_TRANSPILATION to true to "
             "enable them", 405

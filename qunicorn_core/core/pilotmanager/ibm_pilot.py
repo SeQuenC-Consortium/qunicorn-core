@@ -166,7 +166,7 @@ class IBMPilot(Pilot):
     def __upload_ibm_program(self, job_core_dto: JobCoreDto):
         """EXPERIMENTAL"""
         """Upload and then run a quantum program on the QiskitRuntimeService"""
-        if not utils.are_experimental_features_enabled():
+        if not utils.is_experimental_feature_enabled():
             raise job_db_service.return_exception_and_update_job(
                 job_core_dto.id,
                 QunicornError(
@@ -192,7 +192,7 @@ class IBMPilot(Pilot):
     def __run_ibm_program(self, job_core_dto: JobCoreDto):
         """EXPERIMENTAL"""
         """Run a program previously uploaded to the IBM Backend"""
-        if not utils.are_experimental_features_enabled():
+        if not utils.is_experimental_feature_enabled():
             raise job_db_service.return_exception_and_update_job(
                 job_core_dto.id,
                 QunicornError(
