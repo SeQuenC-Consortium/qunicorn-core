@@ -22,6 +22,7 @@ import click
 from flask import Flask, Blueprint, current_app
 
 import qunicorn_core.core.pilotmanager.pilot_manager
+
 # make sure all models are imported for CLI to work properly
 from . import models  # noqa
 from .db import DB
