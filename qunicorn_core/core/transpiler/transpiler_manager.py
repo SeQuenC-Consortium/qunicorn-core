@@ -169,7 +169,8 @@ def qasm_to_quil(source: str):
     if not utils.is_experimental_feature_enabled():
         raise QunicornError(
             "Experimental transpilation features are disabled, set ENABLE_EXPERIMENTAL_TRANSPILATION to true to "
-            "enable them", 405
+            "enable them",
+            405,
         )
     logging.warn("This function is experimental and could not be fully tested yet")
     quilc_compiler = get_qc("9q-square-qvm").compiler
