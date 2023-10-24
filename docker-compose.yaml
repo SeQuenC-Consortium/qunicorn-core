@@ -86,6 +86,7 @@ services:
     ports:
       - "5432:5432"
 
+  # QuilC and QVM Servers are commented out, as rigetti is an experimental feature and not running on docker.
   #quilc:
   #  image: rigetti/quilc
   #  command: -S -p 5555

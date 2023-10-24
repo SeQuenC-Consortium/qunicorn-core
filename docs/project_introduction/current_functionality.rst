@@ -6,7 +6,7 @@ The user currently has one main way to access the application, this is through t
 
 A good way to get an overview, as well as example values, is to access those through the Swagger UI.
 
-The Endpoints defined can be found on the api documentation under :doc:`my document <../architecture_documentation/api_documentation/apidocumentation>`.
+The Endpoints defined can be found on the api documentation under :doc:`API Documentation <../architecture_documentation/api_documentation/apidocumentation>`.
 
 Available Providers
 ^^^^^^^^^^^^^^^^^^^

@@ -33,7 +33,7 @@ DEFAULT_TEST_CONFIG = {
     "OPENAPI_JSON_PATH": "api-spec.json",
     "OPENAPI_URL_PREFIX": "",
     "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-    "ENABLE_EXPERIMENTAL_FEATURES": "FALSE",
+    "ENABLE_EXPERIMENTAL_FEATURES": "False",
 }
 
 

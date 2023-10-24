@@ -45,7 +45,7 @@ Sampler
 
 **Notes:** Can also be executed locally using LocalSampler.
 
-File Runner
+IBM_RUNNER
 ***********
 
 **Description:** Executes files already uploaded to the IBM Backend using their id.
@@ -54,7 +54,7 @@ File Runner
 
 **Requires:** A file uploaded to the IBM backend using File Upload.
 
-File Upload
+IBM_UPLOAD
 ************
 
 **Description:** Uploads a file to the IBM Backend.
