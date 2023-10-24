@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 from collections import Counter
 from datetime import datetime
 
@@ -33,7 +32,7 @@ from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
-from qunicorn_core.util import logging
+from qunicorn_core.util import logging, utils
 
 DEFAULT_QUANTUM_CIRCUIT_2 = """from pyquil import Program \n
 from pyquil.gates import * \n
@@ -68,7 +67,7 @@ class RigettiPilot(Pilot):
 
     def run(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
         """Execute the job on a local simulator and saves results in the database"""
-        if os.environ.get("RUNNING_IN_DOCKER", "") == "True":
+        if utils.is_running_in_docker():
             raise job_db_service.return_exception_and_update_job(
                 job_core_dto.id,
                 ValueError(

@@ -27,3 +27,7 @@ def get_default_qasm2_string(hadamard_amount: int = 1) -> str:
 
 def is_experimental_feature_enabled() -> bool:
     return os.environ.get("ENABLE_EXPERIMENTAL_FEATURES") == "True"
+
+
+def is_running_in_docker() -> bool:
+    return os.environ.get("RUNNING_IN_DOCKER", "") == "True"
