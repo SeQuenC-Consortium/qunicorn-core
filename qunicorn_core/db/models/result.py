@@ -25,20 +25,21 @@ from ...static.enums.result_type import ResultType
 class ResultDataclass(DbModel):
     """Dataclass for storing results of a job
 
-
     Attributes:
-        id: The ID of the result.
         result_dict (dict): The results of the job, in the given result_type.
             For the Runner it should have the keys counts and probabilities.
             The counts and probabilities should be a dict with hexadecimals as quantum-bit-keys.
+        id (int): The ID of the result.
         job_id (int): The  job_id that was executed.
         circuit (str): The circuit which was executed by the job.
         meta_data (dict): Some other data that was given by ibm.
         result_type (Enum): Result type depending on the Job_Type of the job.
     """
 
+    # non-default arguments
+    result_dict: Mapped[dict] = mapped_column(sql.JSON, nullable=True)
+    # default arguments
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
-    result_dict: Mapped[dict] = mapped_column(sql.JSON, default=None, nullable=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("Job.id", ondelete="CASCADE"), default=None, nullable=True)
     circuit: Mapped[str] = mapped_column(sql.String(500), default=None, nullable=True)
     meta_data: Mapped[dict] = mapped_column(sql.JSON, default=None, nullable=True)

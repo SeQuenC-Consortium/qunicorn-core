@@ -26,6 +26,8 @@ from invoke import UnexpectedExit, task
 from invoke.context import Context
 from invoke.runners import Result
 
+from qunicorn_core.static.qunicorn_exception import QunicornError
+
 if system() == "Windows":
     from subprocess import list2cmdline as join
 else:
@@ -476,7 +478,7 @@ def git_url_to_folder(url: str) -> str:
     # roughly matches …[/<organization]/<repository-name>[.git][/]
     url_match = match(r".*(?:\/(?P<orga>[^\/.]+))?\/(?P<repo>[^\/]+)(?:\.git)\/?$", url)
     if not url_match:
-        raise ValueError(f"Url '{url}' could not be parsed!", url_match)
+        raise QunicornError((f"Url '{url}' could not be parsed!", url_match))
     if url_match["orga"]:
         return f"{url_match['orga']}__{url_match['repo']}"
     else:
@@ -598,7 +600,7 @@ def start_docker(c):
             periodic_scheduler=periodic_scheduler,
         )
     else:
-        raise ValueError("Environment variable 'CONTAINER_MODE' must be set to either 'server' or 'worker'!")
+        raise QunicornError("Environment variable 'CONTAINER_MODE' must be set to either 'server' or 'worker'!")
 
 
 @task

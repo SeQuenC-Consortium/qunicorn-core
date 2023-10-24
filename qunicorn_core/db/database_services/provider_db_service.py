@@ -16,6 +16,7 @@
 
 from qunicorn_core.db.database_services import db_service
 from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import logging
 
 
@@ -28,7 +29,7 @@ def get_provider_by_id(provider_id: int) -> ProviderDataclass:
     """Get a provider by id"""
     db_provider = db_service.get_database_object_by_id(provider_id, ProviderDataclass)
     if db_provider is None:
-        raise ValueError(("provider_id '" + str(provider_id) + "' can not be found"))
+        raise QunicornError(("provider_id '" + str(provider_id) + "' can not be found"))
     return db_provider
 
 

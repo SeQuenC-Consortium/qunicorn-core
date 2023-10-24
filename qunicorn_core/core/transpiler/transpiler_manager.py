@@ -30,6 +30,7 @@ from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
 from rustworkx.visualization import graphviz_draw
 
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
+from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import logging, utils
 
 """
@@ -78,7 +79,7 @@ class TranspileManager:
         )
         path_to_dest = paths[dest_node]
         if not path_to_dest:
-            raise ValueError("Could not find transpile strategy")
+            raise QunicornError("Could not find transpile strategy")
 
         return [
             TranspileStrategyStep(

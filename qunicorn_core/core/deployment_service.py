@@ -19,6 +19,7 @@ from qunicorn_core.api.jwt import abort_if_user_unauthorized
 from qunicorn_core.core.mapper import deployment_mapper, quantum_program_mapper
 from qunicorn_core.db.database_services import deployment_db_service, db_service, job_db_service
 from qunicorn_core.db.models.deployment import DeploymentDataclass
+from qunicorn_core.static.qunicorn_exception import QunicornError
 
 
 def get_all_deployments(user_id: Optional[str] = None) -> list[DeploymentDto]:
@@ -51,7 +52,7 @@ def update_deployment(
         return db_service.save_database_object(db_deployment)
     except AttributeError:
         db_service.get_session().rollback()
-        raise ValueError("Error updating deployment with id: " + str(deployment_id))
+        raise QunicornError("Error updating deployment with id: " + str(deployment_id))
 
 
 def delete_deployment(id: int, user_id: Optional[str] = None) -> DeploymentDto:
@@ -59,7 +60,7 @@ def delete_deployment(id: int, user_id: Optional[str] = None) -> DeploymentDto:
     db_deployment = deployment_mapper.dataclass_to_dto(deployment_db_service.get_deployment_by_id(id))
     abort_if_user_unauthorized(db_deployment.deployed_by, user_id)
     if len(job_db_service.get_jobs_by_deployment_id(db_deployment.id)) > 0:
-        raise ValueError("Deployment is in use by a job")
+        raise QunicornError("Deployment is in use by a job", 422)
     deployment_db_service.delete(id)
     return db_deployment
 

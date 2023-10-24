@@ -19,6 +19,7 @@ from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
 from qunicorn_core.core.pilotmanager.rigetti_pilot import RigettiPilot
 from qunicorn_core.db.database_services import device_db_service, db_service
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.static.qunicorn_exception import QunicornError
 
 PILOTS: list[Pilot] = [IBMPilot(), AWSPilot(), RigettiPilot()]
 
@@ -55,4 +56,4 @@ def get_device_data_from_provider(device, token) -> dict:
     for pilot in PILOTS:
         if pilot.has_same_provider(device.provider.name):
             return pilot.get_device_data_from_provider(device, token)
-    raise ValueError("No valid Target specified")
+    raise QunicornError("No valid Target specified")

@@ -35,6 +35,7 @@ from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
+from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import logging
 
 
@@ -49,7 +50,7 @@ class AWSPilot(Pilot):
         """Execute the job on a local simulator and saves results in the database"""
         if not job_core_dto.executed_on.is_local:
             raise job_db_service.return_exception_and_update_job(
-                job_core_dto.id, ValueError("Device need to be local for AWS")
+                job_core_dto.id, QunicornError("Device not found, device needs to be local for AWS")
             )
 
         # Since QASM is stored as a String, it needs to be converted to a QASM Program before execution
@@ -65,14 +66,16 @@ class AWSPilot(Pilot):
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
         """Execute a job of a provider specific type on a backend using a Pilot"""
-        raise job_db_service.return_exception_and_update_job(job_core_dto.id, ValueError("No valid Job Type specified"))
+        raise job_db_service.return_exception_and_update_job(
+            job_core_dto.id, QunicornError("No valid Job Type specified")
+        )
 
     def cancel_provider_specific(self, job_dto):
         logging.warn(
             f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} failed."
             f"Canceling while in execution not supported for AWS Jobs"
         )
-        raise ValueError("Canceling not supported on AWS devices")
+        raise QunicornError("Canceling not supported on AWS devices")
 
     @staticmethod
     def __map_aws_results_to_dataclass(

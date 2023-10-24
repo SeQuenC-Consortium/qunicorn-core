@@ -14,7 +14,6 @@
 
 # originally from <https://github.com/buehlefs/flask-template/>
 
-
 """Module containing database cli and api_models."""
 
 from flask import Flask

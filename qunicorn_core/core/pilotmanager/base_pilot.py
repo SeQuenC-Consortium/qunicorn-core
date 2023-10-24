@@ -28,6 +28,7 @@ from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
+from qunicorn_core.static.qunicorn_exception import QunicornError
 
 
 class Pilot:
@@ -82,7 +83,7 @@ class Pilot:
         elif job.state == JobState.RUNNING:
             self.cancel_provider_specific(job)
         else:
-            raise ValueError(f"Job is in invalid state for canceling: {job.state}")
+            raise QunicornError(f"Job is in invalid state for canceling: {job.state}")
 
     def cancel_provider_specific(self, job):
         """Cancel execution of a job at the corresponding backend"""
@@ -112,7 +113,7 @@ class Pilot:
                 devices_without_default.append(device)
 
         if default_device is None:
-            raise ValueError("No default device found for provider {}".format(self.provider_name))
+            raise QunicornError("No default device found for provider {}".format(self.provider_name))
 
         return devices_without_default, default_device
 
@@ -124,7 +125,7 @@ class Pilot:
             return dict([(hex(k), v) for k, v in qubits_in_binary.items()])
         except Exception:
             raise job_db_service.return_exception_and_update_job(
-                job_id, ValueError("Could not convert decimal-results to hex")
+                job_id, QunicornError("Could not convert decimal-results to hex")
             )
 
     @staticmethod
@@ -135,7 +136,7 @@ class Pilot:
             return dict([(hex(int(k, 2)), v) for k, v in qubits_in_binary.items()])
         except Exception:
             raise job_db_service.return_exception_and_update_job(
-                job_id, ValueError("Could not convert binary-results to hex")
+                job_id, QunicornError("Could not convert binary-results to hex")
             )
 
     @staticmethod

@@ -27,15 +27,17 @@ class ProviderDataclass(DbModel):
     """Dataclass for storing Providers
 
     Attributes:
-        id (int): The id of a provider.
-        with_token (bool): If authentication is needed and can be done by passing a token this attribute is true.
-        supported_languages: The programming language that is supported by this provider.
         name (ProviderName): Name of the cloud service.
+        with_token (bool): If authentication is needed and can be done by passing a token this attribute is true.
+        supported_languages (list): The programming language that is supported by this provider.
+        id (int): The id of a provider.
     """
 
-    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
-    with_token: Mapped[bool] = mapped_column(sql.BOOLEAN, default=None)
+    # non-default arguments
+    name: Mapped[str] = mapped_column(sql.Enum(ProviderName))
+    with_token: Mapped[bool] = mapped_column(sql.BOOLEAN)
     supported_languages: Mapped[List[ProviderAssemblerLanguageDataclass.__name__]] = relationship(
-        ProviderAssemblerLanguageDataclass.__name__, default=None
+        ProviderAssemblerLanguageDataclass.__name__
     )
-    name: Mapped[str] = mapped_column(sql.Enum(ProviderName), default=None)
+    # default arguments
+    id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)

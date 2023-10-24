@@ -26,6 +26,8 @@ from flask.app import Flask
 from flask.cli import FlaskGroup
 from flask.logging import default_handler
 from flask_cors import CORS
+from qiskit_ibm_runtime import IBMRuntimeError
+from qunicorn_core.static.qunicorn_exception import QunicornError
 from tomli import load as load_toml
 
 from . import db, api, celery, licenses, core, util
@@ -143,11 +145,15 @@ def create_app(test_config: Optional[Dict[str, Any]] = None):
 
     # To display the errors differently in the swagger ui
     @app.errorhandler(Exception)
-    def handle_internal_server_error(error):
+    def handle_errors(error):
         logging.error(str(error))
-        error_code: int = 500 if not hasattr(error, "status_code") else error.status_code
+        if hasattr(error, "status_code"):
+            error_code = error.status_code
+        elif isinstance(error, NotImplementedError):
+            error_code: int = 501
+        else:
+            error_code: int = 500
         return {
-            "code": error_code,
             "error": type(error).__name__,
             "message": str(error),
         }, error_code

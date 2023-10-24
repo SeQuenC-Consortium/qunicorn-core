@@ -26,21 +26,23 @@ class DeviceDataclass(DbModel):
     """Dataclass for storing CloudDevices of a provider
 
     Attributes:
-        id: The id of the device.
-        provider_id: provider_id of the provider saved in the provider table.
-        num_qubits: The amount of qubits that is available at this device.
-        name: The name of the device.
-        is_simulator: The information whether the device is a simulator (true) or not (false).
-        is_local: The information whether jobs executed on this device are executed local or not.
-        provider: The provider of this device.
+        name (str): The name of the device.
+        num_qubits (int): The amount of qubits that is available at this device.
+        is_simulator (bool): The information whether the device is a simulator (true) or not (false).
+        is_local (bool): The information whether jobs executed on this device are executed local or not.
+        provider (ProviderDataclass): The provider of this device.
+        id (int): The id of the device.
+        provider_id (int): provider_id of the provider saved in the provider table.
     """
 
+    # non-default arguments
+    name: Mapped[str] = mapped_column(sql.String)
+    num_qubits: Mapped[int] = mapped_column(sql.INTEGER)
+    is_simulator: Mapped[bool] = mapped_column(sql.BOOLEAN)
+    is_local: Mapped[bool] = mapped_column(sql.BOOLEAN)
+    provider: Mapped[ProviderDataclass.__name__] = relationship(ProviderDataclass.__name__)
+    # default arguments
     id: Mapped[int] = mapped_column(sql.INTEGER(), primary_key=True, autoincrement=True, default=None)
     provider_id: Mapped[int] = mapped_column(
         ForeignKey(ProviderDataclass.__tablename__ + ".id", ondelete="SET NULL"), default=None
     )
-    num_qubits: Mapped[int] = mapped_column(sql.INTEGER, default=-1)
-    name: Mapped[str] = mapped_column(sql.String, default="")
-    is_simulator: Mapped[bool] = mapped_column(sql.BOOLEAN, default=False)
-    is_local: Mapped[bool] = mapped_column(sql.BOOLEAN, default=False)
-    provider: Mapped[ProviderDataclass.__name__] = relationship(ProviderDataclass.__name__, default=None)

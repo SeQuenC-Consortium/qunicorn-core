@@ -45,6 +45,7 @@ from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
+from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import logging, utils
 
 ENABLE_EXPERIMENTAL_FEATURES = os.environ.get("ENABLE_EXPERIMENTAL_FEATURES")
@@ -70,7 +71,7 @@ class IBMPilot(Pilot):
             return self.__upload_ibm_program(job_core_dto)
         else:
             raise job_db_service.return_exception_and_update_job(
-                job_core_dto.id, ValueError("No valid Job Type specified")
+                job_core_dto.id, QunicornError("No valid Job Type specified")
             )
 
     def run(self, job_dto: JobCoreDto) -> list[ResultDataclass]:
@@ -154,7 +155,8 @@ class IBMPilot(Pilot):
         try:
             return IBMPilot.get_ibm_provider_and_login(token)
         except Exception as exception:
-            raise job_db_service.return_exception_and_update_job(job_dto_id, exception)
+            e = job_db_service.return_exception_and_update_job(job_dto_id, exception)
+            raise QunicornError(type(e).__name__, e.args)
 
     @staticmethod
     def __get_file_path_to_resources(file_name) -> str:
@@ -215,7 +217,7 @@ class IBMPilot(Pilot):
                 ResultDataclass(result_dict={"value": "403 Error when accessing"}, result_type=ResultType.ERROR)
             )
             job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.ERROR)
-            raise exception
+            raise QunicornError(type(exception).__name__ + exception.message)
         job_db_service.update_finished_job(job_core_dto.id, ibm_results)
 
     @staticmethod

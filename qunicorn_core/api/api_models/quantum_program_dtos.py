@@ -44,7 +44,12 @@ class QuantumProgramRequestDto:
 
 class QuantumProgramRequestDtoSchema(MaBaseSchema):
     quantum_circuit = ma.fields.String(
-        required=True, allow_none=True, metadata={"example": utils.get_default_qasm2_string()}
+        required=True,
+        allow_none=True,
+        metadata={
+            "example": utils.get_default_qasm2_string() + " (Note: if you have qrisp/qiskit as your assembler language"
+            " add 'circuit =' to the beginning of your quantumCircuit string)"
+        },
     )
     assembler_language = ma.fields.Enum(
         required=True, metadata={"example": AssemblerLanguage.QASM2}, enum=AssemblerLanguage
