@@ -119,17 +119,4 @@ class JobCancelView(MethodView):
     def post(self, body, job_id: str, jwt_subject: Optional[str]):
         """Cancel a job execution via id."""
         logging.info("Request: cancel job")
-        try:
-            return jsonify(job_service.cancel_job_by_id(job_id, body["token"], user_id=jwt_subject)), 200
-        except (ValueError, QunicornError, IBMRuntimeError, RuntimeInvalidStateError) as exception:
-            status_code = 422
-            return (
-                jsonify(
-                    {
-                        "code": status_code,
-                        "message": "Unable to cancel job",
-                        "errors": {exception.__class__.__name__: str(exception)},
-                    }
-                ),
-                status_code,
-            )
+        return jsonify(job_service.cancel_job_by_id(job_id, body["token"], user_id=jwt_subject)), 200

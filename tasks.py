@@ -478,7 +478,7 @@ def git_url_to_folder(url: str) -> str:
     # roughly matches …[/<organization]/<repository-name>[.git][/]
     url_match = match(r".*(?:\/(?P<orga>[^\/.]+))?\/(?P<repo>[^\/]+)(?:\.git)\/?$", url)
     if not url_match:
-        raise QunicornError(f"Url '{url}' could not be parsed!", url_match)
+        raise QunicornError((f"Url '{url}' could not be parsed!", url_match))
     if url_match["orga"]:
         return f"{url_match['orga']}__{url_match['repo']}"
     else:

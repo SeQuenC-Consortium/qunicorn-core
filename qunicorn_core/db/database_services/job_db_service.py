@@ -57,7 +57,7 @@ def get_job_by_id(job_id: int) -> JobDataclass:
     """Gets the job with the job_id from the database"""
     db_job = db_service.get_database_object_by_id(job_id, JobDataclass)
     if db_job is None:
-        raise QunicornError(("job_id '" + str(job_id) + "' can not be found"))
+        raise QunicornError("job_id '" + str(job_id) + "' can not be found")
     return db_job
 
 
