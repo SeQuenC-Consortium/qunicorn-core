@@ -30,6 +30,7 @@ from .models.deployment import DeploymentDataclass
 from .models.job import JobDataclass
 from .models.quantum_program import QuantumProgramDataclass
 from ..static.enums.assembler_languages import AssemblerLanguage
+from ..util import utils
 from ..util.logging import get_logger
 
 DB_CLI_BLP = Blueprint("db_cli", __name__, cli_group=None)
@@ -72,28 +73,32 @@ def load_db_function(app: Flask, if_not_exists=True):
         return
 
     # Create default deployments for languages that do not have their own primary pilot.
-    DB.session.add(create_default_braket_deployment())
-    DB.session.add(create_default_qiskit_deployment())
+    DB.session.add(create_default_qasm2_deployment())
+    DB.session.add(create_default_qasm3_deployment())
     DB.session.commit()
     qunicorn_core.core.pilotmanager.pilot_manager.save_default_jobs_and_devices_from_provider()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
 
 
-def create_default_braket_deployment() -> DeploymentDataclass:
-    braket_str: str = "Circuit().h(0).cnot(0, 1)"
-    braket_program = QuantumProgramDataclass(quantum_circuit=braket_str, assembler_language=AssemblerLanguage.BRAKET)
+def create_default_qasm2_deployment() -> DeploymentDataclass:
+    language = AssemblerLanguage.QASM2
+    programs = [QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm2_string(1), assembler_language=language)]
     return DeploymentDataclass(
-        deployed_by=None, programs=[braket_program], deployed_at=datetime.datetime.now(), name="BraketDeployment"
+        deployed_by=None,
+        programs=programs,
+        deployed_at=datetime.datetime.now(),
+        name="QASM2Deployment",
     )
 
 
-def create_default_qiskit_deployment() -> DeploymentDataclass:
-    qiskit_str: str = (
-        "circuit = QuantumCircuit(2, 2);circuit.h(0);" "circuit.cx(0, 1);circuit.measure(0, 0);circuit.measure(1, 1)"
+def create_default_qasm3_deployment() -> DeploymentDataclass:
+    language = AssemblerLanguage.QASM3
+    qasm3_str: str = (
+        "OPENQASM 3; \nqubit[3] q;\nbit[3] c;\nh q[0];\ncnot q[0], q[1];\ncnot q[1], q[2];\nc = " "measure q;"
     )
-    qiskit_program = QuantumProgramDataclass(quantum_circuit=qiskit_str, assembler_language=AssemblerLanguage.QISKIT)
+    programs = [QuantumProgramDataclass(quantum_circuit=qasm3_str, assembler_language=language)]
     return DeploymentDataclass(
-        deployed_by=None, programs=[qiskit_program], deployed_at=datetime.datetime.now(), name="QiskitDeployment"
+        deployed_by=None, programs=programs, deployed_at=datetime.datetime.now(), name="QASM3Deployment"
     )
 
 

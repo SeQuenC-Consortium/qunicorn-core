@@ -13,39 +13,22 @@
 # limitations under the License.
 
 from collections import Counter
-from datetime import datetime
 
 from pyquil.api import get_qc
 
 from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.db.database_services import job_db_service
-from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
-from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
-from qunicorn_core.static.enums.job_state import JobState
-from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import logging, utils
-
-DEFAULT_QUANTUM_CIRCUIT_2 = """from pyquil import Program \n
-from pyquil.gates import * \n
-from pyquil.quilbase import Declare\n
-circuit = Program(
-Declare(\"ro\", \"BIT\", 2),
-H(0),
-H(0),
-CNOT(0, 1),
-MEASURE(0, (\"ro\", 0)),
-MEASURE(1, (\"ro\", 1)),
-)"""
 
 DEFAULT_QUANTUM_CIRCUIT_1 = """from pyquil import Program \n
 from pyquil.gates import * \n
@@ -119,43 +102,7 @@ class RigettiPilot(Pilot):
         raise QunicornError("Canceling not implemented for rigetti pilot yet")
 
     def get_standard_job_with_deployment(self, device: DeviceDataclass) -> JobDataclass:
-        language: AssemblerLanguage = AssemblerLanguage.QUIL
-        programs: list[QuantumProgramDataclass] = [
-            QuantumProgramDataclass(
-                quantum_circuit=DEFAULT_QUANTUM_CIRCUIT_1,
-                assembler_language=language,
-            ),
-            QuantumProgramDataclass(
-                quantum_circuit=DEFAULT_QUANTUM_CIRCUIT_2,
-                assembler_language=language,
-            ),
-        ]
-        deployment = DeploymentDataclass(
-            deployed_by=None,
-            programs=programs,
-            deployed_at=datetime.now(),
-            name="DeploymentRigettiQuilName",
-        )
-
-        return JobDataclass(
-            executed_by=None,
-            executed_on=device,
-            deployment=deployment,
-            progress=0,
-            state=JobState.READY,
-            shots=4000,
-            type=JobType.RUNNER,
-            started_at=datetime.now(),
-            name="RigettiJob",
-            results=[
-                ResultDataclass(
-                    result_dict={
-                        "counts": {"0x0": 2007, "0x3": 1993},
-                        "probabilities": {"0x0": 0.50175, "0x3": 0.49825},
-                    }
-                )
-            ],
-        )
+        return self.create_default_job_with_circuit_and_device(device, DEFAULT_QUANTUM_CIRCUIT_1)
 
     def save_devices_from_provider(self, device_request):
         raise QunicornError(

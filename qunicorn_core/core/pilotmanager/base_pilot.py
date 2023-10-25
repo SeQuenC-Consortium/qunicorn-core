@@ -13,16 +13,18 @@
 # limitations under the License.
 import json
 import os
-from typing import Optional
+from datetime import datetime
 
 from celery.states import PENDING
 
 from qunicorn_core.api.api_models import JobCoreDto, DeviceRequestDto, DeviceDto
 from qunicorn_core.celery import CELERY
 from qunicorn_core.db.database_services import job_db_service
+from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
@@ -49,7 +51,7 @@ class Pilot:
         """Create the standard ProviderDataclass Object for the pilot and return it"""
         raise NotImplementedError()
 
-    def get_standard_job_with_deployment(self, device: DeviceDataclass, user_id: Optional[str] = None) -> JobDataclass:
+    def get_standard_job_with_deployment(self, device: DeviceDataclass) -> JobDataclass:
         """Create the standard ProviderDataclass Object for the pilot and return it"""
         raise NotImplementedError()
 
@@ -124,9 +126,8 @@ class Pilot:
         try:
             return dict([(hex(k), v) for k, v in qubits_in_binary.items()])
         except Exception:
-            raise job_db_service.return_exception_and_update_job(
-                job_id, QunicornError("Could not convert decimal-results to hex")
-            )
+            exception: Exception = QunicornError("Could not convert decimal-results to hex")
+            raise job_db_service.return_exception_and_update_job(job_id, exception)
 
     @staticmethod
     def qubit_binary_to_hex(qubits_in_binary: dict, job_id: int) -> dict:
@@ -135,9 +136,8 @@ class Pilot:
         try:
             return dict([(hex(int(k, 2)), v) for k, v in qubits_in_binary.items()])
         except Exception:
-            raise job_db_service.return_exception_and_update_job(
-                job_id, QunicornError("Could not convert binary-results to hex")
-            )
+            exception: Exception = QunicornError("Could not convert binary-results to hex")
+            raise job_db_service.return_exception_and_update_job(job_id, exception)
 
     @staticmethod
     def calculate_probabilities(counts: dict) -> dict:
@@ -148,3 +148,30 @@ class Pilot:
         for key, value in counts.items():
             probabilities[key] = value / total_counts
         return probabilities
+
+    def create_default_job_with_circuit_and_device(self, device: DeviceDataclass, circuit: str) -> JobDataclass:
+        """
+        Method to create a default job for a pilot with one given circuit and device.
+        This method always takes the first supported Language of the pilot and assigns it to the program.
+        The Deployment and Job Name will be generated from the ProviderName and SupportedLanguage of the Pilot.
+        """
+
+        program = QuantumProgramDataclass(quantum_circuit=circuit, assembler_language=self.supported_languages[0])
+        name: str = program.assembler_language.name + "Deployment"
+        deployment = DeploymentDataclass(deployed_by=None, programs=[program], deployed_at=datetime.now(), name=name)
+
+        counts: dict = {"0x0": 2007, "0x3": 1993}
+        probs: dict = {"0x0": 0.50175, "0x3": 0.49825}
+        job_name = device.provider.name + "Job"
+        return JobDataclass(
+            executed_by=None,
+            executed_on=device,
+            deployment=deployment,
+            progress=0,
+            state=JobState.READY,
+            shots=4000,
+            type=JobType.RUNNER,
+            started_at=datetime.now(),
+            name=job_name,
+            results=[ResultDataclass(result_dict={"counts": counts, "probabilities": probs})],
+        )

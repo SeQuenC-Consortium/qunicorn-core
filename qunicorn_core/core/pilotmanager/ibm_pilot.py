@@ -13,8 +13,6 @@
 # limitations under the License.
 
 import os
-from datetime import datetime
-from typing import Optional
 
 import qiskit
 from qiskit.primitives import EstimatorResult, SamplerResult, Sampler as LocalSampler, Estimator as LocalEstimator
@@ -33,12 +31,10 @@ from qiskit_ibm_runtime import (
 from qunicorn_core.api.api_models import JobCoreDto, DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.db.database_services import job_db_service, device_db_service, provider_db_service
-from qunicorn_core.db.models.deployment import DeploymentDataclass
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.db.models.provider_assembler_language import ProviderAssemblerLanguageDataclass
-from qunicorn_core.db.models.quantum_program import QuantumProgramDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
@@ -164,16 +160,8 @@ class IBMPilot(Pilot):
     def __upload_ibm_program(self, job_core_dto: JobCoreDto):
         """EXPERIMENTAL"""
         """Upload and then run a quantum program on the QiskitRuntimeService"""
-        if not utils.is_experimental_feature_enabled():
-            raise job_db_service.return_exception_and_update_job(
-                job_core_dto.id,
-                QunicornError(
-                    "Running uploaded IBM Programs is experimental and was not fully tested. Set "
-                    "ENABLE_EXPERIMENTAL_FEATURES to True to enable this feature.",
-                    405,
-                ),
-            )
-        logging.warn("This function is experimental and could not be fully tested yet")
+
+        self.check_if_env_variable_true_for_experimental(job_core_dto)
 
         service = self.__get_runtime_service(job_core_dto)
         ibm_program_ids = []
@@ -181,44 +169,45 @@ class IBMPilot(Pilot):
             python_file_path = self.__get_file_path_to_resources(program.python_file_path)
             python_file_metadata_path = self.__get_file_path_to_resources(program.python_file_metadata)
             ibm_program_ids.append(service.upload_program(python_file_path, python_file_metadata_path))
+
         job_db_service.update_attribute(job_core_dto.id, JobType.IBM_RUNNER, JobDataclass.type)
-        job_db_service.update_attribute(job_core_dto.id, JobState.READY, JobDataclass.state)
-        ibm_results = [
-            ResultDataclass(result_dict={"ibm_job_id": ibm_program_ids[0]}, result_type=ResultType.UPLOAD_SUCCESSFUL)
-        ]
+        result_type: ResultType = ResultType.UPLOAD_SUCCESSFUL
+        ibm_results = [ResultDataclass(result_dict={"ibm_job_id": ibm_program_ids[0]}, result_type=result_type)]
         job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.READY)
 
     def __run_ibm_program(self, job_core_dto: JobCoreDto):
         """EXPERIMENTAL"""
         """Run a program previously uploaded to the IBM Backend"""
-        if not utils.is_experimental_feature_enabled():
-            raise job_db_service.return_exception_and_update_job(
-                job_core_dto.id,
-                QunicornError(
-                    "Running uploaded IBM Programs is experimental and was not fully tested. Set "
-                    "ENABLE_EXPERIMENTAL_FEATURES to True to enable this feature.",
-                    405,
-                ),
-            )
-        logging.warn("This function is experimental and could not be fully tested yet")
+        self.check_if_env_variable_true_for_experimental(job_core_dto)
 
         service = self.__get_runtime_service(job_core_dto)
-        ibm_results = []
         options_dict: dict = job_core_dto.ibm_file_options
         input_dict: dict = job_core_dto.ibm_file_inputs
+        ibm_job_id = job_core_dto.results[0].result_dict["ibm_job_id"]
 
         try:
-            ibm_job_id = job_core_dto.results[0].result_dict["ibm_job_id"]
             result = service.run(ibm_job_id, inputs=input_dict, options=options_dict).result()
-            ibm_results.extend(IBMPilot.__map_runner_results_to_dataclass(result, job_core_dto))
         except IBMRuntimeError as exception:
-            logging.info("Error when accessing IBM, 403 Client Error")
-            ibm_results.append(
-                ResultDataclass(result_dict={"value": "403 Error when accessing"}, result_type=ResultType.ERROR)
-            )
-            job_db_service.update_finished_job(job_core_dto.id, ibm_results, job_state=JobState.ERROR)
-            raise QunicornError(type(exception).__name__ + exception.message)
+            e = job_db_service.return_exception_and_update_job(job_core_dto.id, exception)
+            raise QunicornError(type(e).__name__, e.args)
+
+        ibm_results = IBMPilot.__map_runner_results_to_dataclass(result, job_core_dto)
         job_db_service.update_finished_job(job_core_dto.id, ibm_results)
+
+    @staticmethod
+    def check_if_env_variable_true_for_experimental(job_core_dto):
+        """Raise an error if the experimental env variable is not true and logs a warning"""
+
+        exception_str: str = (
+            "Running uploaded IBM Programs is experimental and was not fully tested. Set "
+            "ENABLE_EXPERIMENTAL_FEATURES to True to enable this feature."
+        )
+
+        if not utils.is_experimental_feature_enabled():
+            exception: Exception = QunicornError(exception_str, 405)
+            raise job_db_service.return_exception_and_update_job(job_core_dto.id, exception)
+
+        logging.warn("This function is experimental and could not be fully tested yet")
 
     @staticmethod
     def __get_runtime_service(job_core_dto) -> QiskitRuntimeService:
@@ -255,10 +244,9 @@ class IBMPilot(Pilot):
         for i in range(ibm_result.num_experiments):
             value: float = ibm_result.values[i]
             variance: float = ibm_result.metadata[i]["variance"]
-            circuit: str = job.deployment.programs[i].quantum_circuit
             result_dtos.append(
                 ResultDataclass(
-                    circuit=circuit,
+                    circuit=job.deployment.programs[i].quantum_circuit,
                     result_dict={"value": str(value), "variance": str(variance)},
                     result_type=ResultType.VALUE_AND_VARIANCE,
                     meta_data={"observer": f"SparsePauliOp-{observer}"},
@@ -270,12 +258,10 @@ class IBMPilot(Pilot):
     def _map_sampler_results_to_dataclass(ibm_result: SamplerResult, job_dto: JobCoreDto) -> list[ResultDataclass]:
         result_dtos: list[ResultDataclass] = []
         for i in range(ibm_result.num_experiments):
-            quasi_dist: dict = Pilot.qubits_decimal_to_hex(ibm_result.quasi_dists[i], job_dto.id)
-            circuit: str = job_dto.deployment.programs[i].quantum_circuit
             result_dtos.append(
                 ResultDataclass(
-                    circuit=circuit,
-                    result_dict=quasi_dist,
+                    circuit=job_dto.deployment.programs[i].quantum_circuit,
+                    result_dict=Pilot.qubits_decimal_to_hex(ibm_result.quasi_dists[i], job_dto.id),
                     result_type=ResultType.QUASI_DIST,
                 )
             )
@@ -287,43 +273,18 @@ class IBMPilot(Pilot):
         ]
         return ProviderDataclass(with_token=True, supported_languages=supported_languages, name=self.provider_name)
 
-    def get_standard_job_with_deployment(self, device: DeviceDataclass, user_id: Optional[str] = None) -> JobDataclass:
-        language: AssemblerLanguage = AssemblerLanguage.QASM2
-        programs: list[QuantumProgramDataclass] = [
-            QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm2_string(1), assembler_language=language),
-            QuantumProgramDataclass(quantum_circuit=utils.get_default_qasm2_string(2), assembler_language=language),
-        ]
-        deployment = DeploymentDataclass(
-            deployed_by=user_id,
-            programs=programs,
-            deployed_at=datetime.now(),
-            name="DeploymentIBMQasmName",
+    def get_standard_job_with_deployment(self, device: DeviceDataclass) -> JobDataclass:
+        circuit: str = (
+            "circuit = QuantumCircuit(2, 2);circuit.h(0); circuit.cx(0, 1);circuit.measure(0, 0);circuit.measure(1, 1)"
         )
-
-        return JobDataclass(
-            executed_by=user_id,
-            executed_on=device,
-            deployment=deployment,
-            progress=0,
-            state=JobState.READY,
-            shots=4000,
-            type=JobType.RUNNER,
-            started_at=datetime.now(),
-            name="IBMJob",
-            results=[
-                ResultDataclass(
-                    result_dict={
-                        "counts": {"0x0": 2007, "0x3": 1993},
-                        "probabilities": {"0x0": 0.50175, "0x3": 0.49825},
-                    }
-                )
-            ],
-        )
+        return self.create_default_job_with_circuit_and_device(device, circuit)
 
     def save_devices_from_provider(self, device_request):
         ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(device_request.token)
         all_devices = ibm_provider.backends()
         provider: ProviderDataclass = provider_db_service.get_provider_by_name(self.provider_name)
+
+        # First Safe all devices from the cloud service
         for ibm_device in all_devices:
             device: DeviceDataclass = DeviceDataclass(
                 name=ibm_device.name,
@@ -335,6 +296,7 @@ class IBMPilot(Pilot):
             )
             device_db_service.save_device_by_name(device)
 
+        # Then add also the local simulator
         device: DeviceDataclass = DeviceDataclass(
             name="aer_simulator",
             num_qubits=-1,
