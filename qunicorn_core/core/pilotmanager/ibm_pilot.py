@@ -221,7 +221,6 @@ class IBMPilot(Pilot):
     @staticmethod
     def __map_runner_results_to_dataclass(ibm_result: Result, job_dto: JobCoreDto) -> list[ResultDataclass]:
         result_dtos: list[ResultDataclass] = []
-
         for i in range(len(ibm_result.results)):
             counts: dict = ibm_result.results[i].data.counts
             probabilities: dict = Pilot.calculate_probabilities(counts)
