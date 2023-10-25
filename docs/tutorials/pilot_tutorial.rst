@@ -41,6 +41,7 @@ Change the transpile and preprocessing manager if necessary
    You should add a method to transpile your language to one already existing.
    And also add a method to transpile from one already existing to your language.
 
+
 Add some tests and documentation
 --------------------------------
 
@@ -53,4 +54,4 @@ Add some tests and documentation
 
 4. Write comments and documentation to your new implemented code, if there are some special architectural decisions you should also add them to the documentation.
 
-5. Checkout the tests from the `test_pilots_default_data.py` file to not create the same tests twice.
+5. Checkout the tests from the `test_pilots_default_data.py` file to avoid creating the same tests twice.

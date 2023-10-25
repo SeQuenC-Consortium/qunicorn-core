@@ -196,11 +196,12 @@ class IBMPilot(Pilot):
 
     @staticmethod
     def check_if_env_variable_true_for_experimental(job_core_dto):
+        """EXPERIMENTAL"""
         """Raise an error if the experimental env variable is not true and logs a warning"""
 
         exception_str: str = (
-            "Running uploaded IBM Programs is experimental and was not fully tested. Set "
-            "ENABLE_EXPERIMENTAL_FEATURES to True to enable this feature."
+            "Running uploaded IBM Programs is experimental and has not been fully tested yet."
+            "Set ENABLE_EXPERIMENTAL_FEATURES to True to enable this feature."
         )
 
         if not utils.is_experimental_feature_enabled():
@@ -283,7 +284,7 @@ class IBMPilot(Pilot):
         all_devices = ibm_provider.backends()
         provider: ProviderDataclass = provider_db_service.get_provider_by_name(self.provider_name)
 
-        # First Safe all devices from the cloud service
+        # First save all devices from the cloud service
         for ibm_device in all_devices:
             device: DeviceDataclass = DeviceDataclass(
                 name=ibm_device.name,
@@ -295,7 +296,7 @@ class IBMPilot(Pilot):
             )
             device_db_service.save_device_by_name(device)
 
-        # Then add also the local simulator
+        # Then add the local simulator
         device: DeviceDataclass = DeviceDataclass(
             name="aer_simulator",
             num_qubits=-1,

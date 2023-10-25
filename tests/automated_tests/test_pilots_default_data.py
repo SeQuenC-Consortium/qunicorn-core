@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""test in-request execution for aws"""
+"""Test in-request execution for aws"""
 
 from qunicorn_core.core.pilotmanager import pilot_manager
 from qunicorn_core.db.models.job import JobDataclass

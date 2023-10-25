@@ -61,7 +61,7 @@ Test if the current pilot already works
     .. image:: ../resources/images/tutorial_demo/get_result_api.png
         :width: 80%
 
-6. Execute the tests from the `test_pilots_default_data.py` file that tests the default data created by each pilot.
+6. Execute the tests from the `test_pilots_default_data.py` file which tests the default data created by each pilot.
 
 
 Change the transpile and preprocessing manager - if necessary
@@ -98,4 +98,4 @@ Add some tests and documentation
 
 4. Do not forget to add comments and documentation to your newly implemented code.
 
-5. Checkout the tests from the `test_pilots_default_data.py` file to not create the same tests twice.
+5. Checkout the tests from the `test_pilots_default_data.py` file to avoid creating the same tests twice.
