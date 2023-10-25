@@ -14,5 +14,10 @@
 
 """Module containing all automated tests."""
 
-from . import test_deployments, test_aws_job_execution, test_ibm_job_execution, test_ibm_sampler, \
-    test_pilots_default_data
+from . import (
+    test_deployments,
+    test_aws_job_execution,
+    test_ibm_job_execution,
+    test_ibm_sampler,
+    test_pilots_default_data,
+)

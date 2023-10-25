@@ -76,6 +76,8 @@ def load_db_function(app: Flask, if_not_exists=True):
     DB.session.add(create_default_qasm2_deployment())
     DB.session.add(create_default_qasm3_deployment())
     DB.session.commit()
+
+    # Save all default data from the pilots
     qunicorn_core.core.pilotmanager.pilot_manager.save_default_jobs_and_devices_from_provider()
     get_logger(app, DB_COMMAND_LOGGER).info("Test Data loaded.")
 

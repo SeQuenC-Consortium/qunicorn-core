@@ -26,6 +26,7 @@ Implement your pilot
 
 4. Check out the comments in the base_pilot.py file for more information about the methods and also find some examples in the aws_pilot or ibm_pilot file.
 
+
 Change the transpile and preprocessing manager if necessary
 -----------------------------------------------------------
 
@@ -52,3 +53,4 @@ Add some tests and documentation
 
 4. Write comments and documentation to your new implemented code, if there are some special architectural decisions you should also add them to the documentation.
 
+5. Checkout the tests from the `test_pilots_default_data.py` file to not create the same tests twice.
