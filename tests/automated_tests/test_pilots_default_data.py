@@ -16,11 +16,13 @@
 
 from qunicorn_core.core.pilotmanager import pilot_manager
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.db.models.provider import ProviderDataclass
 
 
-def test_pilots_default_data():
-    """Test for each pilot if the default data is correctly created"""
+def test_pilots_default_job_deployment():
+    """Test for each pilot if the default job and deployment is correctly created"""
     for pilot in pilot_manager.PILOTS:
+        # GIVEN: The pilot is set up correctly
         assert pilot.supported_languages is not None
         assert pilot.provider_name is not None
 
@@ -34,3 +36,19 @@ def test_pilots_default_data():
         assert len(job.deployment.programs) > 0
         assert job.deployment.programs[0].assembler_language == pilot.supported_languages[0]
         assert job.deployment.programs[0].quantum_circuit is not None
+
+
+def test_pilots_default_provider():
+    """Test for each pilot if the default provider is correctly created"""
+    for pilot in pilot_manager.PILOTS:
+        # GIVEN: The pilot is set up correctly
+        assert pilot.provider_name is not None
+
+        # WHEN: Getting the standard provider
+        provider: ProviderDataclass = pilot.get_standard_provider()
+
+        # THEN: The Provider is created correctly
+        assert provider is not None
+        assert len(provider.supported_languages) == len(pilot.supported_languages)
+        assert len(pilot.supported_languages) > 0 and len(provider.supported_languages) > 0
+        assert provider.name == pilot.provider_name
