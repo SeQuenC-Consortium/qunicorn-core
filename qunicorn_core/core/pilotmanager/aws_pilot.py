@@ -37,7 +37,6 @@ class AWSPilot(Pilot):
     """The AWS Pilot"""
 
     provider_name: ProviderName = ProviderName.AWS
-
     supported_languages: list[AssemblerLanguage] = [AssemblerLanguage.BRAKET, AssemblerLanguage.QASM3]
 
     def run(self, job_core_dto: JobCoreDto) -> list[ResultDataclass]:
@@ -47,7 +46,7 @@ class AWSPilot(Pilot):
                 job_core_dto.id, QunicornError("Device not found, device needs to be local for AWS")
             )
 
-        # Since QASM is stored as a String, it needs to be converted to a QASM Program before execution
+        # Since QASM is stored as a string, it needs to be converted to a QASM program before execution
         for index in range(len(job_core_dto.transpiled_circuits)):
             if type(job_core_dto.transpiled_circuits[index]) is str:
                 job_core_dto.transpiled_circuits[index] = Program(source=job_core_dto.transpiled_circuits[index])
@@ -59,7 +58,7 @@ class AWSPilot(Pilot):
         return AWSPilot.__map_aws_results_to_dataclass(quantum_tasks.results(), job_core_dto)
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
-        """Execute a job of a provider specific type on a backend using a Pilot"""
+        """Execute a job of a provider specific type on a backend using a pilot"""
         raise job_db_service.return_exception_and_update_job(
             job_core_dto.id, QunicornError("No valid Job Type specified")
         )
@@ -97,7 +96,7 @@ class AWSPilot(Pilot):
     def save_devices_from_provider(self, device_request):
         raise QunicornError("AWS Pilot cannot fetch Devices from AWS API, because there is no Cloud Access.")
 
-    def get_standard_provider(self):
+    def get_standard_provider(self) -> ProviderDataclass:
         return ProviderDataclass(
             with_token=False,
             supported_languages=[

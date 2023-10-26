@@ -123,7 +123,7 @@ def send_job_to_pilot():
     raise NotImplementedError
 
 
-def cancel_job_by_id(job_id, token, user_id: Optional[str] = None):
+def cancel_job_by_id(job_id, token, user_id: Optional[str] = None) -> SimpleJobDto:
     """cancel job execution"""
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
     abort_if_user_unauthorized(job.executed_by, user_id)

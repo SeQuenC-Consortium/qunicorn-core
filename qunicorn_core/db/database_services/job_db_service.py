@@ -85,7 +85,7 @@ def delete_jobs_by_deployment_id(deployment_id: int) -> list[JobDataclass]:
     return job_ids
 
 
-def return_exception_and_update_job(job_id: int, exception: Exception):
+def return_exception_and_update_job(job_id: int, exception: Exception) -> Exception:
     """Update job with id job_id in DB with error state and return the exception"""
     results = result_mapper.exception_to_error_results(exception)
     update_finished_job(job_id, results, JobState.ERROR)

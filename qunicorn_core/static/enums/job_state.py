@@ -21,10 +21,10 @@ class JobState(StrEnum):
     Values:
         READY: Job is ready to use
         RUNNING: Job is currently executing a quantum circuit
-        FINISHED: Job finished the executing
-        BLOCKED: Job is blocked, and cannot be used for other purposes
+        FINISHED: Job finished the execution
+        BLOCKED: Job is blocked and cannot be used for other purposes
         ERROR: When an error occurred while executing a quantum circuit
-        CANCELED: Job execution has been successfully canceled
+        CANCELED: Job execution has been successfully cancelled
     """
 
     READY = "READY"

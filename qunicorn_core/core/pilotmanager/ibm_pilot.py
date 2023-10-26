@@ -16,7 +16,7 @@ import os
 
 import qiskit
 from qiskit.primitives import EstimatorResult, SamplerResult, Sampler as LocalSampler, Estimator as LocalEstimator
-from qiskit.providers import QiskitBackendNotFoundError
+from qiskit.providers import QiskitBackendNotFoundError, Backend
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.result import Result
 from qiskit_ibm_provider import IBMProvider
@@ -49,7 +49,6 @@ class IBMPilot(Pilot):
     """The IBM Pilot"""
 
     provider_name: ProviderName = ProviderName.IBM
-
     supported_languages: list[AssemblerLanguage] = [AssemblerLanguage.QISKIT]
 
     def execute_provider_specific(self, job_core_dto: JobCoreDto):
@@ -96,7 +95,7 @@ class IBMPilot(Pilot):
         job_db_service.update_attribute(job_dto.id, JobState.CANCELED, JobDataclass.state)
         logging.info(f"Cancel job with id {job_dto.id} on {job_dto.executed_on.provider.name} successful.")
 
-    def __sample(self, job_dto: JobCoreDto):
+    def __sample(self, job_dto: JobCoreDto) -> list[ResultDataclass]:
         """Uses the Sampler to execute a job on an IBM backend using the IBM Pilot"""
         if job_dto.executed_on.is_local:
             sampler = LocalSampler()
@@ -117,13 +116,13 @@ class IBMPilot(Pilot):
         ibm_result: EstimatorResult = job_from_ibm.result()
         return IBMPilot._map_estimator_results_to_dataclass(ibm_result, job_dto, "IY")
 
-    def __get_qiskit_runtime_backend(self, job_dto):
+    def __get_qiskit_runtime_backend(self, job_dto) -> Backend:
         """Instantiate all important configurations and updates the job_state"""
 
         self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
         return QiskitRuntimeService().get_backend(job_dto.executed_on.name)
 
-    def __get_qiskit_job_from_qiskit_runtime(self, job_dto: JobCoreDto):
+    def __get_qiskit_job_from_qiskit_runtime(self, job_dto: JobCoreDto) -> RuntimeJob:
         """Returns the job of the provider specific ID created on the given account"""
 
         self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
@@ -267,7 +266,7 @@ class IBMPilot(Pilot):
             )
         return result_dtos
 
-    def get_standard_provider(self):
+    def get_standard_provider(self) -> ProviderDataclass:
         supported_languages = [
             ProviderAssemblerLanguageDataclass(supported_language=language) for language in self.supported_languages
         ]

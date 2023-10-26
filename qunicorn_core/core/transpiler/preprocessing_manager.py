@@ -32,7 +32,7 @@ class PreProcessingManager:
         self._language_nodes = dict()
 
     def register(self, language: AssemblerLanguage):
-        def decorator(transpile_method: PreProcessor):
+        def decorator(transpile_method: PreProcessor) -> PreProcessor:
             self._preprocessing_methods[language] = transpile_method
             return transpile_method
 
