@@ -19,7 +19,7 @@ from qunicorn_core.core.mapper.general_mapper import map_from_to
 from qunicorn_core.db.models.deployment import DeploymentDataclass
 
 
-def dto_to_dataclass(deployment: DeploymentDto) -> DeploymentDataclass:
+def dto_to_dataclass(deployment: DeploymentDto) -> DeploymentDataclass | None:
     return map_from_to(
         from_object=deployment,
         to_type=DeploymentDataclass,
@@ -30,7 +30,7 @@ def dto_to_dataclass(deployment: DeploymentDto) -> DeploymentDataclass:
     )
 
 
-def request_to_dataclass(deployment: DeploymentRequestDto) -> DeploymentDataclass:
+def request_to_dataclass(deployment: DeploymentRequestDto) -> DeploymentDataclass | None:
     return map_from_to(
         from_object=deployment,
         to_type=DeploymentDataclass,
@@ -41,7 +41,7 @@ def request_to_dataclass(deployment: DeploymentRequestDto) -> DeploymentDataclas
     )
 
 
-def dataclass_to_dto(deployment: DeploymentDataclass) -> DeploymentDto:
+def dataclass_to_dto(deployment: DeploymentDataclass) -> DeploymentDto | None:
     return map_from_to(
         from_object=deployment,
         to_type=DeploymentDto,

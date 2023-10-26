@@ -18,8 +18,7 @@ from qunicorn_core.db.models.provider_assembler_language import ProviderAssemble
 
 
 def dto_to_dataclass(
-    provider_assembler_language_dto: ProviderAssemblerLanguageDto,
-) -> ProviderAssemblerLanguageDataclass:
+    provider_assembler_language_dto: ProviderAssemblerLanguageDto) -> ProviderAssemblerLanguageDataclass:
     return map_from_to(
         provider_assembler_language_dto,
         ProviderAssemblerLanguageDataclass,

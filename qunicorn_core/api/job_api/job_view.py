@@ -85,7 +85,7 @@ class JobRunView(MethodView):
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
     @JOBMANAGER_API.require_jwt(optional=True)
     def post(self, body, job_id: int, jwt_subject: Optional[str]):
-        """Run job on IBM that was previously Uploaded."""
+        """Run job on IBM that was previously uploaded."""
         logging.info("Request: run job")
         job_execution_dto: JobExecutePythonFileDto = JobExecutePythonFileDto(**body)
         return jsonify(job_service.run_job_by_id(int(job_id), job_execution_dto, user_id=jwt_subject)), 200
