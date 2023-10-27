@@ -28,7 +28,14 @@ from .quantum_program_dtos import (
 )
 from ..flask_api_utils import MaBaseSchema
 
-__all__ = ["DeploymentDtoSchema", "DeploymentRequestDtoSchema", "DeploymentDto", "DeploymentRequestDto"]
+__all__ = [
+    "DeploymentDtoSchema",
+    "DeploymentRequestDtoSchema",
+    "DeploymentDto",
+    "DeploymentRequestDto",
+    "DeploymentResponseDto",
+    "DeploymentResponseDtoSchema",
+]
 
 
 @dataclass
@@ -69,3 +76,16 @@ class DeploymentRequestDtoSchema(MaBaseSchema):
         required=True,
         metadata={"example": "DeploymentName", "description": "an optional name for the deployment_api."},
     )
+
+
+@dataclass
+class DeploymentResponseDto:
+    id: int
+    programs: str
+    name: str
+
+
+class DeploymentResponseDtoSchema(MaBaseSchema):
+    id = ma.fields.Integer(dump_only=True)
+    programs = ma.fields.String(dump_only=True)
+    name = ma.fields.String(dump_only=True)

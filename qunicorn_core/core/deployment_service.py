@@ -15,6 +15,7 @@ from datetime import datetime
 from typing import Optional
 
 from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto
+from qunicorn_core.api.api_models.deployment_dtos import DeploymentResponseDto
 from qunicorn_core.api.jwt import abort_if_user_unauthorized
 from qunicorn_core.core.mapper import deployment_mapper, quantum_program_mapper
 from qunicorn_core.db.database_services import deployment_db_service, db_service, job_db_service
@@ -29,6 +30,11 @@ def get_all_deployments(user_id: Optional[str] = None) -> list[DeploymentDto]:
         if deployment.deployed_by is None or deployment.deployed_by == user_id:
             deployment_list.append(deployment_mapper.dataclass_to_dto(deployment))
     return deployment_list
+
+
+def get_all_deployment_responses(user_id: Optional[str] = None) -> list[DeploymentResponseDto]:
+    """Gets all deployments from a user as responses to clearly arrange them in the frontend"""
+    return [deployment_mapper.dto_to_response(deployment) for deployment in get_all_deployments(user_id)]
 
 
 def get_deployment_by_id(depl_id: int, user_id: Optional[str] = None) -> DeploymentDto:
@@ -47,8 +53,7 @@ def update_deployment(
         abort_if_user_unauthorized(db_deployment.deployed_by, user_id)
         db_deployment.deployed_at = datetime.now()
         db_deployment.name = deployment_dto.name
-        programs = [quantum_program_mapper.request_to_dataclass(qc) for qc in deployment_dto.programs]
-        db_deployment.programs = programs
+        db_deployment.programs = [quantum_program_mapper.request_to_dataclass(qc) for qc in deployment_dto.programs]
         return db_service.save_database_object(db_deployment)
     except AttributeError:
         db_service.get_session().rollback()
@@ -65,9 +70,9 @@ def delete_deployment(id: int, user_id: Optional[str] = None) -> DeploymentDto:
     return db_deployment
 
 
-def create_deployment(deployment_dto: DeploymentRequestDto, user_id: Optional[str] = None) -> DeploymentDto:
+def create_deployment(deployment_dto: DeploymentRequestDto, user_id: Optional[str] = None) -> DeploymentResponseDto:
     """Create a deployment and save it in the database"""
     deployment: DeploymentDataclass = deployment_mapper.request_to_dataclass(deployment_dto)
     deployment.deployed_by = user_id
     deployment = deployment_db_service.create(deployment)
-    return deployment_mapper.dataclass_to_dto(deployment)
+    return deployment_mapper.dataclass_to_response(deployment)

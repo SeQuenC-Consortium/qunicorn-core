@@ -14,6 +14,7 @@
 from datetime import datetime
 
 from qunicorn_core.api.api_models import DeploymentDto, DeploymentRequestDto
+from qunicorn_core.api.api_models.deployment_dtos import DeploymentResponseDto
 from qunicorn_core.core.mapper import quantum_program_mapper
 from qunicorn_core.core.mapper.general_mapper import map_from_to
 from qunicorn_core.db.models.deployment import DeploymentDataclass
@@ -47,5 +48,27 @@ def dataclass_to_dto(deployment: DeploymentDataclass) -> DeploymentDto:
         to_type=DeploymentDto,
         fields_mapping={
             "programs": [quantum_program_mapper.dataclass_to_dto(qc) for qc in deployment.programs],
+        },
+    )
+
+
+def dto_to_response(deployment: DeploymentDto) -> DeploymentResponseDto:
+    joined_programs = ",".join([qc.assembler_language for qc in deployment.programs])
+    return map_from_to(
+        from_object=deployment,
+        to_type=DeploymentResponseDto,
+        fields_mapping={
+            "programs": "[" + joined_programs + "]",
+        },
+    )
+
+
+def dataclass_to_response(deployment: DeploymentDataclass) -> DeploymentResponseDto:
+    joined_programs = ",".join([qc.assembler_language for qc in deployment.programs])
+    return map_from_to(
+        from_object=deployment,
+        to_type=DeploymentResponseDto,
+        fields_mapping={
+            "programs": "[" + joined_programs + "]",
         },
     )

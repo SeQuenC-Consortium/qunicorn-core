@@ -23,7 +23,12 @@ from flask.views import MethodView
 
 from .root import DEPLOYMENT_API
 from ..api_models import JobResponseDtoSchema
-from ..api_models.deployment_dtos import DeploymentDtoSchema, DeploymentRequestDtoSchema, DeploymentRequestDto
+from ..api_models.deployment_dtos import (
+    DeploymentDtoSchema,
+    DeploymentRequestDtoSchema,
+    DeploymentRequestDto,
+    DeploymentResponseDtoSchema,
+)
 from ...core import deployment_service, job_service
 from ...util import logging
 
@@ -32,15 +37,15 @@ from ...util import logging
 class DeploymentIDView(MethodView):
     """Deployments endpoint for collection of all deployed jobs."""
 
-    @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema(many=True))
+    @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentResponseDtoSchema(many=True))
     @DEPLOYMENT_API.require_jwt(optional=True)
     def get(self, jwt_subject: Optional[str]):
         """Get the list of deployments."""
         logging.info("Request: get all deployments")
-        return deployment_service.get_all_deployments(user_id=jwt_subject)
+        return deployment_service.get_all_deployment_responses(user_id=jwt_subject)
 
     @DEPLOYMENT_API.arguments(DeploymentRequestDtoSchema(), location="json")
-    @DEPLOYMENT_API.response(HTTPStatus.CREATED, DeploymentDtoSchema())
+    @DEPLOYMENT_API.response(HTTPStatus.CREATED, DeploymentResponseDtoSchema())
     @DEPLOYMENT_API.require_jwt(optional=True)
     def post(self, body, jwt_subject: Optional[str]):
         """Create/Deploy new Job-definition."""
