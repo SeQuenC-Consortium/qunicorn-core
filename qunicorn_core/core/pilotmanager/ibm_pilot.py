@@ -73,7 +73,7 @@ class IBMPilot(Pilot):
         """Execute a job local using aer simulator or a real backend"""
 
         if job_dto.executed_on.is_local:
-            backend = qiskit_aer.Aer.get_backend("qasm_simulator")
+            backend = qiskit_aer.Aer.get_backend("aer_simulator")
         else:
             provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
             backend = provider.get_backend(job_dto.executed_on.name)
