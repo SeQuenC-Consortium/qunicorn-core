@@ -133,7 +133,7 @@ def cancel_job_by_id(job_id, token, user_id: Optional[str] = None) -> SimpleJobD
     return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.CANCELED)
 
 
-def get_jobs_by_deployment_id(deployment_id, user_id: Optional[str]) -> list[JobResponseDto]:
+def get_jobs_by_deployment_id(deployment_id, user_id: Optional[str] = None) -> list[JobResponseDto]:
     """get all jobs with the id deployment_id"""
     jobs_by_deployment_id = job_db_service.get_jobs_by_deployment_id(deployment_id)
     for job in jobs_by_deployment_id:
