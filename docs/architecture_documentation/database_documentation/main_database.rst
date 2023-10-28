@@ -3,7 +3,7 @@ Database Documentation
 
 Domain model
 ----------------------
-.. image:: ../resources/images/qunicorn_domain_model.png
+.. image:: ../../resources/images/qunicorn_domain_model.png
   :width: 700
   :alt: Alternative text
 

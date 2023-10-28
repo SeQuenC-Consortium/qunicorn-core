@@ -5,12 +5,13 @@ Vision
 -------
 
 The following two diagrams represent the vision which was set out for qunicorn.
-The quantum unification layer is the middleware between the user / service orchestration and the Infrastructure providers.
-These contain providers like AWS and IBM.
+
 
 Context
 ^^^^^^^^
 
+The quantum unification layer is the middleware between the user / service orchestration and the Infrastructure providers.
+These contain providers like AWS and IBM.
 The Context describes the surrounding components and APIs in which qunicorn is embedded.
 
 .. image:: ../resources/images/highLevelComponents.png
@@ -37,7 +38,7 @@ This component diagram visualizes the different components and their interaction
 The API implements different Endpoints for Jobs, Deployments, Devices and Providers.
 More details on the API can be found here: :doc:`API Documentation <./api_documentation/main_apidocumentation>`.
 
-Details on the Pilot Manager and Transpiler can be found in the :doc:`Pilot and Transpiler Documentation <../pilot_documentation/main_pilot_documentation`.
+Details on the Pilot Manager and Transpiler can be found in the :doc:`Pilot and Transpiler Documentation <../pilot_documentation/main_pilot_documentation>`.
 
 .. image:: ../resources/images/qunicorn_component_interaction.png
   :width: 800
@@ -54,9 +55,7 @@ These are used as a data source for the different components of qunicorn.
   :alt: Alternative text
 
 For more information you can refer to the database documention, which can be found here:
-:doc:`Database Documentation <./database_documentation/main_database_documentation>`.
-
-
+:doc:`Database Documentation </database_documentation/main_database>`.
 
 
 Sequence Diagram for Creating a Deployment
