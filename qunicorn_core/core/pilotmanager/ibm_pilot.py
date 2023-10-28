@@ -15,6 +15,7 @@
 import os
 
 import qiskit
+import qiskit_aer
 from qiskit.primitives import EstimatorResult, SamplerResult, Sampler as LocalSampler, Estimator as LocalEstimator
 from qiskit.providers import QiskitBackendNotFoundError
 from qiskit.quantum_info import SparsePauliOp
@@ -72,7 +73,7 @@ class IBMPilot(Pilot):
         """Execute a job local using aer simulator or a real backend"""
 
         if job_dto.executed_on.is_local:
-            backend = qiskit.Aer.get_backend("qasm_simulator")
+            backend = qiskit_aer.Aer.get_backend("qasm_simulator")
         else:
             provider = self.__get_provider_login_and_update_job(job_dto.token, job_dto.id)
             backend = provider.get_backend(job_dto.executed_on.name)

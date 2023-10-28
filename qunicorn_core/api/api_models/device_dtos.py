@@ -58,8 +58,8 @@ class DeviceDtoSchema(MaBaseSchema):
 
 
 class DeviceRequestDtoSchema(MaBaseSchema):
-    provider_name = ma.fields.Enum(required=True, example=ProviderName.IBM, enum=ProviderName)
-    token = ma.fields.String(required=False, example="")
+    provider_name = ma.fields.Enum(required=True, metadata={"example": ProviderName.IBM}, enum=ProviderName)
+    token = ma.fields.String(required=False, metadata={"example": ""})
 
 
 @dataclass
