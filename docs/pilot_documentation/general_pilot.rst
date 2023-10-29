@@ -18,6 +18,8 @@ It also implements some general logic used by all pilots.
 This ensures a consistent interface for all pilots and allows for easy extension of the pilot framework.
 For more information on how to create a new Pilot, refer to this Tutorial:
 
+Supported/Tested Gates on IBM and AWS: X, Y, H, CX, CXX, S, T
+
 :doc:`How to create a new pilot <../tutorials/pilot_tutorial>`
 
 Providers

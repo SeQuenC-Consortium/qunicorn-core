@@ -33,7 +33,10 @@ def test_multiple_gates_ibm():
 
 
 def create_and_test_multiple_gates_deployment(provider_name: ProviderName):
-    """Tests the create and run job method for synchronous execution of an estimator"""
+    """
+    Tests the create and run job method for synchronous execution of an estimator
+    Tested Gates: X, Y, H, CX, CXX, S, T
+    """
     # GIVEN: Database Setup & job_request_dto created
     app = set_up_env()
     job_request_dto: JobRequestDto = test_utils.get_test_job(provider_name)
