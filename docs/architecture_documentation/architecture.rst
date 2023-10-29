@@ -40,6 +40,8 @@ More details on the API can be found here: :doc:`API Documentation <./api_docume
 
 Details on the Pilot Manager and Transpiler can be found in the :doc:`Pilot and Transpiler Documentation <../pilot_documentation/main_pilot_documentation>`.
 
+Details on the Database can be found in the :doc:`Database Documentation <./database_documentation/main_database>`.
+
 .. image:: ../resources/images/qunicorn_component_interaction.png
   :width: 800
   :alt: Alternative text
@@ -55,7 +57,7 @@ These are used as a data source for the different components of qunicorn.
   :alt: Alternative text
 
 For more information you can refer to the database documention, which can be found here:
-:doc:`Database Documentation </database_documentation/main_database>`.
+:doc:`Database Documentation <./database_documentation/main_database>`.
 
 
 Sequence Diagram for Creating a Deployment

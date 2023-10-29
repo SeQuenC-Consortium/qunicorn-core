@@ -1,0 +1,81 @@
+<mxfile host="app.diagrams.net" modified="2023-10-29T13:56:34.294Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36" etag="6jIMWc3C-c_ACK9lfJc7" version="22.0.8" type="device">
+  <diagram id="woZmq--j6TU2j0kvm82t" name="Seite-1">
+    <mxGraphModel dx="945" dy="82" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="t27paKJEgx_SuJI81twm-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V3UwspmhFO0YC6Pmkuhm-42" target="V3UwspmhFO0YC6Pmkuhm-54" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V3UwspmhFO0YC6Pmkuhm-42" value="&amp;nbsp; &lt;b&gt;Qunicorn&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=default;verticalAlign=top;align=left;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="-610" y="230" width="627.14" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="V3UwspmhFO0YC6Pmkuhm-54" value="&lt;font size=&quot;1&quot;&gt;&lt;b&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;&amp;nbsp; QuantumService Provider&lt;br&gt;&lt;/font&gt;&lt;/b&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;verticalAlign=top;align=left;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="-610" y="342" width="630" height="73" as="geometry" />
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-5" value="Circuit Transpilation" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-577" y="254" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-6" value="Job Queuing" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-427" y="254" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="t27paKJEgx_SuJI81twm-8" target="t27paKJEgx_SuJI81twm-11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-8" value="Deployment" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-610" y="190" width="80" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-9" value="Persist Jobs &amp;amp; Deployment" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-277" y="254" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-10" value="Authentication with User Management" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-127" y="254" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-11" value="Job" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-510" y="190" width="70" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-12" value="IBM" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-577" y="372" width="137" height="33" as="geometry" />
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.099;exitY=0.985;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-569.635" y="171.04000000000002" as="sourcePoint" />
+            <mxPoint x="-571" y="190" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="-571" y="171" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-14" value="&lt;b&gt;&amp;nbsp; User&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" parent="1" vertex="1">
+          <mxGeometry x="-610" y="108" width="135" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-7" value="Quantum Program" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-602.5" y="142" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.396;entryY=-0.008;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="t27paKJEgx_SuJI81twm-8" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-568.7925599999999" y="229.24" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="t27paKJEgx_SuJI81twm-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.885;exitY=1.007;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-492.93500000000006" y="172.60799999999998" as="sourcePoint" />
+            <mxPoint x="-493" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NI8GxOVh--Mk-tzUHl7c-1" value="IBM" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-363.5" y="372" width="137" height="33" as="geometry" />
+        </mxCell>
+        <mxCell id="NI8GxOVh--Mk-tzUHl7c-2" value="IBM" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-150" y="372" width="137" height="33" as="geometry" />
+        </mxCell>
+        <mxCell id="NI8GxOVh--Mk-tzUHl7c-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.396;entryY=-0.008;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-472" y="210" as="sourcePoint" />
+            <mxPoint x="-471.9925599999999" y="229" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
