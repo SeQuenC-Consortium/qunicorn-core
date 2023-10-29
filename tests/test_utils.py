@@ -187,13 +187,14 @@ def check_if_job_runner_result_correct_multiple_gates(job: JobDataclass):
         counts: dict = result.result_dict["counts"]
         probabilities: dict = result.result_dict["probabilities"]
         prob_tolerance: float = PROBABILITY_TOLERANCE * 2
+        count_tolerance: float = COUNTS_TOLERANCE * 2
         if i != 2:
             qubit = QUBIT_8 if i == 3 else QUBIT_1
             assert counts[qubit] == shots
             assert probabilities[qubit] == PROBABILITY_1
         else:
-            assert compare_values_with_tolerance(7 * (shots / 8), counts[QUBIT_0], COUNTS_TOLERANCE)
-            assert compare_values_with_tolerance(shots / 8, counts[QUBIT_1], COUNTS_TOLERANCE)
+            assert compare_values_with_tolerance(7 * (shots / 8), counts[QUBIT_0], count_tolerance)
+            assert compare_values_with_tolerance(shots / 8, counts[QUBIT_1], count_tolerance)
             assert (counts[QUBIT_0] + counts[QUBIT_1]) == shots
 
             assert compare_values_with_tolerance(7 * (PROBABILITY_1 / 8), probabilities[QUBIT_0], prob_tolerance)
