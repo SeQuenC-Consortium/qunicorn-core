@@ -187,7 +187,7 @@ def check_if_job_runner_result_correct_multiple_gates(job: JobDataclass):
         counts: dict = result.result_dict["counts"]
         probabilities: dict = result.result_dict["probabilities"]
         if i != 2:
-            qubit = QUBIT_1 if i == 0 or i == 1 else QUBIT_8
+            qubit = QUBIT_8 if i == 3 else QUBIT_1
             assert counts[qubit] == shots
             assert probabilities[qubit] == PROBABILITY_1
         else:
