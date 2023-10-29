@@ -53,7 +53,7 @@ def dataclass_to_dto(deployment: DeploymentDataclass) -> DeploymentDto:
 
 
 def dto_to_response(deployment: DeploymentDto) -> DeploymentResponseDto:
-    joined_programs = ",".join([qc.assembler_language for qc in deployment.programs])
+    joined_programs = ", ".join([qc.assembler_language + "-Program" for qc in deployment.programs])
     return map_from_to(
         from_object=deployment,
         to_type=DeploymentResponseDto,
@@ -64,7 +64,7 @@ def dto_to_response(deployment: DeploymentDto) -> DeploymentResponseDto:
 
 
 def dataclass_to_response(deployment: DeploymentDataclass) -> DeploymentResponseDto:
-    joined_programs = ",".join([qc.assembler_language for qc in deployment.programs])
+    joined_programs = ",  ".join([qc.assembler_language + "-Program" for qc in deployment.programs])
     return map_from_to(
         from_object=deployment,
         to_type=DeploymentResponseDto,
