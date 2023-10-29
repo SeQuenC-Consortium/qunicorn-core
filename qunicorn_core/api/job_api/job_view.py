@@ -45,7 +45,7 @@ class JobIDView(MethodView):
     @JOBMANAGER_API.require_jwt(optional=True)
     def get(self, jwt_subject: Optional[str]):
         """Get all created jobs."""
-
+        logging.info("Request: get all created jobs")
         return jsonify(job_service.get_all_jobs(user_id=jwt_subject))
 
     @JOBMANAGER_API.arguments(JobRequestDtoSchema(), location="json")
@@ -53,6 +53,7 @@ class JobIDView(MethodView):
     @JOBMANAGER_API.require_jwt(optional=True)
     def post(self, body, jwt_subject: Optional[str]):
         """Create/Register and run new job."""
+        logging.info("Request: create and run new job")
         job_dto: JobRequestDto = JobRequestDto(**body)
         job_response: SimpleJobDto = job_service.create_and_run_job(job_dto, user_id=jwt_subject)
         return jsonify(job_response)
@@ -66,6 +67,7 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.require_jwt(optional=True)
     def get(self, job_id: str, jwt_subject: Optional[str]):
         """Get the details/results of a job."""
+        logging.info(f"Request: get results of job with id: {job_id}")
         job_response_dto: JobResponseDto = job_service.get_job_by_id(int(job_id))
         abort_if_user_unauthorized(job_response_dto.executed_by, jwt_subject)
         return jsonify(job_response_dto), 200
@@ -74,6 +76,7 @@ class JobDetailView(MethodView):
     @JOBMANAGER_API.require_jwt(optional=True)
     def delete(self, job_id: str, jwt_subject: Optional[str]):
         """Delete job data via id and return the deleted job."""
+        logging.info(f"Request: delete job with id: {job_id}")
         return job_service.delete_job_data_by_id(job_id, user_id=jwt_subject)
 
 
@@ -86,7 +89,7 @@ class JobRunView(MethodView):
     @JOBMANAGER_API.require_jwt(optional=True)
     def post(self, body, job_id: int, jwt_subject: Optional[str]):
         """Run job on IBM that was previously uploaded."""
-        logging.info("Request: run job")
+        logging.info(f"Request: run job with id: {job_id}")
         job_execution_dto: JobExecutePythonFileDto = JobExecutePythonFileDto(**body)
         return jsonify(job_service.run_job_by_id(int(job_id), job_execution_dto, user_id=jwt_subject)), 200
 
@@ -100,7 +103,7 @@ class JobReRunView(MethodView):
     @JOBMANAGER_API.require_jwt(optional=True)
     def post(self, body, job_id: int, jwt_subject: Optional[str]):
         """Create a new job on basis of an existing job and execute it."""
-        logging.info("Request: re run job")
+        logging.info(f"Request: re run job with id: {job_id}")
         return jsonify(job_service.re_run_job_by_id(job_id, body["token"], user_id=jwt_subject))
 
 
@@ -113,5 +116,5 @@ class JobCancelView(MethodView):
     @JOBMANAGER_API.require_jwt(optional=True)
     def post(self, body, job_id: str, jwt_subject: Optional[str]):
         """Cancel a job execution via id."""
-        logging.info("Request: cancel job")
+        logging.info(f"Request: cancel job with id: {job_id}")
         return jsonify(job_service.cancel_job_by_id(job_id, body["token"], user_id=jwt_subject)), 200

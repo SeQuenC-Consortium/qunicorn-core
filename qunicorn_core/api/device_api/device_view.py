@@ -28,6 +28,7 @@ from ..api_models.device_dtos import (
     SimpleDeviceDtoSchema,
 )
 from ...core import device_service
+from ...util import logging
 
 
 @DEVICES_API.route("/")
@@ -38,12 +39,14 @@ class DeviceView(MethodView):
     @DEVICES_API.response(HTTPStatus.OK, RootSchema())
     def put(self, device_request_data):
         """Update the devices by retrieving data from the provider and returning the updated devices."""
+        logging.info("Request: update the devices")
         device_request: DeviceRequestDto = DeviceRequestDto(**device_request_data)
         return device_service.update_devices(device_request)
 
     @DEVICES_API.response(HTTPStatus.OK, SimpleDeviceDtoSchema(many=True))
     def get(self):
         """Get all devices from the database, for more details get the device by id."""
+        logging.info("Request: get all devices that are in the database")
         return device_service.get_all_devices()
 
 
@@ -54,7 +57,7 @@ class DeviceIdView(MethodView):
     @DEVICES_API.response(HTTPStatus.OK, DeviceDtoSchema())
     def get(self, device_id):
         """Get information about a specific device."""
-
+        logging.info(f"Request: get information about device with id:{device_id}")
         return device_service.get_device_by_id(device_id)
 
 
@@ -66,6 +69,7 @@ class DevicesStatusStatus(MethodView):
     @DEVICES_API.response(HTTPStatus.OK)
     def post(self, device_request_data, device_id):
         """To check if a specific device is available."""
+        logging.info(f"Request: get availability information of the device with id:{device_id}")
         device_request: DeviceRequestDto = DeviceRequestDto(**device_request_data)
         return device_service.check_if_device_available(device_id, device_request.token)
 
@@ -78,7 +82,7 @@ class DevicesCalibrationView(MethodView):
     @DEVICES_API.response(HTTPStatus.OK)
     def post(self, device_request_data, device_id):
         """Get configuration data for a specific device in a uniform way."""
-
+        logging.info(f"Request: get configuration data for device with id:{device_id}")
         device_request: DeviceRequestDto = DeviceRequestDto(**device_request_data)
         device = device_service.get_device_data_from_provider(device_id, device_request.token)
 
