@@ -1,4 +1,4 @@
-Authentication in Qunicorn
+Authentication
 =========================================
 Authentication is based on OAuth2. The docker-compose contains a Keycloak service for handling the user management.
 The realm already contains the client configuration for qunicorn.

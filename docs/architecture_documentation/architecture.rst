@@ -18,7 +18,7 @@ The Context describes the surrounding components and APIs in which qunicorn is e
   :width: 700
   :alt: High Level Components
 
-The general Architecture
+Architecture
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The general architecture described here visualizes the different planes and components of qunicorn.
@@ -68,7 +68,7 @@ Sequence Diagram for Creating a Deployment
   :alt: https://sequencediagram.org/index.html?presentationMode=readOnly#initialData=C4S2BsFMAIGECdIENgwCKQA7gPYE8BbSAO2ACgzMl5QBjEK06AVQGdJ5Lq6GkmNs+IkwCCABQCSXGiHqNg0AbkIkFAZQ4A3WZDIATFEgBGSdtDXAc8JAHNdZNhwC0APiVDV0cRIBcCZKjQxJAA7opYysLk7iqikq4xUeZaOj7sxHrQlmTEOIE4mhzhgrHqKbSQfogo6BEepGSJnhrw2hWuFla2lWpIhcWRqo11pcmtOgA8Tk6d1nY+IrAA0sMlSd5TTk1MLW2Vi0vQIWAAFgP1ChJoDuzwm9sK3gvLR6fno1cUX0A
 
 This sequence diagram represents the creation of a deployment. For this process the deployment API is used.
-The Request is send to the Deployment Service, where a deployment is created and stored in the database.
+The Request is sent to the Deployment Service, where a deployment is created and stored in the database.
 
 Sequence Diagram for Creating a Job from a Deployment
 ------------------------------------------------------
