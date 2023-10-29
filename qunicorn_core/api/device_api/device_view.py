@@ -37,7 +37,7 @@ class DeviceView(MethodView):
     @DEVICES_API.arguments(DeviceRequestDtoSchema(), location="json")
     @DEVICES_API.response(HTTPStatus.OK, RootSchema())
     def put(self, device_request_data):
-        """Update the devices by retrieving data from the provider and returning an updated device list."""
+        """Update the devices by retrieving data from the provider and returning the updated devices."""
         device_request: DeviceRequestDto = DeviceRequestDto(**device_request_data)
         return device_service.update_devices(device_request)
 
@@ -49,7 +49,7 @@ class DeviceView(MethodView):
 
 @DEVICES_API.route("/<string:device_id>/")
 class DeviceIdView(MethodView):
-    """Devices Endpoint to get properties of a specific device."""
+    """Devices endpoint to get properties of a specific device."""
 
     @DEVICES_API.response(HTTPStatus.OK, DeviceDtoSchema())
     def get(self, device_id):
@@ -60,7 +60,7 @@ class DeviceIdView(MethodView):
 
 @DEVICES_API.route("/<string:device_id>/status")
 class DevicesStatusStatus(MethodView):
-    """Devices Endpoint to get properties of a specific device."""
+    """Devices endpoint to get properties of a specific device."""
 
     @DEVICES_API.arguments(DeviceRequestDtoSchema(), location="json")
     @DEVICES_API.response(HTTPStatus.OK)
@@ -72,7 +72,7 @@ class DevicesStatusStatus(MethodView):
 
 @DEVICES_API.route("/<string:device_id>/calibration")
 class DevicesCalibrationView(MethodView):
-    """Devices Endpoint to get properties of a specific device."""
+    """Devices endpoint to get properties of a specific device."""
 
     @DEVICES_API.arguments(DeviceRequestDtoSchema(), location="json")
     @DEVICES_API.response(HTTPStatus.OK)

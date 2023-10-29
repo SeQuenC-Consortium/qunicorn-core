@@ -24,7 +24,7 @@ import qrisp.circuit
 from braket.circuits import Circuit
 from braket.circuits.serialization import IRType
 from braket.ir.openqasm import Program as OpenQASMProgram
-from pyquil import get_qc
+from pyquil import get_qc, Program
 from qrisp.interface.circuit_converter import convert_circuit
 from rustworkx import PyDiGraph, digraph_dijkstra_shortest_paths
 from rustworkx.visualization import graphviz_draw
@@ -63,7 +63,7 @@ class TranspileManager:
 
         return decorator
 
-    def _get_or_create_language_node(self, language: AssemblerLanguage):
+    def _get_or_create_language_node(self, language: AssemblerLanguage) -> int:
         language_node = self._language_nodes.get(language)
         if language_node is None:
             language_node = self._transpile_method_graph.add_node(language)
@@ -90,7 +90,7 @@ class TranspileManager:
             for src, dest in zip(path_to_dest, path_to_dest[1:])
         ]
 
-    def get_transpiler(self, src_language: AssemblerLanguage, dest_languages: [AssemblerLanguage]):
+    def get_transpiler(self, src_language: AssemblerLanguage, dest_languages: [AssemblerLanguage]) -> any:
         steps = None
         # in case of multiple supported languages the shortest path is selected
         for dest_language in dest_languages:
@@ -98,7 +98,7 @@ class TranspileManager:
             if steps is None or len(steps_of_current_run) < len(steps):
                 steps = steps_of_current_run
 
-        def transpile(circuit):
+        def transpile(circuit) -> any:
             return reduce(lambda immediate_circuit, step: step.transpile_method(immediate_circuit), steps, circuit)
 
         return transpile
@@ -163,7 +163,7 @@ def qrisp_to_qiskit(circuit: qrisp.circuit.QuantumCircuit) -> OpenQASMProgram:
 
 
 @transpile_manager.register_transpile_method(AssemblerLanguage.QASM2, AssemblerLanguage.QUIL)
-def qasm_to_quil(source: str):
+def qasm_to_quil(source: str) -> Program:
     # qvm and quilc from pyquil should run in server mode and can be found with get_qc
     # WARNING: the qasm to quil transpilation does not allow for the use of standard gates.
     if not utils.is_experimental_feature_enabled():

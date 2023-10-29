@@ -123,7 +123,7 @@ def send_job_to_pilot():
     raise NotImplementedError
 
 
-def cancel_job_by_id(job_id, token, user_id: Optional[str] = None):
+def cancel_job_by_id(job_id, token, user_id: Optional[str] = None) -> SimpleJobDto:
     """cancel job execution"""
     job: JobDataclass = job_db_service.get_job_by_id(job_id)
     abort_if_user_unauthorized(job.executed_by, user_id)
@@ -133,14 +133,18 @@ def cancel_job_by_id(job_id, token, user_id: Optional[str] = None):
     return SimpleJobDto(id=job_core_dto.id, name=job_core_dto.name, state=JobState.CANCELED)
 
 
-def get_jobs_by_deployment_id(deployment_id) -> list[JobResponseDto]:
-    """get all jobs with the id deployment_id"""
+def get_jobs_by_deployment_id(deployment_id, user_id: Optional[str] = None) -> list[JobResponseDto]:
+    """get all jobs of a deployment that the user is authorized to with the id deployment_id"""
     jobs_by_deployment_id = job_db_service.get_jobs_by_deployment_id(deployment_id)
-    return [job_mapper.dataclass_to_response(job) for job in jobs_by_deployment_id]
+    user_owned_jobs: list[JobResponseDto] = []
+    for job in jobs_by_deployment_id:
+        if job.executed_by == user_id or job.executed_by is None:
+            user_owned_jobs.append(job_mapper.dataclass_to_response(job))
+    return user_owned_jobs
 
 
-def delete_jobs_by_deployment_id(deployment_id) -> list[JobResponseDto]:
-    """delete all jobs with the id deployment_id"""
-    jobs = get_jobs_by_deployment_id(deployment_id)
+def delete_jobs_by_deployment_id(deployment_id, user_id: Optional[str] = None) -> list[JobResponseDto]:
+    """delete all jobs of a deployment that the user is authorized to with the id deployment_id"""
+    jobs = get_jobs_by_deployment_id(deployment_id, user_id=user_id)
     job_db_service.delete_jobs_by_deployment_id(deployment_id)
     return jobs

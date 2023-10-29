@@ -37,6 +37,8 @@ See the content of the `.flaskenv` file for the default environment variables.
 You can also add an `IBM_TOKEN` to the `.env` file to use the IBM backend without a token in each request.
 Set the `EXECUTE_CELERY_TASK_ASYNCHRONOUS` in your .env file to False, if you don't want to start a
 celery worker and execute all tasks synchronously.
+Set the `ENABLE_EXPERIMENTAL_FEATURES` in your .env file to True, if you want to use experimental features like
+the qasm to quil transpilation, and IBM File_Runner and File_Upload job types.
 
 ### Available endpoints are:
 

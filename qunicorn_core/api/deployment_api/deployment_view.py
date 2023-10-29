@@ -63,7 +63,7 @@ class DeploymentDetailView(MethodView):
     def get(self, deployment_id: int, jwt_subject: Optional[str]):
         """Get detailed information for single deployed job-definition."""
         logging.info("Request: get deployment by id")
-        return deployment_service.get_deployment_by_id(deployment_id, jwt_subject)
+        return deployment_service.get_deployment_by_id(deployment_id, user_id=jwt_subject)
 
     @DEPLOYMENT_API.response(HTTPStatus.OK, DeploymentDtoSchema)
     @DEPLOYMENT_API.require_jwt(optional=True)
@@ -79,7 +79,7 @@ class DeploymentDetailView(MethodView):
         """Update single deployment by ID."""
         logging.info("Request: update deployment by id")
         deployment_dto: DeploymentRequestDto = DeploymentRequestDto.from_dict(body)
-        return deployment_service.update_deployment(deployment_dto, deployment_id)
+        return deployment_service.update_deployment(deployment_dto, deployment_id, user_id=jwt_subject)
 
 
 @DEPLOYMENT_API.route("/<string:deployment_id>/jobs")
@@ -91,7 +91,7 @@ class JobsByDeploymentView(MethodView):
     def get(self, deployment_id: str, jwt_subject: Optional[str]):
         """Get the details of all jobs with a specific deployment id."""
         logging.info("Request: get jobs with deployment id")
-        jobs_by_deployment_id = job_service.get_jobs_by_deployment_id(deployment_id)
+        jobs_by_deployment_id = job_service.get_jobs_by_deployment_id(deployment_id, user_id=jwt_subject)
         return (
             jobs_by_deployment_id
             if jobs_by_deployment_id is []
@@ -103,7 +103,7 @@ class JobsByDeploymentView(MethodView):
     def delete(self, deployment_id: str, jwt_subject: Optional[str]):
         """Delete all jobs with a specific deployment id."""
         logging.info("Request: delete jobs with deployment id")
-        jobs_by_deployment_id = job_service.delete_jobs_by_deployment_id(deployment_id)
+        jobs_by_deployment_id = job_service.delete_jobs_by_deployment_id(deployment_id, user_id=jwt_subject)
         return (
             jobs_by_deployment_id
             if jobs_by_deployment_id is []

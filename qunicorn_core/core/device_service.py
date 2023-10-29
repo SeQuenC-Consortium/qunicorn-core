@@ -19,7 +19,7 @@ from qunicorn_core.db.database_services import device_db_service
 from qunicorn_core.util import logging
 
 
-def update_devices(device_request: DeviceRequestDto):
+def update_devices(device_request: DeviceRequestDto) -> list[SimpleDeviceDto]:
     """Update all backends for the provider from device_request"""
     logging.info(f"Update all available devices for {device_request.provider_name} in database.")
     return pilot_manager.update_and_get_devices_from_provider(device_request)
