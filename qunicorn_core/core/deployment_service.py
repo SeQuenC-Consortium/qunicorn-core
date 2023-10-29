@@ -32,16 +32,16 @@ def get_all_deployments(user_id: Optional[str] = None) -> list[DeploymentDto]:
     return deployment_list
 
 
+def get_deployment_by_id(deployment_id: int, user_id: Optional[str] = None) -> DeploymentDto:
+    """Gets one deployment by id if the user is authorized to see it"""
+    deployment = deployment_db_service.get_deployment_by_id(deployment_id)
+    abort_if_user_unauthorized(deployment.deployed_by, user_id)
+    return deployment_mapper.dataclass_to_dto(deployment)
+
+
 def get_all_deployment_responses(user_id: Optional[str] = None) -> list[DeploymentResponseDto]:
     """Gets all deployments from a user as responses to clearly arrange them in the frontend"""
     return [deployment_mapper.dto_to_response(deployment) for deployment in get_all_deployments(user_id)]
-
-
-def get_deployment_by_id(depl_id: int, user_id: Optional[str] = None) -> DeploymentDto:
-    """Gets one deployment by id if the user is authorized to see it"""
-    deployment = deployment_db_service.get_deployment_by_id(depl_id)
-    abort_if_user_unauthorized(deployment.deployed_by, user_id)
-    return deployment_mapper.dataclass_to_dto(deployment)
 
 
 def update_deployment(
@@ -60,13 +60,13 @@ def update_deployment(
         raise QunicornError("Error updating deployment with id: " + str(deployment_id))
 
 
-def delete_deployment(id: int, user_id: Optional[str] = None) -> DeploymentDto:
+def delete_deployment(deployment_id: int, user_id: Optional[str] = None) -> DeploymentDto:
     """Remove one deployment by id"""
-    db_deployment = deployment_mapper.dataclass_to_dto(deployment_db_service.get_deployment_by_id(id))
+    db_deployment = deployment_mapper.dataclass_to_dto(deployment_db_service.get_deployment_by_id(deployment_id))
     abort_if_user_unauthorized(db_deployment.deployed_by, user_id)
     if len(job_db_service.get_jobs_by_deployment_id(db_deployment.id)) > 0:
         raise QunicornError("Deployment is in use by a job", 422)
-    deployment_db_service.delete(id)
+    deployment_db_service.delete(deployment_id)
     return db_deployment
 
 

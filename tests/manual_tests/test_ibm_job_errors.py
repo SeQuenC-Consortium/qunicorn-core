@@ -62,8 +62,8 @@ def test_invalid_circuit():
     with app.app_context():
         deployment: DeploymentDataclass = deployment_mapper.request_to_dataclass(deployment_dto)
         deployment.deployed_by = None
-        depl_id: int = db_service.save_database_object(deployment).id
-        job_request_dto.deployment_id = depl_id
+        deployment_id: int = db_service.save_database_object(deployment).id
+        job_request_dto.deployment_id = deployment_id
         with pytest.raises(Exception) as exception:
             job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
