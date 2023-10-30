@@ -17,14 +17,21 @@
 For this feature we need a broker and qunicorn running.
 Thus, it is not possible to test this automatically, because asynchronous tasks are not supported by our pytest setting.
 
+# GIVEN:
 1. Start qunicorn with the env. Variable EXECUTE_CELERY_TASK_ASYNCHRONOUS=True
 2. Start Docker
 3. Start the broker (poetry run invoke broker and poetry run invoke start-broker)
 4. Make sure to add your ibm token to the env file
+
+# WHEN:
 5. Use the Qunicorn API to create three jobs (change the device name to "ibmq_qasm_simulator" to have a slower job)
 6. Use the Qunicorn API to cancel the last job (you get the id from the previous response)
-    -> As a response the job-state should be CANCELED
 7. Use the Qunicorn API to get the job queue
-    -> As a response we should have multiple jobs in the queue and one running job
+
+# THEN:
+    -> As a response the job-state should be CANCELED
+    - One running and multiple queued jobs should be returned when accessing the endpoint
+    - All jobs except the canceled job should be finished at the end
+    - The jobs are executed in FIFO order
 
 """
