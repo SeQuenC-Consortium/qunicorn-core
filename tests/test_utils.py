@@ -102,18 +102,22 @@ def get_object_from_json(json_file_name: str):
 
 
 def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, assembler_language):
-    deployment_request: DeploymentRequestDto = get_test_deployment_request(assembler_language=assembler_language)
+    deployment_request: DeploymentRequestDto = get_test_deployment_request(assembler_language_list=[assembler_language])
     deployment: DeploymentDto = deployment_service.create_deployment(deployment_request)
     job_request_dto.deployment_id = deployment.id
 
 
-def get_test_deployment_request(assembler_language: AssemblerLanguage) -> DeploymentRequestDto:
+def get_test_deployment_request(assembler_language_list: list[AssemblerLanguage]) -> DeploymentRequestDto:
     """Search for an assembler_language in the file names to create a DeploymentRequestDto"""
     for path in DEPLOYMENT_JSON_PATHS:
-        if assembler_language.lower() in path:
-            deployment_dict: dict = get_object_from_json(path)
-            return DeploymentRequestDto.from_dict(deployment_dict)
-
+        deployment_dict: dict = None
+        final_deployment_dict_programs = []
+        for assembler_language in assembler_language_list:
+            if assembler_language.lower() in path:
+                deployment_dict = get_object_from_json(path)
+                final_deployment_dict_programs.append(deployment_dict["programs"])
+        deployment_dict["programs"] = final_deployment_dict_programs
+        return DeploymentRequestDto.from_dict(deployment_dict)
     raise QunicornError("No deployment json found for assembler language: {}".format(assembler_language))
 
 
