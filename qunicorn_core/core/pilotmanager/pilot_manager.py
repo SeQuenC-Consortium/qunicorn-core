@@ -58,6 +58,7 @@ def get_device_data_from_provider(device, token) -> dict:
 
 
 def get_matching_pilot(provider_name: ProviderName) -> Pilot:
+    """Get the pilot that matches the provider name, if no pilot matches raise an error"""
     for pilot in PILOTS:
         if pilot.has_same_provider(provider_name):
             return pilot
