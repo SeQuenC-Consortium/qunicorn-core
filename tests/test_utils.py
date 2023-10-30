@@ -60,8 +60,10 @@ QUBIT_3: str = "0x3"
 
 
 def execute_job_test(
-    provider: ProviderName, device: str, input_assembler_language_list: list[AssemblerLanguage], is_asynchronous: bool =
-    False
+    provider: ProviderName,
+    device: str,
+    input_assembler_language_list: list[AssemblerLanguage],
+    is_asynchronous: bool = False,
 ):
     """
     This is the main testing method to test the execution of a job on a device of a provider.
@@ -104,7 +106,8 @@ def get_object_from_json(json_file_name: str):
 
 def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, assembler_language_list: list[AssemblerLanguage]):
     deployment_request: DeploymentRequestDto = get_test_deployment_request(
-        assembler_language_list=assembler_language_list)
+        assembler_language_list=assembler_language_list
+    )
     deployment: DeploymentDto = deployment_service.create_deployment(deployment_request)
     job_request_dto.deployment_id = deployment.id
 

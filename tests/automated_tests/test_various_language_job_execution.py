@@ -28,8 +28,9 @@ def test_qasm2_and_qasm3_ibm_job_execution():
 
 
 def test_qasm2_and_qiskit_aws_job_execution():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator",
-                                [AssemblerLanguage.QASM2, AssemblerLanguage.QISKIT])
+    test_utils.execute_job_test(
+        ProviderName.AWS, "local_simulator", [AssemblerLanguage.QASM2, AssemblerLanguage.QISKIT]
+    )
 
 
 def test_qasm2_and_qiskit_ibm_job_execution():
@@ -37,20 +38,20 @@ def test_qasm2_and_qiskit_ibm_job_execution():
 
 
 def test_qiskit_and_qasm3_aws_job_execution():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator",
-                                [AssemblerLanguage.QISKIT, AssemblerLanguage.QASM3])
+    test_utils.execute_job_test(
+        ProviderName.AWS, "local_simulator", [AssemblerLanguage.QISKIT, AssemblerLanguage.QASM3]
+    )
 
 
 def test_qiskit_and_qasm3_ibm_job_execution():
-    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator",
-                                [AssemblerLanguage.QISKIT, AssemblerLanguage.QASM3])
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", [AssemblerLanguage.QISKIT, AssemblerLanguage.QASM3])
 
 
 def test_qiskit_and_braket_aws_job_execution():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator",
-                                [AssemblerLanguage.QISKIT, AssemblerLanguage.BRAKET])
+    test_utils.execute_job_test(
+        ProviderName.AWS, "local_simulator", [AssemblerLanguage.QISKIT, AssemblerLanguage.BRAKET]
+    )
 
 
 def test_qiskit_and_braket_ibm_job_execution():
-    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator",
-                                [AssemblerLanguage.QISKIT, AssemblerLanguage.BRAKET])
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", [AssemblerLanguage.QISKIT, AssemblerLanguage.BRAKET])
