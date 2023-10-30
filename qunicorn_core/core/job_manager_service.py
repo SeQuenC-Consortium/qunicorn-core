@@ -22,7 +22,8 @@ from qunicorn_core.api.api_models.job_dtos import (
 )
 from qunicorn_core.celery import CELERY
 from qunicorn_core.core.mapper import result_mapper
-from qunicorn_core.core.pilotmanager.pilot_manager import PILOTS
+from qunicorn_core.core.pilotmanager import pilot_manager
+from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.core.transpiler.preprocessing_manager import preprocessing_manager
 from qunicorn_core.core.transpiler.transpiler_manager import transpile_manager
 from qunicorn_core.db.database_services import job_db_service
@@ -45,22 +46,21 @@ def run_job(job_core_dto_dict: dict):
     job_core_dto: JobCoreDto = yaml.load(job_core_dto_dict["data"], yaml.Loader)
     job_db_service.update_attribute(job_core_dto.id, JobState.RUNNING, JobDataclass.state)
     device = job_core_dto.executed_on
-    results: Optional[list[ResultDataclass]] = None
 
-    for pilot in PILOTS:
-        if pilot.has_same_provider(device.provider.name):
-            __transpile_circuits(job_core_dto, pilot.supported_languages)
-            logging.info(f"Run job with id {job_core_dto.id} on {pilot.__class__}")
-            results = pilot.execute(job_core_dto)
-            break
+    # Transpile and Run the Job on the correct provider
+    pilot: Pilot = pilot_manager.get_matching_pilot(device.provider.name)
+    __transpile_circuits(job_core_dto, pilot.supported_languages)
+    logging.info(f"Run job with id {job_core_dto.id} on {pilot.__class__}")
+    results: Optional[list[ResultDataclass]] = pilot.execute(job_core_dto)
 
+    # Check if the job was executed successfully and return results
     if results is None:
         exception: Exception = QunicornError("No valid Target specified")
-        job_db_service.update_finished_job(
-            job_core_dto.id, result_mapper.exception_to_error_results(exception), JobState.ERROR
-        )
+        error_results: list[ResultDataclass] = result_mapper.exception_to_error_results(exception)
+        job_db_service.update_finished_job(job_core_dto.id, error_results, JobState.ERROR)
         raise exception
 
+    # Update job state and results of the job
     job_db_service.update_finished_job(job_core_dto.id, results)
     logging.info(f"Run job with id {job_core_dto.id} and get the result {results}")
 
@@ -99,9 +99,6 @@ def __transpile_circuits(job_dto: JobCoreDto, dest_languages: [ProviderAssembler
 
 
 def cancel_job(job_core_dto):
-    """cancel job execution"""
-    device = job_core_dto.executed_on
-    for pilot in PILOTS:
-        if pilot.has_same_provider(device.provider.name):
-            pilot.cancel(job_core_dto)
-            return
+    """Check which pilot was used to execute the job and then cancel it there"""
+    pilot: Pilot = pilot_manager.get_matching_pilot(job_core_dto.executed_on.provider.name)
+    pilot.cancel(job_core_dto)

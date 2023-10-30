@@ -19,6 +19,7 @@ from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
 from qunicorn_core.core.pilotmanager.rigetti_pilot import RigettiPilot
 from qunicorn_core.db.database_services import device_db_service, db_service
 from qunicorn_core.db.models.job import JobDataclass
+from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.qunicorn_exception import QunicornError
 
 PILOTS: list[Pilot] = [IBMPilot(), AWSPilot(), RigettiPilot()]
@@ -39,21 +40,25 @@ def save_default_jobs_and_devices_from_provider():
 
 def update_and_get_devices_from_provider(device_request: DeviceRequestDto) -> list[SimpleDeviceDto]:
     """Update the devices from the provider and return all devices from the database"""
-    for pilot in PILOTS:
-        if pilot.has_same_provider(device_request.provider_name):
-            pilot.save_devices_from_provider(device_request)
+    pilot: Pilot = get_matching_pilot(device_request.provider_name)
+    pilot.save_devices_from_provider(device_request)
     return [device_mapper.dataclass_to_simple(device) for device in device_db_service.get_all_devices()]
 
 
 def check_if_device_available_from_provider(device, token) -> bool:
-    for pilot in PILOTS:
-        if pilot.has_same_provider(device.provider.name):
-            return pilot.is_device_available(device, token)
-    return False
+    """Checks if a device is currently available at the cloud provider"""
+    pilot: Pilot = get_matching_pilot(device.provider.name)
+    return pilot.is_device_available(device, token)
 
 
 def get_device_data_from_provider(device, token) -> dict:
+    """Gets the data of a single device by requesting it from the cloud provider"""
+    pilot: Pilot = get_matching_pilot(device.provider.name)
+    return pilot.get_device_data_from_provider(device, token)
+
+
+def get_matching_pilot(provider_name: ProviderName) -> Pilot:
     for pilot in PILOTS:
-        if pilot.has_same_provider(device.provider.name):
-            return pilot.get_device_data_from_provider(device, token)
-    raise QunicornError("No valid Target specified")
+        if pilot.has_same_provider(provider_name):
+            return pilot
+    raise QunicornError(f"No valid Target specified to get device data: {provider_name}")
