@@ -82,7 +82,7 @@ class JobDetailView(MethodView):
 
 @JOBMANAGER_API.route("/run/<string:job_id>/")
 class JobRunView(MethodView):
-    """Jobs endpoint for a single job."""
+    """Jobs endpoint to run a single job."""
 
     @JOBMANAGER_API.arguments(JobExecutionDtoSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
@@ -96,7 +96,7 @@ class JobRunView(MethodView):
 
 @JOBMANAGER_API.route("/rerun/<string:job_id>/")
 class JobReRunView(MethodView):
-    """Jobs endpoint for a single job."""
+    """Jobs endpoint to rerun a single job."""
 
     @JOBMANAGER_API.arguments(TokenSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
@@ -109,7 +109,7 @@ class JobReRunView(MethodView):
 
 @JOBMANAGER_API.route("/cancel/<string:job_id>/")
 class JobCancelView(MethodView):
-    """Jobs endpoint for a single job."""
+    """Jobs endpoint to cancel a single job."""
 
     @JOBMANAGER_API.arguments(TokenSchema(), location="json")
     @JOBMANAGER_API.response(HTTPStatus.OK, SimpleJobDtoSchema())
@@ -118,3 +118,14 @@ class JobCancelView(MethodView):
         """Cancel a job execution via id."""
         logging.info(f"Request: cancel job with id: {job_id}")
         return jsonify(job_service.cancel_job_by_id(job_id, body["token"], user_id=jwt_subject)), 200
+
+
+@JOBMANAGER_API.route("/queue/")
+class JobQueueView(MethodView):
+    """Jobs endpoint to get the queued jobs."""
+
+    @JOBMANAGER_API.response(HTTPStatus.OK, dict)
+    def get(self):
+        """Get the items of the job queue and the running job."""
+        logging.info("Request: Get the items of the job queue and the running job")
+        return jsonify(job_service.get_job_queue_items()), 200

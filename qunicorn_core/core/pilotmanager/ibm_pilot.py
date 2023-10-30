@@ -150,7 +150,7 @@ class IBMPilot(Pilot):
             return IBMPilot.get_ibm_provider_and_login(token)
         except Exception as exception:
             e = job_db_service.return_exception_and_update_job(job_dto_id, exception)
-            raise QunicornError(type(e).__name__, e.args)
+            raise QunicornError(type(e).__name__ + ": " + str(e.args), 401)
 
     @staticmethod
     def __get_file_path_to_resources(file_name) -> str:

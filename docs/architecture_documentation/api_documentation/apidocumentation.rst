@@ -29,6 +29,7 @@ Available endpoints are:
     * **POST /jobs/run/{job_id}/** *(Executes an uploaded python file)*
     * **POST /jobs/rerun/{job_id}/** *(Copies and Runs again an existing Job)*
     * **POST /jobs/cancel/{job_id}/** *(Cancel a job that has be started)*
+    * **GET /jobs/queue/** *(Get all queued and currently running jobs)*
 
 * **DEVICES**
     * **GET /devices/** *(Get all currently saved devices)*
