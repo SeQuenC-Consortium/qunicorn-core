@@ -27,19 +27,19 @@ RESULT_TOLERANCE: int = 100
 
 
 def test_aws_local_simulator_braket_job_results():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", AssemblerLanguage.BRAKET)
+    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", [AssemblerLanguage.BRAKET])
 
 
 def test_aws_local_simulator_qiskit_job_results():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", AssemblerLanguage.QISKIT)
+    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", [AssemblerLanguage.QISKIT])
 
 
 def test_aws_local_simulator_qasm3_job_results():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM3)
+    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", [AssemblerLanguage.QASM3])
 
 
 def test_aws_local_simulator_qasm2_job_results():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", AssemblerLanguage.QASM2)
+    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", [AssemblerLanguage.QASM2])
 
 
 def test_create_and_run_aws_local_simulator():
@@ -50,7 +50,7 @@ def test_create_and_run_aws_local_simulator():
     # WHEN: create_and_run executed
     with app.app_context():
         job_request_dto: JobRequestDto = test_utils.get_test_job(ProviderName.AWS)
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QASM3)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, [AssemblerLanguage.QASM3])
 
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto)
 

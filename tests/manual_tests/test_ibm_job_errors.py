@@ -55,7 +55,7 @@ def test_invalid_circuit():
     app = set_up_env()
     job_request_dto: JobRequestDto = JobRequestDto(**get_object_from_json("job_request_dto_ibm_test_data.json"))
     job_request_dto.device_name = "ibmq_qasm_simulator"
-    deployment_dto: DeploymentRequestDto = test_utils.get_test_deployment_request(AssemblerLanguage.QISKIT)
+    deployment_dto: DeploymentRequestDto = test_utils.get_test_deployment_request([AssemblerLanguage.QISKIT])
     deployment_dto.programs[0].quantum_circuit = "invalid circuit"
 
     # WHEN: Executing create and run

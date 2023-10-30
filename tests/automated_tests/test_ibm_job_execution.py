@@ -20,23 +20,23 @@ from tests import test_utils
 
 
 def test_create_and_run_job_on_aer_simulator_with_qiskit():
-    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.QISKIT)
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", [AssemblerLanguage.QISKIT])
 
 
 def test_create_and_run_job_on_aer_simulator_with_qasm2():
-    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.QASM2)
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", [AssemblerLanguage.QASM2])
 
 
 def test_create_and_run_job_on_aer_simulator_with_qasm3():
-    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.QASM3)
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", [AssemblerLanguage.QASM3])
 
 
 def test_create_and_run_job_on_aer_simulator_with_braket():
-    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.BRAKET)
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", [AssemblerLanguage.BRAKET])
 
 
 def test_create_and_run_job_on_aer_simulator_with_qrisp():
-    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", AssemblerLanguage.QRISP)
+    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", [AssemblerLanguage.QRISP])
 
 
 """Test for experimental ibm_upload"""

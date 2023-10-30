@@ -41,7 +41,7 @@ def create_and_run_sampler_with_device(device_name: str):
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        test_utils.save_deployment_and_add_id_to_job(job_request_dto, AssemblerLanguage.QISKIT)
+        test_utils.save_deployment_and_add_id_to_job(job_request_dto, [AssemblerLanguage.QISKIT])
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)
 
     # THEN: Check if the correct job with its result is saved in the db

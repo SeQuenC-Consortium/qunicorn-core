@@ -60,7 +60,8 @@ QUBIT_3: str = "0x3"
 
 
 def execute_job_test(
-    provider: ProviderName, device: str, input_assembler_language: AssemblerLanguage, is_asynchronous: bool = False
+    provider: ProviderName, device: str, input_assembler_language_list: list[AssemblerLanguage], is_asynchronous: bool =
+    False
 ):
     """
     This is the main testing method to test the execution of a job on a device of a provider.
@@ -78,7 +79,7 @@ def execute_job_test(
     with app.app_context():
         job_request_dto: JobRequestDto = get_test_job(provider)
         job_request_dto.device_name = device
-        save_deployment_and_add_id_to_job(job_request_dto, input_assembler_language)
+        save_deployment_and_add_id_to_job(job_request_dto, input_assembler_language_list)
 
         # WHEN: create_and_run
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, is_asynchronous)
@@ -101,24 +102,27 @@ def get_object_from_json(json_file_name: str):
     return data
 
 
-def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, assembler_language):
-    deployment_request: DeploymentRequestDto = get_test_deployment_request(assembler_language_list=[assembler_language])
+def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, assembler_language_list: list[AssemblerLanguage]):
+    deployment_request: DeploymentRequestDto = get_test_deployment_request(
+        assembler_language_list=assembler_language_list)
     deployment: DeploymentDto = deployment_service.create_deployment(deployment_request)
     job_request_dto.deployment_id = deployment.id
 
 
 def get_test_deployment_request(assembler_language_list: list[AssemblerLanguage]) -> DeploymentRequestDto:
     """Search for an assembler_language in the file names to create a DeploymentRequestDto"""
+    deployment_dict: dict = None
+    final_deployment_dict_programs = []
     for path in DEPLOYMENT_JSON_PATHS:
-        deployment_dict: dict = None
-        final_deployment_dict_programs = []
         for assembler_language in assembler_language_list:
             if assembler_language.lower() in path:
                 deployment_dict = get_object_from_json(path)
-                final_deployment_dict_programs.append(deployment_dict["programs"])
+                final_deployment_dict_programs.extend(deployment_dict["programs"])
+    if final_deployment_dict_programs is not []:
         deployment_dict["programs"] = final_deployment_dict_programs
         return DeploymentRequestDto.from_dict(deployment_dict)
-    raise QunicornError("No deployment json found for assembler language: {}".format(assembler_language))
+    else:
+        raise QunicornError("No deployment json found for assembler_language: {}".format(assembler_language_list))
 
 
 def get_test_job(provider: ProviderName) -> JobRequestDto:
@@ -152,7 +156,7 @@ def ibm_check_if_job_runner_result_correct(job: JobDataclass):
         shots: int = job.shots
         counts: dict = result.result_dict["counts"]
         probabilities: dict = result.result_dict["probabilities"]
-        if i == 0:
+        if (i % 2) == 0:
             assert compare_values_with_tolerance(shots / 2, counts[QUBIT_0], COUNTS_TOLERANCE)
             assert compare_values_with_tolerance(shots / 2, counts[QUBIT_3], COUNTS_TOLERANCE)
             assert (counts[QUBIT_0] + counts[QUBIT_3]) == shots
