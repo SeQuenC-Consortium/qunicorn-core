@@ -18,6 +18,7 @@
 class QunicornError(Exception):
     """General Exception raised for errors in qunicorn"""
 
+    # Status code that will be visible in the swagger api
     status_code: int
 
     def __init__(self, msg, status_code=404):
