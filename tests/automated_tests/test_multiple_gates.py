@@ -43,8 +43,8 @@ def create_and_test_multiple_gates_deployment(provider_name: ProviderName):
 
     # WHEN: create_and_run executed synchronous
     with app.app_context():
-        deployment_dict: str = "deployment_request_dto_multiple_gates_test_data.json"
-        deployment_request: DeploymentRequestDto = DeploymentRequestDto.from_dict(get_object_from_json(deployment_dict))
+        deployment_path: str = "deployment_request_dto_multiple_gates_test_data.json"
+        deployment_request: DeploymentRequestDto = DeploymentRequestDto.from_dict(get_object_from_json(deployment_path))
         deployment: DeploymentDto = deployment_service.create_deployment(deployment_request)
         job_request_dto.deployment_id = deployment.id
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, IS_ASYNCHRONOUS)

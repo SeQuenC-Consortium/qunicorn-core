@@ -150,7 +150,7 @@ def check_if_job_runner_result_correct(job: JobDataclass):
         counts: dict = result.result_dict["counts"]
         probabilities: dict = result.result_dict["probabilities"]
 
-        # Check if the first result is correct distributed 50% for the qubit zero and three
+        # Check if the first result is distributed correctly: 50% for the qubit zero and 50% for the qubit three
         if i == 0:
             assert compare_values_with_tolerance(shots / 2, counts[QUBIT_0], COUNTS_TOLERANCE)
             assert compare_values_with_tolerance(shots / 2, counts[QUBIT_3], COUNTS_TOLERANCE)
@@ -160,7 +160,7 @@ def check_if_job_runner_result_correct(job: JobDataclass):
             assert compare_values_with_tolerance(PROBABILITY_1 / 2, probabilities[QUBIT_3], PROBABILITY_TOLERANCE)
             assert (probabilities[QUBIT_0] + probabilities[QUBIT_3]) > PROBABILITY_1 - PROBABILITY_TOLERANCE
 
-        # Check if the second result is correct distributed 100% for the qubit zero
+        # Check if the first result is distributed correctly: 100% for the qubit zero
         else:
             assert counts[QUBIT_0] == shots
             assert probabilities[QUBIT_0] == PROBABILITY_1

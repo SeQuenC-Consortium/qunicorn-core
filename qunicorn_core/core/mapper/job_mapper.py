@@ -35,7 +35,7 @@ def request_to_core(job: JobRequestDto) -> JobCoreDto:
     deployment: DeploymentDataclass = deployment_db_service.get_deployment_by_id(job.deployment_id)
 
     if device.provider.name != job.provider_name:
-        raise QunicornError("Provider name and the provider of the device are not matching")
+        raise QunicornError("Provider name and the provider of the device are not matching", 409)
 
     return map_from_to(
         from_object=job,
