@@ -17,8 +17,7 @@ import json
 import os
 from typing import Optional
 
-from qunicorn_core.api.api_models import DeploymentRequestDto, JobRequestDto, SimpleJobDto, \
-    DeploymentResponseDto
+from qunicorn_core.api.api_models import DeploymentRequestDto, JobRequestDto, SimpleJobDto, DeploymentResponseDto
 from qunicorn_core.core import deployment_service, job_service
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
