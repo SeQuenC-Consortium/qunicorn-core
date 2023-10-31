@@ -15,8 +15,10 @@
 """"pytest utils file"""
 import json
 import os
+from typing import Optional
 
-from qunicorn_core.api.api_models import DeploymentRequestDto, JobRequestDto, DeploymentDto, SimpleJobDto
+from qunicorn_core.api.api_models import DeploymentRequestDto, JobRequestDto, SimpleJobDto, \
+    DeploymentResponseDto
 from qunicorn_core.core import deployment_service, job_service
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
@@ -62,7 +64,7 @@ QUBIT_3: str = "0x3"
 def execute_job_test(
     provider: ProviderName,
     device: str,
-    input_assembler_language_list: list[AssemblerLanguage],
+    assembler_language_list: list[AssemblerLanguage],
     is_asynchronous: bool = False,
 ):
     """
@@ -81,7 +83,7 @@ def execute_job_test(
     with app.app_context():
         job_request_dto: JobRequestDto = get_test_job(provider)
         job_request_dto.device_name = device
-        save_deployment_and_add_id_to_job(job_request_dto, input_assembler_language_list)
+        save_deployment_and_add_id_to_job(job_request_dto, assembler_language_list)
 
         # WHEN: create_and_run
         return_dto: SimpleJobDto = job_service.create_and_run_job(job_request_dto, is_asynchronous)
@@ -108,21 +110,21 @@ def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, assembler_
     deployment_request: DeploymentRequestDto = get_test_deployment_request(
         assembler_language_list=assembler_language_list
     )
-    deployment: DeploymentDto = deployment_service.create_deployment(deployment_request)
+    deployment: DeploymentResponseDto = deployment_service.create_deployment(deployment_request)
     job_request_dto.deployment_id = deployment.id
 
 
 def get_test_deployment_request(assembler_language_list: list[AssemblerLanguage]) -> DeploymentRequestDto:
     """Search for an assembler_language in the file names to create a DeploymentRequestDto"""
-    deployment_dict: dict = None
-    final_deployment_dict_programs = []
+    deployment_dict: Optional[dict] = None
+    combined_deployment_dict_programs = []
     for path in DEPLOYMENT_JSON_PATHS:
         for assembler_language in assembler_language_list:
             if assembler_language.lower() in path:
                 deployment_dict = get_object_from_json(path)
-                final_deployment_dict_programs.extend(deployment_dict["programs"])
-    if final_deployment_dict_programs is not []:
-        deployment_dict["programs"] = final_deployment_dict_programs
+                combined_deployment_dict_programs.extend(deployment_dict["programs"])
+    if len(combined_deployment_dict_programs) > 0:
+        deployment_dict["programs"] = combined_deployment_dict_programs
         return DeploymentRequestDto.from_dict(deployment_dict)
     else:
         raise QunicornError("No deployment json found for assembler_language: {}".format(assembler_language_list))
