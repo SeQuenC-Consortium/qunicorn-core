@@ -1,0 +1,35 @@
+{
+  "name": "MultipleGatesDeployment",
+  "programs": [
+    {
+      "quantum_circuit": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncreg meas[2];\nh q[0];\ns q[0];\ns q[0];\nh q[0];\nbarrier q[0],q[1];\nmeasure q[0] -> meas[0];\nmeasure q[1] -> meas[1];\n",
+      "assembler_language": "QASM2",
+      "python_file_metadata": "",
+      "python_file_path": ""
+    },
+    {
+      "quantum_circuit": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncreg meas[2];\nh q[0];\nz q[0];\nh q[0];\nbarrier q[0],q[1];\nmeasure q[0] -> meas[0];\nmeasure q[1] -> meas[1];\n",
+      "assembler_language": "QASM2",
+      "python_file_metadata": "",
+      "python_file_path": ""
+    },
+    {
+      "quantum_circuit": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncreg meas[2];\nh q[0];\nt q[0];\nh q[0];\nbarrier q[0],q[1];\nmeasure q[0] -> meas[0];\nmeasure q[1] -> meas[1];\n",
+      "assembler_language": "QASM2",
+      "python_file_metadata": "",
+      "python_file_path": ""
+    },
+    {
+      "quantum_circuit": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[3];\ncreg meas[3];\nx q[0];\nx q[1];\nccx q[0], q[1], q[2];\nbarrier q[0],q[1];\nmeasure q[0] -> meas[0];\nmeasure q[1] -> meas[1];\nmeasure q[2] -> meas[2];\n",
+      "assembler_language": "QASM2",
+      "python_file_metadata": "",
+      "python_file_path": ""
+    },
+    {
+      "quantum_circuit": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncreg meas[2];\ny q[0];\nbarrier q[0],q[1];\nmeasure q[0] -> meas[0];\nmeasure q[1] -> meas[1];\n",
+      "assembler_language": "QASM2",
+      "python_file_metadata": "",
+      "python_file_path": ""
+    }
+  ]
+}

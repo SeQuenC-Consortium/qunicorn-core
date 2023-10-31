@@ -30,6 +30,19 @@ Currently Supported Languages
 
 **Note:** (QUIL Transpilation needs to be enabled by setting ENABLE_EXPERIMENTAL_FEATURES in .env to True.)
 
+
+Currently Supported/Tested Gates
+--------------------------------
+* X (Pauli X)
+* Z (Pauli Z)
+* Y (Pauli Y)
+* H (Hadamard)
+* S (Phase)
+* T (T)
+* CX (CNOT)
+* CCX (Toffoli)
+
+
 Currently Supported Transpile Strategies
 -----------------------------------------
 

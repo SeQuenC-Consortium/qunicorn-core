@@ -24,7 +24,6 @@ from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.result import ResultDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
-from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.static.qunicorn_exception import QunicornError
@@ -57,7 +56,9 @@ COUNTS_TOLERANCE: int = 100
 PROBABILITY_1: float = 1
 PROBABILITY_TOLERANCE: float = 0.1
 QUBIT_0: str = "0x0"
+QUBIT_1: str = "0x1"
 QUBIT_3: str = "0x3"
+QUBIT_8: str = "0x7"
 
 
 def execute_job_test(
@@ -91,7 +92,7 @@ def execute_job_test(
         check_simple_job_dto(return_dto)
         job: JobDataclass = job_db_service.get_job_by_id(return_dto.id)
         check_if_job_finished(job)
-        ibm_check_if_job_runner_result_correct(job)
+        check_if_job_runner_result_correct(job)
 
 
 def get_object_from_json(json_file_name: str):
@@ -151,8 +152,8 @@ def check_if_job_finished(job: JobDataclass):
     assert job.state == JobState.FINISHED
 
 
-def ibm_check_if_job_runner_result_correct(job: JobDataclass):
-    job.type = JobType.RUNNER
+def check_if_job_runner_result_correct(job: JobDataclass):
+    """Iterate over every result and check if the distribution of the measurement is correct"""
     for i in range(len(job.results)):
         result: ResultDataclass = job.results[i]
         check_standard_result_data(i, job, result)
@@ -160,6 +161,8 @@ def ibm_check_if_job_runner_result_correct(job: JobDataclass):
         shots: int = job.shots
         counts: dict = result.result_dict["counts"]
         probabilities: dict = result.result_dict["probabilities"]
+
+        # Check if the first result is distributed correctly: 50% for the qubit zero and 50% for the qubit three
         if (i % 2) == 0:
             assert compare_values_with_tolerance(shots / 2, counts[QUBIT_0], COUNTS_TOLERANCE)
             assert compare_values_with_tolerance(shots / 2, counts[QUBIT_3], COUNTS_TOLERANCE)
@@ -168,6 +171,8 @@ def ibm_check_if_job_runner_result_correct(job: JobDataclass):
             assert compare_values_with_tolerance(PROBABILITY_1 / 2, probabilities[QUBIT_0], PROBABILITY_TOLERANCE)
             assert compare_values_with_tolerance(PROBABILITY_1 / 2, probabilities[QUBIT_3], PROBABILITY_TOLERANCE)
             assert (probabilities[QUBIT_0] + probabilities[QUBIT_3]) > PROBABILITY_1 - PROBABILITY_TOLERANCE
+
+        # Check if the first result is distributed correctly: 100% for the qubit zero
         else:
             assert counts[QUBIT_0] == shots
             assert probabilities[QUBIT_0] == PROBABILITY_1
@@ -181,3 +186,29 @@ def check_standard_result_data(i, job, result):
     assert result.result_type == ResultType.get_result_type(job.type)
     assert result.job_id == job.id
     assert result.circuit == job.deployment.programs[i].quantum_circuit
+
+
+def check_if_job_runner_result_correct_multiple_gates(job: JobDataclass):
+    """Iterate over every result and check if the distribution of the measurement is correct"""
+
+    for i in range(len(job.results)):
+        result: ResultDataclass = job.results[i]
+        check_standard_result_data(i, job, result)
+        assert result.meta_data is not None
+        shots: int = job.shots
+        counts: dict = result.result_dict["counts"]
+        probabilities: dict = result.result_dict["probabilities"]
+        prob_tolerance: float = PROBABILITY_TOLERANCE * 2
+        count_tolerance: float = COUNTS_TOLERANCE * 2
+        if i != 2:
+            qubit = QUBIT_8 if i == 3 else QUBIT_1
+            assert counts[qubit] == shots
+            assert probabilities[qubit] == PROBABILITY_1
+        else:
+            assert compare_values_with_tolerance(7 * (shots / 8), counts[QUBIT_0], count_tolerance)
+            assert compare_values_with_tolerance(shots / 8, counts[QUBIT_1], count_tolerance)
+            assert (counts[QUBIT_0] + counts[QUBIT_1]) == shots
+
+            assert compare_values_with_tolerance(7 * (PROBABILITY_1 / 8), probabilities[QUBIT_0], prob_tolerance)
+            assert compare_values_with_tolerance(PROBABILITY_1 / 8, probabilities[QUBIT_1], prob_tolerance)
+            assert (probabilities[QUBIT_0] + probabilities[QUBIT_1]) > PROBABILITY_1 - PROBABILITY_TOLERANCE

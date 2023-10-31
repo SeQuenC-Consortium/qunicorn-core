@@ -30,6 +30,9 @@ def get_device_by_name(device_name: str) -> DeviceDataclass:
     if len(devices) != 1:
         logging.warn(f"There exists multiple or zero devices with the same name {device_name}")
 
+    if len(devices) == 0:
+        raise QunicornError(f"Device with name {device_name} does not exist")
+
     return devices[0]
 
 
