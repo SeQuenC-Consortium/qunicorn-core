@@ -100,6 +100,7 @@ class TranspileManager:
         ]
 
     def get_transpiler(self, src_language: AssemblerLanguage, dest_languages: [AssemblerLanguage]) -> any:
+        """Main method of the class that returns the method to be used to transpile to the destination language"""
         steps = None
         # in case of multiple supported languages the shortest path is selected by comparing the options
         for dest_language in dest_languages:
@@ -108,6 +109,8 @@ class TranspileManager:
                 steps = steps_of_current_run
 
         def transpile(circuit) -> any:
+            """apply the selected transpile methods stepwise to the required steps with the circuit to return one
+            single method for transpiling to the destination language"""
             return reduce(lambda immediate_circuit, step: step.transpile_method(immediate_circuit), steps, circuit)
 
         return transpile
