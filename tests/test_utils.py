@@ -48,6 +48,8 @@ DEPLOYMENT_JSON_PATHS = [
     "deployment_request_dto_quil_test_data.json",
 ]
 
+AWS_LOCAL_SIMULATOR = "local_simulator"
+IBM_LOCAL_SIMULATOR = "aer_simulator"
 EXPECTED_ID: int = 4  # hardcoded ID can be removed if tests for the correct ID are no longer needed
 JOB_FINISHED_PROGRESS: int = 100
 STANDARD_JOB_NAME: str = "JobName"
@@ -107,6 +109,7 @@ def get_object_from_json(json_file_name: str):
 
 
 def save_deployment_and_add_id_to_job(job_request_dto: JobRequestDto, assembler_language_list: list[AssemblerLanguage]):
+    """Save the deployment and add the id to the job_request_dto"""
     deployment_request: DeploymentRequestDto = get_test_deployment_request(
         assembler_language_list=assembler_language_list
     )
@@ -121,12 +124,16 @@ def get_test_deployment_request(assembler_language_list: list[AssemblerLanguage]
     for path in DEPLOYMENT_JSON_PATHS:
         for assembler_language in assembler_language_list:
             if assembler_language.lower() in path:
+                # Filling Deployment Dict from path for correct assembler language
                 deployment_dict = get_object_from_json(path)
+                # Extend programs with programs from other assembler languages
                 combined_deployment_dict_programs.extend(deployment_dict["programs"])
     if len(combined_deployment_dict_programs) > 0:
+        # Return DeploymentDict as DeploymentRequestDto with all combined programs
         deployment_dict["programs"] = combined_deployment_dict_programs
         return DeploymentRequestDto.from_dict(deployment_dict)
     else:
+        # Raise Error if no deployment json was found
         raise QunicornError("No deployment json found for assembler_language: {}".format(assembler_language_list))
 
 

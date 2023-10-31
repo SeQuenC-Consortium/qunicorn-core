@@ -17,41 +17,52 @@
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.provider_name import ProviderName
 from tests import test_utils
+from tests.test_utils import AWS_LOCAL_SIMULATOR, IBM_LOCAL_SIMULATOR
 
 
 def test_qasm2_and_qasm3_aws_job_execution():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", [AssemblerLanguage.QASM2, AssemblerLanguage.QASM3])
+    test_utils.execute_job_test(
+        ProviderName.AWS, AWS_LOCAL_SIMULATOR, [AssemblerLanguage.QASM2, AssemblerLanguage.QASM3]
+    )
 
 
 def test_qasm2_and_qasm3_ibm_job_execution():
-    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", [AssemblerLanguage.QASM2, AssemblerLanguage.QASM3])
+    test_utils.execute_job_test(
+        ProviderName.IBM, IBM_LOCAL_SIMULATOR, [AssemblerLanguage.QASM2, AssemblerLanguage.QASM3]
+    )
 
 
 def test_qasm2_and_qiskit_aws_job_execution():
     test_utils.execute_job_test(
-        ProviderName.AWS, "local_simulator", [AssemblerLanguage.QASM2, AssemblerLanguage.QISKIT]
+        ProviderName.AWS, AWS_LOCAL_SIMULATOR, [AssemblerLanguage.QASM2, AssemblerLanguage.QISKIT]
     )
 
 
 def test_qasm2_and_qiskit_ibm_job_execution():
-    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", [AssemblerLanguage.QASM2, AssemblerLanguage.QISKIT])
+    test_utils.execute_job_test(
+        ProviderName.IBM, IBM_LOCAL_SIMULATOR, [AssemblerLanguage.QASM2, AssemblerLanguage.QISKIT]
+    )
 
 
 def test_qiskit_and_qasm3_aws_job_execution():
     test_utils.execute_job_test(
-        ProviderName.AWS, "local_simulator", [AssemblerLanguage.QISKIT, AssemblerLanguage.QASM3]
+        ProviderName.AWS, AWS_LOCAL_SIMULATOR, [AssemblerLanguage.QISKIT, AssemblerLanguage.QASM3]
     )
 
 
 def test_qiskit_and_qasm3_ibm_job_execution():
-    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", [AssemblerLanguage.QISKIT, AssemblerLanguage.QASM3])
+    test_utils.execute_job_test(
+        ProviderName.IBM, IBM_LOCAL_SIMULATOR, [AssemblerLanguage.QISKIT, AssemblerLanguage.QASM3]
+    )
 
 
 def test_qiskit_and_braket_aws_job_execution():
     test_utils.execute_job_test(
-        ProviderName.AWS, "local_simulator", [AssemblerLanguage.QISKIT, AssemblerLanguage.BRAKET]
+        ProviderName.AWS, AWS_LOCAL_SIMULATOR, [AssemblerLanguage.QISKIT, AssemblerLanguage.BRAKET]
     )
 
 
 def test_qiskit_and_braket_ibm_job_execution():
-    test_utils.execute_job_test(ProviderName.IBM, "aer_simulator", [AssemblerLanguage.QISKIT, AssemblerLanguage.BRAKET])
+    test_utils.execute_job_test(
+        ProviderName.IBM, IBM_LOCAL_SIMULATOR, [AssemblerLanguage.QISKIT, AssemblerLanguage.BRAKET]
+    )

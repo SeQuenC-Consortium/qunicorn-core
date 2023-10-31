@@ -21,25 +21,26 @@ from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.provider_name import ProviderName
 from tests import test_utils
 from tests.conftest import set_up_env
+from tests.test_utils import AWS_LOCAL_SIMULATOR
 
 IS_ASYNCHRONOUS: bool = False
 RESULT_TOLERANCE: int = 100
 
 
 def test_aws_local_simulator_braket_job_results():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", [AssemblerLanguage.BRAKET])
+    test_utils.execute_job_test(ProviderName.AWS, AWS_LOCAL_SIMULATOR, [AssemblerLanguage.BRAKET])
 
 
 def test_aws_local_simulator_qiskit_job_results():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", [AssemblerLanguage.QISKIT])
+    test_utils.execute_job_test(ProviderName.AWS, AWS_LOCAL_SIMULATOR, [AssemblerLanguage.QISKIT])
 
 
 def test_aws_local_simulator_qasm3_job_results():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", [AssemblerLanguage.QASM3])
+    test_utils.execute_job_test(ProviderName.AWS, AWS_LOCAL_SIMULATOR, [AssemblerLanguage.QASM3])
 
 
 def test_aws_local_simulator_qasm2_job_results():
-    test_utils.execute_job_test(ProviderName.AWS, "local_simulator", [AssemblerLanguage.QASM2])
+    test_utils.execute_job_test(ProviderName.AWS, AWS_LOCAL_SIMULATOR, [AssemblerLanguage.QASM2])
 
 
 def test_create_and_run_aws_local_simulator():

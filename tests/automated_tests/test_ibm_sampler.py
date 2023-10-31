@@ -24,11 +24,18 @@ from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from tests import test_utils
 from tests.conftest import set_up_env
-from tests.test_utils import IS_ASYNCHRONOUS, PROBABILITY_1, PROBABILITY_TOLERANCE, QUBIT_3, QUBIT_0
+from tests.test_utils import (
+    IS_ASYNCHRONOUS,
+    PROBABILITY_1,
+    PROBABILITY_TOLERANCE,
+    QUBIT_3,
+    QUBIT_0,
+    IBM_LOCAL_SIMULATOR,
+)
 
 
 def test_create_and_run_sampler():
-    create_and_run_sampler_with_device("aer_simulator")
+    create_and_run_sampler_with_device(IBM_LOCAL_SIMULATOR)
 
 
 def create_and_run_sampler_with_device(device_name: str):
