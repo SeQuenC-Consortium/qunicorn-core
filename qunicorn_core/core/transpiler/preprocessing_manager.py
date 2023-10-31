@@ -34,6 +34,7 @@ class PreProcessingManager:
     def register(self, language: AssemblerLanguage):
         """decorator that is used to add new preprocessing options, so the methods can be found dynamically from
         get_preprocessor()"""
+
         def decorator(transpile_method: PreProcessor) -> PreProcessor:
             self._preprocessing_methods[language] = transpile_method
             return transpile_method
