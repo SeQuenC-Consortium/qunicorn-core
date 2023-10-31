@@ -32,6 +32,8 @@ class PreProcessingManager:
         self._language_nodes = dict()
 
     def register(self, language: AssemblerLanguage):
+        """decorator that is used to add new preprocessing options, so the methods can be found dynamically from
+        get_preprocessor()"""
         def decorator(transpile_method: PreProcessor) -> PreProcessor:
             self._preprocessing_methods[language] = transpile_method
             return transpile_method
@@ -83,5 +85,6 @@ def preprocess_qrisp(program: str) -> QrispQC:
 
 @preprocessing_manager.register(AssemblerLanguage.QUIL)
 def preprocess_quil(program: str) -> Program:
+    """execute the string to retrieve the associated python object"""
     exec(program, globals())
     return globals().get("circuit")
