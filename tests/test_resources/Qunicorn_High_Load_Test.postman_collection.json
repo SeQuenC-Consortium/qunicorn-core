@@ -21,11 +21,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5005/deployments/",
+					"raw": "localhost:8080/deployments/",
 					"host": [
 						"localhost"
 					],
-					"port": "5005",
+					"port": "8080",
 					"path": [
 						"deployments",
 						""
@@ -50,11 +50,11 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5005/jobs/",
+					"raw": "localhost:8080/jobs/",
 					"host": [
 						"localhost"
 					],
-					"port": "5005",
+					"port": "8080",
 					"path": [
 						"jobs",
 						""
