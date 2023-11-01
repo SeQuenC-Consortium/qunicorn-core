@@ -109,14 +109,15 @@ class TranspileManager:
                 steps = steps_of_current_run
 
         def transpile(circuit) -> any:
-            """apply the selected transpile methods stepwise to the required steps with the circuit to return one
-            single method for transpiling to the destination language"""
+            """Iteratively apply the selected transpile methods to the required steps to return one single method for
+            transpiling the circuit from the source language to the destination language by using intermediate
+            circuits along the discovered shortest path"""
             return reduce(lambda immediate_circuit, step: step.transpile_method(immediate_circuit), steps, circuit)
 
         return transpile
 
     def visualize_transpile_strategy(self, filename):
-        """visualisation of the graph of the possible transpile methods between each node"""
+        """Visualisation of the graph of the possible transpile methods between each node"""
         graphviz_draw(
             self._transpile_method_graph, node_attr_fn=lambda language: {"label": str(language)}, filename=filename
         )
@@ -133,7 +134,7 @@ def braket_to_qasm3(source: Circuit) -> str:
 @transpile_manager.register_transpile_method(AssemblerLanguage.QISKIT, AssemblerLanguage.QASM2)
 def qiskit_to_qasm2(circuit: qiskit.circuit.QuantumCircuit) -> str:
     qasm = circuit.qasm()
-    # XXX replace gate references standard gate library an add 'CX' to 'cnot' mapping
+    # replace gate references standard gate library an add 'CX' to 'cnot' mapping
     with open(path.join(path.dirname(qiskit.__file__), "qasm/libs/qelib1.inc")) as qelib1_file:
         qelib1 = qelib1_file.read()
         qasm = qasm.replace('include "qelib1.inc";', "gate CX a,b { cnot a,b; }\n" + qelib1)
@@ -143,7 +144,7 @@ def qiskit_to_qasm2(circuit: qiskit.circuit.QuantumCircuit) -> str:
 @transpile_manager.register_transpile_method(AssemblerLanguage.QISKIT, AssemblerLanguage.QASM3)
 def qiskit_to_qasm3(circuit: qiskit.circuit.QuantumCircuit) -> str:
     qasm = qiskit.qasm3.Exporter(allow_aliasing=False).dumps(circuit)
-    # XXX replace gate references standard gate library
+    # replace gate references standard gate library
     with open(path.join(path.dirname(qiskit.__file__), "qasm/libs/stdgates.inc")) as stdgates_file:
         stdgates = stdgates_file.read()
     qasm = qasm.replace('include "stdgates.inc";', stdgates)
@@ -178,7 +179,7 @@ def qrisp_to_qiskit(circuit: qrisp.circuit.QuantumCircuit) -> OpenQASMProgram:
 @transpile_manager.register_transpile_method(AssemblerLanguage.QASM2, AssemblerLanguage.QUIL)
 def qasm2_to_quil(source: str) -> Program:
     # qvm and quilc from pyquil should run in server mode and can be found with get_qc
-    # WARNING: the qasm to quil transpilation does not allow for the use of standard gates.
+    # WARNING: the qasm to quil transpilation does not allow for the use of standard gate library.
     if not utils.is_experimental_feature_enabled():
         raise QunicornError(
             "Experimental transpilation features are disabled, set ENABLE_EXPERIMENTAL_TRANSPILATION to true to "
