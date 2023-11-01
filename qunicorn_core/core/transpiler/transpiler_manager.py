@@ -109,9 +109,10 @@ class TranspileManager:
                 steps = steps_of_current_run
 
         def transpile(circuit) -> any:
-            """Iteratively apply the selected transpile methods to the required steps to return one single method for
-            transpiling the circuit from the source language to the destination language by using intermediate
-            circuits along the discovered shortest path"""
+            """This method transpiles the circuit from the source language to the destination language by using
+            intermediate circuits along the discovered shortest path (saved in "steps"). It iteratively applies
+            the transpile methods from the selected steps to return one single transpiled circuit.
+            The result of one iteration becomes the immediate_circuit/input for the next iteration."""
             return reduce(lambda immediate_circuit, step: step.transpile_method(immediate_circuit), steps, circuit)
 
         return transpile
