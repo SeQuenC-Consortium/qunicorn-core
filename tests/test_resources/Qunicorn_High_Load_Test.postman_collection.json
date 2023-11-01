@@ -1,0 +1,67 @@
+{
+	"info": {
+		"_postman_id": "d22fc6df-04d1-4716-b8af-8c73be0caa83",
+		"name": "Qunicorn_High_Load_Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13524644"
+	},
+	"item": [
+		{
+			"name": "DeploymentRequest",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"programs\": [\r\n    {\r\n      \"quantumCircuit\": \"OPENQASM 2.0;\\ninclude \\\"qelib1.inc\\\";\\nqreg q[2];\\ncreg meas[2];\\nh q[0];\\ncx q[0],q[1];\\nbarrier q[0],q[1];\\nmeasure q[0] -> meas[0];\\nmeasure q[1] -> meas[1];\\n (Note: if you have qrisp/qiskit as your assembler language add 'circuit =' to the beginning of your quantumCircuit string)\",\r\n      \"assemblerLanguage\": \"QASM2\",\r\n      \"pythonFilePath\": \"ibm_upload_test_data_file.py (Note: this is an experimental feature for IBM_UPLOAD job type)\",\r\n      \"pythonFileMetadata\": \"ibm_upload_test_data_metadata.json (Note: this is an experimental feature for IBM_UPLOAD job type)\"\r\n    }\r\n  ],\r\n  \"name\": \"DeploymentName\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5005/deployments/",
+					"host": [
+						"localhost"
+					],
+					"port": "5005",
+					"path": [
+						"deployments",
+						""
+					]
+				},
+				"description": "Test"
+			},
+			"response": []
+		},
+		{
+			"name": "CreateNewJob",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"JobName\",\r\n  \"providerName\": \"IBM\",\r\n  \"deviceName\": \"aer_simulator\",\r\n  \"shots\": 4000,\r\n  \"token\": \"\",\r\n  \"type\": \"RUNNER\",\r\n  \"deploymentId\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5005/jobs/",
+					"host": [
+						"localhost"
+					],
+					"port": "5005",
+					"path": [
+						"jobs",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
