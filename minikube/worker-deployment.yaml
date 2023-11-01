@@ -24,6 +24,8 @@ spec:
               value: worker
             - name: DB_URL
               value: postgresql://postgres:passwd@postgres/qunicorn
+            - name: NUMBA_CACHE_DIR
+              value: /app/cache
           image: qunicorn:local
           name: worker
           ports:
