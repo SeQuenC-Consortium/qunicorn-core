@@ -32,7 +32,7 @@ The Postman collection provided is testing the POST Deployment and Job Endpoint.
 
 # THEN:
     -> Postman will show you how the test is performing.
-    - After the Test has concluded, check the qunicorn database whether all deployments and jobs have been created
+    -> After the Test has concluded, check the qunicorn database whether all deployments and jobs have been created
     and the jobs have finished.
 
 """
