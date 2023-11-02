@@ -126,6 +126,7 @@ class JobRequestDtoSchema(MaBaseSchema):
 
 class JobResponseDtoSchema(MaBaseSchema):
     id = ma.fields.Int(required=True, dump_only=True)
+    name = ma.fields.String(required=True, dump_only=True)
     executed_by = ma.fields.String(required=False, dump_only=True)
     executed_on = ma.fields.Nested(DeviceDtoSchema())
     progress = ma.fields.Int(required=True, dump_only=True)

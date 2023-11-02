@@ -51,6 +51,7 @@ class DeviceRequestDto:
 
 class DeviceDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=True, allow_none=False, metadata={"description": "The unique deviceID."})
+    name = ma.fields.String(required=True, allow_none=False, metadata={"description": "The name of the device."})
     num_qubits = ma.fields.Integer(required=True, allow_none=False)
     is_simulator = ma.fields.Boolean(required=True, allow_none=False)
     is_local = ma.fields.Boolean(required=True, allow_none=False)
