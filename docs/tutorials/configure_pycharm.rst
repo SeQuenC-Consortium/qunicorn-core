@@ -77,17 +77,17 @@ How to check if the pipeline will succeed
 How to test the user authentication
 -----------------------------------
 
-Checkout the Keycloak documentation under :doc:`Keycloak Authentication <./architecture_documentation/authentication>`
+Checkout the Keycloak documentation under :doc:`Keycloak Authentication <../architecture_documentation/authentication>`
 
 
 How to write documentation
 --------------------------
 
-Use Read the docs for that: :doc:`Read The Docs Documentation <./tutorials/rtd_setup_testing>`
+Use Read the docs for that: :doc:`Read The Docs Documentation <./rtd_setup_testing>`
 
 
 Other useful commands
 ----------------------
 
-To add some flask or invoke commands checkout the documentation: :doc:`Read The Docs Documentation <./tutorials/useful_commands>`
+To add some flask or invoke commands checkout the documentation: :doc:`Useful Commands <./useful_commands>`
 
