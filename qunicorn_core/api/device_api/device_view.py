@@ -20,7 +20,6 @@ from flask import jsonify
 from flask.views import MethodView
 
 from .root import DEVICES_API
-from ..api_models import RootSchema
 from ..api_models.device_dtos import (
     DeviceDtoSchema,
     DeviceRequestDtoSchema,
@@ -36,7 +35,7 @@ class DeviceView(MethodView):
     """Root endpoint of the device api, to list all available device_api."""
 
     @DEVICES_API.arguments(DeviceRequestDtoSchema(), location="json")
-    @DEVICES_API.response(HTTPStatus.OK, RootSchema())
+    @DEVICES_API.response(HTTPStatus.OK, SimpleDeviceDtoSchema(many=True))
     def put(self, device_request_data):
         """Update the devices by retrieving data from the provider and returning the updated devices."""
         logging.info("Request: update the devices")
