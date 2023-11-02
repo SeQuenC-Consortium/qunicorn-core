@@ -21,6 +21,12 @@ On linux:
         ]
     }
 
+Pycharm
+################
+
+For Pycharm there exists a detailed guide in the documentation: :doc:`Pycharm Docu - Development Guide <./tutorials/configure_pycharm>`
+With also some hints how to develop qunicorn.
+
 Development
 ################
 
@@ -114,3 +120,34 @@ Debug pages:
 
 * Index: http://localhost:5005/debug/
 * Registered Routes: http://localhost:5005/debug/routes | Useful for looking up which endpoint is served under a route or what routes are available.
+
+
+
+How to check if the pipeline will succeed
+-----------------------------------------
+
+1. poetry run invoke check-linting
+
+    a. If black fails fix it with: poetry run black .
+
+    b. If flake8 fails fix it with: poetry run flake8
+
+2. poetry run pytest ./tests/automated_tests/
+
+
+How to test the user authentication
+-----------------------------------
+
+Checkout the Keycloak documentation under ./architecture_documentation/authentication.rst
+
+
+How to write documentation
+--------------------------
+
+Use Read the docs for that: ./rtd_setup_testing.rst
+
+
+Other useful commands
+----------------------
+
+To add some flask or invoke commands checkout the documentation: ./useful_commands.rst
