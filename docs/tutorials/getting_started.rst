@@ -24,7 +24,7 @@ On linux:
 Pycharm
 ################
 
-For Pycharm there exists a detailed guide in the documentation: :doc:`Pycharm Docu - Development Guide <./tutorials/configure_pycharm>`
+For Pycharm there exists a detailed guide in the documentation: :doc:`Pycharm Docu - Development Guide <./configure_pycharm>`
 With also some hints how to develop qunicorn.
 
 Development
