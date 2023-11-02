@@ -15,8 +15,10 @@
 
 """Module containing all Dtos and their Schemas  for tasks in the Services API."""
 from dataclasses import dataclass
-from ..flask_api_utils import MaBaseSchema
+
 import marshmallow as ma
+
+from ..flask_api_utils import MaBaseSchema
 
 __all__ = ["ProviderAssemblerLanguageDto", "ProviderAssemblerLanguageDtoSchema"]
 
@@ -33,4 +35,4 @@ class ProviderAssemblerLanguageDto:
 class ProviderAssemblerLanguageDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=True, allow_none=False)
     provider_id = ma.fields.String(required=True, allow_none=False)
-    name = ma.fields.Enum(required=True, allow_none=False, enum=AssemblerLanguage)
+    supported_language = ma.fields.Enum(required=True, allow_none=False, enum=AssemblerLanguage)

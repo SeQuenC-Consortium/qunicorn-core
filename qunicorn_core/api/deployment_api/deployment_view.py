@@ -22,7 +22,7 @@ from flask import jsonify
 from flask.views import MethodView
 
 from .root import DEPLOYMENT_API
-from ..api_models import JobResponseDtoSchema
+from ..api_models import SimpleJobDtoSchema
 from ..api_models.deployment_dtos import (
     DeploymentDtoSchema,
     DeploymentRequestDtoSchema,
@@ -86,7 +86,7 @@ class DeploymentDetailView(MethodView):
 class JobsByDeploymentView(MethodView):
     """API endpoint for jobs of a specific deployment."""
 
-    @DEPLOYMENT_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))
+    @DEPLOYMENT_API.response(HTTPStatus.OK, SimpleJobDtoSchema(many=True))
     @DEPLOYMENT_API.require_jwt(optional=True)
     def get(self, deployment_id: str, jwt_subject: Optional[str]):
         """Get the details of all jobs with a specific deployment id."""
@@ -94,11 +94,11 @@ class JobsByDeploymentView(MethodView):
         jobs_by_deployment_id = job_service.get_jobs_by_deployment_id(deployment_id, user_id=jwt_subject)
         return (
             jobs_by_deployment_id
-            if jobs_by_deployment_id is []
+            if len(jobs_by_deployment_id) > 0
             else jsonify({"Warning": "No Jobs can be found for this DeploymentID"})
         )
 
-    @DEPLOYMENT_API.response(HTTPStatus.OK, JobResponseDtoSchema(many=True))
+    @DEPLOYMENT_API.response(HTTPStatus.OK, SimpleJobDtoSchema(many=True))
     @DEPLOYMENT_API.require_jwt(optional=True)
     def delete(self, deployment_id: str, jwt_subject: Optional[str]):
         """Delete all jobs with a specific deployment id."""
@@ -106,6 +106,6 @@ class JobsByDeploymentView(MethodView):
         jobs_by_deployment_id = job_service.delete_jobs_by_deployment_id(deployment_id, user_id=jwt_subject)
         return (
             jobs_by_deployment_id
-            if jobs_by_deployment_id is []
+            if len(jobs_by_deployment_id) > 0
             else jsonify({"Warning": "No Jobs can be found for this DeploymentID"})
         )

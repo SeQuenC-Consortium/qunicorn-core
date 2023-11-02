@@ -138,8 +138,8 @@ class JobResponseDtoSchema(MaBaseSchema):
 
 class SimpleJobDtoSchema(MaBaseSchema):
     id = ma.fields.Integer(required=True, allow_none=False, dump_only=True)
-    job_name = ma.fields.String(required=False, allow_none=False, dump_only=True)
-    job_state = ma.fields.String(required=False, allow_none=False, dump_only=True)
+    name = ma.fields.String(required=False, allow_none=False, dump_only=True)
+    state = ma.fields.String(required=False, allow_none=False, dump_only=True)
 
 
 class TokenSchema(MaBaseSchema):

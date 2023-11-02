@@ -309,6 +309,8 @@ class IBMPilot(Pilot):
 
     def is_device_available(self, device: DeviceDto, token: str) -> bool:
         ibm_provider: IBMProvider = IBMPilot.get_ibm_provider_and_login(token)
+        if device.is_simulator:
+            return True
         try:
             ibm_provider.get_backend(device.name)
             return True
