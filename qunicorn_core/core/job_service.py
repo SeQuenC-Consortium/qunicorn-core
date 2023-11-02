@@ -29,7 +29,9 @@ from qunicorn_core.core.mapper import job_mapper
 from qunicorn_core.db.database_services import job_db_service
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.static.enums.job_state import JobState
+from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import logging
+from qunicorn_core.util.utils import is_running_asynchronously
 
 """
 This module contains the service layer for jobs. It is used to create and run jobs.
@@ -139,6 +141,8 @@ def delete_jobs_by_deployment_id(deployment_id, user_id: Optional[str] = None) -
 
 def get_job_queue_items() -> dict:
     """Get the latest running job and all latest ready jobs"""
+    if not is_running_asynchronously():
+        raise QunicornError(f"Canceling a job is not possible in synchronous mode", status_code=400)
     all_jobs: list[JobDataclass] = job_db_service.get_all()
     return {"running_job": get_latest_running_job(all_jobs), "queued_jobs": get_latest_ready_jobs(all_jobs)}
 

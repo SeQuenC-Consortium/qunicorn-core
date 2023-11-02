@@ -31,3 +31,7 @@ def is_experimental_feature_enabled() -> bool:
 
 def is_running_in_docker() -> bool:
     return os.environ.get("RUNNING_IN_DOCKER", "") == "True"
+
+
+def is_running_asynchronously() -> bool:
+    return os.environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from os import environ
 from typing import Optional
 
 import yaml
@@ -36,8 +35,6 @@ from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import logging
 
 """This Class is responsible for running a job on a pilot and scheduling them with celery"""
-
-ASYNCHRONOUS: bool = environ.get("EXECUTE_CELERY_TASK_ASYNCHRONOUS") == "True"
 
 
 @CELERY.task()
