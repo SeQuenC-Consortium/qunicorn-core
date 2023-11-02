@@ -31,7 +31,7 @@ Configure Debugger for Pycharm
 
 Run → Edit Configurations → Add the configuration parameters from the image
 
-.. image:: ../resources/images/configure_debugger.png
+.. image:: ../resources/images/configure_debugger.jpeg
 
 
 Configure Logger Terminal
@@ -45,7 +45,7 @@ Configure Logger Terminal
 
 4. With "Rehighlight-Your-Console" the customization can be "tested" directly
 
-.. image:: ../resources/images/configure_logger.jpeg
+.. image:: ../resources/images/configure_logger.png
 
 
 How to open the database
