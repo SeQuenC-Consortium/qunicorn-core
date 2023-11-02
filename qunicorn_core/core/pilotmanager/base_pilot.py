@@ -31,6 +31,7 @@ from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.job_type import JobType
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.qunicorn_exception import QunicornError
+from qunicorn_core.util.utils import is_running_asynchronously
 
 
 class Pilot:
@@ -77,6 +78,8 @@ class Pilot:
 
     def cancel(self, job: JobCoreDto):
         """Cancel the execution of a job, locally or if that is not possible at the backend"""
+        if not is_running_asynchronously():
+            raise QunicornError(f"Canceling a job is not possible in synchronous mode", status_code=400)
         if job.state == JobState.READY and not JobCoreDto.celery_id == "synchronous":
             res = CELERY.AsyncResult(job.celery_id)
             if res.status == PENDING:
