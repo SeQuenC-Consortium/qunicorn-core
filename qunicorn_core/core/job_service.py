@@ -142,7 +142,7 @@ def delete_jobs_by_deployment_id(deployment_id, user_id: Optional[str] = None) -
 def get_job_queue_items() -> dict:
     """Get the latest running job and all latest ready jobs"""
     if not is_running_asynchronously():
-        raise QunicornError(f"Canceling a job is not possible in synchronous mode", status_code=400)
+        raise QunicornError("Returning queued jobs is not possible in synchronous mode", status_code=400)
     all_jobs: list[JobDataclass] = job_db_service.get_all()
     return {"running_job": get_latest_running_job(all_jobs), "queued_jobs": get_latest_ready_jobs(all_jobs)}
 
