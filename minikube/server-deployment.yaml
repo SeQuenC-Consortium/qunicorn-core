@@ -18,10 +18,12 @@ spec:
     spec:
       containers:
         - env:
-            - name: BROKER_URL
-              value: redis://broker:6379
             - name: CONTAINER_MODE
               value: server
+            - name: BROKER_URL
+              value: redis://broker:6379
+            - name: JWKS_URL
+              value: http://keycloak:8081/auth/realms/qunicorn/protocol/openid-connect/certs
             - name: DB_URL
               value: postgresql://postgres:passwd@postgres/qunicorn
             - name: SERVER_PORT
