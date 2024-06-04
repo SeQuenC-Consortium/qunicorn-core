@@ -16,6 +16,11 @@ spec:
         io.kompose.network/qunicorn-core-qunicorn: "true"
         io.kompose.service: server
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
       containers:
         - env:
             - name: CONTAINER_MODE
@@ -53,4 +58,6 @@ spec:
             - containerPort: 8081
               #hostPort: 8081
               protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
       restartPolicy: Always

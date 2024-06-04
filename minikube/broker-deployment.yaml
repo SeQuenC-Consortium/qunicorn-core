@@ -16,6 +16,11 @@ spec:
         io.kompose.network/qunicorn-core-qunicorn: "true"
         io.kompose.service: broker
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
       containers:
         - image: redis:7.2.5
           name: broker
@@ -30,4 +35,6 @@ spec:
             - containerPort: 6379
               #hostPort: 6379
               protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
       restartPolicy: Always

@@ -16,6 +16,11 @@ spec:
         io.kompose.network/qunicorn-core-qunicorn: "true"
         io.kompose.service: worker
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
       containers:
         - env:
             - name: BROKER_PASSWORD
@@ -53,4 +58,6 @@ spec:
           ports:
             - containerPort: 6379
               protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
       restartPolicy: Always
