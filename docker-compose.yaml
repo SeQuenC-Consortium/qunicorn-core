@@ -15,7 +15,7 @@ services:
       - postgres
       - broker
     ports:
-      - "8080:8080"
+      - ":8080"
     labels:
       kompose.service.expose: "true"
       kompose.service.type: "loadbalancer"
@@ -37,35 +37,51 @@ services:
     ports:
       - "6379"
 
-  keycloak:
-    image: jboss/keycloak
-    networks:
-      - qunicorn
-    depends_on:
-      - keycloak_postgres
-    ports:
-      - "8081:8080"
-    volumes:
-      - "./resources/keycloak-realm-export.json:/tmp/realm-export.json"
-    environment:
-      DB_VENDOR: postgres
-      KEYCLOAK_USER: kc_user
-      KEYCLOAK_PASSWORD: kc_pass
-      DB_ADDR: keycloak_postgres
-      DB_USER: postgres
-      DB_PASSWORD: passwd
-      KEYCLOAK_IMPORT=/tmp/realm-export.json:
-
+  
   keycloak_postgres:
     image: postgres:15.3
-    networks:
-      - qunicorn
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
-      POSTGRES_PASSWORD: passwd
       POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: passwd
+    hostname: local
+    restart: always
     volumes:
-      - keycloak_pgdata:/var/lib/postgresql/data \
+      - /keycloak_pgdata:/var/lib/postgresql/data
+    ports: 
+      - "5439:5432"
+    networks:
+      - qunicorn
+
+  keycloak:
+    image: quay.io/keycloak/keycloak
+    command: ["start-dev"]
+    environment:
+      DB_VENDOR: postgres
+      DB_ADDR: keycloak_postgres
+      DB_PORT: 5432
+      DB_SCHEMA: public
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: passwd
+      KEYCLOAK_USER: kc_user
+      KEYCLOAK_PASSWORD: kc_pass
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_PROXY_MODE: edge
+      KC_METRICS_ENABLED: true
+      KC_HTTP_ENABLED: true
+      KEYCLOAK_IMPORT: /tmp/realm-export.json
+    ports:
+      - ":8080"
+    volumes:
+      - ./resources/keycloak-realm-export.json:/tmp/realm-export.json
+    depends_on:
+      - keycloak_postgres
+    restart: always
+    networks:
+      - qunicorn
 
   broker:
     image: redis:7.0.12
