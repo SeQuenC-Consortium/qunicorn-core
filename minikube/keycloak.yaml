@@ -6,8 +6,8 @@ metadata:
     app: keycloak
 spec:
   ports:
-    - name: "8081"
-      port: 8081
+    - name: http
+      port: 8443
       targetPort: 8080
   selector:
     app: keycloak
@@ -32,26 +32,40 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: jboss/keycloak
+          image: quay.io/keycloak/keycloak
+          args: ["start-dev","--import-realm"]
           env:
+            - name: DB_ADDR
+              value: keycloak_postgres
+            - name: DB_DATABASE
+              value: keycloak
+            - name: DB_PASSWORD
+              value: pas443
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_SCHEMA
+              value: public
+            - name: DB_USER
+              value: keycloak
             - name: DB_VENDOR
-              value: postgres
-            - name: KEYCLOAK_USER
-              value: kc_user
+              value: postg443
+            - name: KC_HTTP_ENABLED
+              value: "true"
+            - name: KC_METRICS_ENABLED
+              value: "true"
+            - name: KC_PROXY_MODE
+              value: edge
+            - name: KEYCLOAK_ADMIN
+              value: admin
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: admin
             - name: KEYCLOAK_PASSWORD
               value: kc_pass
-            - name: DB_ADDR
-              value: keycloak-postgres
-            - name: DB_USER
-              value: postgres
-            - name: DB_PASSWORD
-              value: passwd
-            - name: KEYCLOAK_IMPORT
-              value: /import/realm.json
+            - name: KEYCLOAK_USER
+              value: kc_user
           ports:
             - containerPort: 8080
-              hostPort: 8081
-              protocol: TCP
+              hostPort: 8080
           volumeMounts:
             - name: keycloak-volume
               mountPath: /import
