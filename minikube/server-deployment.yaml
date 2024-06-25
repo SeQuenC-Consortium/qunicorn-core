@@ -27,13 +27,13 @@ spec:
             - name: DB_URL
               value: postgresql://postgres:passwd@postgres/qunicorn
             - name: SERVER_PORT
-              value: "8080"
+              value: "8082"
             - name: NUMBA_CACHE_DIR
               value: /app/cache
           image: ghcr.io/qunicorn/qunicorn-core:main
           name: server
           ports:
-            - containerPort: 8080
-              hostPort: 8080
+            - containerPort: 8082
+              hostPort: 8082
               protocol: TCP
       restartPolicy: Always
