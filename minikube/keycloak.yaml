@@ -34,7 +34,7 @@ spec:
         - name: keycloak
           image: quay.io/keycloak/keycloak
           args: ["start-dev","--import-realm"]
-          env:
+        - env:
             - name: DB_ADDR
               value: keycloak_postgres
             - name: DB_DATABASE
