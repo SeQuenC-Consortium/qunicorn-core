@@ -25,15 +25,15 @@ spec:
             - name: JWKS_URL
               value: http://keycloak:8081/auth/realms/qunicorn/protocol/openid-connect/certs
             - name: DB_URL
-              value: postgresql://postgres:passwd@postgres/qunicorn
+              value: postgresql+psycopg://postgres:passwd@postgres/qunicorn
             - name: SERVER_PORT
-              value: "8082"
+              value: "8081"
             - name: NUMBA_CACHE_DIR
               value: /app/cache
           image: ghcr.io/qunicorn/qunicorn-core:main
           name: server
           ports:
-            - containerPort: 8082
-              hostPort: 8082
+            - containerPort: 8081
+              hostPort: 8081
               protocol: TCP
       restartPolicy: Always

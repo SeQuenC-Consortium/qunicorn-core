@@ -23,7 +23,7 @@ spec:
             - name: CONTAINER_MODE
               value: worker
             - name: DB_URL
-              value: postgresql://postgres:passwd@postgres/qunicorn
+              value: postgresql+psycopg://postgres:passwd@postgres/qunicorn
             - name: NUMBA_CACHE_DIR
               value: /app/cache
           image: ghcr.io/qunicorn/qunicorn-core:main
