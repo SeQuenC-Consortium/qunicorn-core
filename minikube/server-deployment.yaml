@@ -49,14 +49,12 @@ spec:
                 secretKeyRef:
                   name: qmware-secret
                   key: QMWARE_API_KEY_ID
-            # the URL of the QMware API is to be set here
-            # - name: QMWARE_URL
-            #   value: ???
+            - name: QMWARE_URL
+              value: http://10.186.9.12:9003/
           image: ghcr.io/qunicorn/qunicorn-core:main
           name: server
           ports:
             - containerPort: 8081
-              #hostPort: 8081
               protocol: TCP
           securityContext:
             allowPrivilegeEscalation: false
