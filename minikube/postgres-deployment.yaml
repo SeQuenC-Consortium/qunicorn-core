@@ -30,4 +30,12 @@ spec:
             - containerPort: 5432
               #hostPort: 5432
               protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: qunicorn-db-volume
+              subPath: pgdata
       restartPolicy: Always
+      volumes:
+        - name: qunicorn-db-volume
+          persistentVolumeClaim:
+            claimName: qunicorn-db-pvc
