@@ -25,6 +25,11 @@ spec:
         - env:
             - name: CONTAINER_MODE
               value: server
+            - name: BROKER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: broker-secret
+                  key: password
             - name: BROKER_HOST
               value: broker
             - name: BROKER_PORT
