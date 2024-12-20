@@ -51,7 +51,7 @@ spec:
                   key: QMWARE_API_KEY_ID
             - name: QMWARE_URL
               value: http://10.186.9.12:9003/
-          image: ghcr.io/qunicorn/qunicorn-core:main
+          image: ghcr.io/qunicorn/qunicorn-core:v1.0.4
           name: server
           ports:
             - containerPort: 8081
