@@ -1,0 +1,11 @@
+{
+    "all_devices": [
+      {
+        "name": "qunicorn_local_simulator",
+        "num_qubits": 10,
+        "is_simulator": true,
+        "is_local": true
+      }
+    ]
+  }
+  
