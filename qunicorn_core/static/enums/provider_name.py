@@ -29,3 +29,4 @@ class ProviderName(StrEnum):
     AWS = "AWS"
     RIGETTI = "RIGETTI"
     QMWARE = "QMWARE"
+    IONQ = "IONQ"
