@@ -35,7 +35,7 @@ RUN python -m pip install poetry==1.5.1
 
 COPY --chown=gunicorn . /app
 
-RUN python -m poetry export --without-hashes --format=requirements.txt -o requirements.txt && python -m pip install -r requirements.txt
+RUN python -m poetry export --without-hashes --format=requirements.txt -o requirements.txt && python -m pip install --default-timeout=100 -r requirements.txt
 
 VOLUME ["/app/instance"]
 ENV INSTANCE_PATH="/app/instance"

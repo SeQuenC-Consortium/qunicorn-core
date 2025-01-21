@@ -57,7 +57,7 @@ class IonQPilot(Pilot):
                 db_job.save_error(QunicornError("The job does not have any device associated!"))
                 continue  # one job failing should not affect other jobs
             else:
-                if IONQPilot.is_device_available(device, token):
+                if IonQPilot.is_device_available(device, token):
                     provider = IonQProvider(token)
                     backend = provider.backend(device.name)  # possible are simulator or ionq
                 else:
@@ -87,7 +87,7 @@ class IonQPilot(Pilot):
             db_job.save(commit=True)
 
             result = qiskit_job.result()
-            mapped_results: list[Sequence[PilotJobResult]] = IONQPilot.__map_runner_results(
+            mapped_results: list[Sequence[PilotJobResult]] = IonQPilot.__map_runner_results(
                 result, backend_specific_circuits
             )
 
@@ -184,7 +184,7 @@ class IonQPilot(Pilot):
             metadata.pop("data")
             metadata.pop("circuit", None)
 
-            hex_counts = IONQPilot._binary_counts_to_hex(binary_counts[i])
+            hex_counts = IonQPilot._binary_counts_to_hex(binary_counts[i])
 
             pilot_results.append(
                 PilotJobResult(
