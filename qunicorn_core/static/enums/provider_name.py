@@ -23,9 +23,11 @@ class ProviderName(StrEnum):
         AWS: Amazon Web Services
         RIGETTI: Rigetti Computing
         QMWARE: QMware
+        IONQ: IonQ
     """
 
     IBM = "IBM"
     AWS = "AWS"
     RIGETTI = "RIGETTI"
     QMWARE = "QMWARE"
+    IONQ = "IONQ"
