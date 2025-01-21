@@ -26,8 +26,8 @@ class ProviderName(StrEnum):
         IONQ: IonQ
     """
 
-    IBM = "IBM"
     AWS = "AWS"
+    IBM = "IBM"
     RIGETTI = "RIGETTI"
     QMWARE = "QMWARE"
     IONQ = "IONQ"
