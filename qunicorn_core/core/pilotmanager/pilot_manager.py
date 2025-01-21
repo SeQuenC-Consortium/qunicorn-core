@@ -24,13 +24,14 @@ from qunicorn_core.core.pilotmanager.base_pilot import Pilot
 from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
 from qunicorn_core.core.pilotmanager.qmware_pilot import QMwarePilot
 from qunicorn_core.core.pilotmanager.rigetti_pilot import RigettiPilot
+from qunicorn_core.core.pilotmanager.ionq_pilot import IonQPilot
 from qunicorn_core.db.db import DB
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
 from qunicorn_core.static.qunicorn_exception import QunicornError
 
-PILOTS: list[Pilot] = [IBMPilot(), AWSPilot(), RigettiPilot(), QMwarePilot()]
+PILOTS: list[Pilot] = [IBMPilot(), AWSPilot(), RigettiPilot(), QMwarePilot(), IonQPilot()]
 provider_name_map = {"IBM": "ibmq"}  # "<Qunicorn Provider Name>: <QPROV Provider Name>"
 
 """"This Class is responsible for managing the pilots and their data, all pilots are saved in the PILOTS list"""
