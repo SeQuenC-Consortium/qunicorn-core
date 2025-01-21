@@ -19,7 +19,7 @@ from typing import List, Optional, Sequence, Dict
 from flask.globals import current_app
 
 
-#ionq imports
+# ionq imports
 from qiskit_ionq import IonQProvider
 from qiskit import QuantumCircuit, transpile, QiskitError
 from qiskit.result import Result
@@ -37,18 +37,17 @@ from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import utils
 
-#devices IONQ Pilot: 'simulator', qpu.forte-1 , qpu.aria-1, qpu.aria-2
-#ionq uses Qiskit as SDK 
+# devices IONQ Pilot: 'simulator', qpu.forte-1 , qpu.aria-1, qpu.aria-2
+# ionq uses Qiskit as SDK
 
 
-class IONQPilot(Pilot):
+class IonQPilot(Pilot):
     """The IonQ Pilot"""
 
     provider_name = ProviderName.IONQ.value
     supported_languages = tuple([AssemblerLanguage.QISKIT.value])
 
     def run(self, jobs: Sequence[PilotJob], token: Optional[str] = None):
-
         """Execute a job local using ionq_simulator"""
         batched_jobs = [(db_job, list(pilot_jobs)) for db_job, pilot_jobs in groupby(jobs, lambda j: j.job)]
 
@@ -60,10 +59,9 @@ class IONQPilot(Pilot):
             else:
                 if IONQPilot.is_device_available(device, token):
                     provider = IonQProvider(token)
-                    backend = provider.backend(device.name) #possible are simulator or ionq
+                    backend = provider.backend(device.name)  # possible are simulator or ionq
                 else:
                     current_app.logger.info(f"Device {device.name} is not available")
-
 
             pilot_jobs = list(pilot_jobs)
 
@@ -108,20 +106,20 @@ class IONQPilot(Pilot):
             found_provider.supported_languages = list(self.supported_languages)
             found_provider.save()  # make sure that the provider will be committed to DB
         return found_provider
-    
+
     def get_standard_job_with_deployment(self, device: DeviceDataclass) -> JobDataclass:
         circuit: str = (
             "circuit = QuantumCircuit(2, 2);circuit.h(0); circuit.cx(0, 1);circuit.measure(0, 0);circuit.measure(1, 1)"
         )
         return self.create_default_job_with_circuit_and_device(device, circuit, assembler_language="QISKIT-PYTHON")
-    
+
     def save_devices_from_provider(self, token: Optional[str]):
         provider = IonQProvider(token)
         backends = provider.backends()
         for ionq_device in backends:
             backend = provider.get_backend(ionq_device.name)
             config = backend.configuration()
-            device_data = DeviceDataclass.get_by_name(ionq_device.name,provider)
+            device_data = DeviceDataclass.get_by_name(ionq_device.name, provider)
             if not found_device:
                 found_device = DeviceDataclass(
                     name=ionq_device.name,
@@ -141,7 +139,7 @@ class IONQPilot(Pilot):
         backend = provider.get_backend(device.name)
         status = backend.status()
         return status == "online"
-    
+
     def get_device_data_from_provider(self, device, token):
         provider = IonQProvider(token)
         backend = provider.get_backend(device.name)
@@ -206,7 +204,7 @@ class IONQPilot(Pilot):
                 )
             )
         return results
-    
+
     @staticmethod
     def _binary_counts_to_hex(binary_counts: Dict[str, int] | None) -> Dict[str, int] | None:
         if binary_counts is None:
