@@ -15,6 +15,7 @@
 
 from itertools import groupby
 from typing import List, Optional, Sequence, Dict
+from typing import Any, List, Optional, Sequence, Tuple, Union, Generator, NamedTuple, Dict
 
 from flask.globals import current_app
 
@@ -23,7 +24,9 @@ from flask.globals import current_app
 from qiskit_ionq import IonQProvider
 from qiskit import QuantumCircuit, transpile, QiskitError
 from qiskit.result import Result
+import qiskit_aer
 
+from qunicorn_core.api.api_models.device_dtos import DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot, PilotJob, PilotJobResult
 from qunicorn_core.db.db import DB
 from qunicorn_core.db.models.device import DeviceDataclass
@@ -36,6 +39,7 @@ from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import utils
+from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
 
 # devices IONQ Pilot: 'simulator', qpu.forte-1 , qpu.aria-1, qpu.aria-2
 # ionq uses Qiskit as SDK
@@ -56,10 +60,12 @@ class IonQPilot(Pilot):
             if device is None:
                 db_job.save_error(QunicornError("The job does not have any device associated!"))
                 continue  # one job failing should not affect other jobs
+            elif device.is_local:
+                backend = qiskit_aer.Aer.get_backend("aer_simulator")
             else:
-                if IonQPilot.is_device_available(device, token):
+                if self.is_device_available(device=device, token=token):
                     provider = IonQProvider(token)
-                    backend = provider.backend(device.name)  # possible are simulator or ionq
+                    backend = provider.get_backend(device.name)  # possible are simulator or ionq
                 else:
                     current_app.logger.info(f"Device {device.name} is not available")
 
@@ -87,7 +93,7 @@ class IonQPilot(Pilot):
             db_job.save(commit=True)
 
             result = qiskit_job.result()
-            mapped_results: list[Sequence[PilotJobResult]] = IonQPilot.__map_runner_results(
+            mapped_results: list[Sequence[PilotJobResult]] = self.__map_runner_results(
                 result, backend_specific_circuits
             )
 
@@ -134,13 +140,13 @@ class IonQPilot(Pilot):
                 found_device.is_local = False
             found_device.save()
 
-    def is_device_available(self, device, token):
+    def is_device_available(self, device: Union[DeviceDataclass, DeviceDto], token: Optional[str]) -> bool:
         provider = IonQProvider(token)
         backend = provider.get_backend(device.name)
         status = backend.status()
-        return status == "online"
+        return status.operational
 
-    def get_device_data_from_provider(self, device, token):
+    def get_device_data_from_provider(self, device: Union[DeviceDataclass, DeviceDto], token: Optional[str]) -> dict:
         provider = IonQProvider(token)
         backend = provider.get_backend(device.name)
         config_dict: dict = vars(backend.configuration())
