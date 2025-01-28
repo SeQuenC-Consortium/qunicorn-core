@@ -39,7 +39,6 @@ from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.static.qunicorn_exception import QunicornError
 from qunicorn_core.util import utils
-from qunicorn_core.core.pilotmanager.ibm_pilot import IBMPilot
 
 # devices IONQ Pilot: 'simulator', qpu.forte-1 , qpu.aria-1, qpu.aria-2
 # ionq uses Qiskit as SDK
