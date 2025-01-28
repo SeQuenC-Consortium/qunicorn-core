@@ -42,6 +42,7 @@ from qunicorn_core.util import utils
 
 # devices IONQ Pilot: 'simulator', qpu.forte-1 , qpu.aria-1, qpu.aria-2
 # ionq uses Qiskit as SDK
+# TODO: IonQ Pilot stuck in running state but job is completed on simulator; aer simulator is working
 
 
 class IonQPilot(Pilot):
@@ -51,7 +52,6 @@ class IonQPilot(Pilot):
     supported_languages = tuple([AssemblerLanguage.QISKIT.value])
 
     def run(self, jobs: Sequence[PilotJob], token: Optional[str] = None):
-        """Execute a job local using ionq_simulator"""
         batched_jobs = [(db_job, list(pilot_jobs)) for db_job, pilot_jobs in groupby(jobs, lambda j: j.job)]
 
         for db_job, pilot_jobs in batched_jobs:
@@ -124,7 +124,7 @@ class IonQPilot(Pilot):
         for ionq_device in backends:
             backend = provider.get_backend(ionq_device.name)
             config = backend.configuration()
-            device_data = DeviceDataclass.get_by_name(ionq_device.name, provider)
+            found_device = DeviceDataclass.get_by_name(ionq_device.name, provider)
             if not found_device:
                 found_device = DeviceDataclass(
                     name=ionq_device.name,
@@ -138,7 +138,23 @@ class IonQPilot(Pilot):
                 found_device.is_simulator = ionq_device.name.__contains__("simulator")
                 found_device.is_local = False
             found_device.save()
+        found_aer_device = DeviceDataclass.get_by_name("aer_simulator", provider)
+        if not found_aer_device:
+            # Then add the local simulator
+            found_aer_device = DeviceDataclass(
+                name="aer_simulator",
+                num_qubits=-1,
+                is_simulator=True,
+                is_local=True,
+                provider=provider,
+            )
+        else:
+            found_aer_device.num_qubits = -1
+            found_aer_device.is_simulator = True
+            found_aer_device.is_local = True
+        found_aer_device.save(commit=True)
 
+        
     def is_device_available(self, device: Union[DeviceDataclass, DeviceDto], token: Optional[str]) -> bool:
         provider = IonQProvider(token)
         backend = provider.get_backend(device.name)
