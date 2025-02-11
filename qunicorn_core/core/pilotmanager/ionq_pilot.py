@@ -1,4 +1,4 @@
-# Copyright 2024 University of Stuttgart
+# Copyright 2023 University of Stuttgart
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,358 +11,237 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import json
-import os
-from time import time
-from typing import List, Optional, Sequence, Union, Dict, Tuple
-from urllib.parse import urljoin
 
-import requests
+
+from itertools import groupby
+from typing import List, Optional, Sequence, Dict
+from typing import Any, List, Optional, Sequence, Tuple, Union, Generator, NamedTuple, Dict
+
 from flask.globals import current_app
-from qiskit import qasm2
-from requests.exceptions import ConnectionError
+
+
 # ionq imports
 from qiskit_ionq import IonQProvider
 from qiskit import QuantumCircuit, transpile, QiskitError
 from qiskit.result import Result
 import qiskit_aer
 
-from qunicorn_core.celery import CELERY
 from qunicorn_core.api.api_models.device_dtos import DeviceDto
 from qunicorn_core.core.pilotmanager.base_pilot import Pilot, PilotJob, PilotJobResult
 from qunicorn_core.db.db import DB
 from qunicorn_core.db.models.device import DeviceDataclass
 from qunicorn_core.db.models.job import JobDataclass
-from qunicorn_core.db.models.job_state import TransientJobStateDataclass
 from qunicorn_core.db.models.provider import ProviderDataclass
+from qunicorn_core.db.models.job_state import TransientJobStateDataclass
 from qunicorn_core.static.enums.assembler_languages import AssemblerLanguage
 from qunicorn_core.static.enums.job_state import JobState
 from qunicorn_core.static.enums.provider_name import ProviderName
 from qunicorn_core.static.enums.result_type import ResultType
 from qunicorn_core.static.qunicorn_exception import QunicornError
+from qunicorn_core.util import utils
 
-# Dein IonQ API-Token (setzt es als Umgebungsvariable oder direkt hier)
-IONQ_API_KEY = os.environ.get("IONQ_API_KEY", "WV1MdicOazYQODsDgXYPSdmRYjJCNyi3")
-
-# Die Basis-URL der IonQ-API
-BASE_IONQ_URL = "https://api.ionq.co"
-IONQ_URL = "https://api.ionq.co/v0.3"
-
-# Setze die Header für die Authentifizierung (API-Token)
-headers = {
-    "Authorization": f"Bearer {IONQ_API_KEY}",
-    "Content-Type": "application/json"
-}
-
-class IONQResultsPending(Exception):
-    pass
+# devices IONQ Pilot: 'simulator', qpu.forte-1 , qpu.aria-1, qpu.aria-2
+# ionq uses Qiskit as SDK
+# TODO: IonQ Pilot stuck in running state but job is completed on simulator; aer simulator is working
 
 
 class IonQPilot(Pilot):
-    """Base class for Pilots"""
+    """The IonQ Pilot"""
 
-    provider_name = ProviderName.IONQ
-    supported_languages = AssemblerLanguage.QISKIT
+    provider_name = ProviderName.IONQ.value
+    supported_languages = tuple([AssemblerLanguage.QISKIT.value])
 
     def run(self, jobs: Sequence[PilotJob], token: Optional[str] = None):
-        """Run a job of type RUNNER on a backend using a Pilot"""
-        job_name = "Qunicorn request"
+        batched_jobs = [(db_job, list(pilot_jobs)) for db_job, pilot_jobs in groupby(jobs, lambda j: j.job)]
 
-        jobs_to_watch = {}
-        job_len = len(jobs)
-        
-        for job in jobs:
-            job_name = f"{job_name}_{job.job.id}_{job.program.id}"
-            if job.circuit_fragment_id:
-                job_name = f"{job_name}-{job.circuit_fragment_id}"
-
-            data = {
-                "name": job_name,
-                "maxExecutionTimeInMs": 60_000,
-                "ttlAfterFinishedInMs": 1_200_000,
-                "code": {"type": "qiskit", "code": job.circuit},
-                "selectionParameters": [],
-                "programParameters": [{"name": "shots", "value": str(job.job.shots)}],
-            }
-
-            response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()
-
-            result = response.json()
-            jobs = result.get("jobs",[])
-
-            if result['jobs'][0]['status'] == 'failed':
-                # TODO save job/program specific error in DB
-                raise QunicornError(f"Job was not created. ({result['message']})")
-
-            program_state = TransientJobStateDataclass(
-                job=job.job,
-                program=job.program,
-                circuit_fragment_id=job.circuit_fragment_id,
-                data={
-                    "type": "IONQ",
-                    "id": result['jobs'][0]["id"],
-                    "started_at": int(time()),
-                    "X-API-KEY": IONQ_API_KEY,
-                    "circuit": job.circuit,
-                },
-            )
-            program_state.save()
-
-            jobs_to_watch[job.job.id] = job.job
-
-            if job.job.state not in (JobState.FINISHED, JobState.ERROR, JobState.CANCELED, JobState.BLOCKED):
-                job.job.state = JobState.RUNNING.value
-                job.job.save()
-        DB.session.commit()
-
-        for qunicorn_job in jobs_to_watch.values():
-            watch_task = watch_ionq_results.s(job_id=qunicorn_job.id).delay()
-            qunicorn_job.celery_id = watch_task.id
-            qunicorn_job.save(commit=True)  # commit new celery id
-
-    def _get_job_results(self, qunicorn_job_id: int) -> None:  # noqa: C901
-        qunicorn_job: JobDataclass = JobDataclass.get_by_id(qunicorn_job_id)
-
-        if qunicorn_job is None:
-            raise ValueError("Unknown Qunicorn job id {qunicorn_job_id}!")
-
-        jobs_to_save = []
-        results_to_save = []
-
-        for program_state in tuple(qunicorn_job._transient):
-            if program_state.program is None:
-                continue  # only process program related transient state
-
-            if not isinstance(program_state.data, dict) or program_state.data.get("type", None) != "IONQ":
-                continue  # only process transient state created by this pilot
-
-            job_started_at = program_state.data["started_at"]
-            ionq_job_id = program_state.data["id"]
-            program = program_state.program
-
-            if job_started_at + (24 * 3600) < time():
-                # time out jobs after 24 hours!
-                program_state.delete()
-                error = QunicornError(f"IonQ job with id {ionq_job_id} timed out!")
-                qunicorn_job.save_error(error, program=program)
-                continue
-
-
-            # Endpunkt für die Liste der Jobs
-            url = f"{IONQ_URL}/jobs/{ionq_job_id}"
-            response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()
-            result = response.json()   
-
-            status = result['status']
-
-            if status in ("pending", "queued", "running"):
-                raise IONQResultsPending()
-            
-            if status in ("failed", "canceled"):
-                program_state.delete()
-                error = QunicornError(f"IonQ job with id {ionq_job_id} returned status {status}")
-                qunicorn_job.save_error(error, program=program, extra_data={"ionq_result": result})
-                continue
-
-            if status != 'completed':
-                program_state.delete()
-                error = QunicornError(f"IonQ job with id {ionq_job_id} returned unknown status {status}")
-                qunicorn_job.save_error(error, program=program, extra_data={"ionq_result": result})
-                continue
-            
-            try:
-                try:
-                    circuit = qasm2.loads(program_state.data["circuit"])
-                except qasm2.exceptions.QASM2ParseError:
-                    circuit = qasm2.loads(
-                        program_state.data["circuit"], custom_instructions=qasm2.LEGACY_CUSTOM_INSTRUCTIONS
-                    )
-                register_metadata = []
-
-                for classical_register in reversed(circuit.cregs):
-                    register_metadata.append(
-                        {
-                            "name": classical_register.name,
-                            "size": classical_register.size,
-                        }
-                    )
-
-                results_url = results['results_url']
-                url_complete = f"{BASE_IONQ_URL}/{results_url}"
-                measurement_response = requests.get(url_complete, headers=headers, timeout=10)
-                measurement_response.raise_for_status()
-                measurement = measurement_response.json()
-
-                ##TODO: from here not updated to IONQ
-                measurements: List[Dict] = json.loads(result["out"]["value"])
-                results: List[List[Dict[str, int]]] = [measurement["result"] for measurement in measurements]
-
-                hex_counts, hex_probabilities = self._convert_qmware_measurements_to_qunicorn_measurements(
-                    qunicorn_job, results, register_metadata
-                )
-            except Exception as err:
-                program_state.delete()
-                qunicorn_job.save_error(err, program=program, extra_data={"qmware_result": result})
-                continue
-
-            jobs_to_save.append(
-                PilotJob(
-                    circuit=program_state.data["circuit"],
-                    job=program_state.job,
-                    program=program_state.program,
-                    circuit_fragment_id=program_state.circuit_fragment_id,
-                )
-            )
-
-            results_to_save.append(
-                [
-                    PilotJobResult(
-                        data=hex_counts,
-                        result_type=ResultType.COUNTS,
-                        meta={
-                            "format": "hex",
-                            "shots": qunicorn_job.shots,
-                            "registers": register_metadata,
-                        },
-                    ),
-                    PilotJobResult(
-                        data=hex_probabilities,
-                        result_type=ResultType.PROBABILITIES,
-                        meta={
-                            "format": "hex",
-                            "shots": qunicorn_job.shots,
-                            "registers": register_metadata,
-                        },
-                    ),
-                ]
-            )
-            program_state.delete()
-
-        # ensure that the relevant transient states are removed
-        DB.session.commit()
-
-        # this saves the results after all transient states with type QMWARE are deleted so that determine_db_job_state
-        # can determine the correct state
-        for job, result in zip(jobs_to_save, results_to_save):
-            self.save_results(job, result)
-
-        DB.session.commit()
-
-    def _convert_qmware_measurements_to_qunicorn_measurements(
-        self, job: JobDataclass, results: List[List[dict[str, int]]], register_metadata: list[dict[str, any]]
-    ) -> Tuple[dict[str, int], dict[str, float]]:
-        hex_counts = {}
-        hex_probabilities = {}
-
-        for single_result in zip(*results):
-            hex_measurements = []
-            hits = None
-            register: Dict[str, int]
-
-            if job.executed_on.name == "dev":
-                for register in single_result:
-                    hex_measurements.append(hex(register["number"]))
-
-                    if hits is None:
-                        hits = register["hits"]
-                    else:
-                        assert hits == register["hits"], "results have different number of hits"
-            elif job.executed_on.name == "dev-gpu":
-                # measurements are combined into one register on this device, therefore we have to split them again
-                register = single_result[0]
-                measured_bits = register["number"]
-
-                for single_register_meta in reversed(register_metadata):
-                    size: int = single_register_meta["size"]
-                    mask = (0b1 << size) - 1
-
-                    hex_measurements.append(hex(measured_bits & mask))
-
-                    # discard already processed bits
-                    measured_bits >>= size
-
-                hex_measurements.reverse()
-
-                if hits is None:
-                    hits = register["hits"]
+        for db_job, pilot_jobs in batched_jobs:
+            device = db_job.executed_on
+            if device is None:
+                db_job.save_error(QunicornError("The job does not have any device associated!"))
+                continue  # one job failing should not affect other jobs
+            elif device.is_local:
+                backend = qiskit_aer.Aer.get_backend("aer_simulator")
+            else:
+                if self.is_device_available(device=device, token=token):
+                    provider = IonQProvider(token)
+                    backend = provider.get_backend(device.name)  # possible are simulator or ionq
                 else:
-                    assert hits == register["hits"], "results have different number of hits"
+                    current_app.logger.info(f"Device {device.name} is not available")
 
-            if hits is None:
-                hits = 0
+            pilot_jobs = list(pilot_jobs)
 
-            hex_measurement = " ".join(hex_measurements)
-            hex_counts[hex_measurement] = hits
-            hex_probabilities[hex_measurement] = hits / job.shots
+            backend_specific_circuits = transpile([j.circuit for j in pilot_jobs], backend)
+            qiskit_job = backend.run(backend_specific_circuits, shots=db_job.shots)
 
-        return hex_counts, hex_probabilities
+            job_state: Optional[TransientJobStateDataclass] = None
 
-    def determine_db_job_state(self, db_job: JobDataclass) -> JobState:
-        if db_job.state == JobState.RUNNING.value:
-            if any(t.data.get("type") == "QMWARE" for t in db_job._transient if isinstance(t.data, dict)):
-                return JobState.RUNNING
-            return JobState.FINISHED
-        return super().determine_db_job_state(db_job)
+            for state in db_job._transient:
+                if state.program is not None and isinstance(state.data, dict):
+                    if state.data.get("type") == "IONQ":
+                        job_state = state
+                        break
+            else:
+                job_state = TransientJobStateDataclass(db_job, data={"type": "IONQ"})
+
+            provider_specific_ids = job_state.data.get("provider_ids", [])
+            provider_specific_ids.append(qiskit_job.job_id())
+            job_state.data = dict(job_state.data) | {"provider_ids": provider_specific_ids}
+            job_state.save()
+
+            db_job.state = JobState.RUNNING.value
+            db_job.save(commit=True)
+
+            result = qiskit_job.result()
+            mapped_results: list[Sequence[PilotJobResult]] = self.__map_runner_results(
+                result, backend_specific_circuits
+            )
+
+            for pilot_results, pilot_job in zip(mapped_results, pilot_jobs):
+                self.save_results(pilot_job, pilot_results)
+            DB.session.commit()
 
     def execute_provider_specific(self, jobs: Sequence[PilotJob], job_type: str, token: Optional[str] = None):
         """Execute a job of a provider specific type on a backend using a Pilot"""
-        raise QunicornError("No valid Job Type specified. QMware Pilot does not support provider specific job types.")
+        raise QunicornError("No valid Job Type specified. IonQ does not support provider specific jobs")
 
     def get_standard_provider(self) -> ProviderDataclass:
-        """Create the standard ProviderDataclass Object for the pilot and return it"""
         found_provider = ProviderDataclass.get_by_name(self.provider_name)
-
         if not found_provider:
             found_provider = ProviderDataclass(with_token=True, name=self.provider_name)
             found_provider.supported_languages = list(self.supported_languages)
             found_provider.save()  # make sure that the provider will be committed to DB
-
         return found_provider
 
     def get_standard_job_with_deployment(self, device: DeviceDataclass) -> JobDataclass:
-        """Create the standard ProviderDataclass Object for the pilot and return it"""
-        return self.create_default_job_with_circuit_and_device(device, DEFAULT_QUANTUM_CIRCUIT)
+        circuit: str = (
+            "circuit = QuantumCircuit(2, 2);circuit.h(0); circuit.cx(0, 1);circuit.measure(0, 0);circuit.measure(1, 1)"
+        )
+        return self.create_default_job_with_circuit_and_device(device, circuit, assembler_language="QISKIT-PYTHON")
 
     def save_devices_from_provider(self, token: Optional[str]):
-        """Access the devices from the cloud service of the provider, to update the current device list of qunicorn"""
-        raise QunicornError(
-            "The QMware pilot cannot fetch devices because the QMware API doesn't have the concept of devices."
-        )
+        provider = IonQProvider(token)
+        backends = provider.backends()
+        for ionq_device in backends:
+            backend = provider.get_backend(ionq_device.name)
+            config = backend.configuration()
+            found_device = DeviceDataclass.get_by_name(ionq_device.name, provider)
+            if not found_device:
+                found_device = DeviceDataclass(
+                    name=ionq_device.name,
+                    num_qubits=config.n_qubits,
+                    is_simulator=ionq_device.name.__contains__("simulator"),
+                    is_local=False,
+                    provider=provider,
+                )
+            else:
+                found_device.num_qubits = config.n_qubits
+                found_device.is_simulator = ionq_device.name.__contains__("simulator")
+                found_device.is_local = False
+            found_device.save()
+        found_aer_device = DeviceDataclass.get_by_name("aer_simulator", provider)
+        if not found_aer_device:
+            # Then add the local simulator
+            found_aer_device = DeviceDataclass(
+                name="aer_simulator",
+                num_qubits=-1,
+                is_simulator=True,
+                is_local=True,
+                provider=provider,
+            )
+        else:
+            found_aer_device.num_qubits = -1
+            found_aer_device.is_simulator = True
+            found_aer_device.is_local = True
+        found_aer_device.save(commit=True)
 
+        
     def is_device_available(self, device: Union[DeviceDataclass, DeviceDto], token: Optional[str]) -> bool:
-        """Check if a device is available for a user"""
-        response = requests.get(urljoin(QMWARE_URL, "/health"))
-
-        if response.status_code != 200:
-            return False
-
-        content = response.json()
-
-        return content["status"] == "UP"
+        provider = IonQProvider(token)
+        backend = provider.get_backend(device.name)
+        status = backend.status()
+        return status.operational
 
     def get_device_data_from_provider(self, device: Union[DeviceDataclass, DeviceDto], token: Optional[str]) -> dict:
-        """Get device data for a specific device from the provider"""
-        raise QunicornError(
-            "The QMware pilot cannot fetch devices because the QMware API doesn't have the concept of devices."
-        )
+        provider = IonQProvider(token)
+        backend = provider.get_backend(device.name)
+        config_dict: dict = vars(backend.configuration())
+        return config_dict
 
     def cancel_provider_specific(self, job: JobDataclass, token: Optional[str] = None):
-        """Cancel execution of a job at the corresponding backend"""
-        current_app.logger.warning(
-            f"Cancel job with id {job.id} on {job.executed_on.provider.name} failed."
-            f"Canceling while in execution not supported for QMware Jobs"
-        )
-        raise QunicornError("Canceling not supported on QMware devices")
+        provider = IonQProvider(token)
+        ionq_job = provider.get_job(job.id)
+        ionq_job.cancel()
+        job.state = JobState.CANCELED.value
+        job.save(commit=True)
+        current_app.logger.info(f"Cancel job with id {job.id} on {job.executed_on.provider.name} successful.")
 
+    @staticmethod
+    def __map_runner_results(
+        ionq_result: Result, circuits: List[QuantumCircuit] = None
+    ) -> list[Sequence[PilotJobResult]]:
+        results: list[Sequence[PilotJobResult]] = []
 
-@CELERY.task(
-    ignore_result=True,
-    autoretry_for=(IONQResultsPending, ConnectionError),
-    retry_backoff=1.2,
-    retry_backoff_max=60,
-    max_retries=None,
-)
-def watch_ionq_results(job_id: int):
-    IonQPilot()._get_job_results(job_id)
+        try:
+            binary_counts = ionq_result.get_counts()
+        except QiskitError:
+            binary_counts = [None]
+
+        if isinstance(binary_counts, dict):
+            binary_counts = [binary_counts]
+
+        for i, result in enumerate(ionq_result.results):
+            pilot_results: list[PilotJobResult] = []
+            results.append(pilot_results)
+
+            metadata = result.to_dict()
+            metadata["format"] = "hex"
+            classical_registers_metadata = []
+
+            for reg in reversed(circuits[i].cregs):
+                # FIXME: don't append registers that are not measured
+                classical_registers_metadata.append({"name": reg.name, "size": reg.size})
+
+            metadata["registers"] = classical_registers_metadata
+            metadata.pop("data")
+            metadata.pop("circuit", None)
+
+            hex_counts = IonQPilot._binary_counts_to_hex(binary_counts[i])
+
+            pilot_results.append(
+                PilotJobResult(
+                    result_type=ResultType.COUNTS,
+                    data=hex_counts if hex_counts else {"": 0},
+                    meta=metadata,
+                )
+            )
+
+            probabilities: dict = utils.calculate_probabilities(hex_counts) if hex_counts else {"": 0}
+
+            pilot_results.append(
+                PilotJobResult(
+                    result_type=ResultType.PROBABILITIES,
+                    data=probabilities,
+                    meta=metadata,
+                )
+            )
+        return results
+
+    @staticmethod
+    def _binary_counts_to_hex(binary_counts: Dict[str, int] | None) -> Dict[str, int] | None:
+        if binary_counts is None:
+            return None
+
+        hex_counts = {}
+
+        for k, v in binary_counts.items():
+            hex_registers = []
+
+            for binary_register in k.split():
+                hex_registers.append(f"0x{int(binary_register, 2):x}")
+
+            hex_sample = " ".join(hex_registers)
+
+            hex_counts[hex_sample] = v
+
+        return hex_counts
+
