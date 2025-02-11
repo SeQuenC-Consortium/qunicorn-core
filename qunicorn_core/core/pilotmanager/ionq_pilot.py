@@ -92,12 +92,18 @@ class IonQPilot(Pilot):
             db_job.save(commit=True)
 
             result = qiskit_job.result()
-            mapped_results: list[Sequence[PilotJobResult]] = self.__map_runner_results(
-                result, backend_specific_circuits
-            )
+            if result.success:
+                db_job.state = JobState.FINISHED
+                mapped_results: list[Sequence[PilotJobResult]] = self.__map_runner_results(
+                    result, backend_specific_circuits
+                )
 
-            for pilot_results, pilot_job in zip(mapped_results, pilot_jobs):
-                self.save_results(pilot_job, pilot_results)
+                for pilot_results, pilot_job in zip(mapped_results, pilot_jobs):
+                    self.save_results(pilot_job, pilot_results)
+            else:
+                job_state.state = JobState.ERROR.value
+                QunicornError(f"Job failed due to: {result.results}")
+
             DB.session.commit()
 
     def execute_provider_specific(self, jobs: Sequence[PilotJob], job_type: str, token: Optional[str] = None):
@@ -165,6 +171,11 @@ class IonQPilot(Pilot):
         provider = IonQProvider(token)
         backend = provider.get_backend(device.name)
         config_dict: dict = vars(backend.configuration())
+        config_dict["u_channel_lo"] = None
+        config_dict["_qubit_channel_map"] = None
+        config_dict["_channel_qubit_map"] = None
+        config_dict["_control_channels"] = None
+        config_dict["gates"] = None
         return config_dict
 
     def cancel_provider_specific(self, job: JobDataclass, token: Optional[str] = None):
@@ -174,7 +185,7 @@ class IonQPilot(Pilot):
         job.state = JobState.CANCELED.value
         job.save(commit=True)
         current_app.logger.info(f"Cancel job with id {job.id} on {job.executed_on.provider.name} successful.")
-
+     
     @staticmethod
     def __map_runner_results(
         ionq_result: Result, circuits: List[QuantumCircuit] = None
@@ -214,7 +225,7 @@ class IonQPilot(Pilot):
                     meta=metadata,
                 )
             )
-
+            #Could we use the probabilities calculated from IONQ?
             probabilities: dict = utils.calculate_probabilities(hex_counts) if hex_counts else {"": 0}
 
             pilot_results.append(

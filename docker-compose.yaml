@@ -1,7 +1,7 @@
 version: "3"
 services:
   server:
-    image: ghcr.io/qunicorn/qunicorn-core:main
+    image: docker.io/library/qunicorn:local2 
 
     networks:
       - qunicorn
@@ -22,7 +22,7 @@ services:
       kompose.service.type: "loadbalancer"
 
   worker:
-    image: ghcr.io/qunicorn/qunicorn-core:main
+    image: docker.io/library/qunicorn:local2 
     networks:
       - qunicorn
     environment:
