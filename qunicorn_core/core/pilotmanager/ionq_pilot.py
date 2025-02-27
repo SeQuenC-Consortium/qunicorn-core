@@ -13,9 +13,12 @@
 # limitations under the License.
 
 
+import traceback
+from http import HTTPStatus
+from os import environ
 from itertools import groupby
-from typing import List, Optional, Sequence, Dict
-from typing import Any, List, Optional, Sequence, Tuple, Union, Generator, NamedTuple, Dict
+from pathlib import Path
+from typing import List, Optional, Sequence, Union, Dict
 
 from flask.globals import current_app
 
@@ -52,6 +55,7 @@ class IonQPilot(Pilot):
     supported_languages = tuple([AssemblerLanguage.QISKIT.value])
 
     def run(self, jobs: Sequence[PilotJob], token: Optional[str] = None):
+        """Execute a job using aer simulator if local or a real backend from IonQ"""
         batched_jobs = [(db_job, list(pilot_jobs)) for db_job, pilot_jobs in groupby(jobs, lambda j: j.job)]
 
         for db_job, pilot_jobs in batched_jobs:
@@ -92,17 +96,13 @@ class IonQPilot(Pilot):
             db_job.save(commit=True)
 
             result = qiskit_job.result()
-            if result.success:
-                db_job.state = JobState.FINISHED
-                mapped_results: list[Sequence[PilotJobResult]] = self.__map_runner_results(
-                    result, backend_specific_circuits
-                )
 
-                for pilot_results, pilot_job in zip(mapped_results, pilot_jobs):
-                    self.save_results(pilot_job, pilot_results)
-            else:
-                job_state.state = JobState.ERROR.value
-                QunicornError(f"Job failed due to: {result.results}")
+            mapped_results:list[Sequence[PilotJobResult]] = IonQPilot.__map_runner_results(
+                    result, backend_specific_circuits
+            )
+            for pilot_results, pilot_job in zip(mapped_results, pilot_jobs):
+                self.save_results(pilot_job, pilot_results, commit=True)
+            #raise QunicornError(f'Result {mapped_results} AND {pilot_jobs[0].job.state}')
 
             DB.session.commit()
 
@@ -162,10 +162,13 @@ class IonQPilot(Pilot):
 
         
     def is_device_available(self, device: Union[DeviceDataclass, DeviceDto], token: Optional[str]) -> bool:
-        provider = IonQProvider(token)
-        backend = provider.get_backend(device.name)
-        status = backend.status()
-        return status.operational
+        if device.is_simulator:
+            return True
+        else:    
+            provider = IonQProvider(token)
+            backend = provider.get_backend(device.name)
+            status = backend.status()
+            return status.operational
 
     def get_device_data_from_provider(self, device: Union[DeviceDataclass, DeviceDto], token: Optional[str]) -> dict:
         provider = IonQProvider(token)
@@ -185,7 +188,7 @@ class IonQPilot(Pilot):
         job.state = JobState.CANCELED.value
         job.save(commit=True)
         current_app.logger.info(f"Cancel job with id {job.id} on {job.executed_on.provider.name} successful.")
-     
+
     @staticmethod
     def __map_runner_results(
         ionq_result: Result, circuits: List[QuantumCircuit] = None

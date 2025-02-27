@@ -126,6 +126,7 @@ class Pilot:
         raise NotImplementedError()
 
     def save_results(self, job: PilotJob, results: Sequence[PilotJobResult], commit: bool = False):
+        #raise QunicornError("Saving")
         contains_error = False
         contains_fragments = False
 
@@ -138,6 +139,8 @@ class Pilot:
                 contains_fragments = True
 
             else:
+                #raise QunicornError('saving')
+                #raise QunicornError(f'results left {len(results)-1}') until here it functions
                 res = ResultDataclass(
                     job=job.job,
                     program=job.program,
@@ -145,8 +148,11 @@ class Pilot:
                     meta=result.meta,
                     result_type=result.result_type,
                 )
-                res.save()
+                                                                        # until here it does not get
+                res.save(commit=True)
+                
 
+        #raise QunicornError('after all results')
         if contains_fragments:
             self._check_if_all_results_available(job)
 
@@ -164,7 +170,8 @@ class Pilot:
         if job.job.progress != new_progress:
             job.job.progress = new_progress
             job.job.save()
-
+        
+        raise QunicornError(f'ergebnis: {job.job.state}')
         if commit:
             DB.session.commit()
 
@@ -252,7 +259,7 @@ class Pilot:
             programs_with_results = set(r.program.id for r in db_job.results if r.program)
             if programs_with_results >= all_programs:
                 return JobState.FINISHED
-
+        raise QunicornError(f'state {db_job.state}')
         return JobState(db_job.state)
 
     def has_same_provider(self, provider_name: str) -> bool:
