@@ -139,8 +139,7 @@ class Pilot:
                 contains_fragments = True
 
             else:
-                #raise QunicornError('saving')
-                #raise QunicornError(f'results left {len(results)-1}') until here it functions
+                #raise QunicornError(f'Job: {job.job}, Program: {job.program}, Data: {result.data}, Meta: {result.meta}, Result type: {result.result_type}')
                 res = ResultDataclass(
                     job=job.job,
                     program=job.program,
@@ -148,8 +147,9 @@ class Pilot:
                     meta=result.meta,
                     result_type=result.result_type,
                 )
-                                                                        # until here it does not get
-                res.save(commit=True)
+                #raise QunicornError(f'result: {res}')                                      
+                res.save()                                                                #bis hier hin geht es      
+                #raise QunicornError("Wuhu")
                 
 
         #raise QunicornError('after all results')
@@ -171,7 +171,7 @@ class Pilot:
             job.job.progress = new_progress
             job.job.save()
         
-        raise QunicornError(f'ergebnis: {job.job.state}')
+        #raise QunicornError(f'ergebnis: {job.job.state}')
         if commit:
             DB.session.commit()
 
