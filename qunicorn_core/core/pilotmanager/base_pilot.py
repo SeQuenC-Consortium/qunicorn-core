@@ -126,7 +126,6 @@ class Pilot:
         raise NotImplementedError()
 
     def save_results(self, job: PilotJob, results: Sequence[PilotJobResult], commit: bool = False):
-        #raise QunicornError("Saving")
         contains_error = False
         contains_fragments = False
 
@@ -139,20 +138,15 @@ class Pilot:
                 contains_fragments = True
 
             else:
-                #raise QunicornError(f'Job: {job.job}, Program: {job.program}, Data: {result.data}, Meta: {result.meta}, Result type: {result.result_type}')
                 res = ResultDataclass(
                     job=job.job,
                     program=job.program,
                     data=result.data,
                     meta=result.meta,
                     result_type=result.result_type,
-                )
-                #raise QunicornError(f'result: {res}')                                      
-                res.save()                                                                #bis hier hin geht es      
-                #raise QunicornError("Wuhu")
+                )                                   
+                res.save()                                                                  
                 
-
-        #raise QunicornError('after all results')
         if contains_fragments:
             self._check_if_all_results_available(job)
 
@@ -171,7 +165,6 @@ class Pilot:
             job.job.progress = new_progress
             job.job.save()
         
-        #raise QunicornError(f'ergebnis: {job.job.state}')
         if commit:
             DB.session.commit()
 

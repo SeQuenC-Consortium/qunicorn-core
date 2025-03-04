@@ -14,6 +14,7 @@
 
 
 import traceback
+import numpy as np
 from http import HTTPStatus
 from os import environ
 from itertools import groupby
@@ -47,6 +48,72 @@ from qunicorn_core.util import utils
 # ionq uses Qiskit as SDK
 # TODO: IonQ Pilot stuck in running state but job is completed on simulator; aer simulator is working
 
+def convert_ionq_to_qiskit_result(ionq_result):
+    # Extrahieren der relevanten Daten aus dem IonQResult
+    ionq_results = ionq_result.results
+    
+    # Erstellen einer Liste von ExperimentResult-ähnlichen Objekten
+    experiment_results = []
+    
+    # Extrahieren der fehlenden Felder (wie backend_name, backend_version, qobj_id, job_id)
+    backend_name = ionq_result.backend_name
+    backend_version = ionq_result.backend_version
+    qobj_id = ionq_result.qobj_id
+    job_id = ionq_result.job_id
+
+    for ionq_exp_result in ionq_results:
+        # Zugriff auf die Daten im ExperimentResultData
+        experiment_data = ionq_exp_result.data
+        
+        # Extrahieren der relevanten Daten
+        counts = experiment_data.counts
+        probabilities = experiment_data.probabilities
+        metadata = experiment_data.metadata
+        shots = ionq_exp_result.shots
+        
+        # Konvertieren des QobjExperimentHeader-Objekts in ein Dictionary
+        header = ionq_exp_result.header.to_dict() if ionq_exp_result.header else {}
+
+        # Erstellen eines ExperimentResult-ähnlichen Objekts als Dictionary
+        experiment_result = {
+            'success': ionq_exp_result.success,
+            'shots': shots,
+            'data': {
+                'counts': counts,
+                'probabilities': probabilities,
+                'metadata': metadata
+            },
+            'header': header,  # Hier übergeben wir den Header als Dictionary
+            'metadata': {}  # Hier kannst du zusätzliche Metadaten hinzufügen, falls erforderlich
+        }
+        
+        # Füge das ExperimentResult-ähnliche Objekt zu unserer Liste hinzu
+        experiment_results.append(experiment_result)
+    
+    # Erstelle das Result-Objekt mit den experimentellen Ergebnissen
+    result_data = {
+        'backend_name': backend_name,
+        'backend_version': backend_version,
+        'qobj_id': qobj_id,
+        'job_id': job_id,
+        'results': experiment_results,
+        'success': ionq_result.success
+    }
+    
+    # Erstelle das Qiskit Result-Objekt
+    qiskit_result = Result.from_dict(result_data)
+    
+    return qiskit_result
+
+def convert_int64_to_int(obj):
+    """Rekursiv alle int64-Werte in int umwandeln."""
+    if isinstance(obj, dict):
+        return {key: convert_int64_to_int(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_int64_to_int(item) for item in obj]
+    elif isinstance(obj, np.int64):  # Überprüft, ob der Wert np.int64 ist
+        return int(obj)  # Konvertiert np.int64 zu int
+    return obj
 
 class IonQPilot(Pilot):
     """The IonQ Pilot"""
@@ -73,6 +140,7 @@ class IonQPilot(Pilot):
                     current_app.logger.info(f"Device {device.name} is not available")
 
             pilot_jobs = list(pilot_jobs)
+            pilot_jobs_conv = convert_int64_to_int(pilot_jobs)
 
             backend_specific_circuits = transpile([j.circuit for j in pilot_jobs], backend)
             qiskit_job = backend.run(backend_specific_circuits, shots=db_job.shots)
@@ -96,13 +164,14 @@ class IonQPilot(Pilot):
             db_job.save(commit=True)
 
             result = qiskit_job.result()
+            result_converted = convert_int64_to_int(result)
 
             mapped_results:list[Sequence[PilotJobResult]] = IonQPilot.__map_runner_results(
-                    result, backend_specific_circuits
+                    result_converted, backend_specific_circuits
             )
+
             for pilot_results, pilot_job in zip(mapped_results, pilot_jobs):
                 self.save_results(pilot_job, pilot_results, commit=True)
-            #raise QunicornError(f'Result {mapped_results} AND {pilot_jobs[0].job.state}')
 
             DB.session.commit()
 
