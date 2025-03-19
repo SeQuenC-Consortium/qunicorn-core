@@ -13,6 +13,7 @@
 # limitations under the License.
 import json
 import os
+from itertools import groupby
 from time import time
 from typing import List, Optional, Sequence, Union, Dict, Tuple
 from urllib.parse import urljoin
@@ -87,52 +88,60 @@ class QMwarePilot(Pilot):
             else:
                 raise QunicornError(f"Unknown QMware device {job.job.executed_on.name}")
 
-            data = {
-                "name": job_name,
-                "maxExecutionTimeInMs": 60_000,
-                "ttlAfterFinishedInMs": 1_200_000,
-                "code": {"type": code_type, "code": job.circuit},
-                "selectionParameters": [],
-                "programParameters": [{"name": "shots", "value": str(job.job.shots)}],
-            }
-
-            response = requests.post(
-                urljoin(QMWARE_URL, "/v0/requests"), json=data, headers=AUTHORIZATION_HEADERS, timeout=10
-            )
-            response.raise_for_status()
-
-            result = response.json()
-
-            if not result["jobCreated"]:
-                # TODO save job/program specific error in DB
-                raise QunicornError(f"Job was not created. ({result['message']})")
-
-            program_state = TransientJobStateDataclass(
-                job=job.job,
-                program=job.program,
-                circuit_fragment_id=job.circuit_fragment_id,
-                data={
-                    "type": "QMWARE",
-                    "id": result["id"],
-                    "started_at": int(time()),
-                    "X-API-KEY": QMWARE_API_KEY,
-                    "X-API-KEY-ID": QMWARE_API_KEY_ID,
-                    "circuit": job.circuit,
-                },
-            )
-            program_state.save()
-
+            self._send_single_circuit_request(job, job_name, code_type)
             jobs_to_watch[job.job.id] = job.job
 
-            if job.job.state not in (JobState.FINISHED, JobState.ERROR, JobState.CANCELED, JobState.BLOCKED):
-                job.job.state = JobState.RUNNING.value
-                job.job.save()
         DB.session.commit()
 
         for qunicorn_job in jobs_to_watch.values():
             watch_task = watch_qmware_results.s(job_id=qunicorn_job.id).delay()
             qunicorn_job.celery_id = watch_task.id
             qunicorn_job.save(commit=True)  # commit new celery id
+
+    @staticmethod
+    def _send_single_circuit_request(
+        job: PilotJob,
+        job_name: str,
+        code_type: str,
+    ):
+        data = {
+            "name": job_name,
+            "maxExecutionTimeInMs": 60_000,
+            "ttlAfterFinishedInMs": 1_200_000,
+            "code": {"type": code_type, "code": job.circuit},
+            "selectionParameters": [],
+            "programParameters": [{"name": "shots", "value": str(job.job.shots)}],
+        }
+
+        response = requests.post(
+            urljoin(QMWARE_URL, "/v0/requests"), json=data, headers=AUTHORIZATION_HEADERS, timeout=10
+        )
+        response.raise_for_status()
+
+        result = response.json()
+
+        if not result["jobCreated"]:
+            # TODO save job/program specific error in DB
+            raise QunicornError(f"Job was not created. ({result['message']})")
+
+        program_state = TransientJobStateDataclass(
+            job=job.job,
+            program=job.program,
+            circuit_fragment_id=job.circuit_fragment_id,
+            data={
+                "type": "QMWARE",
+                "id": result["id"],
+                "started_at": int(time()),
+                "X-API-KEY": QMWARE_API_KEY,
+                "X-API-KEY-ID": QMWARE_API_KEY_ID,
+                "circuit": job.circuit,
+            },
+        )
+        program_state.save()
+
+        if job.job.state not in (JobState.FINISHED, JobState.ERROR, JobState.CANCELED, JobState.BLOCKED):
+            job.job.state = JobState.RUNNING.value
+            job.job.save()
 
     def _get_job_results(self, qunicorn_job_id: int) -> None:  # noqa: C901
         qunicorn_job: JobDataclass = JobDataclass.get_by_id(qunicorn_job_id)
