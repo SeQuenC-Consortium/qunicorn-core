@@ -20,6 +20,7 @@ from os import environ
 from itertools import groupby
 from pathlib import Path
 from typing import List, Optional, Sequence, Union, Dict
+import select
 
 from flask.globals import current_app
 
@@ -134,9 +135,9 @@ class IonQPilot(Pilot):
             else:
                 if self.is_device_available(device=device, token=token):
                     provider = IonQProvider(token)
-                    backend = provider.get_backend(device.name)  # possible are simulator or ionq
+                    backend = provider.get_backend(str(device))  # possible are simulator or ionq
                 else:
-                    current_app.logger.info(f"Device {device.name} is not available")
+                    current_app.logger.info(f"Device {str(device)} is not available")
 
             pilot_jobs = list(pilot_jobs)
             pilot_jobs_conv = convert_int64_to_int(pilot_jobs)
@@ -193,25 +194,30 @@ class IonQPilot(Pilot):
         return self.create_default_job_with_circuit_and_device(device, circuit, assembler_language="QISKIT-PYTHON")
 
     def save_devices_from_provider(self, token: Optional[str]):
-        provider = IonQProvider(token)
-        backends = provider.backends()
-        for ionq_device in backends:
-            backend = provider.get_backend(ionq_device.name)
+        ionq_provider = IonQProvider(token)
+        all_devices = ionq_provider.backends()
+
+        provider: Optional[ProviderDataclass] = self.get_standard_provider()
+
+        # First save all devices from the cloud service
+        for ionq_device in all_devices:
+            found_device = DeviceDataclass.get_by_name(str(ionq_device), provider)
+            backend = ionq_provider.get_backend(str(ionq_device))
             config = backend.configuration()
-            found_device = DeviceDataclass.get_by_name(ionq_device.name, provider)
             if not found_device:
                 found_device = DeviceDataclass(
-                    name=ionq_device.name,
-                    num_qubits=config.n_qubits,
-                    is_simulator=ionq_device.name.__contains__("simulator"),
+                    name=str(ionq_device),
+                    num_qubits=-1 if str(ionq_device).__contains__("stabilizer") else config.n_qubits,
+                    is_simulator=str(ionq_device).__contains__("simulator"),
                     is_local=False,
                     provider=provider,
                 )
             else:
-                found_device.num_qubits = config.n_qubits
-                found_device.is_simulator = ionq_device.name.__contains__("simulator")
+                found_device.num_qubits = -1 if str(ionq_device).__contains__("stabilizer") else config.n_qubits
+                found_device.is_simulator = str(ionq_device).__contains__("simulator")
                 found_device.is_local = False
             found_device.save()
+
         found_aer_device = DeviceDataclass.get_by_name("aer_simulator", provider)
         if not found_aer_device:
             # Then add the local simulator
@@ -228,19 +234,18 @@ class IonQPilot(Pilot):
             found_aer_device.is_local = True
         found_aer_device.save(commit=True)
 
-        
     def is_device_available(self, device: Union[DeviceDataclass, DeviceDto], token: Optional[str]) -> bool:
         if device.is_simulator:
             return True
         else:    
             provider = IonQProvider(token)
-            backend = provider.get_backend(device.name)
+            backend = provider.get_backend(str(device))
             status = backend.status()
             return status.operational
 
     def get_device_data_from_provider(self, device: Union[DeviceDataclass, DeviceDto], token: Optional[str]) -> dict:
         provider = IonQProvider(token)
-        backend = provider.get_backend(device.name)
+        backend = provider.get_backend(str(device))
         config_dict: dict = vars(backend.configuration())
         config_dict["u_channel_lo"] = None
         config_dict["_qubit_channel_map"] = None
@@ -327,3 +332,15 @@ class IonQPilot(Pilot):
 
         return hex_counts
 
+    @classmethod
+    def get_by_name(cls, name: str):
+        """Returns all providers matching the given name"""
+        q = select(cls).where(cls.name == name)
+        providers = DB.session.execute(q).scalars().all()
+
+        if len(providers) < 1:
+            return None
+        if len(providers) > 1:
+            raise QunicornError(f"Found multiple providers with the same name '{name}'!")
+
+        return providers[0]
