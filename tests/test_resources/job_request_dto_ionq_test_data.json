@@ -1,0 +1,10 @@
+{
+    "name": "JobName",
+    "providerName": "IONQ",
+    "type": "RUNNER",
+    "token": "",
+    "deviceName": "ionq_simulator",
+    "shots": 4000,
+    "deploymentId": 3,
+    "errorMitigation": "none"
+  }
