@@ -30,12 +30,11 @@ RUN mkdir --parents /app/instance \
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
 RUN chmod +x /wait
 
-RUN python -m pip install --upgrade pip
-RUN python -m pip install poetry==1.5.1
+RUN python -m pip install poetry
 
 COPY --chown=gunicorn . /app
 
-RUN python -m poetry export --without-hashes --format=requirements.txt -o requirements.txt && python -m pip install --default-timeout=100 -r requirements.txt
+RUN python -m poetry export --without-hashes --format=requirements.txt -o requirements.txt && python -m pip install -r requirements.txt
 
 VOLUME ["/app/instance"]
 ENV INSTANCE_PATH="/app/instance"
