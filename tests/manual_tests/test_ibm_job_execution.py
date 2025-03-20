@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""""Test class to test the functionality of the job_api"""
+""" "Test class to test the functionality of the job_api"""
 
 from qunicorn_core.api.api_models import JobRequestDto, SimpleJobDto
 from qunicorn_core.core import job_service
