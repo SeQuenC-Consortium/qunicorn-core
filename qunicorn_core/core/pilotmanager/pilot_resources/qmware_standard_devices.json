@@ -11,6 +11,12 @@
       "num_qubits": -1,
       "is_simulator": true,
       "is_local": true
+    },
+    {
+      "name": "dev-batch",
+      "num_qubits": -1,
+      "is_simulator": true,
+      "is_local": true
     }
   ]
 }
