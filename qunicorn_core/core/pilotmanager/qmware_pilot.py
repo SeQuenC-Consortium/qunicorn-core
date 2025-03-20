@@ -130,7 +130,7 @@ class QMwarePilot(Pilot):
             "name": job_name,
             "maxExecutionTimeInMs": 60_000,
             "ttlAfterFinishedInMs": 1_200_000,
-            "code": {"type": code_type, "code": circuits if batched else circuits[0]},
+            "code": {"type": code_type, "code": json.dumps(circuits) if batched else circuits[0]},
             "selectionParameters": [],
             "programParameters": [{"name": "shots", "value": str(shots)}],
         }
