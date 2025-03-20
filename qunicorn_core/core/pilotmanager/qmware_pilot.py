@@ -138,8 +138,6 @@ class QMwarePilot(Pilot):
         response = requests.post(
             urljoin(QMWARE_URL, "/v0/requests"), json=data, headers=AUTHORIZATION_HEADERS, timeout=10
         )
-        current_app.logger.info(f"QMWARE API request: {response.request.body}")
-        current_app.logger.info(f"QMWARE API response: {response.text}")
         response.raise_for_status()
 
         result = response.json()
