@@ -15,4 +15,4 @@
 
 """Module containing all manual tests."""
 
-from . import test_ibm_job_errors, test_ibm_job_execution
+from . import test_ibm_job_errors, test_ibm_job_execution, test_ionq_job_execution

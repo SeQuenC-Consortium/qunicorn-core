@@ -144,9 +144,9 @@ class Pilot:
                     data=result.data,
                     meta=result.meta,
                     result_type=result.result_type,
-                )                                   
-                res.save()                                                                  
-                
+                )
+                res.save()
+
         if contains_fragments:
             self._check_if_all_results_available(job)
 
@@ -164,7 +164,7 @@ class Pilot:
         if job.job.progress != new_progress:
             job.job.progress = new_progress
             job.job.save()
-        
+
         if commit:
             DB.session.commit()
 
@@ -252,7 +252,7 @@ class Pilot:
             programs_with_results = set(r.program.id for r in db_job.results if r.program)
             if programs_with_results >= all_programs:
                 return JobState.FINISHED
-        raise QunicornError(f'state {db_job.state}')
+        raise QunicornError(f"state {db_job.state}")
         return JobState(db_job.state)
 
     def has_same_provider(self, provider_name: str) -> bool:
