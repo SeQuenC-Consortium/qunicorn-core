@@ -13,12 +13,8 @@
 # limitations under the License.
 
 
-import traceback
 import numpy as np
-from http import HTTPStatus
-from os import environ
 from itertools import groupby
-from pathlib import Path
 from typing import List, Optional, Sequence, Union, Dict
 import select
 
@@ -49,13 +45,12 @@ from qunicorn_core.util import utils
 # ionq uses Qiskit as SDK
 # TODO: IonQ Pilot stuck in running state but job is completed on simulator; aer simulator is working
 
+
 def convert_ionq_to_qiskit_result(ionq_result):
 
     ionq_results = ionq_result.results
-    
 
     experiment_results = []
-    
 
     backend_name = ionq_result.backend_name
     backend_version = ionq_result.backend_version
@@ -65,45 +60,37 @@ def convert_ionq_to_qiskit_result(ionq_result):
     for ionq_exp_result in ionq_results:
 
         experiment_data = ionq_exp_result.data
-        
 
         counts = experiment_data.counts
         probabilities = experiment_data.probabilities
         metadata = experiment_data.metadata
         shots = ionq_exp_result.shots
-        
 
         header = ionq_exp_result.header.to_dict() if ionq_exp_result.header else {}
 
         experiment_result = {
-            'success': ionq_exp_result.success,
-            'shots': shots,
-            'data': {
-                'counts': counts,
-                'probabilities': probabilities,
-                'metadata': metadata
-            },
-            'header': header,
-            'metadata': {}  
+            "success": ionq_exp_result.success,
+            "shots": shots,
+            "data": {"counts": counts, "probabilities": probabilities, "metadata": metadata},
+            "header": header,
+            "metadata": {},
         }
-        
 
         experiment_results.append(experiment_result)
-    
 
     result_data = {
-        'backend_name': backend_name,
-        'backend_version': backend_version,
-        'qobj_id': qobj_id,
-        'job_id': job_id,
-        'results': experiment_results,
-        'success': ionq_result.success
+        "backend_name": backend_name,
+        "backend_version": backend_version,
+        "qobj_id": qobj_id,
+        "job_id": job_id,
+        "results": experiment_results,
+        "success": ionq_result.success,
     }
-    
 
     qiskit_result = Result.from_dict(result_data)
-    
+
     return qiskit_result
+
 
 def convert_int64_to_int(obj):
     """Rekursiv alle int64-Werte in int umwandeln."""
@@ -111,9 +98,10 @@ def convert_int64_to_int(obj):
         return {key: convert_int64_to_int(value) for key, value in obj.items()}
     elif isinstance(obj, list):
         return [convert_int64_to_int(item) for item in obj]
-    elif isinstance(obj, np.int64): 
-        return int(obj)  
+    elif isinstance(obj, np.int64):
+        return int(obj)
     return obj
+
 
 class IonQPilot(Pilot):
     """The IonQ Pilot"""
@@ -140,7 +128,6 @@ class IonQPilot(Pilot):
                     current_app.logger.info(f"Device {str(device)} is not available")
 
             pilot_jobs = list(pilot_jobs)
-            pilot_jobs_conv = convert_int64_to_int(pilot_jobs)
 
             backend_specific_circuits = transpile([j.circuit for j in pilot_jobs], backend)
             qiskit_job = backend.run(backend_specific_circuits, shots=db_job.shots)
@@ -164,10 +151,10 @@ class IonQPilot(Pilot):
             db_job.save(commit=True)
 
             result = qiskit_job.result()
-            #result_converted = convert_int64_to_int(result)
+            # result_converted = convert_int64_to_int(result)
 
-            mapped_results:list[Sequence[PilotJobResult]] = IonQPilot.__map_runner_results(
-                    result, backend_specific_circuits
+            mapped_results: list[Sequence[PilotJobResult]] = IonQPilot.__map_runner_results(
+                result, backend_specific_circuits
             )
 
             for pilot_results, pilot_job in zip(mapped_results, pilot_jobs):
@@ -237,7 +224,7 @@ class IonQPilot(Pilot):
     def is_device_available(self, device: Union[DeviceDataclass, DeviceDto], token: Optional[str]) -> bool:
         if device.is_simulator:
             return True
-        else:    
+        else:
             provider = IonQProvider(token)
             backend = provider.get_backend(str(device))
             status = backend.status()
@@ -301,7 +288,7 @@ class IonQPilot(Pilot):
                     meta=metadata,
                 )
             )
-            #Could we use the probabilities calculated from IONQ?
+            # Could we use the probabilities calculated from IONQ?
             probabilities: dict = utils.calculate_probabilities(hex_counts) if hex_counts else {"": 0}
 
             pilot_results.append(
