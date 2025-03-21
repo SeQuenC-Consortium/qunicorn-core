@@ -74,7 +74,7 @@ class QMwarePilot(Pilot):
         """Run a job of type RUNNER on a backend using a Pilot"""
         job_name = "Qunicorn request"
 
-        jobs_to_watch = {}
+        jobs_to_watch = []
         batched_jobs: list[tuple[JobDataclass, list[PilotJob]]] = [
             (db_job, list(pilot_jobs)) for db_job, pilot_jobs in groupby(jobs, lambda j: j.job)
         ]
@@ -98,11 +98,11 @@ class QMwarePilot(Pilot):
                 for pilot_job in pilot_jobs:
                     self._send_circuit_request([pilot_job], batched, job_name, code_type)
 
-            jobs_to_watch[db_job.id] = db_job
+            jobs_to_watch.append(db_job)
 
         DB.session.commit()
 
-        for qunicorn_job in jobs_to_watch.values():
+        for qunicorn_job in jobs_to_watch:
             watch_task = watch_qmware_results.s(job_id=qunicorn_job.id).delay()
             qunicorn_job.celery_id = watch_task.id
             qunicorn_job.save(commit=True)  # commit new celery id
