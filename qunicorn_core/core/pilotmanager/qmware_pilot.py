@@ -177,6 +177,7 @@ class QMwarePilot(Pilot):
         jobs_to_save = []
         results_to_save = []
         fetched_results: dict[str, any] = {}
+        fetched_measurements: dict[str, list[dict] | list[list[dict]]] = {}
 
         for program_state in tuple(qunicorn_job._transient):
             if program_state.program is None:
@@ -191,6 +192,9 @@ class QMwarePilot(Pilot):
 
             if qmware_job_id in fetched_results:
                 result = fetched_results[qmware_job_id]
+
+                if result is None:
+                    continue  # response was fetched, but had an error
             else:
                 if job_started_at + (24 * 3600) < time():
                     # time out jobs after 24 hours!
@@ -207,9 +211,9 @@ class QMwarePilot(Pilot):
                     },
                     timeout=10,
                 )
+                fetched_results[qmware_job_id] = None
                 response.raise_for_status()
                 result = response.json()
-                fetched_results[qmware_job_id] = result
 
                 if result["status"] in ("WAITING", "PREPARING", "RUNNING"):
                     raise QMWAREResultsPending()
@@ -227,6 +231,9 @@ class QMwarePilot(Pilot):
                     )
                     qunicorn_job.save_error(error, program=program, extra_data={"qmware_result": result})
                     continue
+
+                fetched_results[qmware_job_id] = result
+                fetched_measurements[qmware_job_id] = json.loads(result["out"]["value"])
 
             try:
                 try:
@@ -247,9 +254,9 @@ class QMwarePilot(Pilot):
                     )
 
                 if program_state.data["batched"]:
-                    measurements: list[dict] = json.loads(result["out"]["value"])[program_state.data["circuit_index"]]
+                    measurements: list[dict] = fetched_measurements[qmware_job_id][program_state.data["circuit_index"]]
                 else:
-                    measurements: list[dict] = json.loads(result["out"]["value"])
+                    measurements: list[dict] = fetched_measurements[qmware_job_id]
 
                 results: List[List[Dict[str, int]]] = [measurement["result"] for measurement in measurements]
 
