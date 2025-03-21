@@ -13,6 +13,7 @@
 # limitations under the License.
 import json
 import os
+from itertools import groupby
 from time import time
 from typing import List, Optional, Sequence, Union, Dict, Tuple
 from urllib.parse import urljoin
@@ -73,40 +74,79 @@ class QMwarePilot(Pilot):
         """Run a job of type RUNNER on a backend using a Pilot"""
         job_name = "Qunicorn request"
 
-        jobs_to_watch = {}
+        jobs_to_watch = []
+        batched_jobs: list[tuple[JobDataclass, list[PilotJob]]] = [
+            (db_job, list(pilot_jobs)) for db_job, pilot_jobs in groupby(jobs, lambda j: j.job)
+        ]
+
+        for db_job, pilot_jobs in batched_jobs:
+            batched = False
+
+            if db_job.executed_on.name == "dev":
+                code_type = "qasm2"
+            elif db_job.executed_on.name == "dev-gpu":
+                code_type = "qasm2-gpu"
+            elif db_job.executed_on.name == "dev-batch":
+                code_type = "qasm2-batch"
+                batched = True
+            else:
+                raise QunicornError(f"Unknown QMware device {db_job.executed_on.name}")
+
+            if batched:
+                self._send_circuit_request(pilot_jobs, batched, job_name, code_type)
+            else:
+                for pilot_job in pilot_jobs:
+                    self._send_circuit_request([pilot_job], batched, job_name, code_type)
+
+            jobs_to_watch.append(db_job)
+
+        DB.session.commit()
+
+        for qunicorn_job in jobs_to_watch:
+            watch_task = watch_qmware_results.s(job_id=qunicorn_job.id).delay()
+            qunicorn_job.celery_id = watch_task.id
+            qunicorn_job.save(commit=True)  # commit new celery id
+
+    @staticmethod
+    def _send_circuit_request(
+        jobs: list[PilotJob],
+        batched: bool,
+        job_name: str,
+        code_type: str,
+    ):
+        if not batched:
+            assert len(jobs) == 1, "without batching only one job can be dispatched at a time"
+
+        db_job = jobs[0].job
+        job_id = db_job.id
 
         for job in jobs:
-            job_name = f"{job_name}_{job.job.id}_{job.program.id}"
-            if job.circuit_fragment_id:
-                job_name = f"{job_name}-{job.circuit_fragment_id}"
+            assert job_id == job.job.id, "all PilotJobs need to belong to the same job"
 
-            if job.job.executed_on.name == "dev":
-                code_type = "qasm2"
-            elif job.job.executed_on.name == "dev-gpu":
-                code_type = "qasm2-gpu"
-            else:
-                raise QunicornError(f"Unknown QMware device {job.job.executed_on.name}")
+        circuits = [job.circuit for job in jobs]
+        shots = jobs[0].job.shots
 
-            data = {
-                "name": job_name,
-                "maxExecutionTimeInMs": 60_000,
-                "ttlAfterFinishedInMs": 1_200_000,
-                "code": {"type": code_type, "code": job.circuit},
-                "selectionParameters": [],
-                "programParameters": [{"name": "shots", "value": str(job.job.shots)}],
-            }
+        data = {
+            "name": job_name,
+            "maxExecutionTimeInMs": 60_000,
+            "ttlAfterFinishedInMs": 1_200_000,
+            "code": {"type": code_type, "code": json.dumps(circuits) if batched else circuits[0]},
+            "selectionParameters": [],
+            "programParameters": [{"name": "shots", "value": str(shots)}],
+        }
 
-            response = requests.post(
-                urljoin(QMWARE_URL, "/v0/requests"), json=data, headers=AUTHORIZATION_HEADERS, timeout=10
-            )
-            response.raise_for_status()
+        response = requests.post(
+            urljoin(QMWARE_URL, "/v0/requests"), json=data, headers=AUTHORIZATION_HEADERS, timeout=10
+        )
+        response.raise_for_status()
 
-            result = response.json()
+        result = response.json()
 
-            if not result["jobCreated"]:
-                # TODO save job/program specific error in DB
-                raise QunicornError(f"Job was not created. ({result['message']})")
+        if not result["jobCreated"]:
+            # TODO save job/program specific error in DB
+            raise QunicornError(f"Job was not created. ({result['message']})")
 
+        for i, job in enumerate(jobs):
             program_state = TransientJobStateDataclass(
                 job=job.job,
                 program=job.program,
@@ -118,21 +158,15 @@ class QMwarePilot(Pilot):
                     "X-API-KEY": QMWARE_API_KEY,
                     "X-API-KEY-ID": QMWARE_API_KEY_ID,
                     "circuit": job.circuit,
+                    "batched": batched,
+                    "circuit_index": i if batched else None,
                 },
             )
             program_state.save()
 
-            jobs_to_watch[job.job.id] = job.job
-
-            if job.job.state not in (JobState.FINISHED, JobState.ERROR, JobState.CANCELED, JobState.BLOCKED):
-                job.job.state = JobState.RUNNING.value
-                job.job.save()
-        DB.session.commit()
-
-        for qunicorn_job in jobs_to_watch.values():
-            watch_task = watch_qmware_results.s(job_id=qunicorn_job.id).delay()
-            qunicorn_job.celery_id = watch_task.id
-            qunicorn_job.save(commit=True)  # commit new celery id
+        if db_job.state not in (JobState.FINISHED, JobState.ERROR, JobState.CANCELED, JobState.BLOCKED):
+            db_job.state = JobState.RUNNING.value
+            db_job.save()
 
     def _get_job_results(self, qunicorn_job_id: int) -> None:  # noqa: C901
         qunicorn_job: JobDataclass = JobDataclass.get_by_id(qunicorn_job_id)
@@ -142,6 +176,8 @@ class QMwarePilot(Pilot):
 
         jobs_to_save = []
         results_to_save = []
+        fetched_results: dict[str, any] = {}
+        fetched_measurements: dict[str, list[dict] | list[list[dict]]] = {}
 
         for program_state in tuple(qunicorn_job._transient):
             if program_state.program is None:
@@ -154,38 +190,50 @@ class QMwarePilot(Pilot):
             qmware_job_id = program_state.data["id"]
             program = program_state.program
 
-            if job_started_at + (24 * 3600) < time():
-                # time out jobs after 24 hours!
-                program_state.delete()
-                error = QunicornError(f"QMware job with id {qmware_job_id} timed out!")
-                qunicorn_job.save_error(error, program=program)
-                continue
+            if qmware_job_id in fetched_results:
+                result = fetched_results[qmware_job_id]
 
-            response = requests.get(
-                urljoin(QMWARE_URL, f"/v0/jobs/{qmware_job_id}"),
-                headers={
-                    "X-API-KEY": program_state.data["X-API-KEY"],
-                    "X-API-KEY-ID": program_state.data["X-API-KEY-ID"],
-                },
-                timeout=10,
-            )
-            response.raise_for_status()
-            result = response.json()
+                if result is None:
+                    continue  # response was fetched, but had an error
+            else:
+                if job_started_at + (24 * 3600) < time():
+                    # time out jobs after 24 hours!
+                    program_state.delete()
+                    error = QunicornError(f"QMware job with id {qmware_job_id} timed out!")
+                    qunicorn_job.save_error(error, program=program)
+                    continue
 
-            if result["status"] in ("WAITING", "PREPARING", "RUNNING"):
-                raise QMWAREResultsPending()
+                response = requests.get(
+                    urljoin(QMWARE_URL, f"/v0/jobs/{qmware_job_id}"),
+                    headers={
+                        "X-API-KEY": program_state.data["X-API-KEY"],
+                        "X-API-KEY-ID": program_state.data["X-API-KEY-ID"],
+                    },
+                    timeout=10,
+                )
+                fetched_results[qmware_job_id] = None
+                response.raise_for_status()
+                result = response.json()
 
-            if result["status"] in ("ERROR", "TIMEOUT", "CANCELED"):
-                program_state.delete()
-                error = QunicornError(f"QMware job with id {qmware_job_id} returned status {result['status']}")
-                qunicorn_job.save_error(error, program=program, extra_data={"qmware_result": result})
-                continue
+                if result["status"] in ("WAITING", "PREPARING", "RUNNING"):
+                    raise QMWAREResultsPending()
 
-            if result["status"] != "SUCCESS":
-                program_state.delete()
-                error = QunicornError(f"QMware job with id {qmware_job_id} returned unknown status {result['status']}")
-                qunicorn_job.save_error(error, program=program, extra_data={"qmware_result": result})
-                continue
+                if result["status"] in ("ERROR", "TIMEOUT", "CANCELED"):
+                    program_state.delete()
+                    error = QunicornError(f"QMware job with id {qmware_job_id} returned status {result['status']}")
+                    qunicorn_job.save_error(error, program=program, extra_data={"qmware_result": result})
+                    continue
+
+                if result["status"] != "SUCCESS":
+                    program_state.delete()
+                    error = QunicornError(
+                        f"QMware job with id {qmware_job_id} returned unknown status {result['status']}"
+                    )
+                    qunicorn_job.save_error(error, program=program, extra_data={"qmware_result": result})
+                    continue
+
+                fetched_results[qmware_job_id] = result
+                fetched_measurements[qmware_job_id] = json.loads(result["out"]["value"])
 
             try:
                 try:
@@ -205,7 +253,11 @@ class QMwarePilot(Pilot):
                         }
                     )
 
-                measurements: List[Dict] = json.loads(result["out"]["value"])
+                if program_state.data["batched"]:
+                    measurements: list[dict] = fetched_measurements[qmware_job_id][program_state.data["circuit_index"]]
+                else:
+                    measurements: list[dict] = fetched_measurements[qmware_job_id]
+
                 results: List[List[Dict[str, int]]] = [measurement["result"] for measurement in measurements]
 
                 hex_counts, hex_probabilities = self._convert_qmware_measurements_to_qunicorn_measurements(
@@ -278,7 +330,7 @@ class QMwarePilot(Pilot):
                         hits = register["hits"]
                     else:
                         assert hits == register["hits"], "results have different number of hits"
-            elif job.executed_on.name == "dev-gpu":
+            elif job.executed_on.name in ("dev-gpu", "dev-batch"):
                 # measurements are combined into one register on this device, therefore we have to split them again
                 register = single_result[0]
                 measured_bits = register["number"]

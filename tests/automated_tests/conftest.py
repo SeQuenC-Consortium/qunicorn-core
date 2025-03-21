@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""""pytest conftest file"""
+"""pytest conftest file"""
 from qunicorn_core import create_app
 from qunicorn_core.db.cli import create_db_function
 
