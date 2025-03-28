@@ -13,7 +13,6 @@
 # limitations under the License.
 
 
-import numpy as np
 from itertools import groupby
 from typing import List, Optional, Sequence, Union, Dict
 import select
@@ -67,17 +66,16 @@ class IonQPilot(Pilot):
                     provider = IonQProvider(token)
                     if str(device.name).__contains__("simulator"):
                         backend = provider.get_backend("ionq_simulator")
-                        if str(device.name).__contains__("noisy"):
-                            backend.set_options(noise_model="aria-1")
                     else:
                         backend = provider.get_backend("ionq_qpu")
                 else:
-                    current_app.logger.info(f"Device {str(device)} is not available")
+                    current_app.logger.info(f"Device {device.name} is not available")
 
+            noise_model = self.check_noise(device)
             pilot_jobs = list(pilot_jobs)
 
             backend_specific_circuits = transpile([j.circuit for j in pilot_jobs], backend)
-            qiskit_job = backend.run(backend_specific_circuits, shots=db_job.shots)
+            qiskit_job = backend.run(backend_specific_circuits, shots=db_job.shots, noise_model=noise_model)
 
             job_state: Optional[TransientJobStateDataclass] = None
 
@@ -111,6 +109,14 @@ class IonQPilot(Pilot):
                 self.save_results(pilot_job, pilot_results, commit=True)
 
             DB.session.commit()
+
+    def check_noise(self, device):
+        noise_model = "ideal"
+        if str(device.name).__contains__("aria-1"):
+            noise_model = "aria-1"
+        elif str(device.name).__contains__("harmony"):
+            noise_model = "harmony"
+        return noise_model
 
     def execute_provider_specific(self, jobs: Sequence[PilotJob], job_type: str, token: Optional[str] = None):
         """Execute a job of a provider specific type on a backend using a Pilot"""
