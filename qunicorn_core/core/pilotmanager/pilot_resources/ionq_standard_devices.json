@@ -19,7 +19,7 @@
         "is_local": false
       },
       {
-        "name": "ionq_qpu   ",
+        "name": "ionq_qpu",
         "num_qubits": 100,
         "is_simulator": false,
         "is_local": false
