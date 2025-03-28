@@ -43,64 +43,6 @@ from qunicorn_core.util import utils
 
 # devices IONQ Pilot: 'simulator', qpu.forte-1 , qpu.aria-1, qpu.aria-2
 # ionq uses Qiskit as SDK
-# TODO: IonQ Pilot stuck in running state but job is completed on simulator; aer simulator is working
-
-
-def convert_ionq_to_qiskit_result(ionq_result):
-
-    ionq_results = ionq_result.results
-
-    experiment_results = []
-
-    backend_name = ionq_result.backend_name
-    backend_version = ionq_result.backend_version
-    qobj_id = ionq_result.qobj_id
-    job_id = ionq_result.job_id
-
-    for ionq_exp_result in ionq_results:
-
-        experiment_data = ionq_exp_result.data
-
-        counts = experiment_data.counts
-        probabilities = experiment_data.probabilities
-        metadata = experiment_data.metadata
-        shots = ionq_exp_result.shots
-
-        header = ionq_exp_result.header.to_dict() if ionq_exp_result.header else {}
-
-        experiment_result = {
-            "success": ionq_exp_result.success,
-            "shots": shots,
-            "data": {"counts": counts, "probabilities": probabilities, "metadata": metadata},
-            "header": header,
-            "metadata": {},
-        }
-
-        experiment_results.append(experiment_result)
-
-    result_data = {
-        "backend_name": backend_name,
-        "backend_version": backend_version,
-        "qobj_id": qobj_id,
-        "job_id": job_id,
-        "results": experiment_results,
-        "success": ionq_result.success,
-    }
-
-    qiskit_result = Result.from_dict(result_data)
-
-    return qiskit_result
-
-
-def convert_int64_to_int(obj):
-    """Rekursiv alle int64-Werte in int umwandeln."""
-    if isinstance(obj, dict):
-        return {key: convert_int64_to_int(value) for key, value in obj.items()}
-    elif isinstance(obj, list):
-        return [convert_int64_to_int(item) for item in obj]
-    elif isinstance(obj, np.int64):
-        return int(obj)
-    return obj
 
 
 class IonQPilot(Pilot):
@@ -123,7 +65,12 @@ class IonQPilot(Pilot):
             else:
                 if self.is_device_available(device=device, token=token):
                     provider = IonQProvider(token)
-                    backend = provider.get_backend(str(device))  # possible are simulator or ionq
+                    if str(device.name).__contains__("simulator"):
+                        backend = provider.get_backend("ionq_simulator")
+                        if str(device.name).__contains__("noisy"):
+                            backend.set_options(noise_model="aria-1")
+                    else:
+                        backend = provider.get_backend("ionq_qpu")
                 else:
                     current_app.logger.info(f"Device {str(device)} is not available")
 
@@ -151,7 +98,10 @@ class IonQPilot(Pilot):
             db_job.save(commit=True)
 
             result = qiskit_job.result()
-            # result_converted = convert_int64_to_int(result)
+            exp_result = result.results[0]
+            counts_int64 = exp_result.data.counts
+            counts_normal = {key: int(value) for key, value in counts_int64.items()}
+            exp_result.data.counts = counts_normal
 
             mapped_results: list[Sequence[PilotJobResult]] = IonQPilot.__map_runner_results(
                 result, backend_specific_circuits

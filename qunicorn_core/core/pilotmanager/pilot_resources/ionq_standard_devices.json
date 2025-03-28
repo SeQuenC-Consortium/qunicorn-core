@@ -7,7 +7,13 @@
         "is_local": true
       },
       {
-        "name": "ionq_simulator",
+        "name": "ideal_simulator",
+        "num_qubits": 29,
+        "is_simulator": true,
+        "is_local": false
+      },
+      {
+        "name": "noisy_simulator",
         "num_qubits": 29,
         "is_simulator": true,
         "is_local": false
