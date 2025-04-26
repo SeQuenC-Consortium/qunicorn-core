@@ -61,6 +61,10 @@ class IonQPilot(Pilot):
                 continue  # one job failing should not affect other jobs
             elif device.is_local:
                 backend = qiskit_aer.Aer.get_backend("aer_simulator")
+                pilot_jobs = list(pilot_jobs)
+
+                backend_specific_circuits = transpile([j.circuit for j in pilot_jobs], backend)
+                qiskit_job = backend.run(backend_specific_circuits, shots=db_job.shots)
             else:
                 if self.is_device_available(device=device, token=token):
                     provider = IonQProvider(token)
@@ -71,11 +75,11 @@ class IonQPilot(Pilot):
                 else:
                     current_app.logger.info(f"Device {device.name} is not available")
 
-            noise_model = self.check_noise(device)
-            pilot_jobs = list(pilot_jobs)
+                noise_model = self.check_noise(device)
+                pilot_jobs = list(pilot_jobs)
 
-            backend_specific_circuits = transpile([j.circuit for j in pilot_jobs], backend)
-            qiskit_job = backend.run(backend_specific_circuits, shots=db_job.shots, noise_model=noise_model)
+                backend_specific_circuits = transpile([j.circuit for j in pilot_jobs], backend)
+                qiskit_job = backend.run(backend_specific_circuits, shots=db_job.shots, noise_model=noise_model)
 
             job_state: Optional[TransientJobStateDataclass] = None
 
