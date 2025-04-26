@@ -118,8 +118,6 @@ class IonQPilot(Pilot):
         noise_model = "ideal"
         if str(device.name).__contains__("aria-1"):
             noise_model = "aria-1"
-        elif str(device.name).__contains__("harmony"):
-            noise_model = "harmony"
         return noise_model
 
     def execute_provider_specific(self, jobs: Sequence[PilotJob], job_type: str, token: Optional[str] = None):

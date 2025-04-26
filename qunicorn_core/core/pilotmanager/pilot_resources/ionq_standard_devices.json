@@ -19,12 +19,6 @@
         "is_local": false
       },
       {
-        "name": "harmony_simulator", 
-        "num_qubits": 29,
-        "is_simulator": true,
-        "is_local": false
-      },
-      {
         "name": "ionq_qpu",
         "num_qubits": 100,
         "is_simulator": false,
