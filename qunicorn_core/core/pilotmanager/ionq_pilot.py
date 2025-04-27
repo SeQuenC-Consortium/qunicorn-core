@@ -184,7 +184,7 @@ class IonQPilot(Pilot):
             return True
         else:
             provider = IonQProvider(token)
-            backend = provider.get_backend(str(device))
+            backend = provider.get_backend(str(device.name))
             status = backend.status()
             return status.operational
 
