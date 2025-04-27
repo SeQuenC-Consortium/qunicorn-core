@@ -190,7 +190,7 @@ class IonQPilot(Pilot):
 
     def get_device_data_from_provider(self, device: Union[DeviceDataclass, DeviceDto], token: Optional[str]) -> dict:
         provider = IonQProvider(token)
-        backend = provider.get_backend(str(device))
+        backend = provider.get_backend(str(device.name))
         config_dict: dict = vars(backend.configuration())
         config_dict["u_channel_lo"] = None
         config_dict["_qubit_channel_map"] = None
