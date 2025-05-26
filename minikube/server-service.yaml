@@ -12,4 +12,3 @@ spec:
       targetPort: 8081
   selector:
     io.kompose.service: server
-  type: LoadBalancer

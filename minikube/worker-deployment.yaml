@@ -16,6 +16,11 @@ spec:
         io.kompose.network/qunicorn-core-qunicorn: "true"
         io.kompose.service: worker
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
       containers:
         - env:
             - name: BROKER_PASSWORD
@@ -45,12 +50,13 @@ spec:
                 secretKeyRef:
                   name: qmware-secret
                   key: QMWARE_API_KEY_ID
-            # the URL of the QMware API is to be set here
-            # - name: QMWARE_URL
-            #   value: ???
-          image: ghcr.io/qunicorn/qunicorn-core:main
+            - name: QMWARE_URL
+              value: http://10.186.9.12:9003/
+          image: ghcr.io/qunicorn/qunicorn-core:v1.0.4
           name: worker
           ports:
             - containerPort: 6379
               protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
       restartPolicy: Always

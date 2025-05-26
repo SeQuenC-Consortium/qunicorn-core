@@ -1,0 +1,38 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: qunicorn-db-pv
+  annotations:
+    pv.kubernetes.io/provisioned-by: cloud.ionos.com
+spec:
+  storageClassName: ionos-enterprise-ssd
+  persistentVolumeReclaimPolicy: Retain
+  accessModes:
+    - ReadWriteOncePod
+  capacity:
+    storage: 100G
+  csi:
+    driver: cloud.ionos.com
+    fsType: ext4
+    volumeHandle: datacenters/81e69aa1-1672-4cf0-87a8-9e40d4bb98ea/volumes/4b901655-a3b1-4d90-8e1f-9d4c54b96772
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: enterprise.cloud.ionos.com/datacenter-id
+          operator: In
+          values:
+          - 81e69aa1-1672-4cf0-87a8-9e40d4bb98ea
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qunicorn-db-pvc
+spec:
+  storageClassName: ionos-enterprise-ssd
+  accessModes:
+    - ReadWriteOncePod
+  resources:
+    requests:
+      storage: 100Gi
