@@ -1,0 +1,12 @@
+@startuml
+package IONOS {
+  component Qunicorn
+  component "VPN GW"
+}
+component QmWare
+
+Qunicorn --> "VPN GW" : request
+"VPN GW" --> QmWare : forward/request
+QmWare --> "VPN GW" : response
+"VPN GW" --> Qunicorn : response
+@enduml

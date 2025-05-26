@@ -223,3 +223,19 @@ systemctl stop strongswan-starter
 systemctl start strongswan-starter
 swanctl --load-all
 ```
+
+## Data flow diagram
+
+### Data Flow Diagram
+
+The following diagram illustrates the data flow between the main components deployed in the IONOS Kubernetes cluster:
+
+![Qunicorn Components Data Flow](components-diagram.png)
+
+**Data Flow Overview:**
+- User requests are routed through the NGINX proxy, which handles authentication and forwards traffic to the Qunicorn server.
+- The Qunicorn server communicates with the Redis broker for job management and with the PostgreSQL database for persistent storage.
+- The server also interacts with external providers, such as QMware, via secure VPN connections.
+- Worker components process jobs and interact with both the broker and the database as needed.
+
+This setup ensures secure, authenticated access and efficient orchestration of quantum computing tasks within the cluster.
